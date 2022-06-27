@@ -1,0 +1,98 @@
+"This project is about creating a dating website.
+
+You will need to create an app allowing two potential lovers to meet,
+from the registration to the final encounter.
+
+A user will then be able to register, connect, fill his/her profile, search and look into
+the profile of other users, like them, chat with those that “liked” back."
+
+Sign up
+    User information
+        email
+        username
+        firstname
+        lastname
+        password
+    Email confirmation
+Login
+Logout
+Password reset
+Fill profile information after first login
+    Don't allow access to other parts of the site until this is completed.
+    Gender
+    Sexual preference
+    Profile text
+    "Interested in" tags
+    Pictures (max 5)
+        Choose one as profile picture
+Control panel
+    Change user information
+Edit profile
+Show profile views
+Show who liked you
+"Fame rating"
+    Show in profile
+GPS location
+    Locate with ip if GPS is not allowed
+    Allow user to change GPS position in profile
+Browsing
+    Show suggestions that match preferences
+    Match
+        Sexual preference
+        Location
+        Maximum common tags
+        With maximum fame rating
+    Prioritise people from same area
+    Sort by
+        Age
+        Location
+        Fame rating
+        Common tags
+Advanced search
+    Age gap
+    Fame rating gap
+    Location
+    Interest tag
+        One or more
+    Sort and filter by same as previously
+    Filtering (can be same as the search?)
+Profile of other users
+    Visits to profile must be stored to user's visit history
+    Notification of visit to profile owner
+    Show
+        all profile information
+        Fame rating
+        Online/Offline
+        Last login date and time
+        If likes you
+    Like
+        Must have at least one picture to like someone
+        If both like each other they're matched
+            Allows chatting
+    Unlike
+    Report fake account
+    Block user
+        Hides blocked user from search
+        Disables chat
+        Removes notifications
+Chat
+    Available when users like each other
+    Notification for new message must be available on any page
+Notifications
+    Likes
+    Profile views
+    New messages
+    Liked user liked back
+    Connected user unliked
+    Notifications visible on any page
+Database
+    relational or graph
+    Can't be noSQL
+    Build your own ORM
+Bonuses
+    Facebook/google login/signup
+    Facebook picture import
+    Interactive map of the users
+    Webcam integration
+    Notification settings
+
