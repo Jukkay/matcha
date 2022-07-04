@@ -1,10 +1,22 @@
-up-app:
+create-app:
 	docker-compose up -d --force-recreate app
 
-up-server:
+create-server:
 	docker-compose up -d --force-recreate server
 
-up: up-app up-server
+create-db:
+	docker-compose up -d --force-recreate mariadb
+
+create-all: create-app create-server create-db
+
+up:
+	docker-compose up
+
+down:
+	docker-compose down
+	
+clean:
+	docker-compose down --remove-orphans
 
 install-app:
 	docker-compose run --rm app "npm install"

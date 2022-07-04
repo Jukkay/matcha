@@ -11,11 +11,12 @@ services:
       - "CI=true npm start"
     ports:
       - 3000:3000
-  
+
   server:
     image: node
     container_name: 'matcha_server'
-    depends-on: mariadb
+    depends_on:
+      - mariadb
     volumes:
       - "./server:/server"
     working_dir: "/server"
