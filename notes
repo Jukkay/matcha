@@ -1,0 +1,1 @@
+Looks like typescript requires @types/package in dev dependencies AND actual package in normal dependencies to work. Don't know why.

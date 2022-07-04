@@ -1,0 +1,95 @@
+version: "3.8"
+services:
+  app:
+    image: node
+    container_name: 'matcha_app'
+    volumes:
+      - "./app:/app"
+    working_dir: "/app"
+    entrypoint: "/bin/bash -c"
+    command:
+      - "CI=true npm start"
+    ports:
+      - 3000:3000
+  
+  server:
+    image: node
+    container_name: 'matcha_server'
+    depends-on: mariadb
+    volumes:
+      - "./server:/server"
+    working_dir: "/server"
+    entrypoint: "/bin/bash -c"
+    command:
+      - "npm start"
+    ports:
+      - 4000:4000
+
+  mariadb:
+    image: 'mariadb:10.6'
+    container_name: 'matcha_db'
+    working_dir: /server
+    # command: --init-file /data/application/init.sql
+    volumes:
+        - mariadb-data:/var/lib/mysql
+        # - ./config/init.sql:/data/application/init.sql
+    secrets:
+        - mysql_password
+        - mysql_root_password
+    environment:
+        MYSQL_DATABASE: matcha
+        MYSQL_USER: matcha
+        MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
+        MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+    ports:
+        - '8083:3306'
+    restart: always
+
+  # webserver:
+  #     depends_on:
+  #         - mariadb
+  #     image: 'nginx:alpine'
+  #     container_name: 'matcha_web'
+  #     working_dir: /public
+  #     secrets:
+  #         - site.crt
+  #         - site.key
+  #     volumes:
+  #         - './app:/app'
+  #         - './config/nginx.conf:/etc/nginx/conf.d/default.conf'
+  #     ports:
+  #         - '80:80'
+  #         - '443:443'
+  #     restart: always
+
+  phpmyadmin:
+      depends_on:
+          - mariadb
+      image: phpmyadmin
+      container_name: 'phpmyadmin'
+      ports:
+          - 8081:80
+      environment:
+          PMA_HOST: mariadb
+secrets:
+    mysql_password:
+        file: ./config/secrets/mysql_password.secret
+    mysql_root_password:
+        file: ./config/secrets/mysql_root_password.secret
+    site.crt:
+        file: ./config/secrets/MyCertificate.crt
+    site.key:
+        file: ./config/secrets/MyKey.key
+volumes:
+    mariadb-data:
+        name: matcha-data
+
+# Create secrets with:
+# printf "%s" "$(openssl rand -base64 20)" > mysql_password.secret
+# printf "%s" "$(openssl rand -base64 20)" > mysql_root_password.secret
+
+# TLS certificate has to be created manually and added as a secret
+# openssl req -new -newkey rsa:4096 -x509 -sha256 -days 365 -nodes -out MyCertificate.crt -keyout site.key
+
+# Launch with:
+# docker stack deploy --compose-file docker-compose.yml camagru
