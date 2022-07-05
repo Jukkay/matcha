@@ -30,6 +30,7 @@ API
         get
         patch
         delete
+    
 Sign up
     User information
         email

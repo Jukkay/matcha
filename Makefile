@@ -14,7 +14,7 @@ up:
 
 down:
 	docker-compose down
-	
+
 clean:
 	docker-compose down --remove-orphans
 
@@ -32,5 +32,11 @@ goto-app:
 goto-server:
 	docker-compose exec server bash
 
+goto-db:
+	docker-compose exec mariadb bash
+
 logs:
 	docker-compose logs -f
+
+reset-db:
+	docker-compose exec server npm run reset-db

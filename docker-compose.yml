@@ -18,8 +18,15 @@ services:
     depends_on:
       - mariadb
     volumes:
-      - "./server:/server"
+      - ./server:/server
+      - ./config/db/:/server/config/
     working_dir: "/server"
+    secrets:
+        - mysql_password
+    environment:
+        MYSQL_DATABASE: matcha
+        MYSQL_USER: matcha
+        MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
     entrypoint: "/bin/bash -c"
     command:
       - "npm start"
@@ -30,10 +37,12 @@ services:
     image: 'mariadb:10.6'
     container_name: 'matcha_db'
     working_dir: /server
-    # command: --init-file /data/application/init.sql
+    command: --init-file /server/config/init.sql
     volumes:
         - mariadb-data:/var/lib/mysql
-        # - ./config/init.sql:/data/application/init.sql
+        - ./config/db/init.sql:/server/config/init.sql
+        - ./config/db/reset.sql:/server/config/reset.sql
+
     secrets:
         - mysql_password
         - mysql_root_password
@@ -90,7 +99,7 @@ volumes:
 # printf "%s" "$(openssl rand -base64 20)" > mysql_root_password.secret
 
 # TLS certificate has to be created manually and added as a secret
-# openssl req -new -newkey rsa:4096 -x509 -sha256 -days 365 -nodes -out MyCertificate.crt -keyout site.key
+# openssl req -new -newkey rsa:4096 -x509 -sha256 -days 365 -nodes -out MyCertificate.crt -keyout MyKey.key
 
 # Launch with:
 # docker stack deploy --compose-file docker-compose.yml camagru
