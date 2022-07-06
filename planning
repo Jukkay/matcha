@@ -30,7 +30,7 @@ API
         get
         patch
         delete
-    
+
 Sign up
     User information
         email
@@ -58,7 +58,9 @@ Show who liked you
 "Fame rating"
     Show in profile
 GPS location
+    Geolocation API
     Locate with ip if GPS is not allowed
+        https://openbase.com/js/geoip-lite
     Allow user to change GPS position in profile
 Browsing
     Show suggestions that match preferences

@@ -8,15 +8,17 @@ CREATE TABLE IF NOT EXISTS users(
 	email VARCHAR(320) NOT NULL,
 	profile_image VARCHAR(255) DEFAULT "default.png",
 	biography VARCHAR(4096),
-	gender VARCHAR(255) NOT NULL,
-	gender_preference VARCHAR(255) NOT NULL,
+	gender VARCHAR(255),
+	gender_preference VARCHAR(255),
+	city VARCHAR(255),
+	country VARCHAR(255),
 	validation_key VARCHAR(255) NOT NULL,
 	validated BOOLEAN DEFAULT FALSE,
 	password_reset_key VARCHAR(255),
 	`admin` BOOLEAN DEFAULT FALSE,
-	email_notification BOOLEAN  DEFAULT TRUE,
+	email_notification BOOLEAN DEFAULT TRUE,
 	location_gps VARCHAR(255),
-	location_city VARCHAR(255),
+	location_ip VARCHAR(255),
 	UNIQUE (email, username),
 	PRIMARY KEY (`user_id`)
 );
@@ -42,23 +44,24 @@ CREATE TABLE IF NOT EXISTS comments(
 
 CREATE TABLE IF NOT EXISTS likes(
 	like_id BIGINT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-	photo_id BIGINT(10) UNSIGNED NOT NULL,
 	`user_id` INT(10) UNSIGNED NOT NULL,
+	target_id INT(10) UNSIGNED NOT NULL,
 	like_date DATETIME DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY (like_id)
 );
 
-CREATE TABLE IF NOT EXISTS chats(
-	chat_id BIGINT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS matches(
+	match_id BIGINT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 	user1 INT(10) UNSIGNED NOT NULL,
 	user2 INT(10) UNSIGNED NOT NULL,
-	PRIMARY KEY (chat_id)
+	like_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (match_id)
 );
 
 CREATE TABLE IF NOT EXISTS messages(
 	message_id BIGINT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 	message_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-	chat_id BIGINT(10) UNSIGNED NOT NULL,
+	match_id BIGINT(10) UNSIGNED NOT NULL,
 	`user_id` INT(10) UNSIGNED NOT NULL,
 	message_text text NOT NULL,
 	PRIMARY KEY (message_id)
