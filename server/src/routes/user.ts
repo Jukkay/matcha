@@ -1,5 +1,5 @@
 import express from 'express';
-const userRouter = express.Router();
+const userRouter: express.Router = express.Router();
 
 userRouter.get('/', (req: express.Request, res: express.Response) => {
 	res.json({
