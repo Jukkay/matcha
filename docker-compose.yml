@@ -101,5 +101,7 @@ volumes:
 # TLS certificate has to be created manually and added as a secret
 # openssl req -new -newkey rsa:4096 -x509 -sha256 -days 365 -nodes -out MyCertificate.crt -keyout MyKey.key
 
+# Build with:
+#   make install
 # Launch with:
-# docker stack deploy --compose-file docker-compose.yml camagru
+#   make up
