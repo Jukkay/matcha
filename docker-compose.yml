@@ -23,6 +23,7 @@ services:
     working_dir: "/server"
     secrets:
         - mysql_password
+        - server_token
     environment:
         MYSQL_DATABASE: matcha
         MYSQL_USER: matcha
@@ -90,6 +91,8 @@ secrets:
         file: ./config/secrets/MyCertificate.crt
     site.key:
         file: ./config/secrets/MyKey.key
+    server_token:
+        file: ./config/secrets/server_token.secret
 volumes:
     mariadb-data:
         name: matcha-data
@@ -97,6 +100,7 @@ volumes:
 # Create secrets with:
 # printf "%s" "$(openssl rand -base64 20)" > mysql_password.secret
 # printf "%s" "$(openssl rand -base64 20)" > mysql_root_password.secret
+# printf "%s" "$(openssl rand -base64 10)" > server_token.secret
 
 # TLS certificate has to be created manually and added as a secret
 # openssl req -new -newkey rsa:4096 -x509 -sha256 -days 365 -nodes -out MyCertificate.crt -keyout MyKey.key

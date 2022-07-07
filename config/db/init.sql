@@ -12,7 +12,6 @@ CREATE TABLE IF NOT EXISTS users(
 	gender_preference VARCHAR(255),
 	city VARCHAR(255),
 	country VARCHAR(255),
-	validation_key VARCHAR(255) NOT NULL,
 	validated BOOLEAN DEFAULT FALSE,
 	password_reset_key VARCHAR(255),
 	`admin` BOOLEAN DEFAULT FALSE,

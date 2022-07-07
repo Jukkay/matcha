@@ -1,4 +1,7 @@
 import express from 'express';
+import checkJWT from '../middleware/checkJWT'
+import controller from '../controllers/user'
+
 const userRouter: express.Router = express.Router();
 
 userRouter.get('/', (req: express.Request, res: express.Response) => {
@@ -8,13 +11,7 @@ userRouter.get('/', (req: express.Request, res: express.Response) => {
 	})
 })
 
-userRouter.post('/', (req: express.Request, res: express.Response) => {
-	// receive, validate and save user data
-	res.json({
-		status: 201,
-		message: 'User added successfully'
-	})
-})
+userRouter.post('/', controller.register)
 userRouter
 	.route('/:id')
 	.get((req: express.Request, res: express.Response) => {
