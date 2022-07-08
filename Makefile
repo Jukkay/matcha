@@ -12,6 +12,9 @@ create-all: create-app create-server create-db
 up:
 	docker-compose up
 
+restart:
+	docker-compose up -d
+
 down:
 	docker-compose down
 

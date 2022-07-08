@@ -1,16 +1,16 @@
 import { NextFunction, Request, Response } from "express";
-import bcryptjs from "bcryptjs";
-import signJWT from "../utilities/signJWT";
-import mysql from 'mysql';
-import { RowDataPacket } from 'mysql';
-import params from "../config/mysql";
-import jwt from 'jsonwebtoken'
 import { getSecret } from "docker-secret"
+import mysql, { RowDataPacket }from 'mysql';
+import jwt from 'jsonwebtoken'
+import bcryptjs from "bcryptjs";
+import params from "../config/mysql";
+import signJWT from "../utilities/signJWT";
+import sendEmailVerification from "../utilities/sendEmailVerification";
 
-const db = mysql.createConnection(params)
+const db: mysql.Connection = mysql.createConnection(params)
 
 const register = (req: Request, res: Response, next: NextFunction) => {
-	let { username, password, name, email } = req.body
+	const { username, password, name, email } = req.body
 
 	bcryptjs.hash(password, 10, (err, hash) => {
 		if (err) {
@@ -21,7 +21,6 @@ const register = (req: Request, res: Response, next: NextFunction) => {
 		}
 		const sql = `INSERT INTO users (name, username, password, email) VALUES ("${name}", "${username}", "${hash}", "${email}");`
 		db.query(sql, (queryErr, result) => {
-			db.end();
 			console.log(result)
 			if (queryErr) {
 				return res.status(500).json({
@@ -33,22 +32,23 @@ const register = (req: Request, res: Response, next: NextFunction) => {
 				message: 'User added successfully'
 			})
 		})
+		db.end();
 	})
 
-	const email_token = jwt.sign(
+	const email_token: string = jwt.sign(
 		{email},
 		getSecret("server_token"), {
 		issuer: 'Matcha',
 		algorithm: 'HS256',
 		expiresIn: 360
 	})
-	// send email verification
+	sendEmailVerification(req.body.email, email_token)
 }
 
 const login = (req: Request, res: Response, next: NextFunction) => {
 	// create token here
 	const { username, password } = req.body
-	const sql = `SELECT * FROM users WHERE username = "${username}";`
+	const sql: string = `SELECT * FROM users WHERE username = "${username}";`
 	db.query(sql, (err: Error, result: RowDataPacket[]) => {
 		if (err) {
 			console.log(err)
@@ -83,7 +83,7 @@ const login = (req: Request, res: Response, next: NextFunction) => {
 							status: 200,
 							auth: true,
 							token,
-							user: result[0].usernames,
+							user: result[0].username,
 							user_id: result[0].user_id
 						})
 					}

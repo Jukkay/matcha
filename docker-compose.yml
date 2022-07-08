@@ -19,15 +19,20 @@ services:
       - mariadb
     volumes:
       - ./server:/server
-      - ./config/db/:/server/config/
     working_dir: "/server"
     secrets:
         - mysql_password
+        - outlook_password
         - server_token
     environment:
+        MYSQL_HOST: mariadb
         MYSQL_DATABASE: matcha
         MYSQL_USER: matcha
         MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+        MYSQL_CONNECTION_LIMIT: 5,
+        DOMAIN_NAME: localhost
+        PORT: 4000
+        MAIL_USER: jukkacamagru@outlook.com
     entrypoint: "/bin/bash -c"
     command:
       - "npm start"
@@ -93,6 +98,8 @@ secrets:
         file: ./config/secrets/MyKey.key
     server_token:
         file: ./config/secrets/server_token.secret
+    outlook_password:
+        file: ./config/secrets/outlook_password.secret
 volumes:
     mariadb-data:
         name: matcha-data

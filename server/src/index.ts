@@ -1,10 +1,11 @@
 import express from 'express';
 import cors from 'cors';
-// import bodyParser from 'body-parser';
+import userRouter from './routes/user';
+import verifyEmailToken from './controllers/verifyEmailToken';
+import * as SQLConnect from './utilities/SQLConnect'
 
 const app: express.Application = express();
-// app.use(bodyParser.json())
-// app.use(bodyParser.urlencoded({ extended: true }));
+SQLConnect.init()
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 app.use(cors());
@@ -13,10 +14,8 @@ app.get("/", (req: express.Request, res: express.Response) => {
     res.send('backend server is running')
 })
 
-import userRouter from './routes/user';
-
 app.use('/user', userRouter);
-const port: number = 4000;
-app.listen(port, () => {
-    console.log(`backend server running at http://localhost:${port}`)
+app.listen(process.env.PORT, () => {
+    console.log(`backend server running at http://${process.env.DOMAIN_NAME}:${process.env.PORT}`)
 })
+app.get("/verify_email/:token", verifyEmailToken)
