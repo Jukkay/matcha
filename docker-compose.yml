@@ -43,12 +43,11 @@ services:
     image: 'mariadb:10.6'
     container_name: 'matcha_db'
     working_dir: /server
-    command: --init-file /server/config/init.sql
     volumes:
         - mariadb-data:/var/lib/mysql
         - ./config/db/init.sql:/server/config/init.sql
         - ./config/db/reset.sql:/server/config/reset.sql
-
+    command: --init-file /server/config/init.sql
     secrets:
         - mysql_password
         - mysql_root_password

@@ -25,11 +25,23 @@ Setup
         PHPMyAdmin
 
 API
+    JWT authentication
     user
         post
         get
         patch
         delete
+    likes
+        get
+        post
+        delete
+    matches
+        get
+        delete
+    login
+        post
+    logout
+        post
 
 Sign up
     User information

@@ -1,98 +1,88 @@
-import { NextFunction, Request, Response } from "express";
+import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
 import { getSecret } from "docker-secret"
-import mysql, { RowDataPacket }from 'mysql';
+import { execute } from '../utilities/SQLConnect';
 import jwt from 'jsonwebtoken'
 import bcryptjs from "bcryptjs";
-import params from "../config/mysql";
+import {IUser} from "../interfaces/IUser";
 import signJWT from "../utilities/signJWT";
 import sendEmailVerification from "../utilities/sendEmailVerification";
 
-const db: mysql.Connection = mysql.createConnection(params)
-
-const register = (req: Request, res: Response, next: NextFunction) => {
+const register = async(req: Request, res: Response, next: NextFunction) => {
 	const { username, password, name, email } = req.body
-
-	bcryptjs.hash(password, 10, (err, hash) => {
-		if (err) {
-			return res.status(500).json({
-				error: err,
-				message: err.message
-			})
-		}
-		const sql = `INSERT INTO users (name, username, password, email) VALUES ("${name}", "${username}", "${hash}", "${email}");`
-		db.query(sql, (queryErr, result) => {
-			console.log(result)
-			if (queryErr) {
-				return res.status(500).json({
-					error: queryErr,
-					message: queryErr.message
-				})
-			}
-			return res.status(201).json({
-				message: 'User added successfully'
-			})
+	try {
+		const hash = await bcryptjs.hash(password, 10)
+		const sql = `INSERT INTO users (username, password, email, name) VALUES (?, ?, ?, ?);`
+		const result = await execute(sql, {username, password, email, name} as IUser)
+		console.log(result)
+		const email_token = jwt.sign(
+			{email},
+			getSecret("server_token"), {
+			issuer: 'Matcha',
+			algorithm: 'HS256',
+			expiresIn: 360
 		})
-		db.end();
-	})
-
-	const email_token: string = jwt.sign(
-		{email},
-		getSecret("server_token"), {
-		issuer: 'Matcha',
-		algorithm: 'HS256',
-		expiresIn: 360
-	})
-	sendEmailVerification(req.body.email, email_token)
+		sendEmailVerification(req.body.email, email_token)
+		next()
+		return res.status(201).json({
+			message: 'User added successfully'
+		})		
+	}
+	catch (error) {
+		console.error(error)
+		let errorMessage
+		if (error instanceof Error)
+			errorMessage = error.message
+		else
+			errorMessage = 'Registration failed. Unknown error.'
+		return res.status(500).json({
+				message: errorMessage
+		})
+	}
 }
 
-const login = (req: Request, res: Response, next: NextFunction) => {
-	// create token here
+const login = async(req: Request, res: Response, next: NextFunction) => {
+
 	const { username, password } = req.body
-	const sql: string = `SELECT * FROM users WHERE username = "${username}";`
-	db.query(sql, (err: Error, result: RowDataPacket[]) => {
-		if (err) {
-			console.log(err)
-			return;
-		}
-		if (!result) {
-			return res.json({
-				status: 400,
+	try {
+		const sql = `SELECT * FROM users WHERE username = ?;`
+		const user = await execute(sql, username)
+		if (!user) {
+			return res.status(400).json({
 				auth: false,
 				message: 'Invalid user'
 			})
 		}
-		bcryptjs.compare(password, result[0].password, (err, response) => {
-			if (err) {
-				return res.json({
-					status: 400,
-					auth: false,
-					message: 'Invalid password'
-				})
-			}
-			if (response) {
-				signJWT(result[0].username, (error, token) => {
-					if (error) {
-						return res.json({
-							status: 400,
-							auth: false,
-							message: error.message
-						})
-					}
-					if (token) {
-						return res.json({
-							status: 200,
-							auth: true,
-							token,
-							user: result[0].username,
-							user_id: result[0].user_id
-						})
-					}
 
-				})
-			}
+		const match = await bcryptjs.compare(password, user[0].password)
+		if (!match) {
+			return res.status(400).json({
+				auth: false,
+				message: 'Invalid password'
+			})
+		}
+
+		const token = await signJWT(user[0].username)
+		if (token) {
+			return res.json({
+				status: 200,
+				auth: true,
+				token,
+				user: user[0].username,
+				user_id: user[0].user_id
+			})
+		}
+	}
+	catch (error) {
+		console.error(error)
+		let errorMessage
+		if (error instanceof Error)
+			errorMessage = error.message
+		else
+			errorMessage = 'Login failed. Unknown error.'
+		return res.status(500).json({
+				message: errorMessage
 		})
-	})
-
+	}
 }
 
 const getUserInformation = (req: Request, res: Response, next: NextFunction) => {
