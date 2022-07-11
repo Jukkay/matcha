@@ -1,33 +1,33 @@
 import { Request, Response} from 'express';
 import { getSecret } from "docker-secret"
-import jwt, { JwtPayload, VerifyErrors} from 'jsonwebtoken'
 import IEmailToken from '../interfaces/token'
+import { execute } from '../utilities/SQLConnect';
+import { verifyJWT } from '../utilities/promisifyJWT';
 
 const server_token = getSecret("server_token")
 
-const verifyEmailToken = async(req: Request, res: Response) => {
-    const { token } = req.params
-
-	if (!token) {
-		return res.status(401).json({
-			message: 'No token provided'
-		})
-	}
-	jwt.verify(token, server_token, (err, decoded) => {
-		if (err) {
+export const verifyEmailToken = async(req: Request, res: Response) => {
+	try {
+		const { token } = req.params
+		if (!token) {
 			return res.status(401).json({
-				message: 'Cannot verify email token'
+				message: 'No token provided'
 			})
 		}
-		res.locals.jwt = decoded
+		const decoded = await verifyJWT(token)
 		const { email }  = decoded as IEmailToken
-		const sql = `UPDATE users SET validated = "1" WHERE email = ${email};`
-
-		return res.status(200).json({
+		console.log(decoded)
+		console.log(email)
+		const sql = `UPDATE users SET validated = "1" WHERE email = ?;`
+		const response = await execute(sql, [email])
+		console.log(response)
+		return res.status(201).json({
 			message: 'Email verified'
 		})
-	})
 
+	} catch (err) {
+		return res.status(401).json({
+			message: 'Cannot verify email token'
+		})
+	}
 }
-
-export default verifyEmailToken

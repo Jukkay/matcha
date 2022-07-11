@@ -1,4 +1,5 @@
-import { createPool, Pool, RowDataPacket } from 'mysql'
+import { createPool, Pool, RowDataPacket, PoolConnection } from 'mysql'
+import { IUser } from "../interfaces/IUser";
 import params from "../config/mysql"
 
 let pool: Pool
@@ -12,7 +13,7 @@ export const init = () => {
 	}
 }
 
-export const execute = async (query: string, queryParams: string[] | Object): Promise<RowDataPacket[]> => new Promise((resolve, reject) => {
+export const execute = async(query: string, queryParams: Array<any>): Promise<RowDataPacket[]> => new Promise((resolve, reject) => {
 	try {
 		if (!pool)
 			throw new Error('No connection pool available')
@@ -23,7 +24,6 @@ export const execute = async (query: string, queryParams: string[] | Object): Pr
 				resolve(result)
 		})
 	} catch (err) {
-		console.error(err)
-		throw new Error('Mysql query failed')
+		reject(err)
 	}
 })

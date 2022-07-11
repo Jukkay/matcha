@@ -3,29 +3,21 @@ import { getSecret } from "docker-secret"
 import { execute } from '../utilities/SQLConnect';
 import jwt from 'jsonwebtoken'
 import bcryptjs from "bcryptjs";
-import {IUser} from "../interfaces/IUser";
-import signJWT from "../utilities/signJWT";
-import sendEmailVerification from "../utilities/sendEmailVerification";
+import { IUser } from "../interfaces/IUser";
+import { signJWTemail } from "../utilities/promisifyJWT";
+import { sendEmailVerification } from "../utilities/sendEmailVerification";
 
-const register = async(req: Request, res: Response, next: NextFunction) => {
+const register = async(req: Request, res: Response) => {
 	const { username, password, name, email } = req.body
 	try {
 		const hash = await bcryptjs.hash(password, 10)
 		const sql = `INSERT INTO users (username, password, email, name) VALUES (?, ?, ?, ?);`
-		const result = await execute(sql, {username, password, email, name} as IUser)
-		console.log(result)
-		const email_token = jwt.sign(
-			{email},
-			getSecret("server_token"), {
-			issuer: 'Matcha',
-			algorithm: 'HS256',
-			expiresIn: 360
-		})
-		sendEmailVerification(req.body.email, email_token)
-		next()
+		const result = await execute(sql, [username, password, email, name])
+		const email_token = await signJWTemail(email)
+		await sendEmailVerification(req.body.email, email_token)
 		return res.status(201).json({
 			message: 'User added successfully'
-		})		
+		})
 	}
 	catch (error) {
 		console.error(error)
@@ -61,7 +53,7 @@ const login = async(req: Request, res: Response, next: NextFunction) => {
 			})
 		}
 
-		const token = await signJWT(user[0].username)
+		const token = await signJWTemail(user[0].username)
 		if (token) {
 			return res.json({
 				status: 200,

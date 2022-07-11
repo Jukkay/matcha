@@ -7,7 +7,7 @@ create-server:
 create-db:
 	docker-compose up -d --force-recreate mariadb
 
-create-all: create-app create-server create-db
+create: create-app create-server create-db
 
 up:
 	docker-compose up

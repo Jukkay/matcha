@@ -2,14 +2,12 @@ import createMessage from './createMessage'
 import { getSecret } from "docker-secret"
 
 const nodemailer = require('nodemailer');
-const port: string = process.env.PORT == '80' ? '' : ':' + process.env.PORT
-const domain: string = process.env.DOMAIN_NAME || 'localhost'
 const mailUser: string = process.env.MAIL_USER || 'jukkacamagru@outlook.com'
 const password: string = getSecret("outlook_password")
 
-const sendEmailVerification = (email: string, email_token: string) => {
-	const message = createMessage(domain, port, email_token)
-	const transporter = nodemailer.createTransport({
+export const sendEmailVerification = async(email: string, email_token: string) => {
+	const message = createMessage(email_token)
+	const transporter = await nodemailer.createTransport({
 		service: "Outlook365",
 		auth: {
 			user: mailUser,
@@ -31,7 +29,7 @@ const sendEmailVerification = (email: string, email_token: string) => {
 	// 	}
 	//   });
 
-	transporter.sendMail(messageOptions, (error: any, info: any) => {
+	await transporter.sendMail(messageOptions, (error: any, info: any) => {
 		if (error) {
 			return console.log(error)
 		}
@@ -39,4 +37,3 @@ const sendEmailVerification = (email: string, email_token: string) => {
 	})
 
 }
-export default sendEmailVerification
