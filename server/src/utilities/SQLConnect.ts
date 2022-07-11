@@ -14,16 +14,12 @@ export const init = () => {
 }
 
 export const execute = async(query: string, queryParams: Array<any>): Promise<RowDataPacket[]> => new Promise((resolve, reject) => {
-	try {
-		if (!pool)
-			throw new Error('No connection pool available')
-		pool.query<RowDataPacket[]>(query, queryParams, (err, result) => {
-			if (err)
-				reject(err)
-			else
-				resolve(result)
-		})
-	} catch (err) {
-		reject(err)
-	}
+	if (!pool)
+		throw new Error('No connection pool available')
+	pool.query<RowDataPacket[]>(query, queryParams, (err, result) => {
+		if (err)
+			reject(err)
+		else
+			resolve(result)
+	})
 })

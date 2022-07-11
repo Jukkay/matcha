@@ -4,16 +4,16 @@ import { execute } from '../utilities/SQLConnect';
 import jwt from 'jsonwebtoken'
 import bcryptjs from "bcryptjs";
 import { IUser } from "../interfaces/IUser";
-import { signJWTemail } from "../utilities/promisifyJWT";
+import { signEmailToken, signUserToken } from "../utilities/promisifyJWT";
 import { sendEmailVerification } from "../utilities/sendEmailVerification";
 
 const register = async(req: Request, res: Response) => {
-	const { username, password, name, email } = req.body
 	try {
+		const { username, password, name, email } = req.body
 		const hash = await bcryptjs.hash(password, 10)
 		const sql = `INSERT INTO users (username, password, email, name) VALUES (?, ?, ?, ?);`
-		const result = await execute(sql, [username, password, email, name])
-		const email_token = await signJWTemail(email)
+		const result = await execute(sql, [username, hash, email, name])
+		const email_token = await signEmailToken(email)
 		await sendEmailVerification(req.body.email, email_token)
 		return res.status(201).json({
 			message: 'User added successfully'
@@ -34,9 +34,9 @@ const register = async(req: Request, res: Response) => {
 
 const login = async(req: Request, res: Response, next: NextFunction) => {
 
-	const { username, password } = req.body
 	try {
-		const sql = `SELECT * FROM users WHERE username = ?;`
+		const { username, password } = req.body
+		const sql = `SELECT user_id, username, password, validated FROM users WHERE username = ?;`
 		const user = await execute(sql, username)
 		if (!user) {
 			return res.status(400).json({
@@ -44,8 +44,15 @@ const login = async(req: Request, res: Response, next: NextFunction) => {
 				message: 'Invalid user'
 			})
 		}
-
+		console.log(user)
+		if (user[0].validated != true) {
+			return res.status(400).json({
+				auth: false,
+				message: 'Email not validated'
+			})
+		}
 		const match = await bcryptjs.compare(password, user[0].password)
+		console.log(match)
 		if (!match) {
 			return res.status(400).json({
 				auth: false,
@@ -53,13 +60,12 @@ const login = async(req: Request, res: Response, next: NextFunction) => {
 			})
 		}
 
-		const token = await signJWTemail(user[0].username)
+		const token = await signUserToken(user[0].username)
 		if (token) {
-			return res.json({
-				status: 200,
+			return res.status(200).json({
 				auth: true,
 				token,
-				user: user[0].username,
+				username: user[0].username,
 				user_id: user[0].user_id
 			})
 		}

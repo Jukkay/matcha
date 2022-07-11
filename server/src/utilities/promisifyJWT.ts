@@ -1,7 +1,7 @@
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import { getSecret } from "docker-secret"
 
-export const signJWTemail = async(email: string): Promise<string> => {
+export const signEmailToken = async(email: string): Promise<string> => {
 	return new Promise(async(resolve, reject) => {
 		const expirationTime = 600
 		jwt.sign({
@@ -12,10 +12,8 @@ export const signJWTemail = async(email: string): Promise<string> => {
 				algorithm: 'HS256',
 				expiresIn: expirationTime
 			}, (err, token) => {
-				if (token) {
-					console.log('token in signJWT ' + token)
+				if (token)
 					resolve(token)
-				}
 				if (err)
 					reject(err)
 			})
@@ -26,11 +24,28 @@ export const verifyJWT = async(token: string): Promise<string | JwtPayload | und
 	return new Promise(async(resolve, reject) => {
 		const server_token = getSecret("server_token")
 		jwt.verify(token, server_token, (err, decoded) => {
-			if (err) {
+			if (err)
 				reject(err)
-			}
 			else resolve(decoded)
 		})
 	})
 }
 
+export const signUserToken = async(username: string): Promise<string> => {
+	return new Promise(async(resolve, reject) => {
+		const expirationTime = 600
+		jwt.sign({
+				username: username
+			},
+			getSecret("server_token"), {
+				issuer: '42 Dates',
+				algorithm: 'HS256',
+				expiresIn: expirationTime
+			}, (err, token) => {
+				if (token)
+					resolve(token)
+				if (err)
+					reject(err)
+			})
+	})
+}
