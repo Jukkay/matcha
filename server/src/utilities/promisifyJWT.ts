@@ -20,10 +20,10 @@ export const signEmailToken = async(email: string): Promise<string> => {
 	})
 }
 
-export const verifyJWT = async(token: string): Promise<string | JwtPayload | undefined> => {
+export const verifyJWT = async(userToken: string, serverToken: string): Promise<string | JwtPayload | undefined> => {
 	return new Promise(async(resolve, reject) => {
 		const server_token = getSecret("server_token")
-		jwt.verify(token, server_token, (err, decoded) => {
+		jwt.verify(userToken, serverToken, (err, decoded) => {
 			if (err)
 				reject(err)
 			else resolve(decoded)

@@ -8,6 +8,7 @@ import { signEmailToken, signUserToken } from "../utilities/promisifyJWT";
 import { sendEmailVerification } from "../utilities/sendEmailVerification";
 
 const register = async(req: Request, res: Response) => {
+
 	try {
 		const { username, password, name, email } = req.body
 		const hash = await bcryptjs.hash(password, 10)
@@ -32,7 +33,7 @@ const register = async(req: Request, res: Response) => {
 	}
 }
 
-const login = async(req: Request, res: Response, next: NextFunction) => {
+export const login = async(req: Request, res: Response) => {
 
 	try {
 		const { username, password } = req.body
@@ -44,7 +45,6 @@ const login = async(req: Request, res: Response, next: NextFunction) => {
 				message: 'Invalid user'
 			})
 		}
-		console.log(user)
 		if (user[0].validated != true) {
 			return res.status(400).json({
 				auth: false,
@@ -52,21 +52,19 @@ const login = async(req: Request, res: Response, next: NextFunction) => {
 			})
 		}
 		const match = await bcryptjs.compare(password, user[0].password)
-		console.log(match)
 		if (!match) {
 			return res.status(400).json({
 				auth: false,
 				message: 'Invalid password'
 			})
 		}
-
 		const token = await signUserToken(user[0].username)
 		if (token) {
 			return res.status(200).json({
 				auth: true,
-				token,
 				username: user[0].username,
-				user_id: user[0].user_id
+				user_id: user[0].user_id,
+				token
 			})
 		}
 	}
@@ -83,6 +81,15 @@ const login = async(req: Request, res: Response, next: NextFunction) => {
 	}
 }
 
+export const logout = async(req: Request, res: Response) => {
+
+	try {
+		const { user_id } = req.body
+
+	} catch (error) {
+
+	}
+}
 const getUserInformation = (req: Request, res: Response, next: NextFunction) => {
 }
 

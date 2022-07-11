@@ -12,7 +12,6 @@ userRouter.get('/', (req: express.Request, res: express.Response) => {
 })
 
 userRouter.post('/', controller.register)
-userRouter.post('/login', controller.login)
 userRouter
 	.route('/:id')
 	.get((req: express.Request, res: express.Response) => {

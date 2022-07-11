@@ -24,6 +24,7 @@ services:
         - mysql_password
         - outlook_password
         - server_token
+        - refresh_token
     environment:
         MYSQL_HOST: mariadb
         MYSQL_DATABASE: matcha
@@ -98,6 +99,8 @@ secrets:
         file: ./config/secrets/MyKey.key
     server_token:
         file: ./config/secrets/server_token.secret
+    refresh_token:
+        file: ./config/secrets/refresh_token.secret
     outlook_password:
         file: ./config/secrets/outlook_password.secret
 volumes:

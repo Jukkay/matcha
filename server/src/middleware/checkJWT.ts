@@ -8,9 +8,8 @@ const checkJWT = (req: Request, res: Response, next: NextFunction) => {
 	const token = req.headers.authorization?.split(' ')[1]
 
 	if (!token) {
-		return res.json({
-			status: 401,
-			message: 'Unauthorized'
+		return res.status(401).json({
+			message: 'No token provided'
 		})
 	}
 	jwt.verify(token, server_token, (err, decoded) => {
