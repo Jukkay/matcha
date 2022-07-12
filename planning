@@ -6,26 +6,8 @@ from the registration to the final encounter.
 A user will then be able to register, connect, fill his/her profile, search and look into
 the profile of other users, like them, chat with those that “liked” back."
 
-Stack
-    React
-    Node
-    Express
-    Typescript
-    API
-        GraphQL?
-        MariaDB?
-    Nginx reverse proxy for node?
-    Tailwind + DaisyUI?
-Setup
-    Docker
-        Node
-            Express
-            React
-        MariaDB
-        PHPMyAdmin
 
 API
-    JWT authentication
     user
         post
         get
@@ -42,7 +24,6 @@ API
         post
     logout
         post
-
 Sign up
     User information
         email
@@ -135,3 +116,8 @@ Bonuses
     Webcam integration
     Notification settings
 
+Todo
+
+V registration input validation
+jwt token authorization
+token refresh

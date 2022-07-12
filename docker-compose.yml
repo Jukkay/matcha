@@ -19,6 +19,8 @@ services:
       - mariadb
     volumes:
       - ./server:/server
+      - ./config/db/init.sql:/server/config/init.sql
+      - ./config/db/reset.sql:/server/config/reset.sql
     working_dir: "/server"
     secrets:
         - mysql_password
@@ -48,7 +50,6 @@ services:
     volumes:
         - mariadb-data:/var/lib/mysql
         - ./config/db/init.sql:/server/config/init.sql
-        - ./config/db/reset.sql:/server/config/reset.sql
     command: --init-file /server/config/init.sql
     secrets:
         - mysql_password

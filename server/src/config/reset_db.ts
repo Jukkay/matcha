@@ -17,13 +17,13 @@ const reset_db = async () => {
 			password: password,
 			database: database,
 		})
-		const reset = await readFilePromise('config/reset.sql', 'utf8')
+		const reset = await readFilePromise('/server/config/reset.sql', 'utf8')
 		const reset_queries = reset.split(';').map(element => element.trim()).filter(element => element !== '')
 		reset_queries.forEach((sql) =>
 			db.query(sql)
 		)
-		
-		const init = await readFilePromise('config/init.sql', 'utf8')
+
+		const init = await readFilePromise('/server/config/init.sql', 'utf8')
 		const init_queries = init.split(';').map(element => element.trim()).filter(element => element !== '')
 		init_queries.forEach((sql) =>
 			db.query(sql)
