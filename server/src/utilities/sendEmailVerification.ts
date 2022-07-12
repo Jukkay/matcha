@@ -31,7 +31,7 @@ export const sendEmailVerification = async(email: string, email_token: string) =
 					//   });
 
 		await transporter.sendMail(messageOptions)
-		console.log('Nodemailer sent message: ')
+		console.log('Nodemailer sent message')
 
 	} catch (err) {
 		console.error(err)

@@ -17,6 +17,7 @@ const reset_db = async () => {
 			password: password,
 			database: database,
 		})
+
 		const reset = await readFilePromise('/server/config/reset.sql', 'utf8')
 		const reset_queries = reset.split(';').map(element => element.trim()).filter(element => element !== '')
 		reset_queries.forEach((sql) =>
