@@ -6,10 +6,14 @@ import bcryptjs from "bcryptjs";
 import { IUser } from "../interfaces/IUser";
 import { signEmailToken, signUserToken } from "../utilities/promisifyJWT";
 import { sendEmailVerification } from "../utilities/sendEmailVerification";
+import { validateRegistrationInput } from "../utilities/validators";
 
 const register = async(req: Request, res: Response) => {
 
 	try {
+		const validationResponse = await validateRegistrationInput(req, res)
+		if (validationResponse !== undefined)
+			return
 		const { username, password, name, email } = req.body
 		const hash = await bcryptjs.hash(password, 10)
 		const sql = `INSERT INTO users (username, password, email, name) VALUES (?, ?, ?, ?);`
