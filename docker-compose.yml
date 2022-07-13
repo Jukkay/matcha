@@ -1,14 +1,14 @@
 version: "3.8"
 services:
-  app:
+  client:
     image: node
-    container_name: 'matcha_app'
+    container_name: 'matcha_client'
     volumes:
-      - "./app:/app"
-    working_dir: "/app"
+      - "./client:/client"
+    working_dir: "/client"
     entrypoint: "/bin/bash -c"
     command:
-      - "CI=true npm start"
+      - "yarn dev"
     ports:
       - 3000:3000
 

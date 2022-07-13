@@ -1,12 +1,9 @@
-import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
-import { getSecret } from "docker-secret"
+import { NextFunction, Request, Response } from "express";
 import { execute } from '../utilities/SQLConnect';
-import jwt from 'jsonwebtoken'
 import bcryptjs from "bcryptjs";
-import { IUser } from "../interfaces/IUser";
 import { signEmailToken, signUserToken } from "../utilities/promisifyJWT";
 import { sendEmailVerification } from "../utilities/sendEmailVerification";
-import { validateLoginInput, validateRegistrationInput } from "../utilities/validators";
+import { validateRegistrationInput } from "../utilities/validators";
 
 const register = async(req: Request, res: Response) => {
 
@@ -40,10 +37,28 @@ const register = async(req: Request, res: Response) => {
 export const login = async(req: Request, res: Response) => {
 
 	try {
-		const validationResponse = await validateLoginInput(req, res)
-		if (validationResponse !== undefined)
-			return
 		const { username, password } = req.body
+		const sql = `SELECT user_id, username, password, validated FROM users WHERE username = ?;`
+		const user = await execute(sql, username)
+		if (!user) {
+			return res.status(400).json({
+				auth: false,
+				message: 'Invalid user'
+			})
+		}
+		if (user[0].validated != true) {
+			return res.status(400).json({
+				auth: false,
+				message: 'Email not validated'
+			})
+		}
+		const match = await bcryptjs.compare(password, user[0].password)
+		if (!match) {
+			return res.status(400).json({
+				auth: false,
+				message: 'Invalid password'
+			})
+		}
 		const token = await signUserToken(user[0].username)
 		if (token) {
 			return res.status(200).json({

@@ -118,4 +118,5 @@ export const validateLoginInput = async(req: Request, res: Response) => {
 				message: 'Invalid password'
 			})
 		}
+		return user[0]
 }
