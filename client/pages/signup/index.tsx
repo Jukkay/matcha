@@ -1,72 +1,70 @@
 import type { NextPage } from "next";
+import { useRef, useState, useEffect } from "react";
+import { TextInput } from "./textInput"
 
-const Signup: NextPage = () => {
+type SignupProps = {
+  // prop types here
+};
+
+const Signup: NextPage = (props: SignupProps) => {
+  const [username, setUsername] = useState("");
+  const [validUsername, setValidUsername] = useState(false);
+  const [password, setPassword] = useState("");
+  const [validPassword, setValidPassword] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [validMatch, setValidMatch] = useState(false);
+
+  // Password validation
+
+  useEffect(() => {
+    setValidPassword(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/i.test(password));
+    setValidMatch(password === confirmPassword);
+  }, [password, confirmPassword]);
+
   return (
-    <div className="space-y-5">
+    <div className="md:container md:mx-auto space-y-5">
       <article className="prose mb-10">
         <h1>Sign up</h1>
       </article>
-      <div className="form-control w-full max-w-xs">
-        <label className="label">
-          <span className="label-text">Username *</span>
-          <span className="label-text-alt"></span>
-        </label>
-        <input
+      <form>
+        <TextInput
           type="text"
+          label="Username *"
+          name="username"
           placeholder="Username"
-          className="input input-bordered w-full max-w-xs"
+          helper=""
+          error="error text"
+          visibilityState={validUsername}
+          required
         />
-        <label className="label">
-          <span className="label-text-alt text-neutral">Username helper</span>
-          <span className="label-text-alt text-error invisible">Error 1</span>
-        </label>
-      </div>
-      <div className="form-control w-full max-w-xs">
-        <label className="label">
-          <span className="label-text">Password *</span>
-          <span className="label-text-alt"></span>
-        </label>
-        <input
-          type="text"
+        <TextInput
+          type="password"
+          label="Password *"
+          name="password"
           placeholder="Password"
-          className="input input-bordered w-full max-w-xs"
+          helper="Password must be at least 8 characters long and include at least one upper (A-Z) and lower case (a-z) letter and a digit (0-9)."
+          error="Invalid password"
+          visibilityState={validPassword}
+          required
         />
-        <label className="label">
-          <span className="label-text-alt text-neutral">Password helper</span>
-          <span className="label-text-alt text-error invisible">Error 1</span>
-        </label>
-      </div>
-      <div className="form-control w-full max-w-xs">
-        <label className="label">
-          <span className="label-text">Confirm password *</span>
-          <span className="label-text-alt"></span>
-        </label>
-        <input
-          type="text"
+        <TextInput
+          type="password"
+          label="Confirm password *"
+          name="confirmPassword"
           placeholder="Confirm password"
-          className="input input-bordered w-full max-w-xs"
+          error="Passwords don't match."
+          required
         />
-        <label className="label">
-          <span className="label-text-alt text-neutral">Confirm helper</span>
-          <span className="label-text-alt text-error invisible">Error 1</span>
-        </label>
-      </div>
-      <div className="form-control w-full max-w-xs">
-        <label className="label">
-          <span className="label-text">Name</span>
-          <span className="label-text-alt"></span>
-        </label>
-        <input
+        <TextInput
           type="text"
+          label="Name"
+          name="name"
           placeholder="Name"
-          className="input input-bordered w-full max-w-xs"
+          helper="This is the name shown to other users. If no name is given, your username will be used instead."
+          error="error text"
         />
-        <label className="label">
-          <span className="label-text-alt text-neutral">Name helper</span>
-          <span className="label-text-alt text-error invisible">Error 1</span>
-        </label>
-      </div>
-      <button className="btn btn-primary">Submit</button>
+        <button className="btn btn-primary">Submit</button>
+      </form>
       <p>Fields marked with asterisk (*) are mandatory.</p>
     </div>
   );
