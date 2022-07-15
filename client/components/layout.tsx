@@ -1,19 +1,19 @@
-import React from "react"
-import Footer from "./footer"
-import Navbar from "./navbar"
-
+import React from "react";
+import Footer from "./footer";
+import NavbarComponent from "./navbar";
+import { Container } from "react-bulma-components";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
-	return (
-		<div className="container md:container md:mxAuto">
-			<Navbar />
-			<div>
-				<main>
-					{children}
-				</main>
-			</div>
-			<Footer />
-		</div>
-	)
-}
-export default Layout
+  return (
+    <div>
+      <Container breakpoint='widescreen' max={true}>
+        <NavbarComponent />
+        <div>
+          <main>{children}</main>
+        </div>
+        <Footer />
+      </Container>
+    </div>
+  );
+};
+export default Layout;

@@ -52,7 +52,7 @@ export const validateRegistrationInput = async(req: Request, res: Response) => {
 		})
 
 	// check username validity
-	if (!/^[a-z0-9.]{3,32}$/i.test(username))
+	if (!/^[a-zA-Z0-9.]{3,32}$/i.test(username))
 		return res.status(400).json({
 			field: "username",
 			message: "Invalid username. Only characters a-z and 0-9 are allowed."

@@ -1,114 +1,77 @@
 import Link from "next/link";
+import { FaBars, FaRegBell } from "react-icons/fa";
+import "bulma/css/bulma.min.css";
+import {
+  Navbar,
+  Container,
+  Section,
+  Image,
+  Button,
+  Icon,
+} from "react-bulma-components";
+import { FaCog } from "react-icons/fa";
 
-const Navbar = (args: any) => {
+const NavbarComponent = (args: any) => {
   return (
-    <div className="navbar bg-base-100">
-      <div className="navbar-start">
-        <div className="dropdown">
-          <label tabIndex={0} className="btn btn-ghost btn-circle">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M4 6h16M4 12h16M4 18h7"
-              />
-            </svg>
-          </label>
-          <ul
-            tabIndex={0}
-            className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
-          >
-            <li>
-              <a>Homepage</a>
-            </li>
-            <li>
-              <a>Portfolio</a>
-            </li>
-            <li>
-              <a>About</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <div className="navbar-center">
-        <a className="btn btn-ghost normal-case text-xl">42 Dates</a>
-      </div>
-      <div className="navbar-end">
-        <Link href="/signup" passHref>
-          <button className="btn btn-primary mr-5">Signup</button>
-        </Link>
-        <Link href="/login" passHref>
-          <button className="btn btn-primary mr-5">Login</button>
-        </Link>
-        <div className="dropdown dropdown-end">
-          <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
-            <button className="btn btn-ghost btn-circle">
-              <div className="indicator">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                  />
-                </svg>
-                <span className="badge badge-xs badge-primary indicator-item">
-                  69
-                </span>
-              </div>
-            </button>
-          </label>
-          <ul
-            tabIndex={0}
-            className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
-          >
-            <li>
-              <a>Notification 1</a>
-            </li>
-            <li>
-              <a>Notification 2</a>
-            </li>
-            <li>
-              <a>Notification 3</a>
-            </li>
-          </ul>
-        </div>
-        <div className="dropdown dropdown-end">
-          <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
-            <div className="w-10 rounded-full">
-              <img src="https://placeimg.com/80/80/people" />
+    <Navbar>
+      <Navbar.Container align="left">
+        <Navbar.Brand>
+          <Navbar.Item href="/">
+            <div className="">
+              <Image src="../assets/camagru_logo.svg" alt="Main page" />
             </div>
-          </label>
-          <ul
-            tabIndex={0}
-            className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
+          </Navbar.Item>
+          <Navbar.Burger data-target="navbar-burger-button">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+          </Navbar.Burger>
+        </Navbar.Brand>
+        <Navbar.Item href="/camera">Take picture</Navbar.Item>
+        <Navbar.Item href="/newpost">New post</Navbar.Item>
+      </Navbar.Container>
+      <Navbar.Container align="right">
+        <Navbar.Menu>
+          <Navbar.Item>
+            <Button.Group>
+              <Button>Logout</Button>
+              <Button>Sign up</Button>
+              <Button>Login</Button>
+            </Button.Group>
+          </Navbar.Item>
+          <Navbar.Menu
+            className="navbar-menu is-hidden mobile-menu"
+            id="navbar-mobile"
           >
-            <li>
-              <a className="justify-between">Profile</a>
-            </li>
-            <li>
-              <a>Settings</a>
-            </li>
-            <li>
-              <a>Logout</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
+            <Navbar.Item href="/camera">Take picture</Navbar.Item>
+            <Navbar.Item href="/newpost">New post</Navbar.Item>
+            <Navbar.Item href="/profile">Profile</Navbar.Item>
+            <Navbar.Item href="/controlpanel">Control panel</Navbar.Item>
+            <Navbar.Item href="/logout">Logout</Navbar.Item>
+            <Navbar.Item href="/signup">Sign up</Navbar.Item>
+            <Navbar.Item href="/login">Login</Navbar.Item>
+          </Navbar.Menu>
+          <Navbar.Item>
+            <Navbar.Item href="/profile">
+              <p className="mr-3">
+                <strong></strong>
+              </p>
+
+              <figure className="image">
+                <Image
+                  className="is-rounded"
+                  src="https://placeimg.com/80/80/people"
+                  alt="Profile"
+                />
+              </figure>
+            </Navbar.Item>
+          </Navbar.Item>
+          <Navbar.Item href="/controlpanel">
+            <FaCog />
+          </Navbar.Item>
+        </Navbar.Menu>
+      </Navbar.Container>
+    </Navbar>
   );
 };
-export default Navbar;
+export default NavbarComponent;
