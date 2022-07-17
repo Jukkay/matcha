@@ -1,14 +1,14 @@
 version: "3.8"
 services:
   client:
-    image: node
+    build: ./client/
     container_name: 'matcha_client'
     volumes:
       - "./client:/client"
     working_dir: "/client"
     entrypoint: "/bin/bash -c"
     command:
-      - "yarn dev"
+      - "pnpm dev"
     ports:
       - 3000:3000
 

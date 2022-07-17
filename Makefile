@@ -22,7 +22,7 @@ clean:
 	docker-compose down --remove-orphans
 
 install-client:
-	docker-compose run --rm client "npm install"
+	docker-compose run --rm client "pnpm install"
 
 install-server:
 	docker-compose run --rm server "npm install"
