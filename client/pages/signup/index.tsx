@@ -2,7 +2,6 @@ import type { NextPage } from "next";
 import { useRef, useState, useEffect, ChangeEventHandler, ReactNode } from "react";
 import { IconType } from "react-icons";
 import { FaCheck, FaUser, FaLock, FaEnvelope, } from "react-icons/fa";
-import { CLIENT_RENEG_LIMIT } from "tls";
 
 type SignupProps = {
   // prop types here
@@ -74,8 +73,6 @@ const FormInput = ({ label, helper, errorMessage, name, onChange, leftIcon, righ
     setFocus(true)
   }
 
-  const [errorHidden, setErrorHidden] = useState(false);
-
   // Blur field
   const onBlur = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFocus(false)
@@ -98,11 +95,6 @@ const Signup: NextPage = (props: SignupProps) => {
   const [validUsername, setValidUsername] = useState(false);
   const [validPassword, setValidPassword] = useState(false);
   const [validMatch, setValidMatch] = useState(false);
-  const [hasFocusPassword, setFocusPassword] = useState(false);
-  const [hasFocusMatch, setFocusMatch] = useState(false);
-  const [hasFocusName, setFocusName] = useState(false);
-  const [hasFocusUsername, setFocusUsername] = useState(false);
-  const [validForm, setValidForm] = useState(false)
 
   const [values, setValues] = useState({
     username: '',
