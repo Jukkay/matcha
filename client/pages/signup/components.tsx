@@ -78,14 +78,14 @@ export const FormInput = ({
       [event.target.name]: false,
     });
   };
-
+  const classnames = error ? 'input is-danger' : 'input'
   return (
     <div className="field">
       <Label label={label} />
       <Helper helper={helper} focus={helpers[name as keyof typeof helpers]} />
       <div className="control has-icons-left has-icons-right">
         <input
-          className="input"
+          className={classnames}
           name={name}
           {...inputAttributes}
           onChange={onChange}
