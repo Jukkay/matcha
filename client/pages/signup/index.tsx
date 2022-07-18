@@ -11,6 +11,7 @@ const Signup: NextPage = (props: SignupProps) => {
   const [validMatch, setValidMatch] = useState(false);
   const [validEmail, setValidEmail] = useState(false);
   const [validForm, setValidForm] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [values, setValues] = useState({
     username: "",
     password: "",
@@ -164,6 +165,8 @@ const Signup: NextPage = (props: SignupProps) => {
     event.preventDefault();
     try {
       const response = await axios.post("http://localhost:4000/user/", values);
+      if (response.status === 201)
+        setSuccess(true)
     } catch (err: any) {
       const errorField = err.response.data.field;
       const errorMessage = err.response.data.message;
@@ -172,7 +175,18 @@ const Signup: NextPage = (props: SignupProps) => {
     }
   };
 
-  return (
+  return success ? (<div className="columns">
+  <div className="column is-half is-offset-one-quarter">
+    <section className="section">
+      <div className="box has-text-centered">
+        <section className="section">
+          <h3 className="title is-3">Registration successful.</h3>
+          <p>Check your email to confirm your account.</p>
+        </section>
+      </div>
+    </section>
+  </div>
+</div>) : (
     <div className="columns">
       <div className="column is-half is-offset-one-quarter">
         <section className="section">
