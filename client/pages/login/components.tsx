@@ -39,8 +39,8 @@ export const ErrorMessage = ({ errorMessage, error }: IFormInputField) => {
 };
 
 export const SubmitButton = ({ validForm }: IState) => {
-  if (validForm) return <input type="submit" className="button is-primary" />;
-  return <input type="submit" className="button is-primary" disabled />;
+  return <input type="submit" className="button is-primary" />;
+
 };
 
 export const FormInput = ({

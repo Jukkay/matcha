@@ -120,5 +120,8 @@ Bonuses
 Todo
 
 V registration input validation
+Add Name input validation
+Make login form
 jwt token authorization
 token refresh
+make navbar change with login state

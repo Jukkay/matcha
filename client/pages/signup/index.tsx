@@ -43,6 +43,7 @@ const Signup: NextPage = (props: SignupProps) => {
       placeholder: "Username",
       name: "username",
       label: "Username *",
+      autoComplete: "username",
       helper:
         "Username must be between 3 and 32 characters and may not contain special characters",
       leftIcon: <FaUser />,
@@ -56,6 +57,7 @@ const Signup: NextPage = (props: SignupProps) => {
       placeholder: "Password",
       name: "password",
       label: "Password *",
+      autoComplete: "new-password",
       helper:
         "Password must be between 8 and 255 characters long and include lower (a-z) and upper (A-Z) case letters and at least one digit (0-9).",
       leftIcon: <FaLock />,
@@ -69,6 +71,7 @@ const Signup: NextPage = (props: SignupProps) => {
       placeholder: "Confirm password",
       name: "confirmPassword",
       label: "Confirm password *",
+      autoComplete: "new-password",
       leftIcon: <FaLock />,
       rightIcon: <FaCheck color="green" />,
       validator: validMatch,
@@ -80,6 +83,7 @@ const Signup: NextPage = (props: SignupProps) => {
       placeholder: "Email",
       name: "email",
       label: "Email *",
+      autoComplete: "email",
       helper: "Helper",
       leftIcon: <FaEnvelope />,
       rightIcon: <FaCheck color="green" />,
@@ -92,6 +96,7 @@ const Signup: NextPage = (props: SignupProps) => {
       placeholder: "Name",
       name: "name",
       label: "Name",
+      autoComplete: "name",
       helper:
         "This is the name visible for other users. If no name is given, your username is shown instead. The name must be between 3 and 32 characters and only letters and numbers are allowed.",
       leftIcon: <FaUser />,
@@ -125,16 +130,15 @@ const Signup: NextPage = (props: SignupProps) => {
     );
     setErrors({ ...errors, password: !result });
     setErrorMessages({ ...errorMessages, password: "Invalid password" });
-    console.log('setting error messages',errorMessages)
     setValidPassword(result);
 
     if (values.confirmPassword.length < 3) return;
     const match = values.password === values.confirmPassword;
     setErrors({ ...errors, confirmPassword: !match });
     setErrorMessages({
-        ...errorMessages,
-        confirmPassword: "Passwords do not match",
-      });
+      ...errorMessages,
+      confirmPassword: "Passwords do not match",
+    });
     setValidMatch(match);
   }, [values.password, values.confirmPassword]);
 
@@ -165,8 +169,7 @@ const Signup: NextPage = (props: SignupProps) => {
     event.preventDefault();
     try {
       const response = await axios.post("http://localhost:4000/user/", values);
-      if (response.status === 201)
-        setSuccess(true)
+      if (response.status === 201) setSuccess(true);
     } catch (err: any) {
       const errorField = err.response.data.field;
       const errorMessage = err.response.data.message;
@@ -175,41 +178,47 @@ const Signup: NextPage = (props: SignupProps) => {
     }
   };
 
-  return success ? (<div className="columns">
-  <div className="column is-half is-offset-one-quarter">
-    <section className="section">
-      <div className="box has-text-centered">
+  return success ? (
+    <div className="columns">
+      <div className="column is-half is-offset-one-quarter">
         <section className="section">
-          <h3 className="title is-3">Registration successful.</h3>
-          <p>Check your email to confirm your account.</p>
+          <div className="box has-text-centered">
+            <section className="section">
+              <h3 className="title is-3">Registration successful.</h3>
+              <p>Check your email to confirm your account.</p>
+            </section>
+          </div>
         </section>
       </div>
-    </section>
-  </div>
-</div>) : (
+    </div>
+  ) : (
     <div className="columns">
       <div className="column is-half is-offset-one-quarter">
         <section className="section">
           <div className="box">
-            <form onSubmit={handleSubmit}>
-              <h3 className="title is-3">Create new account</h3>
-              {inputs.map((input) => (
-                <FormInput
-                  key={input.id}
-                  {...input}
-                  errorMessage={
-                    errorMessages[input.name as keyof typeof errorMessages]
-                  }
-                  error={errors[input.name as keyof typeof errors]}
-                  validator={input.validator}
-                  leftIcon={input.leftIcon}
-                  rightIcon={input.rightIcon}
-                  value={values[input.name as keyof typeof values]}
-                  onChange={onChange}
-                />
-              ))}
-              <SubmitButton validForm={validForm} />
-            </form>
+            <section className="section">
+              <form onSubmit={handleSubmit} autoComplete="on">
+                <h3 className="title is-3">Create new account</h3>
+                {inputs.map((input) => (
+                  <FormInput
+                    key={input.id}
+                    {...input}
+                    errorMessage={
+                      errorMessages[input.name as keyof typeof errorMessages]
+                    }
+                    error={errors[input.name as keyof typeof errors]}
+                    validator={input.validator}
+                    leftIcon={input.leftIcon}
+                    rightIcon={input.rightIcon}
+                    value={values[input.name as keyof typeof values]}
+                    onChange={onChange}
+                  />
+                ))}
+                <div className="field mt-5">
+                  <SubmitButton validForm={validForm} />
+                </div>
+              </form>
+            </section>
           </div>
         </section>
       </div>
