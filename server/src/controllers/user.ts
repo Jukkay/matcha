@@ -40,15 +40,17 @@ export const login = async(req: Request, res: Response) => {
 		const { username, password } = req.body
 		const sql = `SELECT user_id, username, password, validated FROM users WHERE username = ?;`
 		const user = await execute(sql, username)
-		if (!user) {
+		if (!user[0]) {
 			return res.status(400).json({
 				auth: false,
+				field: 'username',
 				message: 'Invalid user'
 			})
 		}
 		if (user[0].validated != true) {
 			return res.status(400).json({
 				auth: false,
+				field: 'generic',
 				message: 'Email not validated'
 			})
 		}
@@ -56,9 +58,11 @@ export const login = async(req: Request, res: Response) => {
 		if (!match) {
 			return res.status(400).json({
 				auth: false,
+				field: 'password',
 				message: 'Invalid password'
 			})
 		}
+
 		const token = await signUserToken(user[0].username)
 		if (token) {
 			return res.status(200).json({

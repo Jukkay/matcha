@@ -1,5 +1,5 @@
 
-import { ChangeEventHandler, ReactNode } from "react";
+import { ChangeEventHandler, MouseEventHandler, ReactNode } from "react";
 
 export type SignupProps = {
 	// prop types here
@@ -25,9 +25,17 @@ export interface IFormInputField {
   export interface IState {
 	validForm?: boolean;
 	focus?: boolean;
+	notificationText?: string;
+	notificationState?: boolean;
+	handleClick?: MouseEventHandler<HTMLDivElement>
   }
 
   export interface IHelper {
 	helper?: string;
 	focus: boolean;
+  }
+
+  export interface IButton {
+	validForm?: boolean;
+	loadingState?: boolean;
   }

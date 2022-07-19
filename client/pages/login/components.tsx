@@ -1,17 +1,12 @@
-import { useState } from "react";
-import { IFormInputField, IHelper, IState } from "./types";
+
+import { IFormInputField, IState, IButton } from "./types";
 
 export const Label = ({ label, name }: IFormInputField) => {
   if (!label) return null;
-  return <label htmlFor={name} className="label">{label}</label>;
-};
-
-export const Helper = ({ helper, focus }: IHelper) => {
-  if (!helper) return null;
-  return focus ? (
-    <p className="help">{helper}</p>
-  ) : (
-    <p className="help is-hidden">{helper}</p>
+  return (
+    <label htmlFor={name} className="label">
+      {label}
+    </label>
   );
 };
 
@@ -20,80 +15,62 @@ export const LeftIcon = ({ leftIcon }: IFormInputField) => {
   return <span className="icon is-small is-left">{leftIcon}</span>;
 };
 
-export const RightIcon = ({ rightIcon, validator }: IFormInputField) => {
-  if (!rightIcon) return null;
-  return validator ? (
-    <span className="icon is-small is-right">{rightIcon}</span>
-  ) : (
-    <span className="icon is-small is-right is-hidden">{rightIcon}</span>
-  );
-};
-
 export const ErrorMessage = ({ errorMessage, error }: IFormInputField) => {
   if (!errorMessage) return null;
   return error ? (
     <p className="help is-danger">{errorMessage}</p>
   ) : (
-    <p className="help is-danger is-hidden">{errorMessage}</p>
+    <p className="help is-danger is-sr-only">{errorMessage}</p>
   );
 };
 
-export const SubmitButton = ({ validForm }: IState) => {
-  return <input type="submit" className="button is-primary" />;
+export const SubmitButton = ({ validForm, loadingState }: IButton) => {
+  if (!validForm) return <button type="submit" className="button is-primary" disabled>Submit</button>;
+  if (validForm && !loadingState) return <button type="submit" className="button is-primary">Submit</button>;
+  if (validForm && loadingState) return <button type="submit" className="button is-primary is-loading">Submit</button>;
+  return <button type="submit" className="button is-primary is-loading" disabled>Submit</button>;
+};
 
+export const Notification = ({
+  notificationText,
+  notificationState,
+  handleClick,
+}: IState) => {
+  return notificationState ? (
+    <div className="notification is-danger my-5 is-clickable" onClick={handleClick}>
+      <button className="delete"></button>
+      {notificationText}
+    </div>
+  ) : (
+    <div className="notification is-danger my-5 is-sr-only is-clickable" onClick={handleClick}>
+      <button className="delete"></button>
+      {notificationText}
+    </div>
+  );
 };
 
 export const FormInput = ({
   label,
-  helper,
   errorMessage,
   name,
   onChange,
   leftIcon,
-  rightIcon,
   error,
-  validator,
   ...inputAttributes
 }: IFormInputField) => {
-  const [helpers, setHelpers] = useState({
-    username: false,
-    password: false,
-    confirmPassword: false,
-    email: false,
-    name: false,
-  });
 
-  // Focus on field
-  const onFocus = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setHelpers({
-      ...helpers,
-      [event.target.name]: true,
-    });
-  };
-
-  // Blur field
-  const onBlur = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setHelpers({
-      ...helpers,
-      [event.target.name]: false,
-    });
-  };
-  const classnames = error ? 'input is-danger' : 'input'
+  const classnames = error ? "input is-danger" : "input";
   return (
     <div className="field">
       <Label label={label} name={name} />
-      <Helper helper={helper} focus={helpers[name as keyof typeof helpers]} />
-      <div className="control has-icons-left has-icons-right">
+      <div className="control has-icons-left">
         <input
           className={classnames}
           name={name}
           {...inputAttributes}
           onChange={onChange}
-          onFocus={onFocus}
-          onBlur={onBlur}
         />
         <LeftIcon leftIcon={leftIcon} />
-        <RightIcon rightIcon={rightIcon} validator={validator} />
       </div>
       <ErrorMessage errorMessage={errorMessage} error={error} />
     </div>

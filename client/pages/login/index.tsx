@@ -1,13 +1,17 @@
 import type { NextPage } from "next";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaCheck, FaUser, FaLock } from "react-icons/fa";
 import { LoginProps } from "./types";
-import { FormInput, SubmitButton } from "./components";
+import { FormInput, SubmitButton, Notification } from "./components";
 import axios from "axios";
 
 const Login: NextPage = (props: LoginProps) => {
-
   const [success, setSuccess] = useState(false);
+  const [validForm, setValidForm] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [notification, setNotification] = useState(false);
+  const [notificationText, setNotificationText] = useState('');
+  // const [showGenericError, setShowGenericError] = useState(false);
   const [values, setValues] = useState({
     username: "",
     password: "",
@@ -16,14 +20,18 @@ const Login: NextPage = (props: LoginProps) => {
   const [errors, setErrors] = useState({
     username: false,
     password: false,
+    generic: false,
+    server: false,
   });
 
   const [errorMessages, setErrorMessages] = useState({
     username: "Invalid username",
     password: "Invalid password",
-    emailValidation: "Your email address hasn't been validated yet. Check your email.",
+    generic: "",
+    server: "Server error. Please try again later.",
   });
 
+  // Data for input fields
   const inputs = [
     {
       id: 1,
@@ -47,7 +55,6 @@ const Login: NextPage = (props: LoginProps) => {
       rightIcon: <FaCheck color="green" />,
       required: true,
     },
-
   ];
 
   // Update object values
@@ -55,17 +62,46 @@ const Login: NextPage = (props: LoginProps) => {
     setValues({ ...values, [event.target.name]: event.target.value });
   };
 
+  // Check username and password are not empty
+
+  useEffect(() => {
+    if (values.username.length > 2 && values.password.length > 7) {
+      setValidForm(true);
+    } else setValidForm(false);
+  }, [values.username, values.password]);
+
   // Handle submit
   const handleSubmit = async (event: React.SyntheticEvent) => {
     event.preventDefault();
+    setLoading(true);
+    setErrors({
+      username: false,
+      password: false,
+      generic: false,
+      server: false,
+    });
+
     try {
       const response = await axios.post("http://localhost:4000/login/", values);
-      if (response.status === 201) setSuccess(true);
+      if (response.status === 200) setSuccess(true);
     } catch (err: any) {
-      const errorField = err.response.data.field;
-      const errorMessage = err.response.data.message;
-      setErrors({ ...errors, [errorField]: true });
-      setErrorMessages({ ...errorMessages, [errorField]: errorMessage });
+      const errorMessage = err.response?.data?.message;
+      const errorField = err.response?.data?.field;
+      console.log(errorMessage, errorField)
+      if (errorField) {
+        setErrors({ ...errors, [errorField]: true });
+        if (errorField === "generic") {
+          setNotification(true);
+          setNotificationText(errorMessage)
+        }
+      }
+      else {
+        setNotification(true);
+        setNotificationText(errorMessages.server)
+      }
+    } finally {
+      console.log(errors);
+      setLoading(false);
     }
   };
 
@@ -104,9 +140,14 @@ const Login: NextPage = (props: LoginProps) => {
                   />
                 ))}
                 <div className="field mt-5">
-                  <SubmitButton />
+                  <SubmitButton validForm={validForm} loadingState={loading} />
                 </div>
               </form>
+              <Notification
+                notificationText={notificationText}
+                notificationState={notification}
+                handleClick={() => setNotification(false)}
+              />
             </section>
           </div>
         </section>

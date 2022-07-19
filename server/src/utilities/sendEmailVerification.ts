@@ -6,7 +6,6 @@ const mailUser: string = process.env.MAIL_USER || 'jukkacamagru@outlook.com'
 const password: string = getSecret("outlook_password")
 
 export const sendEmailVerification = async(email: string, email_token: string) => {
-	try {
 		const message = createMessage(email_token)
 		const transporter = await nodemailer.createTransport({
 			service: "Outlook365",
@@ -32,8 +31,4 @@ export const sendEmailVerification = async(email: string, email_token: string) =
 
 		await transporter.sendMail(messageOptions)
 		console.log('Nodemailer sent message')
-
-	} catch (err) {
-		console.error(err)
-	}
 }

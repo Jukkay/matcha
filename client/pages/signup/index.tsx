@@ -2,16 +2,25 @@ import type { NextPage } from "next";
 import { useState, useEffect, ChangeEventHandler, ReactNode } from "react";
 import { FaCheck, FaUser, FaLock, FaEnvelope } from "react-icons/fa";
 import { SignupProps } from "./types";
-import { FormInput, SubmitButton } from "./components";
+import { FormInput, Notification, SubmitButton } from "./components";
 import axios from "axios";
 
 const Signup: NextPage = (props: SignupProps) => {
+
+  // validator states
   const [validUsername, setValidUsername] = useState(false);
   const [validPassword, setValidPassword] = useState(false);
   const [validMatch, setValidMatch] = useState(false);
   const [validEmail, setValidEmail] = useState(false);
+  const [validName, setValidName] = useState(false);
   const [validForm, setValidForm] = useState(false);
+
+  // Form states
   const [success, setSuccess] = useState(false);
+  const [showGenericError, setShowGenericError] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // input values
   const [values, setValues] = useState({
     username: "",
     password: "",
@@ -20,6 +29,7 @@ const Signup: NextPage = (props: SignupProps) => {
     name: "",
   });
 
+  // error states
   const [errors, setErrors] = useState({
     username: false,
     password: false,
@@ -28,6 +38,7 @@ const Signup: NextPage = (props: SignupProps) => {
     name: false,
   });
 
+  // Error messages
   const [errorMessages, setErrorMessages] = useState({
     username: "Invalid username",
     password: "Invalid password",
@@ -36,6 +47,7 @@ const Signup: NextPage = (props: SignupProps) => {
     name: "Invalid name",
   });
 
+  // Data for input fields
   const inputs = [
     {
       id: 1,
@@ -84,7 +96,6 @@ const Signup: NextPage = (props: SignupProps) => {
       name: "email",
       label: "Email *",
       autoComplete: "email",
-      helper: "Helper",
       leftIcon: <FaEnvelope />,
       rightIcon: <FaCheck color="green" />,
       validator: validEmail,
@@ -98,9 +109,10 @@ const Signup: NextPage = (props: SignupProps) => {
       label: "Name",
       autoComplete: "name",
       helper:
-        "This is the name visible for other users. If no name is given, your username is shown instead. The name must be between 3 and 32 characters and only letters and numbers are allowed.",
+        "This is the name visible for other users. The name must be between 3 and 32 characters and only letters and numbers and spaces are allowed.",
       leftIcon: <FaUser />,
       rightIcon: <FaCheck color="green" />,
+      validator: validName,
       required: false,
     },
   ];
@@ -157,27 +169,50 @@ const Signup: NextPage = (props: SignupProps) => {
     setValidEmail(result);
   }, [values.email]);
 
+  // Name validation
+  useEffect(() => {
+    if (values.name.length < 3) return;
+    const result = /^[a-zA-Z0-9. ]{3,32}$/.test(values.name);
+    setErrors({
+      ...errors,
+      name: !result,
+    });
+    setErrorMessages({ ...errorMessages, name: "Invalid name" });
+    setValidName(result);
+  }, [values.name]);
+
   // Form validation
   useEffect(() => {
-    if (validUsername && validPassword && validEmail && validMatch)
-      setValidForm(true);
-    else setValidForm(false);
+    if (validUsername && validPassword && validEmail && validMatch) {
+      if (values.name && !validName) setValidForm(false);
+      else setValidForm(true);
+    } else setValidForm(false);
   });
 
   // Handle submit
   const handleSubmit = async (event: React.SyntheticEvent) => {
     event.preventDefault();
+    setLoading(true);
+    setShowGenericError(false);
     try {
       const response = await axios.post("http://localhost:4000/user/", values);
       if (response.status === 201) setSuccess(true);
     } catch (err: any) {
-      const errorField = err.response.data.field;
-      const errorMessage = err.response.data.message;
-      setErrors({ ...errors, [errorField]: true });
-      setErrorMessages({ ...errorMessages, [errorField]: errorMessage });
+      const errorMessage = err.response?.data?.message;
+      const errorField = err.response?.data?.field;
+      if (errorMessage && errorField) {
+        setErrorMessages({ ...errorMessages, [errorField]: errorMessage });
+        setErrors({ ...errors, [errorField]: true });
+      }
+      if (errorMessage && !errorField) {
+        setShowGenericError(true);
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
+  // Component
   return success ? (
     <div className="columns">
       <div className="column is-half is-offset-one-quarter">
@@ -215,9 +250,14 @@ const Signup: NextPage = (props: SignupProps) => {
                   />
                 ))}
                 <div className="field mt-5">
-                  <SubmitButton validForm={validForm} />
+                  <SubmitButton validForm={validForm} loadingState={loading} />
                 </div>
               </form>
+              <Notification
+                notificationText="Server error. Please try again later."
+                notificationState={showGenericError}
+                handleClick={() => setShowGenericError(false)}
+              />
             </section>
           </div>
         </section>
