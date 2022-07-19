@@ -14,26 +14,8 @@ userRouter.get('/', (req: express.Request, res: express.Response) => {
 userRouter.post('/', controller.register)
 userRouter
 	.route('/:id')
-	.get((req: express.Request, res: express.Response) => {
-		res.json({
-			status: 200,
-			message: 'User information',
-			data: req.body
-		})
-	})
-	.patch((req: express.Request, res: express.Response) => {
-		// receive, validate and update user data
-		res.json({
-			status: 200,
-			message: 'User information modified successfully'
-		})
-	})
-	.delete((req: express.Request, res: express.Response) => {
-		// Find user by id and delete
-		res.json({
-			status: 200,
-			message: 'User deleted successfully'
-		})
-	})
+	.get(checkJWT, controller.getUserInformation)
+	.patch(checkJWT, controller.updateUser)
+	.delete(checkJWT, controller.deleteUser)
 
 export default userRouter

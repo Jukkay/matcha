@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import helmet from "helmet";
 import userRouter from './routes/user';
 import { refreshToken, verifyEmailToken } from './controllers/token';
 import * as SQLConnect from './utilities/SQLConnect'
@@ -16,6 +17,7 @@ SQLConnect.init()
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 app.use(cors());
+app.use(helmet());
 
 // Routes
 app.get("/", (req: express.Request, res: express.Response) => {

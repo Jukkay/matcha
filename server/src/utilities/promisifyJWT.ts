@@ -1,9 +1,10 @@
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import { getSecret } from "docker-secret"
+import { RowDataPacket } from 'mysql'
 
 export const signEmailToken = async(email: string): Promise<string> => {
 	return new Promise(async(resolve, reject) => {
-		const expirationTime = 600
+		const expirationTime = 3600
 		jwt.sign({
 				email: email
 			},
@@ -31,11 +32,12 @@ export const verifyJWT = async(userToken: string, serverToken: string): Promise<
 	})
 }
 
-export const signUserToken = async(username: string): Promise<string> => {
+export const signUserToken = async(user: RowDataPacket): Promise<string> => {
 	return new Promise(async(resolve, reject) => {
 		const expirationTime = 600
 		jwt.sign({
-				username: username
+				username: user.username,
+				user_id: user.user_id
 			},
 			getSecret("server_token"), {
 				issuer: '42 Dates',

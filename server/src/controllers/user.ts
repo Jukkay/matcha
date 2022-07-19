@@ -22,7 +22,6 @@ const register = async(req: Request, res: Response) => {
 		})
 	}
 	catch (error) {
-		console.error(error)
 		let errorMessage
 		if (error instanceof Error)
 			errorMessage = error.message
@@ -38,17 +37,27 @@ export const login = async(req: Request, res: Response) => {
 
 	try {
 		const { username, password } = req.body
+		if (!username) return res.status(400).json({
+			auth: false,
+			field: 'username',
+			message: 'Missing username'
+		})
+		if (!password) return res.status(400).json({
+			auth: false,
+			field: 'password',
+			message: 'Missing password'
+		})
 		const sql = `SELECT user_id, username, password, validated FROM users WHERE username = ?;`
 		const user = await execute(sql, username)
 		if (!user[0]) {
-			return res.status(400).json({
+			return res.status(401).json({
 				auth: false,
 				field: 'username',
 				message: 'Invalid user'
 			})
 		}
 		if (user[0].validated != true) {
-			return res.status(400).json({
+			return res.status(401).json({
 				auth: false,
 				field: 'generic',
 				message: 'Email not validated'
@@ -56,14 +65,14 @@ export const login = async(req: Request, res: Response) => {
 		}
 		const match = await bcryptjs.compare(password, user[0].password)
 		if (!match) {
-			return res.status(400).json({
+			return res.status(401).json({
 				auth: false,
 				field: 'password',
 				message: 'Invalid password'
 			})
 		}
 
-		const token = await signUserToken(user[0].username)
+		const token = await signUserToken(user[0])
 		if (token) {
 			return res.status(200).json({
 				auth: true,
@@ -74,7 +83,6 @@ export const login = async(req: Request, res: Response) => {
 		}
 	}
 	catch (error) {
-		console.error(error)
 		let errorMessage
 		if (error instanceof Error)
 			errorMessage = error.message
@@ -95,13 +103,28 @@ export const logout = async(req: Request, res: Response) => {
 
 	}
 }
-const getUserInformation = (req: Request, res: Response, next: NextFunction) => {
+const getUserInformation = async(req: Request, res: Response) => {
+	console.log('in getUserInformation', req.get('authorization'))
+	return res.status(200).json({
+		message: "Message",
+		data: "empty"
+	})
 }
 
-const deleteUser = (req: Request, res: Response, next: NextFunction) => {
+const deleteUser = async(req: Request, res: Response) => {
+	console.log('in deleteUser', req.get('authorization'))
+	return res.status(200).json({
+		message: "Message",
+		data: "empty"
+	})
 }
 
-const updateUser = (req: Request, res: Response, next: NextFunction) => {
+const updateUser = async(req: Request, res: Response) => {
+	console.log('in updateUser', req.get('authorization'))
+	return res.status(200).json({
+		message: "Message",
+		data: "empty"
+	})
 }
 
 export default { register, login, getUserInformation, deleteUser, updateUser }

@@ -122,7 +122,10 @@ Todo
 V registration input validation
 V fix outgoing email
 V Make login form
-Add Name input validation
-jwt token authorization
+V Add Name input validation
+Save token in client end
+Add token to queries
+Add token check middleware to api
 token refresh
 make navbar change with login state
+Add a button to send new email token message to error message
