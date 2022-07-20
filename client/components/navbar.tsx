@@ -1,8 +1,26 @@
 import Link from "next/link";
 import { IconContext } from "react-icons";
+import { useContext } from "react"
 import { FaCog, FaHeart, FaBars, FaRegBell } from "react-icons/fa";
+import { useUserContext } from "../components/UserContext";
 
+const logoutButton = () => {
+  return <Link href="/logout">
+  <a className="button">Log out</a>
+</Link>
+}
+
+const loginSignupButtons = () => {
+  return <><Link href="/signup">
+  <a className="button is-primary">Sign up</a>
+</Link>
+<Link href="/login">
+  <a className="button">Log in</a>
+</Link></>
+}
 const NavbarComponent = (args: any) => {
+  // Token state
+  const {user, updateUser} = useUserContext()
   return (
     <nav className="navbar" role="navigation" aria-label="main navigation">
       <div className="navbar-brand">
@@ -43,15 +61,7 @@ const NavbarComponent = (args: any) => {
         <div className="navbar-end">
           <div className="navbar-item">
             <div className="buttons" id="buttons">
-              <Link href="/logout">
-                <a className="button">Log out</a>
-              </Link>
-              <Link href="/signup">
-                <a className="button is-primary">Sign up</a>
-              </Link>
-              <Link href="/login">
-                <a className="button">Log in</a>
-              </Link>
+              {user.token ? logoutButton() : loginSignupButtons()}
             </div>
           </div>
           <div className="navbar-item" id="profile">

@@ -1,8 +1,9 @@
 import type { NextPage } from "next";
-import { useState, useEffect, ChangeEventHandler, ReactNode } from "react";
+import { useState, useEffect, ChangeEventHandler, ReactNode, useContext } from "react";
 import { FaCheck, FaUser, FaLock, FaEnvelope } from "react-icons/fa";
 import { SignupProps } from "./types";
 import { FormInput, Notification, SubmitButton } from "./components";
+import { useUserContext } from "../../components/UserContext";
 import axios from "axios";
 
 const Signup: NextPage = (props: SignupProps) => {

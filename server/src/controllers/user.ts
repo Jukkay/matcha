@@ -47,7 +47,7 @@ export const login = async(req: Request, res: Response) => {
 			field: 'password',
 			message: 'Missing password'
 		})
-		const sql = `SELECT user_id, username, password, validated FROM users WHERE username = ?;`
+		const sql = `SELECT user_id, username, password, name, validated FROM users WHERE username = ?;`
 		const user = await execute(sql, username)
 		if (!user[0]) {
 			return res.status(401).json({
@@ -76,9 +76,13 @@ export const login = async(req: Request, res: Response) => {
 		if (token) {
 			return res.status(200).json({
 				auth: true,
-				username: user[0].username,
-				user_id: user[0].user_id,
-				token
+				user: {
+					username: user[0].username,
+					user_id: user[0].user_id,
+					email: user[0].email,
+					name: user[0].name,
+					token: token
+				}
 			})
 		}
 	}

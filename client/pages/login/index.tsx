@@ -1,22 +1,30 @@
 import type { NextPage } from "next";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { FaCheck, FaUser, FaLock } from "react-icons/fa";
 import { LoginProps } from "./types";
 import { FormInput, SubmitButton, Notification } from "./components";
+import { useUserContext } from "../../components/UserContext";
 import axios from "axios";
 
 const Login: NextPage = (props: LoginProps) => {
+
+  // Form states
   const [success, setSuccess] = useState(false);
   const [validForm, setValidForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState(false);
   const [notificationText, setNotificationText] = useState('');
-  // const [showGenericError, setShowGenericError] = useState(false);
+
+  // Token state
+  const {updateUser, user} = useUserContext()
+
+  // Form values
   const [values, setValues] = useState({
     username: "",
     password: "",
   });
 
+  // Error states
   const [errors, setErrors] = useState({
     username: false,
     password: false,
@@ -24,6 +32,7 @@ const Login: NextPage = (props: LoginProps) => {
     server: false,
   });
 
+  // Error messages
   const [errorMessages, setErrorMessages] = useState({
     username: "Invalid username",
     password: "Invalid password",
@@ -41,7 +50,6 @@ const Login: NextPage = (props: LoginProps) => {
       label: "Username *",
       autoComplete: "username",
       leftIcon: <FaUser />,
-      rightIcon: <FaCheck color="green" />,
       required: true,
     },
     {
@@ -52,7 +60,6 @@ const Login: NextPage = (props: LoginProps) => {
       label: "Password *",
       autoComplete: "current-password",
       leftIcon: <FaLock />,
-      rightIcon: <FaCheck color="green" />,
       required: true,
     },
   ];
@@ -83,11 +90,17 @@ const Login: NextPage = (props: LoginProps) => {
 
     try {
       const response = await axios.post("http://localhost:4000/login/", values);
-      if (response.status === 200) setSuccess(true);
+      if (response.status === 200) {
+        if (response?.data?.auth !== true) {
+          throw new Error("Invalid server response")
+        }
+        setSuccess(true);
+        updateUser(response?.data?.user);
+        window.localStorage.setItem('userInfo', JSON.stringify(user));
+      }
     } catch (err: any) {
       const errorMessage = err.response?.data?.message;
       const errorField = err.response?.data?.field;
-      console.log(errorMessage, errorField)
       if (errorField) {
         setErrors({ ...errors, [errorField]: true });
         if (errorField === "generic") {
@@ -112,6 +125,7 @@ const Login: NextPage = (props: LoginProps) => {
           <div className="box has-text-centered">
             <section className="section">
               <h3 className="title is-3">Login successful</h3>
+              <div>{user.token}</div>
             </section>
           </div>
         </section>
@@ -134,7 +148,6 @@ const Login: NextPage = (props: LoginProps) => {
                     }
                     error={errors[input.name as keyof typeof errors]}
                     leftIcon={input.leftIcon}
-                    rightIcon={input.rightIcon}
                     value={values[input.name as keyof typeof values]}
                     onChange={onChange}
                   />

@@ -123,9 +123,9 @@ V registration input validation
 V fix outgoing email
 V Make login form
 V Add Name input validation
+V Add token check middleware to api
 Save token in client end
 Add token to queries
-Add token check middleware to api
-token refresh
+implement token refresh functionality
 make navbar change with login state
 Add a button to send new email token message to error message
