@@ -1,22 +1,22 @@
 import type { NextPage } from "next";
-import { useState, useEffect, useContext } from "react";
-import { FaCheck, FaUser, FaLock } from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { FaUser, FaLock } from "react-icons/fa";
 import { LoginProps } from "./types";
 import { FormInput, SubmitButton, Notification } from "./components";
-import { useUserContext} from "../../components/UserContext";
+import { useUserContext } from "../../components/UserContext";
+import { API_URL } from '../../utilities/interceptor';
 import axios from "axios";
 
 const Login: NextPage = (props: LoginProps) => {
-
   // Form states
   const [success, setSuccess] = useState(false);
   const [validForm, setValidForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState(false);
-  const [notificationText, setNotificationText] = useState('');
+  const [notificationText, setNotificationText] = useState("");
 
   // Get user data from context
-  const {updateUserData, userData} = useUserContext()
+  const { updateUserData, userData, tokens, updateTokens } = useUserContext();
 
   // Form values
   const [values, setValues] = useState({
@@ -89,14 +89,26 @@ const Login: NextPage = (props: LoginProps) => {
     });
 
     try {
-      const response = await axios.post("http://localhost:4000/login/", values);
+      const response = await axios.post(`${API_URL}/login/`, values);
       if (response.status === 200) {
         if (response?.data?.auth !== true) {
-          throw new Error("Invalid server response")
+          throw new Error("Invalid server response");
         }
         setSuccess(true);
-        updateUserData(response?.data?.user);
-        sessionStorage.setItem('userData', JSON.stringify(response?.data?.user));
+        if (response.data.user) {
+          updateUserData(response.data.user);
+          sessionStorage.setItem(
+            "userData",
+            JSON.stringify(response.data.user)
+          );
+        }
+        if (response.data.tokens) {
+          updateTokens(response.data.tokens);
+          sessionStorage.setItem(
+            "tokens",
+            JSON.stringify(response.data.tokens)
+          );
+        }
       }
     } catch (err: any) {
       const errorMessage = err.response?.data?.message;
@@ -105,15 +117,13 @@ const Login: NextPage = (props: LoginProps) => {
         setErrors({ ...errors, [errorField]: true });
         if (errorField === "generic") {
           setNotification(true);
-          setNotificationText(errorMessage)
+          setNotificationText(errorMessage);
         }
-      }
-      else {
+      } else {
         setNotification(true);
-        setNotificationText(errorMessages.server)
+        setNotificationText(errorMessages.server);
       }
     } finally {
-      console.log(errors);
       setLoading(false);
     }
   };

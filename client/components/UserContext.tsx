@@ -1,12 +1,16 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 export type UserInfo = {
   username: string | undefined;
   user_id: number | null;
   name: string | undefined;
   email: string | undefined;
-  token: string | undefined;
-  updateToken: (token: string) => void;
 };
 
 export interface IUser {
@@ -16,18 +20,16 @@ export interface IUser {
 export const UserContext = createContext<any>(null);
 
 export const useUserContext = () => {
-  return useContext(UserContext)
-}
+  return useContext(UserContext);
+};
 
 export const UserContextProvider = ({ children }: { children: ReactNode }) => {
-  const [token, updateToken] = useState("");
+  const [tokens, updateTokens] = useState({});
   const [userData, updateUserData] = useState<UserInfo>({
     username: "",
     user_id: null,
     name: "",
     email: "",
-    token: token,
-    updateToken: updateToken,
   });
 
   useEffect(() => {
@@ -37,9 +39,16 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
       const userInfo = JSON.parse(storedInfo);
       updateUserData(userInfo);
     }
+    const storedTokens = sessionStorage.getItem("tokens");
+    if (storedTokens) {
+      const tokens = JSON.parse(storedTokens);
+      updateTokens(tokens);
+    }
   }, []);
   return (
-    <UserContext.Provider value={{ userData, updateUserData }}>
+    <UserContext.Provider
+      value={{ userData, updateUserData, tokens, updateTokens }}
+    >
       {children}
     </UserContext.Provider>
   );

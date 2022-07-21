@@ -2,7 +2,7 @@ import { Request, Response, NextFunction} from 'express';
 import { getSecret } from "docker-secret"
 import IEmailToken from '../interfaces/token'
 import { execute } from '../utilities/SQLConnect';
-import { verifyJWT } from '../utilities/promisifyJWT';
+import { signAccessToken, signRefreshToken, verifyJWT } from '../utilities/promisifyJWT';
 
 
 export const verifyEmailToken = async(req: Request, res: Response) => {
@@ -32,7 +32,7 @@ export const verifyEmailToken = async(req: Request, res: Response) => {
 export const refreshToken = async(req: Request, res: Response, next: NextFunction) => {
 	try {
 
-		const { token } = req.body
+		const { token, user } = req.body
 		const refresh_token = getSecret("refresh_token")
 		if (!token) {
 			return res.json({
@@ -42,9 +42,33 @@ export const refreshToken = async(req: Request, res: Response, next: NextFunctio
 		}
 		// If given token doesn't match a token in refresh token table, status 403. Else
 		const decoded = await verifyJWT(token, refresh_token)
+		if (!decoded) {
+			return res.status(403).json({
+				message: 'Invalid token'
+			})
+		}
 		// create and return new access token
-
-		next()
+		const accessToken = await signAccessToken(user.username)
+		const refreshToken = await signRefreshToken(user.username)
+		if (accessToken && refreshToken) {
+			return res.status(200).json({
+				auth: true,
+				user: {
+					username: user.username,
+					user_id: user.user_id,
+					email: user.email,
+					name: user.name,
+				},
+				tokens: {
+					accessToken: accessToken,
+					refreshToken: refreshToken
+				}
+			})
+		} else {
+			return res.status(500).json({
+				message: 'Server error'
+			})
+		}
 	} catch (err) {
 		console.error(err)
 		return res.status(403).json({

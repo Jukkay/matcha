@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { IconContext } from "react-icons";
-import { useContext } from "react";
 import { FaCog, FaHeart, FaBars, FaRegBell } from "react-icons/fa";
 import { useUserContext } from "./UserContext";
 
@@ -26,7 +25,7 @@ const loginSignupButtons = () => {
 };
 const NavbarComponent = (args: any) => {
   // Token state
-  const { userData } = useUserContext();
+  const { tokens } = useUserContext();
   return (
     <div className="column is-narrow">
     <nav className="navbar" role="navigation" aria-label="main navigation">
@@ -92,7 +91,7 @@ const NavbarComponent = (args: any) => {
         <div className="navbar-end">
           <div className="navbar-item">
             <div className="buttons" id="buttons">
-              {userData.token ? logoutButton() : loginSignupButtons()}
+              {tokens.accessToken ? logoutButton() : loginSignupButtons()}
             </div>
           </div>
           <div className="navbar-item" id="profile">

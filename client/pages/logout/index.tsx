@@ -3,9 +3,11 @@ import { useState, useEffect, useContext } from "react";
 import { useUserContext} from "../../components/UserContext";
 
 const Logout: NextPage = (props) => {
-	const {updateUserData} = useUserContext()
+	const {updateTokens, updateUserData} = useUserContext()
 	useEffect(() => {
+		updateTokens({})
 		updateUserData({})
+		sessionStorage.removeItem('tokens');
 		sessionStorage.removeItem('userData');
 	}, [])
 	return (

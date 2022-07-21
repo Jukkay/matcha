@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { execute } from '../utilities/SQLConnect';
 import bcryptjs from "bcryptjs";
-import { signEmailToken, signUserToken } from "../utilities/promisifyJWT";
+import { signEmailToken, signAccessToken, signRefreshToken } from "../utilities/promisifyJWT";
 import { sendEmailVerification } from "../utilities/sendEmailVerification";
 import { validateRegistrationInput } from "../utilities/validators";
 
@@ -47,7 +47,7 @@ export const login = async(req: Request, res: Response) => {
 			field: 'password',
 			message: 'Missing password'
 		})
-		const sql = `SELECT user_id, username, password, name, validated FROM users WHERE username = ?;`
+		const sql = `SELECT user_id, username, password, email, name, validated FROM users WHERE username = ?;`
 		const user = await execute(sql, username)
 		if (!user[0]) {
 			return res.status(401).json({
@@ -72,8 +72,9 @@ export const login = async(req: Request, res: Response) => {
 			})
 		}
 
-		const token = await signUserToken(user[0])
-		if (token) {
+		const accessToken = await signAccessToken(user[0])
+		const refreshToken = await signRefreshToken(user[0])
+		if (accessToken && refreshToken) {
 			return res.status(200).json({
 				auth: true,
 				user: {
@@ -81,7 +82,10 @@ export const login = async(req: Request, res: Response) => {
 					user_id: user[0].user_id,
 					email: user[0].email,
 					name: user[0].name,
-					token: token
+				},
+				tokens: {
+					accessToken: accessToken,
+					refreshToken: refreshToken
 				}
 			})
 		}
@@ -132,3 +136,5 @@ const updateUser = async(req: Request, res: Response) => {
 }
 
 export default { register, login, getUserInformation, deleteUser, updateUser }
+
+
