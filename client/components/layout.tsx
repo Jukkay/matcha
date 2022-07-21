@@ -1,37 +1,38 @@
-import React, {
+import {
   createContext,
   ReactNode,
+  SetStateAction,
   useEffect,
   useState,
 } from "react";
 import Footer from "./footer";
-import {UserInfo} from "./UserContext";
+import { IUser, UserInfo } from "./UserContext";
 import NavbarComponent from "./navbar";
 
-export const UserContext = createContext({});
+export const UserContext = createContext<any>(null);
 const Layout = ({ children }: { children: ReactNode }) => {
+  const [token, updateToken] = useState("");
+  const [userData, updateUserData] = useState<UserInfo>({
+    username: "",
+    user_id: null,
+    name: "",
+    email: "",
+    token: token,
+    updateToken: updateToken,
+  });
 
-  // Look for user information in local storage
-
-    const [token, updateToken] = useState("");
-    const [user, updateUser] = useState<UserInfo>({
-      username: "",
-      user_id: null,
-      name: "",
-      email: "",
-      loggedIn: false,
-      token: token,
-      updateToken: updateToken
-    })
-    const storedInfo = window.localStorage.getItem("userInfo");
+  useEffect(() => {
+    // Look for user information in local storage
+    const storedInfo = localStorage.getItem("userData");
+    console.log('UserData found on initialization', storedInfo);
     if (storedInfo) {
       const userInfo = JSON.parse(storedInfo);
-      updateUser(userInfo);
-      user.updateToken(userInfo.token);
+      updateUserData(userInfo);
     }
-
+  }, []);
+  console.log('userData state on layout render', userData)
   return (
-    <UserContext.Provider value={{ user, updateUser }}>
+    <UserContext.Provider value={{ userData, updateUserData }}>
       <div className="container is-widescreen">
         <NavbarComponent />
         <div>

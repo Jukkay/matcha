@@ -3,7 +3,7 @@ import { useState, useEffect, useContext } from "react";
 import { FaCheck, FaUser, FaLock } from "react-icons/fa";
 import { LoginProps } from "./types";
 import { FormInput, SubmitButton, Notification } from "./components";
-import { useUserContext } from "../../components/UserContext";
+import { UserContext } from "../../components/layout";
 import axios from "axios";
 
 const Login: NextPage = (props: LoginProps) => {
@@ -16,7 +16,7 @@ const Login: NextPage = (props: LoginProps) => {
   const [notificationText, setNotificationText] = useState('');
 
   // Token state
-  const {updateUser, user} = useUserContext()
+  const {updateUserData, userData} = useContext(UserContext)
 
   // Form values
   const [values, setValues] = useState({
@@ -94,9 +94,11 @@ const Login: NextPage = (props: LoginProps) => {
         if (response?.data?.auth !== true) {
           throw new Error("Invalid server response")
         }
+        console.log('Response data',response.data)
         setSuccess(true);
-        updateUser(response?.data?.user);
-        window.localStorage.setItem('userInfo', JSON.stringify(user));
+        updateUserData(response?.data?.user);
+        window.localStorage.setItem('userData', JSON.stringify(response?.data?.user));
+        console.log('UserData saved', localStorage.getItem("userData"))
       }
     } catch (err: any) {
       const errorMessage = err.response?.data?.message;
@@ -125,7 +127,7 @@ const Login: NextPage = (props: LoginProps) => {
           <div className="box has-text-centered">
             <section className="section">
               <h3 className="title is-3">Login successful</h3>
-              <div>{user.token}</div>
+              <div>{userData.token}</div>
             </section>
           </div>
         </section>
