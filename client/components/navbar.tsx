@@ -2,7 +2,7 @@ import Link from "next/link";
 import { IconContext } from "react-icons";
 import { useContext } from "react";
 import { FaCog, FaHeart, FaBars, FaRegBell } from "react-icons/fa";
-import { UserContext } from "./layout";
+import { useUserContext } from "./UserContext";
 
 const logoutButton = () => {
   return (
@@ -26,7 +26,7 @@ const loginSignupButtons = () => {
 };
 const NavbarComponent = (args: any) => {
   // Token state
-  const { userData } = useContext(UserContext);
+  const { userData } = useUserContext();
   return (
     <nav className="navbar" role="navigation" aria-label="main navigation">
       <div className="navbar-brand">

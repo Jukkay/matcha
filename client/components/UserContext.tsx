@@ -1,4 +1,4 @@
-import { createContext } from "react";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
 export type UserInfo = {
   username: string | undefined;
@@ -13,12 +13,35 @@ export interface IUser {
   user?: UserInfo;
   updateUser?: (user: UserInfo) => void;
 }
-
-// export const UserContextProvider = () => {
-
-//   return (
-//     <UserContextProvider
-
-//   )
-// }
 export const UserContext = createContext<any>(null);
+
+export const useUserContext = () => {
+  return useContext(UserContext)
+}
+
+export const UserContextProvider = ({ children }: { children: ReactNode }) => {
+  const [token, updateToken] = useState("");
+  const [userData, updateUserData] = useState<UserInfo>({
+    username: "",
+    user_id: null,
+    name: "",
+    email: "",
+    token: token,
+    updateToken: updateToken,
+  });
+
+  useEffect(() => {
+    // Look for user information in local storage
+    const storedInfo = localStorage.getItem("userData");
+    console.log("UserData found on initialization", storedInfo);
+    if (storedInfo) {
+      const userInfo = JSON.parse(storedInfo);
+      updateUserData(userInfo);
+    }
+  }, []);
+  return (
+    <UserContext.Provider value={{ userData, updateUserData }}>
+      {children}
+    </UserContext.Provider>
+  );
+};

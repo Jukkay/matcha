@@ -3,7 +3,7 @@ import { useState, useEffect, useContext } from "react";
 import { FaCheck, FaUser, FaLock } from "react-icons/fa";
 import { LoginProps } from "./types";
 import { FormInput, SubmitButton, Notification } from "./components";
-import { UserContext } from "../../components/layout";
+import { useUserContext} from "../../components/UserContext";
 import axios from "axios";
 
 const Login: NextPage = (props: LoginProps) => {
@@ -15,8 +15,8 @@ const Login: NextPage = (props: LoginProps) => {
   const [notification, setNotification] = useState(false);
   const [notificationText, setNotificationText] = useState('');
 
-  // Token state
-  const {updateUserData, userData} = useContext(UserContext)
+  // Get user data from context
+  const {updateUserData, userData} = useUserContext()
 
   // Form values
   const [values, setValues] = useState({
