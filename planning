@@ -8,7 +8,7 @@ the profile of other users, like them, chat with those that “liked” back."
 
 Illustrations https://undraw.co/
 
-API
+# API structure
     user
         post
         get
@@ -25,6 +25,8 @@ API
         post
     logout
         post
+
+# Requirements
 Sign up
     User information
         email
@@ -117,15 +119,15 @@ Bonuses
     Webcam integration
     Notification settings
 
-Todo
+# Todo
 
 V registration input validation
 V fix outgoing email
 V Make login form
 V Add Name input validation
 V Add token check middleware to api
-Save token in client end
+V Save token in client end
+V make navbar change with login state
 Add token to queries
 implement token refresh functionality
-make navbar change with login state
 Add a button to send new email token message to error message

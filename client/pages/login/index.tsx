@@ -94,11 +94,9 @@ const Login: NextPage = (props: LoginProps) => {
         if (response?.data?.auth !== true) {
           throw new Error("Invalid server response")
         }
-        console.log('Response data',response.data)
         setSuccess(true);
         updateUserData(response?.data?.user);
-        window.localStorage.setItem('userData', JSON.stringify(response?.data?.user));
-        console.log('UserData saved', localStorage.getItem("userData"))
+        sessionStorage.setItem('userData', JSON.stringify(response?.data?.user));
       }
     } catch (err: any) {
       const errorMessage = err.response?.data?.message;

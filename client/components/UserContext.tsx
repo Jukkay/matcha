@@ -32,8 +32,7 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     // Look for user information in local storage
-    const storedInfo = localStorage.getItem("userData");
-    console.log("UserData found on initialization", storedInfo);
+    const storedInfo = sessionStorage.getItem("userData");
     if (storedInfo) {
       const userInfo = JSON.parse(storedInfo);
       updateUserData(userInfo);

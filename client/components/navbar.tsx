@@ -28,6 +28,7 @@ const NavbarComponent = (args: any) => {
   // Token state
   const { userData } = useUserContext();
   return (
+    <div className="column is-narrow">
     <nav className="navbar" role="navigation" aria-label="main navigation">
       <div className="navbar-brand">
         <a className="navbar-item pt-3" href="/">
@@ -124,6 +125,7 @@ const NavbarComponent = (args: any) => {
         </div>
       </div>
     </nav>
+    </div>
   );
 };
 export default NavbarComponent;

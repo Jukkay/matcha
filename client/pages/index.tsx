@@ -3,9 +3,12 @@ import Head from 'next/head'
 
 const Home: NextPage = () => {
   return (
-      <h1>
+    <section className="section">
+
+      <h1 className="title is-1">
           Welcome to 42 Dates
       </h1>
+    </section>
   )
 }
 
