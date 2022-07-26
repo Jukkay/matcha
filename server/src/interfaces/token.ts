@@ -1,4 +1,4 @@
-interface IEmailToken {
+export interface IEmailToken {
 	email: string,
 	iat: number,
 	exp: number,
@@ -12,4 +12,6 @@ interface IUserToken {
 	iss: string
 }
 
-export default IEmailToken
+export interface ITokenList {
+	[key: string]: number
+}

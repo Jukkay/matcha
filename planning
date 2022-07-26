@@ -27,16 +27,16 @@ Illustrations https://undraw.co/
         post
 
 # Requirements
-Sign up
+V Sign up
     User information
         email
         username
         firstname
         lastname
         password
-    Email confirmation
-Login
-Logout
+   V Email confirmation
+V Login
+V Logout
 Password reset
 Fill profile information after first login
     Don't allow access to other parts of the site until this is completed.
@@ -128,6 +128,10 @@ V Add Name input validation
 V Add token check middleware to api
 V Save token in client end
 V make navbar change with login state
-Add token to queries
-implement token refresh functionality
+V Add token to queries
+implement token refresh functionality on server side
 Add a button to send new email token message to error message
+Password reset form
+
+# Later
+Remove error message passthrough in user controller

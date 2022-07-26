@@ -24,7 +24,8 @@ export const useUserContext = () => {
 };
 
 export const UserContextProvider = ({ children }: { children: ReactNode }) => {
-  const [tokens, updateTokens] = useState({});
+  const [accessToken, updateAccessToken] = useState('');
+  const [refreshToken, updateRefreshToken] = useState('');
   const [userData, updateUserData] = useState<UserInfo>({
     username: "",
     user_id: null,
@@ -39,15 +40,17 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
       const userInfo = JSON.parse(storedInfo);
       updateUserData(userInfo);
     }
-    const storedTokens = sessionStorage.getItem("tokens");
-    if (storedTokens) {
-      const tokens = JSON.parse(storedTokens);
-      updateTokens(tokens);
+    const accessTokenStored = sessionStorage.getItem("accessToken");
+    const refreshTokenStored = sessionStorage.getItem("refreshToken");
+    if (accessTokenStored && refreshTokenStored) {
+      updateAccessToken(accessTokenStored);
+      updateRefreshToken(refreshTokenStored);
     }
   }, []);
+
   return (
     <UserContext.Provider
-      value={{ userData, updateUserData, tokens, updateTokens }}
+      value={{ userData, updateUserData, accessToken, refreshToken, updateAccessToken, updateRefreshToken }}
     >
       {children}
     </UserContext.Provider>

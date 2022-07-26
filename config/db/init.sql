@@ -65,3 +65,10 @@ CREATE TABLE IF NOT EXISTS messages(
 	message_text text NOT NULL,
 	PRIMARY KEY (message_id)
 );
+
+CREATE TABLE IF NOT EXISTS tokens(
+	token_id BIGINT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`user_id` INT(10) UNSIGNED NOT NULL,
+	token TEXT NOT NULL,
+	PRIMARY KEY (token_id)
+);

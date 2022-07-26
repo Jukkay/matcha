@@ -25,10 +25,10 @@ export const ErrorMessage = ({ errorMessage, error }: IFormInputField) => {
 };
 
 export const SubmitButton = ({ validForm, loadingState }: IButton) => {
-  if (!validForm) return <button type="submit" className="button is-primary" disabled>Submit</button>;
-  if (validForm && !loadingState) return <button type="submit" className="button is-primary">Submit</button>;
-  if (validForm && loadingState) return <button type="submit" className="button is-primary is-loading">Submit</button>;
-  return <button type="submit" className="button is-primary is-loading" disabled>Submit</button>;
+  if (!validForm) return <button type="submit" className="button is-primary my-3" disabled>Submit</button>;
+  if (validForm && !loadingState) return <button type="submit" className="button is-primary my-3">Submit</button>;
+  if (validForm && loadingState) return <button type="submit" className="button is-primary is-loading my-3">Submit</button>;
+  return <button type="submit" className="button is-primary is-loading my-3" disabled>Submit</button>;
 };
 
 export const Notification = ({

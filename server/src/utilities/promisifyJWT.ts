@@ -23,7 +23,6 @@ export const signEmailToken = async(email: string): Promise<string> => {
 
 export const verifyJWT = async(userToken: string, serverToken: string): Promise<string | JwtPayload | undefined> => {
 	return new Promise(async(resolve, reject) => {
-		const server_token = getSecret("server_token")
 		jwt.verify(userToken, serverToken, (err, decoded) => {
 			if (err)
 				reject(err)
@@ -32,12 +31,11 @@ export const verifyJWT = async(userToken: string, serverToken: string): Promise<
 	})
 }
 
-export const signAccessToken = async(user: RowDataPacket): Promise<string> => {
+export const signAccessToken = async(user_id: RowDataPacket): Promise<string> => {
 	return new Promise(async(resolve, reject) => {
 		const expirationTime = 600
 		jwt.sign({
-				username: user.username,
-				user_id: user.user_id
+				user_id: user_id
 			},
 			getSecret("server_token"), {
 				issuer: '42 Dates',
@@ -52,14 +50,13 @@ export const signAccessToken = async(user: RowDataPacket): Promise<string> => {
 	})
 }
 
-export const signRefreshToken = async(user: RowDataPacket): Promise<string> => {
+export const signRefreshToken = async(user_id: RowDataPacket): Promise<string> => {
 	return new Promise(async(resolve, reject) => {
-		const expirationTime = 6 * 60 * 60
+		const expirationTime = 5 * 24 * 60 * 60
 		jwt.sign({
-				username: user.username,
-				user_id: user.user_id
+				user_id: user_id
 			},
-			getSecret("server_token"), {
+			getSecret("refresh_token"), {
 				issuer: '42 Dates',
 				algorithm: 'HS256',
 				expiresIn: expirationTime

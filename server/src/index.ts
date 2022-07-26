@@ -24,8 +24,8 @@ app.get("/", (req: express.Request, res: express.Response) => {
     res.send('backend server is running')
 })
 app.post('/login', login)
-app.post('/logout', checkJWT, logout)
-app.post('/token', checkJWT, refreshToken)
+app.post('/logout', logout)
+app.post('/token', refreshToken)
 app.get('/verify_email/:token', verifyEmailToken)
 
 // User CRUD route

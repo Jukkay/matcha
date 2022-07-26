@@ -19,7 +19,6 @@ const checkJWT = (req: Request, res: Response, next: NextFunction) => {
 				message: 'Unauthorized'
 			})
 		}
-		res.locals.jwt = decoded
 		next()
 	})
 

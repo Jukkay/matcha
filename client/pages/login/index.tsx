@@ -6,6 +6,7 @@ import { FormInput, SubmitButton, Notification } from "./components";
 import { useUserContext } from "../../components/UserContext";
 import { API_URL } from '../../utilities/interceptor';
 import axios from "axios";
+import Link from "next/link";
 
 const Login: NextPage = (props: LoginProps) => {
   // Form states
@@ -16,7 +17,7 @@ const Login: NextPage = (props: LoginProps) => {
   const [notificationText, setNotificationText] = useState("");
 
   // Get user data from context
-  const { updateUserData, userData, tokens, updateTokens } = useUserContext();
+  const { updateUserData, userData, accessToken, refreshToken, updateAccessToken, updateRefreshToken } = useUserContext();
 
   // Form values
   const [values, setValues] = useState({
@@ -103,10 +104,13 @@ const Login: NextPage = (props: LoginProps) => {
           );
         }
         if (response.data.tokens) {
-          updateTokens(response.data.tokens);
+          updateAccessToken(response.data.accessToken);
+          updateRefreshToken(response.data.refreshToken)
           sessionStorage.setItem(
-            "tokens",
-            JSON.stringify(response.data.tokens)
+            "accessToken", response.data.accessToken
+          );
+          sessionStorage.setItem(
+            "refreshToken", response.data.refreshToken
           );
         }
       }
@@ -171,6 +175,8 @@ const Login: NextPage = (props: LoginProps) => {
                 notificationState={notification}
                 handleClick={() => setNotification(false)}
               />
+              <Link href='/passwordreset'>Forgot your password? Click here to reset your password.</Link><br/>
+              <Link href='/emailconfirmation'>Click here to re-send confirmation email.</Link>
             </section>
           </div>
         </section>

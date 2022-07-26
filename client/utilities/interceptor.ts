@@ -8,9 +8,9 @@ import { useUserContext } from "../components/UserContext";
 
 export const API_URL = 'http://localhost:4000'
 const handleRequest = (config: AxiosRequestConfig) => {
-  const { token } = useUserContext();
+  const { accessToken } = useUserContext();
   if (config.headers)
-    config.headers["Authorization"] = `Bearer ${token.accessToken}`;
+    config.headers["Authorization"] = `Bearer ${accessToken}`;
   return config;
 };
 
@@ -27,15 +27,15 @@ const handleResponseError = async (
 ): Promise<AxiosError | undefined> => {
   if (error.status !== "401" && error.message !== "Unauthorized")
     return Promise.reject(error);
-  const { tokens, userData, updateTokens } = useUserContext();
+  const { refreshToken, userData, updateAccessToken } = useUserContext();
   try {
     const refreshResponse = await axios.post(`${API_URL}/token/`, {
-      token: tokens.refreshToken,
-      user: userData,
+      token: refreshToken,
+      user_id: userData.user_id,
     });
-    const { newTokens } = refreshResponse.data.tokens;
-    updateTokens(newTokens);
-    sessionStorage.setItem("tokens", JSON.stringify(newTokens));
+    const newToken = refreshResponse.data.accessToken;
+    updateAccessToken(newToken);
+    sessionStorage.setItem("accessToken", newToken);
     return;
   } catch (err) {
     return Promise.reject(err);

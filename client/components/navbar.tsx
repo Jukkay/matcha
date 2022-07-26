@@ -25,7 +25,7 @@ const loginSignupButtons = () => {
 };
 const NavbarComponent = (args: any) => {
   // Token state
-  const { tokens } = useUserContext();
+  const { accessToken } = useUserContext();
   return (
     <div className="column is-narrow">
     <nav className="navbar" role="navigation" aria-label="main navigation">
@@ -91,7 +91,7 @@ const NavbarComponent = (args: any) => {
         <div className="navbar-end">
           <div className="navbar-item">
             <div className="buttons" id="buttons">
-              {tokens.accessToken ? logoutButton() : loginSignupButtons()}
+              {accessToken ? logoutButton() : loginSignupButtons()}
             </div>
           </div>
           <div className="navbar-item" id="profile">
