@@ -2,13 +2,14 @@ import axios from 'axios';
 import type { NextPage } from 'next'
 import { useEffect, useState } from 'react';
 import { useUserContext } from '../components/UserContext';
+import { api } from "../utilities/api";
 
 const Home: NextPage = () => {
   const {userData} = useUserContext()
   const [serverResponse, setServerResponse] = useState('')
   const getData = async() => {
-    const response = await axios.get(`/user/${userData.user_id}`);
-    console.log('response: ', response.data)
+    const response = await api.get(`/user/${userData.user_id}`);
+    console.log(userData)
     setServerResponse(JSON.stringify(response.data))
   }
   useEffect(() => {

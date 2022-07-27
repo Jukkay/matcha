@@ -1,10 +1,9 @@
 import type { NextPage } from "next";
-import { useState, useEffect, ChangeEventHandler, ReactNode, useContext } from "react";
+import { useState, useEffect} from "react";
 import { FaCheck, FaUser, FaLock, FaEnvelope } from "react-icons/fa";
 import { SignupProps } from "./types";
 import { FormInput, Notification, SubmitButton } from "./components";
-import { useUserContext } from "../../components/UserContext";
-import axios from "axios";
+import { api } from "../../utilities/api";
 
 const Signup: NextPage = (props: SignupProps) => {
 
@@ -196,7 +195,7 @@ const Signup: NextPage = (props: SignupProps) => {
     setLoading(true);
     setShowGenericError(false);
     try {
-      const response = await axios.post("/user/", values);
+      const response = await api.post("/user/", values);
       if (response.status === 201) setSuccess(true);
     } catch (err: any) {
       const errorMessage = err.response?.data?.message;
