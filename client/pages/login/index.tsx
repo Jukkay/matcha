@@ -4,7 +4,7 @@ import { FaUser, FaLock } from "react-icons/fa";
 import { LoginProps } from "./types";
 import { FormInput, SubmitButton, Notification } from "./components";
 import { useUserContext } from "../../components/UserContext";
-import { API_URL } from '../../utilities/interceptor';
+import { API_URL } from "../../utilities/interceptor";
 import axios from "axios";
 import Link from "next/link";
 
@@ -17,7 +17,14 @@ const Login: NextPage = (props: LoginProps) => {
   const [notificationText, setNotificationText] = useState("");
 
   // Get user data from context
-  const { updateUserData, userData, accessToken, refreshToken, updateAccessToken, updateRefreshToken } = useUserContext();
+  const {
+    updateUserData,
+    userData,
+    accessToken,
+    refreshToken,
+    updateAccessToken,
+    updateRefreshToken,
+  } = useUserContext();
 
   // Form values
   const [values, setValues] = useState({
@@ -103,15 +110,11 @@ const Login: NextPage = (props: LoginProps) => {
             JSON.stringify(response.data.user)
           );
         }
-        if (response.data.tokens) {
+        if (response.data.accessToken && response.data.refreshToken) {
           updateAccessToken(response.data.accessToken);
-          updateRefreshToken(response.data.refreshToken)
-          sessionStorage.setItem(
-            "accessToken", response.data.accessToken
-          );
-          sessionStorage.setItem(
-            "refreshToken", response.data.refreshToken
-          );
+          updateRefreshToken(response.data.refreshToken);
+          sessionStorage.setItem("accessToken", response.data.accessToken);
+          sessionStorage.setItem("refreshToken", response.data.refreshToken);
         }
       }
     } catch (err: any) {
@@ -175,8 +178,13 @@ const Login: NextPage = (props: LoginProps) => {
                 notificationState={notification}
                 handleClick={() => setNotification(false)}
               />
-              <Link href='/passwordreset'>Forgot your password? Click here to reset your password.</Link><br/>
-              <Link href='/emailconfirmation'>Click here to re-send confirmation email.</Link>
+              <Link href="/passwordreset">
+                Forgot your password? Click here to reset your password.
+              </Link>
+              <br />
+              <Link href="/emailconfirmation">
+                Click here to re-send confirmation email.
+              </Link>
             </section>
           </div>
         </section>
