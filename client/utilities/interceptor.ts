@@ -6,9 +6,9 @@ import axios, {
 } from "axios";
 import { useUserContext } from "../components/UserContext";
 
-export const API_URL = 'http://localhost:4000'
 const handleRequest = (config: AxiosRequestConfig) => {
-  const { accessToken } = useUserContext();
+  const accessToken = sessionStorage.getItem("accessToken")
+  console.log(config)
   if (config.headers)
     config.headers["Authorization"] = `Bearer ${accessToken}`;
   return config;
@@ -29,7 +29,7 @@ const handleResponseError = async (
     return Promise.reject(error);
   const { refreshToken, userData, updateAccessToken } = useUserContext();
   try {
-    const refreshResponse = await axios.post(`${API_URL}/token/`, {
+    const refreshResponse = await axios.post(`/token/`, {
       token: refreshToken,
       user_id: userData.user_id,
     });
@@ -47,3 +47,4 @@ export const interceptorSetup = (instance: AxiosInstance): AxiosInstance => {
   instance.interceptors.response.use(handleResponse, handleResponseError);
   return instance;
 };
+

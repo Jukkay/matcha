@@ -196,7 +196,7 @@ const Signup: NextPage = (props: SignupProps) => {
     setLoading(true);
     setShowGenericError(false);
     try {
-      const response = await axios.post("http://localhost:4000/user/", values);
+      const response = await axios.post("/user/", values);
       if (response.status === 201) setSuccess(true);
     } catch (err: any) {
       const errorMessage = err.response?.data?.message;

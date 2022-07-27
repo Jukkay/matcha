@@ -1,13 +1,13 @@
-import axios from "axios";
+import {api} from "../../utilities/api";
 import type { NextPage } from "next";
 import { useState, useEffect, useContext } from "react";
 import { useUserContext} from "../../components/UserContext";
-import { API_URL } from '../../utilities/interceptor';
 
 const Logout: NextPage = (props) => {
 	const {updateAccessToken, updateRefreshToken, updateUserData, refreshToken, user_id} = useUserContext()
+	console.log(refreshToken)
 	useEffect(() => {
-		axios.post(`${API_URL}/logout/`, {refreshToken: refreshToken, user_id: user_id}).then(res => {
+		api.post('/logout/', {refreshToken: refreshToken }).then(res => {
 			if (res.status === 200) {
 				updateAccessToken('')
 				updateRefreshToken('')

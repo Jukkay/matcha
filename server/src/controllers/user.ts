@@ -101,9 +101,8 @@ export const login = async (req: Request, res: Response) => {
 };
 
 export const logout = async (req: Request, res: Response) => {
-  const refreshToken = req.headers.authorization?.split(" ")[1];
   try {
-    const { user_id } = req.body;
+    const { refreshToken } = req.body;
     if (!refreshToken)
       return res.status(400).json({ message: "Missing token" });
     await deleteRefreshToken(refreshToken);

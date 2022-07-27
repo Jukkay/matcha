@@ -4,8 +4,7 @@ import { FaUser, FaLock } from "react-icons/fa";
 import { LoginProps } from "./types";
 import { FormInput, SubmitButton, Notification } from "./components";
 import { useUserContext } from "../../components/UserContext";
-import { API_URL } from "../../utilities/interceptor";
-import axios from "axios";
+import {api} from "../../utilities/api";
 import Link from "next/link";
 
 const Login: NextPage = (props: LoginProps) => {
@@ -97,7 +96,7 @@ const Login: NextPage = (props: LoginProps) => {
     });
 
     try {
-      const response = await axios.post(`${API_URL}/login/`, values);
+      const response = await api.post(`login/`, values);
       if (response.status === 200) {
         if (response?.data?.auth !== true) {
           throw new Error("Invalid server response");
@@ -110,6 +109,7 @@ const Login: NextPage = (props: LoginProps) => {
             JSON.stringify(response.data.user)
           );
         }
+        console.log(userData);
         if (response.data.accessToken && response.data.refreshToken) {
           updateAccessToken(response.data.accessToken);
           updateRefreshToken(response.data.refreshToken);
@@ -118,6 +118,7 @@ const Login: NextPage = (props: LoginProps) => {
         }
       }
     } catch (err: any) {
+      console.error(err);
       const errorMessage = err.response?.data?.message;
       const errorField = err.response?.data?.field;
       if (errorField) {
