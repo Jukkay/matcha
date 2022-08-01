@@ -24,8 +24,9 @@ export const signEmailToken = async(email: string): Promise<string> => {
 export const verifyJWT = async(userToken: string, serverToken: string): Promise<string | JwtPayload | undefined> => {
 	return new Promise(async(resolve, reject) => {
 		jwt.verify(userToken, serverToken, (err, decoded) => {
-			if (err)
+			if (err) {
 				reject(err)
+			}
 			else resolve(decoded)
 		})
 	})
@@ -33,7 +34,7 @@ export const verifyJWT = async(userToken: string, serverToken: string): Promise<
 
 export const signAccessToken = async(user_id: RowDataPacket): Promise<string> => {
 	return new Promise(async(resolve, reject) => {
-		const expirationTime = 600
+		const expirationTime = 30
 		jwt.sign({
 				user_id: user_id
 			},
@@ -52,7 +53,8 @@ export const signAccessToken = async(user_id: RowDataPacket): Promise<string> =>
 
 export const signRefreshToken = async(user_id: RowDataPacket): Promise<string> => {
 	return new Promise(async(resolve, reject) => {
-		const expirationTime = 5 * 24 * 60 * 60
+		const expirationTime = '5 days'
+		console.log('Expiration time: ',expirationTime)
 		jwt.sign({
 				user_id: user_id
 			},

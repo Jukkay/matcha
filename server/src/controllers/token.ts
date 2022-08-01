@@ -37,8 +37,7 @@ export const refreshToken = async (
   res: Response,
 ) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1]
-    const { user_id } = req.body;
+    const { user_id, token } = req.body;
     const refresh_token = getSecret("refresh_token");
     if (!token) {
       return res.json({
@@ -73,7 +72,6 @@ export const refreshToken = async (
       accessToken: accessToken,
     });
   } catch (err) {
-    console.error(err);
     return res.status(403).json({
       message: "Unauthorized",
     });

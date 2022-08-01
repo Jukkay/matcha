@@ -74,8 +74,8 @@ export const login = async (req: Request, res: Response) => {
       });
     }
 
-    const accessToken = await signAccessToken(user[0]);
-    const refreshToken = await signRefreshToken(user[0]);
+    const accessToken = await signAccessToken(user[0].user_id);
+    const refreshToken = await signRefreshToken(user[0].user_id);
     if (accessToken && refreshToken) {
       await updateRefreshTokenList(refreshToken, user[0].user_id);
       return res.status(200).json({

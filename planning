@@ -132,6 +132,7 @@ V Add token to queries
 implement token refresh functionality on server side
 Add a button to send new email token message to error message
 Password reset form
+Make separate errorHandler for catch blocks
 
 # Later
 Remove error message passthrough in user controller
