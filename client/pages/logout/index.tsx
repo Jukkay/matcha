@@ -1,4 +1,4 @@
-import {api} from "../../utilities/api";
+import {API} from "../../utilities/api";
 import type { NextPage } from "next";
 import { useState, useEffect, useContext } from "react";
 import { useUserContext} from "../../components/UserContext";
@@ -7,7 +7,7 @@ const Logout: NextPage = (props) => {
 	const {updateAccessToken, updateRefreshToken, updateUserData, refreshToken, user_id} = useUserContext()
 	console.log(refreshToken)
 	useEffect(() => {
-		api.post('/logout/', {refreshToken: refreshToken }).then(res => {
+		API.post('/logout/', {refreshToken: refreshToken }).then(res => {
 			if (res.status === 200) {
 				updateAccessToken('')
 				updateRefreshToken('')

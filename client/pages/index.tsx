@@ -1,20 +1,26 @@
-import axios from 'axios';
 import type { NextPage } from 'next'
 import { useEffect, useState } from 'react';
-import { useUserContext } from '../components/UserContext';
-import { api } from "../utilities/api";
+import { API, addInterceptors } from "../utilities/api";
 
 const Home: NextPage = () => {
-  const {userData} = useUserContext()
   const [serverResponse, setServerResponse] = useState('')
+  const authAPI = addInterceptors(API)
+
   const getData = async() => {
-    const response = await api.get(`/user/${userData.user_id}`);
-    console.log(userData)
-    setServerResponse(JSON.stringify(response.data))
+      const storedInfo = sessionStorage.getItem("userData");
+      if (storedInfo) {
+        const {user_id} = JSON.parse(storedInfo)
+        const response = await authAPI.get(`/user/${user_id}`);
+        if (response) {
+          setServerResponse(JSON.stringify(response.data))
+        }
+      }
   }
+
   useEffect(() => {
     getData()
   }, [])
+
   return (
     <section className="section">
 

@@ -4,7 +4,7 @@ import { FaUser, FaLock } from "react-icons/fa";
 import { LoginProps } from "./types";
 import { FormInput, SubmitButton, Notification } from "./components";
 import { useUserContext } from "../../components/UserContext";
-import {api} from "../../utilities/api";
+import {API} from "../../utilities/api";
 import Link from "next/link";
 
 const Login: NextPage = (props: LoginProps) => {
@@ -84,6 +84,11 @@ const Login: NextPage = (props: LoginProps) => {
     } else setValidForm(false);
   }, [values.username, values.password]);
 
+  // Userdata debug print
+  useEffect(() => {
+    console.log(userData)
+  }, [userData])
+
   // Handle submit
   const handleSubmit = async (event: React.SyntheticEvent) => {
     event.preventDefault();
@@ -96,20 +101,19 @@ const Login: NextPage = (props: LoginProps) => {
     });
 
     try {
-      const response = await api.post(`login/`, values);
-      if (response.status === 200) {
+      const response = await API.post(`login/`, values);
+      if (response?.status === 200) {
         if (response?.data?.auth !== true) {
           throw new Error("Invalid server response");
         }
         setSuccess(true);
-        if (response.data.user) {
+        if (response.data.user?.user_id) {
           updateUserData(response.data.user);
           sessionStorage.setItem(
             "userData",
             JSON.stringify(response.data.user)
           );
         }
-        console.log(userData);
         if (response.data.accessToken && response.data.refreshToken) {
           updateAccessToken(response.data.accessToken);
           updateRefreshToken(response.data.refreshToken);

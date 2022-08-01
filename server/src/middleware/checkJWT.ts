@@ -13,8 +13,7 @@ const checkJWT = (req: Request, res: Response, next: NextFunction) => {
 	}
 	jwt.verify(token, server_token, (err, decoded) => {
 		if (err) {
-			return res.json({
-				status: 401,
+			return res.status(401).json({
 				message: 'Unauthorized'
 			})
 		}
