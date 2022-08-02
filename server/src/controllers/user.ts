@@ -1,8 +1,7 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import { execute } from "../utilities/SQLConnect";
 import bcryptjs from "bcryptjs";
 import {
-  signEmailToken,
   signAccessToken,
   signRefreshToken,
 } from "../utilities/promisifyJWT";
@@ -18,8 +17,7 @@ const register = async (req: Request, res: Response) => {
     const hash = await bcryptjs.hash(password, 10);
     const sql = `INSERT INTO users (username, password, email, name) VALUES (?, ?, ?, ?);`;
     const result = await execute(sql, [username, hash, email, name]);
-    const email_token = await signEmailToken(email);
-    await sendEmailVerification(req.body.email, email_token);
+    await sendEmailVerification(req.body.email);
     return res.status(201).json({
       message: "User added successfully",
     });

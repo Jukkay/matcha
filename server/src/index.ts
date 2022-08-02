@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from "helmet";
 import userRouter from './routes/user';
-import { refreshToken, verifyEmailToken } from './controllers/token';
+import { refreshToken, verifyEmailToken, sendNewEmailVerification } from './controllers/token';
 import * as SQLConnect from './utilities/SQLConnect'
 import { getURL } from './utilities/getURL'
 import { login, logout } from './controllers/user'
@@ -26,7 +26,9 @@ app.get("/", (req: express.Request, res: express.Response) => {
 app.post('/login', login)
 app.post('/logout', logout)
 app.post('/token', refreshToken)
+app.post('/emailtoken', sendNewEmailVerification)
 app.get('/verify_email/:token', verifyEmailToken)
+app.post('/resetpassword', sendNewEmailVerification)
 
 // User CRUD route
 app.use('/user', userRouter);

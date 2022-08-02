@@ -129,10 +129,11 @@ V Add token check middleware to api
 V Save token in client end
 V make navbar change with login state
 V Add token to queries
-implement token refresh functionality on server side
+V implement token refresh functionality on server side
 Add a button to send new email token message to error message
 Password reset form
-Make separate errorHandler for catch blocks
 
 # Later
+Make separate errorHandler for catch blocks
 Remove error message passthrough in user controller
+Refactor interceptors to another file so they can use context instead of sessionStorage

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { IFormInputField, IHelper, IState, IButton } from "./types";
+import { IFormInputField, IHelper, IState, IButton } from "../types/types";
 
 export const Label = ({ label, name }: IFormInputField) => {
   if (!label) return null;

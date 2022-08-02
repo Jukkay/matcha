@@ -1,11 +1,10 @@
 import type { NextPage } from "next";
 import { useState, useEffect} from "react";
 import { FaCheck, FaUser, FaLock, FaEnvelope } from "react-icons/fa";
-import { SignupProps } from "./types";
-import { FormInput, Notification, SubmitButton } from "./components";
-import { api } from "../../utilities/api";
+import { FormInput, Notification, SubmitButton } from "../../components/form";;
+import { API } from "../../utilities/api";
 
-const Signup: NextPage = (props: SignupProps) => {
+const Signup: NextPage = () => {
 
   // validator states
   const [validUsername, setValidUsername] = useState(false);
@@ -195,7 +194,7 @@ const Signup: NextPage = (props: SignupProps) => {
     setLoading(true);
     setShowGenericError(false);
     try {
-      const response = await api.post("/user/", values);
+      const response = await API.post("/user/", values);
       if (response.status === 201) setSuccess(true);
     } catch (err: any) {
       const errorMessage = err.response?.data?.message;
