@@ -2,11 +2,12 @@ import express from 'express';
 import cors from 'cors';
 import helmet from "helmet";
 import userRouter from './routes/user';
-import { refreshToken, verifyEmailToken, sendNewEmailVerification } from './controllers/token';
+import { refreshToken, verifyEmailToken } from './controllers/token';
+import { resetPassword } from './controllers/resetpassword';
+import { sendNewEmailVerification, sendPasswordReset } from './controllers/mailer';
 import * as SQLConnect from './utilities/SQLConnect'
 import { getURL } from './utilities/getURL'
 import { login, logout } from './controllers/user'
-import checkJWT from './middleware/checkJWT';
 
 const app: express.Application = express();
 
@@ -27,8 +28,9 @@ app.post('/login', login)
 app.post('/logout', logout)
 app.post('/token', refreshToken)
 app.post('/emailtoken', sendNewEmailVerification)
-app.get('/verify_email/:token', verifyEmailToken)
-app.post('/resetpassword', sendNewEmailVerification)
+app.post('/resetpasswordtoken', sendPasswordReset)
+app.post('/verifyemail', verifyEmailToken)
+app.post('/setpassword', resetPassword)
 
 // User CRUD route
 app.use('/user', userRouter);

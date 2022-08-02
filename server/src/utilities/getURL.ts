@@ -6,3 +6,5 @@ export const getURL = () => {
 	const port = process.env.PORT == '80' || process.env.PORT == '443' ? '' : ':' + process.env.PORT
 	return `${protocol}${domain}${port}`
 }
+
+export const CLIENT_URL = process.env.CLIENT_URL

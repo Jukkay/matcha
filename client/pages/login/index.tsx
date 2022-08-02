@@ -187,7 +187,7 @@ const Login: NextPage = (props: LoginProps) => {
                 Forgot your password? Click here to reset your password.
               </Link>
               <br />
-              <Link href="/emailconfirmation">
+              <Link href="/sendemailverification">
                 Click here to re-send confirmation email.
               </Link>
             </section>

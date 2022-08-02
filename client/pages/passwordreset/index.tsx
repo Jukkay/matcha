@@ -1,12 +1,10 @@
 import type { NextPage } from "next";
 import { useState, useEffect } from "react";
-import { useUserContext } from "../../components/UserContext";
 import {API} from "../../utilities/api";
-import Link from "next/link";
 import { FaCheck, FaEnvelope } from "react-icons/fa";
 import { FormInput, SubmitButton, Notification } from "../../components/form";
 
-const EmailConfirmation: NextPage = () => {
+const PasswordReset: NextPage = () => {
 // validator states
 
 const [validEmail, setValidEmail] = useState(false);
@@ -16,27 +14,21 @@ const [validForm, setValidForm] = useState(false);
 const [success, setSuccess] = useState(false);
 const [showGenericError, setShowGenericError] = useState(false);
 const [loading, setLoading] = useState(false);
-const [notification, setNotification] = useState(false);
-const [notificationText, setNotificationText] = useState("");
 
 // input values
 const [values, setValues] = useState({
   email: "",
 });
 
-// Error states
+// error states
 const [errors, setErrors] = useState({
-    email: false,
-    generic: false,
-    server: false,
-  });
+  email: false,
+});
 
-  // Error messages
-  const [errorMessages, setErrorMessages] = useState({
-    email: "Invalid email address",
-    generic: "",
-    server: "Server error. Please try again later.",
-  });
+// Error messages
+const [errorMessages, setErrorMessages] = useState({
+  email: "Invalid email address",
+});
 
 // Data for input fields
 const inputs = [
@@ -87,22 +79,17 @@ const handleSubmit = async (event: React.SyntheticEvent) => {
   setLoading(true);
   setShowGenericError(false);
   try {
-	console.log(values)
-	const response = await API.post("/emailtoken/", values);
-	if (response.status === 201) setSuccess(true);
+	const response = await API.post("/resetpasswordtoken/", values);
+	if (response.status === 200) setSuccess(true);
   } catch (err: any) {
-	console.error(err);
 	const errorMessage = err.response?.data?.message;
 	const errorField = err.response?.data?.field;
-	if (errorField) {
+	if (errorMessage && errorField) {
+	  setErrorMessages({ ...errorMessages, [errorField]: errorMessage });
 	  setErrors({ ...errors, [errorField]: true });
-	  if (errorField === "generic") {
-		setNotification(true);
-		setNotificationText(errorMessage);
-	  }
-	} else {
-	  setNotification(true);
-	  setNotificationText(errorMessages.server);
+	}
+	if (errorMessage && !errorField) {
+	  setShowGenericError(true);
 	}
   } finally {
 	setLoading(false);
@@ -116,8 +103,8 @@ return success ? (
 	  <section className="section">
 		<div className="box has-text-centered">
 		  <section className="section">
-			<h3 className="title is-3">Confirmation email was sent successfully</h3>
-			<p>Check your email to confirm your account.</p>
+			<h3 className="title is-3">Password reset email has been sent</h3>
+			<p>Check your email to reset your password.</p>
 		  </section>
 		</div>
 	  </section>
@@ -130,8 +117,8 @@ return success ? (
 		<div className="box">
 		  <section className="section">
 			<form onSubmit={handleSubmit} autoComplete="on">
-			  <h3 className="title is-3">Send new confirmation email</h3>
-			  <p className="mb-4">Follow the link in the email message to activate your account.</p>
+			  <h3 className="title is-3">Reset password</h3>
+			  <p className="mb-4">Password reset instructions will be sent to your email.</p>
 			  {inputs.map((input) => (
 				<FormInput
 				  key={input.id}
@@ -152,10 +139,10 @@ return success ? (
 			  </div>
 			</form>
 			<Notification
-                notificationText={notificationText}
-                notificationState={notification}
-                handleClick={() => setNotification(false)}
-              />
+			  notificationText="Server error. Please try again later."
+			  notificationState={showGenericError}
+			  handleClick={() => setShowGenericError(false)}
+			/>
 		  </section>
 		</div>
 	  </section>
@@ -163,4 +150,4 @@ return success ? (
   </div>
 );
 };
-export default EmailConfirmation;
+export default PasswordReset;

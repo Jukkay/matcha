@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import { getSecret } from "docker-secret";
 import { IEmailToken } from "../interfaces/token";
 import { execute } from "../utilities/SQLConnect";
-import { sendEmailVerification } from "../utilities/sendEmailVerification";
 import {
   signAccessToken,
   verifyJWT,
@@ -11,22 +10,26 @@ const tokenList = require("../index").tokenList;
 
 export const verifyEmailToken = async (req: Request, res: Response) => {
   try {
-    const { token } = req.params;
+    const { token } = req.body;
     const server_token = getSecret("server_token");
     if (!token) {
-      return res.status(401).json({
+      return res.status(400).json({
         message: "No token provided",
       });
     }
     const decoded = await verifyJWT(token, server_token);
     const { email } = decoded as IEmailToken;
     const sql = `UPDATE users SET validated = "1" WHERE email = ?;`;
-    const response = await execute(sql, [email]);
-    return res.status(201).json({
-      message: "Email verified",
+    const result = await execute(sql, [email]);
+    if (result)
+      return res.status(200).json({
+        message: "Email verified",
+      });
+    return res.status(400).json({
+      message: "No user found with that email",
     });
   } catch (err) {
-    return res.status(401).json({
+    return res.status(400).json({
       message: "Cannot verify email token",
     });
   }
@@ -41,14 +44,14 @@ export const refreshToken = async (
     const refresh_token = getSecret("refresh_token");
     if (!token) {
       return res.json({
-        status: 401,
+        status: 400,
         message: "No token given",
       });
     }
     // Check if token is valid
     const decoded = await verifyJWT(token, refresh_token);
     if (!decoded) {
-      return res.status(403).json({
+      return res.status(401).json({
         message: "Invalid token",
       });
     }
@@ -56,7 +59,7 @@ export const refreshToken = async (
     const findToken = `SELECT * FROM tokens WHERE token = ?;`
     const foundToken = await execute(findToken, [token])
     if (!foundToken) {
-      return res.status(403).json({
+      return res.status(401).json({
         message: "Token has been invalidated",
       });
     }
@@ -101,7 +104,6 @@ export const updateRefreshTokenList = async (
   }
 };
 
-
 export const deleteRefreshToken = async (
   refreshToken: string,
  ) => {
@@ -113,33 +115,3 @@ export const deleteRefreshToken = async (
      console.error(err);
    }
  };
-
- export const sendNewEmailVerification = async(req: Request, res: Response) => {
-  const { email } = req.body;
-  if (!email)
-    return res.status(400).json({
-      field: 'email',
-      message: 'Email is required'
-    })
-  const sql = `SELECT validated FROM users WHERE email = ?;`
-  const emailVerified = await execute(sql, [email])
-  if (!emailVerified[0])
-    return res.status(400).json({
-      field: 'generic',
-      message: 'No matching email was found'
-    })
-  if (emailVerified[0]['validated'])
-    return res.status(400).json({
-      field: 'generic',
-      message: 'Your email has already been verified'
-    })
-  const emailSent = await sendEmailVerification(email)
-  if (emailSent) {
-    return res.status(200).json({
-      message: 'Email verification sent successfully'
-    })
-  }
-  return res.status(500).json({
-    message: 'Email verification could not be sent'
-  })
-  }

@@ -37,7 +37,7 @@ V Sign up
    V Email confirmation
 V Login
 V Logout
-Password reset
+V Password reset
 Fill profile information after first login
     Don't allow access to other parts of the site until this is completed.
     Gender
@@ -130,10 +130,17 @@ V Save token in client end
 V make navbar change with login state
 V Add token to queries
 V implement token refresh functionality on server side
-Add a button to send new email token message to error message
-Password reset form
+V Add a button to send new email token message to error message
+V Password reset form
+New profile page
+Save profile information to db
+Redirect to page after first login
+
 
 # Later
+Move API url to docker secrets
 Make separate errorHandler for catch blocks
 Remove error message passthrough in user controller
 Refactor interceptors to another file so they can use context instead of sessionStorage
+
+

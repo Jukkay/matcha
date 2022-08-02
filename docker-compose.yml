@@ -11,6 +11,8 @@ services:
       - "pnpm dev"
     ports:
       - 3000:3000
+    environment:
+        API_URL: http://localhost:4000
 
   server:
     image: node
@@ -37,6 +39,7 @@ services:
         PORT: 4000
         MAIL_USER: jukkacamagru@outlook.com
         PROTOCOL: http
+        CLIENT_URL: http://localhost:3000
     entrypoint: "/bin/bash -c"
     command:
       - "npm start"
