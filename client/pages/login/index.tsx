@@ -1,13 +1,12 @@
 import type { NextPage } from "next";
 import { useState, useEffect } from "react";
 import { FaUser, FaLock } from "react-icons/fa";
-import { LoginProps } from "./types";
-import { FormInput, SubmitButton, Notification } from "./components";
+import { FormInput, SubmitButton, Notification } from "../../components/form";
 import { useUserContext } from "../../components/UserContext";
 import {API} from "../../utilities/api";
 import Link from "next/link";
 
-const Login: NextPage = (props: LoginProps) => {
+const Login: NextPage = () => {
   // Form states
   const [success, setSuccess] = useState(false);
   const [validForm, setValidForm] = useState(false);
@@ -83,11 +82,6 @@ const Login: NextPage = (props: LoginProps) => {
       setValidForm(true);
     } else setValidForm(false);
   }, [values.username, values.password]);
-
-  // Userdata debug print
-  useEffect(() => {
-    console.log(userData)
-  }, [userData])
 
   // Handle submit
   const handleSubmit = async (event: React.SyntheticEvent) => {

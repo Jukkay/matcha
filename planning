@@ -132,7 +132,10 @@ V Add token to queries
 V implement token refresh functionality on server side
 V Add a button to send new email token message to error message
 V Password reset form
-New profile page
+V New profile page
+Add selected interests to the top of the text input
+Add birthdate to signup form
+Add age range to profile form
 Save profile information to db
 Redirect to page after first login
 
