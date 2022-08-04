@@ -172,7 +172,7 @@ export const CountrySelector = ({
 						Choose your country
 					</option>
 					{Country.getAllCountries().map((country) => (
-						<option value={country.isoCode}>{country.name}</option>
+						<option key={country.name} value={country.isoCode}>{country.name}</option>
 					))}
 				</select>
 			</div>
@@ -205,7 +205,7 @@ export const CitySelector = ({
 						Choose your city
 					</option>
 					{City.getCitiesOfCountry(profile.country)?.map((city) => (
-						<option value={city.name}>{city.name}</option>
+						<option key={city.name} value={city.name}>{city.name}</option>
 					))}
 				</select>
 			</div>

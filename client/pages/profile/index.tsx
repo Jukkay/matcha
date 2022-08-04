@@ -38,6 +38,8 @@ const EditMode = ({ setEditMode }: EditProps) => {
 	const [profile, setProfile] = useState<IProfile>({
 		gender: '',
 		looking: '',
+		min_age: userData.age,
+		max_age: userData.age,
 		introduction: '',
 		country: '',
 		city: '',
@@ -147,6 +149,30 @@ const EditMode = ({ setEditMode }: EditProps) => {
 						}
 					></textarea>
 				</div>
+				{/* Age range */}
+				<div className="block">
+					<label htmlFor="interests" className="label my-3">
+						Minimum age *
+					</label>
+					<input
+						type="number"
+						className="input is-primary"
+						min="18"
+						max="122"
+						value={profile.min_age}
+					/>
+					<label htmlFor="interests" className="label my-3">
+						Maximum age *
+					</label>
+					<input
+						type="number"
+						className="input is-primary"
+						min="18"
+						max="122"
+						value={profile.max_age}
+					/>
+				</div>
+
 				{/* Interests */}
 				<div className="block">
 					<label htmlFor="interests" className="label my-3">

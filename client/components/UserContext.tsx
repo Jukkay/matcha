@@ -11,6 +11,7 @@ export type UserInfo = {
   user_id: number | null;
   name: string | undefined;
   email: string | undefined;
+  age: number | undefined;
 };
 
 export interface IUser {
@@ -31,6 +32,7 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
     user_id: null,
     name: "",
     email: "",
+    age: 40
   });
 
   useEffect(() => {

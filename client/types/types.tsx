@@ -52,6 +52,8 @@ export interface IButton {
 export interface IProfile {
   gender: string;
   looking: string;
+  min_age: number,
+  max_age: number,
   introduction: string;
   country: string;
   city: string

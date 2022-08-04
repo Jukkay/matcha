@@ -134,8 +134,11 @@ V Add a button to send new email token message to error message
 V Password reset form
 V New profile page
 V Add selected interests to the top of the text input
-Add birthdate to signup form
-Add age range to profile form
+V Add birthdate to signup form
+V Add age range to profile form
+Make user's age default value for age range fields
+Add picture upload (File API)
+Add picture thumbnails
 Save profile information to db
 Redirect to page after first login
 
@@ -145,5 +148,6 @@ Move API url to docker secrets
 Make separate errorHandler for catch blocks
 Remove error message passthrough in user controller
 Refactor interceptors to another file so they can use context instead of sessionStorage
+Double slider for age range
 
 
