@@ -248,6 +248,7 @@ const Signup: NextPage = () => {
                     onChange={onChange}
                   />
                 ))}
+
                 <div className="field mt-5">
                   <SubmitButton validForm={validForm} loadingState={loading} />
                 </div>

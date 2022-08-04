@@ -53,6 +53,8 @@ export interface IProfile {
   gender: string;
   looking: string;
   introduction: string;
+  country: string;
+  city: string
 }
 
 export interface ITag {
@@ -71,3 +73,7 @@ export interface ISearchResult {
 	setTagError: SetStateAction<any>;
 	query: string;
   }
+export interface ISelector {
+  profile: IProfile;
+  setProfile: SetStateAction<any>,
+}
