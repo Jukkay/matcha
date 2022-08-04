@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import { useState, useEffect} from "react";
-import { FaCheck, FaUser, FaLock, FaEnvelope } from "react-icons/fa";
+import { FaCheck, FaUser, FaLock, FaEnvelope, FaBirthdayCake } from "react-icons/fa";
 import { FormInput, Notification, SubmitButton } from "../../components/form";;
 import { API } from "../../utilities/api";
 
@@ -12,6 +12,7 @@ const Signup: NextPage = () => {
   const [validMatch, setValidMatch] = useState(false);
   const [validEmail, setValidEmail] = useState(false);
   const [validName, setValidName] = useState(false);
+  const [validBirthday, setValidBirthday] = useState(false);
   const [validForm, setValidForm] = useState(false);
 
   // Form states
@@ -21,6 +22,7 @@ const Signup: NextPage = () => {
 
   // input values
   const [values, setValues] = useState({
+    birthday: "",
     username: "",
     password: "",
     confirmPassword: "",
@@ -30,6 +32,7 @@ const Signup: NextPage = () => {
 
   // error states
   const [errors, setErrors] = useState({
+    birthday: false,
     username: false,
     password: false,
     confirmPassword: false,
@@ -39,6 +42,7 @@ const Signup: NextPage = () => {
 
   // Error messages
   const [errorMessages, setErrorMessages] = useState({
+    birthday: "You seem to be younger than 18",
     username: "Invalid username",
     password: "Invalid password",
     confirmPassword: "Passwords do not match",
@@ -50,6 +54,19 @@ const Signup: NextPage = () => {
   const inputs = [
     {
       id: 1,
+      type: "date",
+      name: "birthday",
+      label: "Date of birth *",
+      autoComplete: "bday",
+      helper:
+        "You must be at least 18 years old to register",
+      leftIcon: <FaBirthdayCake />,
+      rightIcon: <FaCheck color="green" />,
+      validator: validBirthday,
+      required: true,
+    },
+    {
+      id: 2,
       type: "text",
       placeholder: "Username",
       name: "username",
@@ -63,7 +80,7 @@ const Signup: NextPage = () => {
       required: true,
     },
     {
-      id: 2,
+      id: 3,
       type: "password",
       placeholder: "Password",
       name: "password",
@@ -77,7 +94,7 @@ const Signup: NextPage = () => {
       required: true,
     },
     {
-      id: 3,
+      id: 4,
       type: "password",
       placeholder: "Confirm password",
       name: "confirmPassword",
@@ -89,7 +106,7 @@ const Signup: NextPage = () => {
       required: true,
     },
     {
-      id: 4,
+      id: 5,
       type: "email",
       placeholder: "Email",
       name: "email",
@@ -101,7 +118,7 @@ const Signup: NextPage = () => {
       required: true,
     },
     {
-      id: 5,
+      id: 6,
       type: "text",
       placeholder: "Name",
       name: "name",
@@ -120,6 +137,28 @@ const Signup: NextPage = () => {
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [event.target.name]: event.target.value });
   };
+
+  // Birthday validation
+  useEffect(() => {
+    if (!values.birthday) return;
+    const birthday = new Date(values.birthday).getTime()
+    const now = new Date().getTime()
+    const age = (now - birthday) / (1000 * 60 * 60 * 24) / 365
+    if (age >= 18) {
+      setValidBirthday(true)
+      setErrors({
+        ...errors,
+        birthday: false,
+      });
+    }
+    else {
+      setValidBirthday(false)
+      setErrors({
+        ...errors,
+        birthday: true,
+      });
+    }
+  }, [values.birthday])
 
   // Username validation
   useEffect(() => {
@@ -182,7 +221,7 @@ const Signup: NextPage = () => {
 
   // Form validation
   useEffect(() => {
-    if (validUsername && validPassword && validEmail && validMatch) {
+    if (validBirthday && validUsername && validPassword && validEmail && validMatch) {
       if (values.name && !validName) setValidForm(false);
       else setValidForm(true);
     } else setValidForm(false);
@@ -233,6 +272,7 @@ const Signup: NextPage = () => {
             <section className="section">
               <form onSubmit={handleSubmit} autoComplete="on">
                 <h3 className="title is-3">Create new account</h3>
+                
                 {inputs.map((input) => (
                   <FormInput
                     key={input.id}
