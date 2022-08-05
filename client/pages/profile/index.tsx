@@ -2,16 +2,20 @@ import type { NextPage } from 'next';
 import React, { useState, useEffect } from 'react';
 import { ErrorMessage } from '../../components/form';
 import {
+	AgeRange,
 	CitySelector,
 	CountrySelector,
 	EditButton,
 	FileInput,
+	GenderSelector,
 	SaveButton,
 	SearchResult,
+	TextArea,
 } from '../../components/profile';
 import { useUserContext } from '../../components/UserContext';
 import { EditProps, IProfile } from '../../types/types';
 import { dummyData } from './data';
+import { Country, City } from 'country-state-city';
 
 const NotLoggedIn = () => {
 	return (
@@ -54,6 +58,7 @@ const EditMode = ({ setEditMode }: EditProps) => {
 		setQuery(event.target.value);
 	};
 
+	// Live query interest from interest list
 	useEffect(() => {
 		if (!query) {
 			setResult([]);
@@ -68,110 +73,47 @@ const EditMode = ({ setEditMode }: EditProps) => {
 	return (
 		<div>
 			<section className="section">
+			<h3 className="title is-3">Tell us about yourself</h3>
 				{/* Location */}
 				<CountrySelector profile={profile} setProfile={setProfile} />
 				<CitySelector profile={profile} setProfile={setProfile} />
-				{/* Gender */}
-				<div className="block">
-					<label htmlFor="gender" className="label my-3">
-						Gender *
-					</label>
-					<div className="select is-primary">
-						<select
-							id="gender"
-							value={profile.gender}
-							onChange={(event) =>
-								setProfile({
-									...profile,
-									gender: event.target.value,
-								})
-							}
-							required
-						>
-							<option value={''} disabled>
-								Choose your gender
-							</option>
-							<option value={'Male'}>Male</option>
-							<option value={'Female'}>Female</option>
-							<option value={'Non-binary'}>Non-binary</option>
-							<option value={'Trans-man'}>Trans-man</option>
-							<option value={'Trans-woman'}>Trans-woman</option>
-							<option value={'Other'}>Other</option>
-						</select>
-					</div>
-				</div>
 
-				{/* Looking For */}
-				<div className="block">
-					<label htmlFor="looking" className="label my-3">
-						Looking for *
-					</label>
-					<div className="select is-primary">
-						<select
-							id="looking"
-							value={profile.looking}
-							onChange={(event) =>
-								setProfile({
-									...profile,
-									looking: event.target.value,
-								})
-							}
-							required
-						>
-							<option value={''} disabled>
-								Choose a gender
-							</option>
-							<option>Male</option>
-							<option>Female</option>
-							<option>Non-binary</option>
-							<option>Trans-man</option>
-							<option>Trans-woman</option>
-							<option>Other</option>
-						</select>
-					</div>
-				</div>
+				{/* Gender */}
+				<GenderSelector
+					label="Gender *"
+					id="gender"
+					value={profile.gender}
+					placeholder="Choose your gender"
+					onChange={(event) =>
+						setProfile({
+							...profile,
+							gender: event.target.value,
+						})
+					}
+					options={[
+						'Male',
+						'Female',
+						'Non-binary',
+						'Trans-man',
+						'Trans-woman',
+						'Other',
+					]}
+				/>
+
 				{/* Introduction */}
-				<div className="block">
-					<label htmlFor="introduction" className="label my-3">
-						Introduction *
-					</label>
-					<textarea
-						id="introduction"
-						className="textarea is-primary"
-						rows={10}
-						placeholder="Tell us about yourself"
-						value={profile.introduction}
-						onChange={(event) =>
-							setProfile({
-								...profile,
-								introduction: event.target.value,
-							})
-						}
-					></textarea>
-				</div>
-				{/* Age range */}
-				<div className="block">
-					<label htmlFor="interests" className="label my-3">
-						Minimum age *
-					</label>
-					<input
-						type="number"
-						className="input is-primary"
-						min="18"
-						max="122"
-						value={profile.min_age}
-					/>
-					<label htmlFor="interests" className="label my-3">
-						Maximum age *
-					</label>
-					<input
-						type="number"
-						className="input is-primary"
-						min="18"
-						max="122"
-						value={profile.max_age}
-					/>
-				</div>
+				<TextArea
+					label="Introduction *"
+					id="introduction"
+					value={profile.introduction}
+					placeholder="Introduction"
+					size={10}
+					onChange={(event) =>
+						setProfile({
+							...profile,
+							introduction: event.target.value,
+						})
+					}
+				/>
 
 				{/* Interests */}
 				<div className="block">
@@ -200,6 +142,36 @@ const EditMode = ({ setEditMode }: EditProps) => {
 				</div>
 				{/* Pictures */}
 				<FileInput />
+
+				</section>
+
+				<section className="section">
+				<h3 className="title is-3">What are you looking for?</h3>
+				{/* Looking For */}
+				<GenderSelector
+					label="Looking for *"
+					id="looking"
+					value={profile.looking}
+					placeholder="Choose a gender"
+					onChange={(event) =>
+						setProfile({
+							...profile,
+							looking: event.target.value,
+						})
+					}
+					options={[
+						'Male',
+						'Female',
+						'Non-binary',
+						'Trans-man',
+						'Trans-woman',
+						'Other',
+					]}
+				/>
+
+				{/* Age range */}
+				<AgeRange profile={profile} setProfile={setProfile} />
+
 				<SaveButton setEditMode={setEditMode} profile={profile} />
 			</section>
 		</div>

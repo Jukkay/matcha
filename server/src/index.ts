@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from "helmet";
 import userRouter from './routes/user';
+import imageRouter from './routes/image';
 import { refreshToken, verifyEmailToken } from './controllers/token';
 import { resetPassword } from './controllers/resetpassword';
 import { sendNewEmailVerification, sendPasswordReset } from './controllers/mailer';
@@ -34,6 +35,9 @@ app.post('/setpassword', resetPassword)
 
 // User CRUD route
 app.use('/user', userRouter);
+
+// Image CRUD route
+app.use('/image', imageRouter);
 
 // Server start
 app.listen(process.env.PORT, () => {

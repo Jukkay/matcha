@@ -76,6 +76,34 @@ export interface ISearchResult {
 	query: string;
   }
 export interface ISelector {
+  label?: string, 
+  id?: string, 
+  value?: string, 
+  placeholder?: string, 
+  onChange?: (e: any) => void;
+  options?: any[]
+}
+
+export interface ISelectorProfile {
   profile: IProfile;
-  setProfile: SetStateAction<any>,
+  setProfile: SetStateAction<any>
+}
+
+export interface ITextArea {
+  label?: string, 
+  id?: string, 
+  value?: string, 
+  placeholder?: string, 
+  onChange?: (e: any) => void;
+  size?: number
+}
+
+export interface IThumbnails {
+  images?: string[];
+  setFiles?: SetStateAction<any>
+}
+
+export interface IUpload {
+  files: FileList | undefined;
+
 }

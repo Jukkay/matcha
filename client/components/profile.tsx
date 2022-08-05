@@ -1,8 +1,24 @@
-import React, { useState, PointerEvent } from 'react';
+import React, {
+	useState,
+	PointerEvent,
+	useEffect,
+	SetStateAction,
+} from 'react';
 import { FaUpload } from 'react-icons/fa';
 
-import { EditProps, ITag, ISearchResult, ISelector } from '../types/types';
+import {
+	EditProps,
+	ITag,
+	ISearchResult,
+	ISelector,
+	ISelectorProfile,
+	ITextArea,
+	IThumbnails,
+	IUpload,
+} from '../types/types';
 import { Country, City } from 'country-state-city';
+import { ErrorMessage } from './form';
+import { authAPI } from '../utilities/api';
 
 export const EditButton = ({ setEditMode }: EditProps) => {
 	return (
@@ -125,32 +141,7 @@ export const SearchResult = ({
 	);
 };
 
-export const FileInput = () => {
-	return (
-		<div className="block">
-			<label htmlFor="upload" className="label my-3">
-				Upload pictures *
-			</label>
-			<div className="file">
-				<label className="file-label">
-					<input className="file-input" type="file" name="upload" />
-					<span className="file-cta">
-						<span className="file-icon">
-							<FaUpload />
-						</span>
-						<span className="file-label">Choose a file…</span>
-					</span>
-				</label>
-			</div>
-			<div className="block">Uploaded pictures</div>
-		</div>
-	);
-};
-
-export const CountrySelector = ({
-	profile,
-	setProfile,
-}: ISelector) => {
+export const CountrySelector = ({ profile, setProfile }: ISelectorProfile) => {
 	return (
 		<div className="block">
 			<label htmlFor="county" className="label my-3">
@@ -172,7 +163,9 @@ export const CountrySelector = ({
 						Choose your country
 					</option>
 					{Country.getAllCountries().map((country) => (
-						<option key={country.name} value={country.isoCode}>{country.name}</option>
+						<option key={country.name} value={country.isoCode}>
+							{country.name}
+						</option>
 					))}
 				</select>
 			</div>
@@ -180,10 +173,7 @@ export const CountrySelector = ({
 	);
 };
 
-export const CitySelector = ({
-	profile,
-	setProfile,
-}: ISelector) => {
+export const CitySelector = ({ profile, setProfile }: ISelectorProfile) => {
 	return profile.country ? (
 		<div className="block">
 			<label htmlFor="county" className="label my-3">
@@ -205,7 +195,9 @@ export const CitySelector = ({
 						Choose your city
 					</option>
 					{City.getCitiesOfCountry(profile.country)?.map((city) => (
-						<option key={city.name} value={city.name}>{city.name}</option>
+						<option key={city.name} value={city.name}>
+							{city.name}
+						</option>
 					))}
 				</select>
 			</div>
@@ -218,7 +210,7 @@ export const CitySelector = ({
 			<div className="select is-primary disabled">
 				<select
 					id="city"
-					value={profile.city}
+					value={profile?.city}
 					onChange={(event) =>
 						setProfile({
 							...profile,
@@ -233,5 +225,204 @@ export const CitySelector = ({
 				</select>
 			</div>
 		</div>
+	);
+};
+
+export const AgeRange = ({ profile, setProfile }: ISelectorProfile) => {
+	return (
+		<div className="block">
+			<label htmlFor="min_age" className="label">
+				Age range *
+			</label>
+
+			<div className="field is-horizontal">
+				<div className="field-label is-normal">
+					<label htmlFor="min_age" className="label">
+						Min
+					</label>
+				</div>
+				<div className="field-body">
+					<div className="field">
+						<input
+							type="number"
+							id="min_age"
+							className="input is-primary"
+							min="18"
+							max={profile?.max_age}
+							value={profile?.min_age}
+							onChange={(event) =>
+								setProfile({
+									...profile,
+									min_age: parseInt(event.target.value),
+								})
+							}
+						/>
+					</div>
+					<div className="field-label is-normal">
+						<label htmlFor="max_age" className="label">
+							Max
+						</label>
+					</div>
+					<div className="field">
+						<input
+							type="number"
+							id="max_age"
+							className="input is-primary"
+							min={profile?.min_age}
+							max="122"
+							value={profile?.max_age}
+							onChange={(event) =>
+								setProfile({
+									...profile,
+									max_age: parseInt(event.target.value),
+								})
+							}
+						/>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+};
+
+export const GenderSelector = ({
+	label,
+	id,
+	value,
+	placeholder,
+	onChange,
+	options,
+}: ISelector) => {
+	return (
+		<div className="block">
+			<label htmlFor={id} className="label my-3">
+				{label}
+			</label>
+			<div className="select is-primary">
+				<select id={id} value={value} onChange={onChange} required>
+					<option value={''} disabled>
+						{placeholder}
+					</option>
+					{options?.map((item) => (
+						<option key={item} value={item}>
+							{item}
+						</option>
+					))}
+				</select>
+			</div>
+		</div>
+	);
+};
+
+export const TextArea = ({
+	label,
+	id,
+	value,
+	placeholder,
+	onChange,
+	size,
+}: ITextArea) => {
+	return (
+		<div className="block">
+			<label htmlFor={id} className="label my-3">
+				{label}
+			</label>
+			<textarea
+				id={id}
+				className="textarea is-primary"
+				rows={size}
+				placeholder={placeholder}
+				value={value}
+				onChange={onChange}
+			></textarea>
+		</div>
+	);
+};
+
+export const FileInput = () => {
+	const [files, setFiles] = useState<FileList>();
+	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		if (!event.target.files) return;
+		setFiles(event.target.files);
+	};
+
+	return (
+		<div>
+			<div className="block">
+				<label htmlFor="upload" className="label my-3">
+					Upload pictures *
+				</label>
+				<div className="file">
+					<label className="file-label">
+						<input
+							className="file-input"
+							type="file"
+							name="upload"
+							onChange={onChange}
+							accept="image/*"
+							multiple
+						/>
+						<span className="file-cta">
+							<span className="file-icon">
+								<FaUpload />
+							</span>
+							<span className="file-label">
+								Choose files to upload
+							</span>
+						</span>
+					</label>
+				</div>
+			</div>
+			<Thumbnails />
+			<div className="block">
+				<UploadButton files={files} />
+			</div>
+		</div>
+	);
+};
+
+export const Thumbnails = () => {
+
+	// Fetch images from api
+	const [images, setImages] = useState([])
+	// Remove uploaded image
+	const handleClick = (event: PointerEvent<HTMLButtonElement>) => {
+		const removedImage = event.currentTarget.id
+	}
+
+	return images ? (
+		<div className="block">
+			<div className="is-flex is-flex-direction-row is-flex-wrap-wrap">
+				{images.map((image) => (
+					<div key={image} className="box mx-3 has-text-centered">
+						<figure className="image is-128x128">
+							<img src={image} alt="Placeholder image" />
+						</figure>
+						<button className="button is-small is-centered mt-3" id={image} onClick={handleClick}>
+							Remove
+						</button>
+					</div>
+				))}
+			</div>
+		</div>
+	) : null;
+};
+export const UploadButton = ({ files }: IUpload) => {
+	const handleClick = () => {
+		if (!files) return
+		// Add files to formData
+		const imageData = new FormData()
+		for (let i = 0; i < files.length; i++) {
+			imageData.append('files', files[i])
+		}
+
+		// Upload to browser
+		authAPI.post('/image', imageData)
+	};
+
+	return (
+		<button className="button is-primary" onClick={handleClick}>
+			Upload pictures
+		</button>
 	);
 };

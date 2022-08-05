@@ -136,9 +136,12 @@ V New profile page
 V Add selected interests to the top of the text input
 V Add birthdate to signup form
 V Add age range to profile form
-Make user's age default value for age range fields
-Add picture upload (File API)
-Add picture thumbnails
+V Get user's age from db
+V Make user's age default value for age range fields
+V Re-order profile so own profile and "looking for" are their own sections
+V Add picture upload (File API)
+Make server side receive pictures and save them to database
+Query images for thumbnails in client
 Save profile information to db
 Redirect to page after first login
 
@@ -150,4 +153,6 @@ Remove error message passthrough in user controller
 Refactor interceptors to another file so they can use context instead of sessionStorage
 Double slider for age range
 
-
+# Bonuses done
+JTW refresh automation
+Live search with interests

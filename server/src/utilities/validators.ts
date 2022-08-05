@@ -3,7 +3,7 @@ import { execute } from '../utilities/SQLConnect';
 import bcryptjs from "bcryptjs";
 
 export const validateRegistrationInput = async(req: Request, res: Response) => {
-	const { username, password, confirmPassword, name, email } = req.body
+	const { username, password, confirmPassword, name, email, birthday } = req.body
 
 	// check exists
 
@@ -27,6 +27,11 @@ export const validateRegistrationInput = async(req: Request, res: Response) => {
 			field: "email",
 			message: "Missing email."
 		})
+	if (!birthday)
+		return res.status(400).json({
+			field: "birthday",
+			message: "Missing birthday."
+		})
 
 	// check input length
 
@@ -49,6 +54,11 @@ export const validateRegistrationInput = async(req: Request, res: Response) => {
 		return res.status(400).json({
 			field: "name",
 			message: "Name has maximum length of 255 characters."
+		})
+	if (birthday.length != 10)
+		return res.status(400).json({
+			field: "birthday",
+			message: "Invalid birthday length."
 		})
 
 	// check username validity
@@ -76,6 +86,17 @@ export const validateRegistrationInput = async(req: Request, res: Response) => {
 			field: "password",
 			message: "Password must include at least one number and one uppercase and lowercase characters."
 		})
+
+	// Check birthday validity
+    const now = new Date().getTime()
+	const bd = new Date(birthday).getTime()
+    const age = (now - bd) / (1000 * 60 * 60 * 24) / 365
+    if (age < 18)
+		return res.status(400).json({
+			field: "birthday",
+			message: "You seem to be too young. Must be at least 18 years old to register."
+		})
+	
 	// check username exists
 	const sql = "SELECT username FROM users WHERE username = ?;"
 	const usercheck = await execute(sql, [username])

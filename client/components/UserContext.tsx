@@ -8,7 +8,7 @@ import react, {
 
 export type UserInfo = {
   username: string | undefined;
-  user_id: number | null;
+  user_id: number | undefined;
   name: string | undefined;
   email: string | undefined;
   age: number | undefined;
@@ -29,10 +29,10 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
   const [refreshToken, updateRefreshToken] = useState('');
   const [userData, updateUserData] = useState<UserInfo>({
     username: "",
-    user_id: null,
+    user_id: undefined,
     name: "",
     email: "",
-    age: 40
+    age: undefined
   });
 
   useEffect(() => {

@@ -6,6 +6,7 @@ import {
   signRefreshToken,
 } from "../utilities/promisifyJWT";
 import { sendEmailVerification } from "../utilities/sendEmailVerification";
+import { convertBirthdayToAge } from "../utilities/helpers";
 import { validateRegistrationInput } from "../utilities/validators";
 import { deleteRefreshToken, updateRefreshTokenList } from "./token";
 
@@ -13,10 +14,10 @@ const register = async (req: Request, res: Response) => {
   try {
     const validationResponse = await validateRegistrationInput(req, res);
     if (validationResponse !== undefined) return;
-    const { username, password, name, email } = req.body;
+    const { username, password, name, email, birthday } = req.body;
     const hash = await bcryptjs.hash(password, 10);
-    const sql = `INSERT INTO users (username, password, email, name) VALUES (?, ?, ?, ?);`;
-    const result = await execute(sql, [username, hash, email, name]);
+    const sql = `INSERT INTO users (username, password, email, name, birthday) VALUES (?, ?, ?, ?, ?);`;
+    const result = await execute(sql, [username, hash, email, name, birthday]);
     await sendEmailVerification(req.body.email);
     return res.status(201).json({
       message: "User added successfully",
@@ -46,7 +47,7 @@ export const login = async (req: Request, res: Response) => {
         field: "password",
         message: "Missing password",
       });
-    const sql = `SELECT user_id, username, password, email, name, validated FROM users WHERE username = ?;`;
+    const sql = `SELECT user_id, username, password, email, name, validated, birthday FROM users WHERE username = ?;`;
     const user = await execute(sql, username);
     if (!user[0]) {
       return res.status(401).json({
@@ -83,6 +84,7 @@ export const login = async (req: Request, res: Response) => {
           user_id: user[0].user_id,
           email: user[0].email,
           name: user[0].name,
+          age: convertBirthdayToAge(user[0].birthday),
         },
         accessToken: accessToken,
         refreshToken: refreshToken,
