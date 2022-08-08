@@ -15,7 +15,7 @@ services:
         API_URL: http://localhost:4000
 
   server:
-    image: node
+    build: ./server/
     container_name: 'matcha_server'
     depends_on:
       - mariadb
@@ -42,7 +42,7 @@ services:
         CLIENT_URL: http://localhost:3000
     entrypoint: "/bin/bash -c"
     command:
-      - "npm start"
+      - "pnpm start"
     ports:
       - 4000:4000
 
