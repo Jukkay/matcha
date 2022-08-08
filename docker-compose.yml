@@ -42,7 +42,7 @@ services:
         CLIENT_URL: http://localhost:3000
     entrypoint: "/bin/bash -c"
     command:
-      - "pnpm start"
+      - "npm start"
     ports:
       - 4000:4000
 

@@ -19,6 +19,7 @@ import {
 import { Country, City } from 'country-state-city';
 import { ErrorMessage } from './form';
 import { authAPI } from '../utilities/api';
+import { useUserContext } from './UserContext';
 
 export const EditButton = ({ setEditMode }: EditProps) => {
 	return (
@@ -375,20 +376,19 @@ export const FileInput = () => {
 			</div>
 			<Thumbnails />
 			<div className="block">
-				<UploadButton files={files} />
+				<UploadButton files={files} setFiles={setFiles} />
 			</div>
 		</div>
 	);
 };
 
 export const Thumbnails = () => {
-
 	// Fetch images from api
-	const [images, setImages] = useState([])
+	const [images, setImages] = useState([]);
 	// Remove uploaded image
 	const handleClick = (event: PointerEvent<HTMLButtonElement>) => {
-		const removedImage = event.currentTarget.id
-	}
+		const removedImage = event.currentTarget.id;
+	};
 
 	return images ? (
 		<div className="block">
@@ -398,7 +398,11 @@ export const Thumbnails = () => {
 						<figure className="image is-128x128">
 							<img src={image} alt="Placeholder image" />
 						</figure>
-						<button className="button is-small is-centered mt-3" id={image} onClick={handleClick}>
+						<button
+							className="button is-small is-centered mt-3"
+							id={image}
+							onClick={handleClick}
+						>
 							Remove
 						</button>
 					</div>
@@ -407,17 +411,21 @@ export const Thumbnails = () => {
 		</div>
 	) : null;
 };
-export const UploadButton = ({ files }: IUpload) => {
+export const UploadButton = ({ files, setFiles }: IUpload) => {
 	const handleClick = () => {
-		if (!files) return
+		if (!files || files.length < 1) return;
 		// Add files to formData
-		const imageData = new FormData()
+		const imageData = new FormData();
 		for (let i = 0; i < files.length; i++) {
-			imageData.append('files', files[i])
+			imageData.append('files', files[i], files[i].name);
 		}
 
+		for (var pair of imageData.entries()) {
+			console.log(pair[0] + ', ' + pair[1]);
+		}
 		// Upload to browser
-		authAPI.post('/image', imageData)
+		authAPI.post('/image', imageData);
+		setFiles([])
 	};
 
 	return (

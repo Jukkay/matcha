@@ -2,12 +2,12 @@ import { Request, Response } from "express";
 import { execute } from "../utilities/SQLConnect";
 
 const upload = async (req: Request, res: Response) => {
-    console.log(req.body);
-
-    return res.status(200).json({
-      message: "Files uploaded",
-      data: "empty",
-    });
+  if (!req.body.files) return
+  console.log(req.body.files);
+  return res.status(200).json({
+    message: "Files uploaded",
+    data: "empty",
+  });
   };
   
 const getImage = async (req: Request, res: Response) => {

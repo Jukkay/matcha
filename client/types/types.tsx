@@ -105,5 +105,6 @@ export interface IThumbnails {
 
 export interface IUpload {
   files: FileList | undefined;
+  setFiles?: SetStateAction<any>
 
 }
