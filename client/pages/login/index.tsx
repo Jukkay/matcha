@@ -2,7 +2,7 @@ import type { NextPage } from "next";
 import { useState, useEffect } from "react";
 import { FaUser, FaLock } from "react-icons/fa";
 import { FormInput, SubmitButton, Notification } from "../../components/form";
-import { useUserContext } from "../../components/UserContext";
+import { UserInfo, useUserContext } from "../../components/UserContext";
 import {API} from "../../utilities/api";
 import Link from "next/link";
 
@@ -97,15 +97,16 @@ const Login: NextPage = () => {
     try {
       const response = await API.post(`login/`, values);
       if (response?.status === 200) {
-        if (response?.data?.auth !== true) {
+        if (response.data?.auth !== true) {
           throw new Error("Invalid server response");
         }
         setSuccess(true);
-        if (response.data.user?.user_id) {
-          updateUserData(response.data.user);
+        if (response.data.user) {
+          const newUserData = await response.data.user
+          updateUserData(newUserData);
           sessionStorage.setItem(
             "userData",
-            JSON.stringify(response.data.user)
+            JSON.stringify(newUserData)
           );
         }
         if (response.data.accessToken && response.data.refreshToken) {

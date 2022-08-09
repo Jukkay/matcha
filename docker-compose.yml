@@ -40,6 +40,7 @@ services:
         MAIL_USER: jukkacamagru@outlook.com
         PROTOCOL: http
         CLIENT_URL: http://localhost:3000
+        IMG_PATH: "./images/"
     entrypoint: "/bin/bash -c"
     command:
       - "npm start"

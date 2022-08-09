@@ -22,7 +22,6 @@ const diskStorage = multer.diskStorage({
 		callback(null, './images');
 	},
 	filename: (req: any, file: any, callback: any) => {
-		console.log(file);
 		const extension = file.mimetype.split('/')[1].toLowerCase();
 		const filename = `${uuidv4().toString()}.${extension}`;
 		callback(null, filename);
@@ -48,7 +47,7 @@ imageRouter.get('/', (req: express.Request, res: express.Response) => {
 imageRouter.post(
 	'/',
 	[checkJWT, upload.array('files')],
-	async (req: any, res: any) => {
+	async(req: any, res: any) => {
 		try {
 			// Get new filenames
 			let filenames: string[] = [];
@@ -63,12 +62,15 @@ imageRouter.post(
 					message: 'Cannot parse user_id',
 				});
 			// Save filenames to database
-			controller.saveFilenames(user_id, filenames);
-
+			const photo_IDs = await controller.saveFilenames(user_id, filenames);
+			if (!photo_IDs)
+				return res.status(500).json({
+					message: 'Failed to save filenames to database'
+			});
 			// Send filenames as response
 			return res.status(200).json({
 				message: 'Files uploaded successfully',
-				filenames: filenames,
+				photo_IDs: photo_IDs,
 			});
 		} catch (err) {
 			console.log(err);
@@ -80,7 +82,8 @@ imageRouter.post(
 );
 imageRouter
 	.route('/:id')
-	.get(checkJWT, controller.getImage)
 	.delete(checkJWT, controller.deleteImage);
+imageRouter.get('/user/:id', checkJWT, controller.getUsersImages);
+
 
 export default imageRouter;

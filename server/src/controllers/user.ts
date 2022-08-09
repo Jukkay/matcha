@@ -118,6 +118,7 @@ export const logout = async (req: Request, res: Response) => {
     });
   }
 };
+
 const getUserInformation = async (req: Request, res: Response) => {
   console.log("in getUserInformation", req.get("authorization"));
   return res.status(200).json({
@@ -142,4 +143,4 @@ const updateUser = async (req: Request, res: Response) => {
   });
 };
 
-export default { register, login, getUserInformation, deleteUser, updateUser };
+export default { register, login, getUserInformation, deleteUser, updateUser};

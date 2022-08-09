@@ -140,8 +140,11 @@ V Get user's age from db
 V Make user's age default value for age range fields
 V Re-order profile so own profile and "looking for" are their own sections
 V Add picture upload (File API)
-Make server side receive pictures and save them to database
-Query images for thumbnails in client
+V Make server side receive pictures and save them to database
+V Fix problem with userData received from API on Login not being saved to State
+Show users uploaded images on profile page 
+Show image counter
+Show upload complete notification
 Save profile information to db
 Redirect to page after first login
 

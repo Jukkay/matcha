@@ -342,10 +342,31 @@ export const TextArea = ({
 
 export const FileInput = () => {
 	const [files, setFiles] = useState<FileList>();
+	const [preview, setPreview] = useState<string[]>([]);
+	const [userImages, setUserImages] = useState<string[]>([]);
+	const {userData} = useUserContext()
+	console.log(userData)
 	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		if (!event.target.files) return;
 		setFiles(event.target.files);
 	};
+	const getImages = async() => {
+		const response = await authAPI.get(`/image/user/${userData.user_id}`)
+		console.log(response.data.photos)
+	}
+
+	useEffect(() => {
+		if (!files || files.length < 1) return;
+		let imageData = []
+		for (let i = 0; i < files.length; i++) {
+			imageData.push(URL.createObjectURL(files[i]));
+		}
+		setPreview(imageData as never[]);
+	}, [files])
+
+	useEffect(() => {
+		getImages()
+	}, [userImages])
 
 	return (
 		<div>
@@ -374,26 +395,27 @@ export const FileInput = () => {
 					</label>
 				</div>
 			</div>
-			<Thumbnails />
+			<Thumbnails preview={preview} setPreview={setPreview}/>
 			<div className="block">
-				<UploadButton files={files} setFiles={setFiles} />
+				<UploadButton files={files} setFiles={setFiles} setPreview={setPreview} />
 			</div>
 		</div>
 	);
 };
 
-export const Thumbnails = () => {
-	// Fetch images from api
-	const [images, setImages] = useState([]);
+export const Thumbnails = ({preview, setPreview}: IThumbnails) => {
+
 	// Remove uploaded image
 	const handleClick = (event: PointerEvent<HTMLButtonElement>) => {
 		const removedImage = event.currentTarget.id;
+		const newPreview = preview.filter(item => item != removedImage)
+		setPreview(newPreview);
 	};
 
-	return images ? (
+	return preview ? (
 		<div className="block">
 			<div className="is-flex is-flex-direction-row is-flex-wrap-wrap">
-				{images.map((image) => (
+				{preview.map((image) => (
 					<div key={image} className="box mx-3 has-text-centered">
 						<figure className="image is-128x128">
 							<img src={image} alt="Placeholder image" />
@@ -411,8 +433,18 @@ export const Thumbnails = () => {
 		</div>
 	) : null;
 };
-export const UploadButton = ({ files, setFiles }: IUpload) => {
-	const handleClick = async() => {
+export const UploadButton = ({ files, setFiles, setPreview }: IUpload) => {
+	const [imageIDs, setImageIDs] = useState([]);
+	const [images, setImages] = useState([]);
+
+	// useEffect(() => {
+	// 	imageIDs.map(async(image) => {
+	// 		const response = await authAPI.get(`image/${image}`)
+
+	// 	})
+	// }, [imageIDs])
+	const handleClick = async () => {
+		console.log(files)
 		if (!files || files.length < 1) return;
 		// Add files to formData
 		const imageData = new FormData();
@@ -425,8 +457,10 @@ export const UploadButton = ({ files, setFiles }: IUpload) => {
 		}
 		// Upload to browser
 		const response = await authAPI.post('/image', imageData);
-		console.log(response.data.filenames)
-		setFiles([])
+		console.log(response.data.photo_IDs);
+		setImageIDs(response.data.photo_IDs);
+		setFiles([]);
+		setPreview([])
 	};
 
 	return (
@@ -434,4 +468,30 @@ export const UploadButton = ({ files, setFiles }: IUpload) => {
 			Upload pictures
 		</button>
 	);
+	// imageIDs ? (<div>
+
+	// 	<button className="button is-primary" onClick={handleClick}>
+	// 		Upload pictures
+	// 	</button>
+	// 	<div className="block">
+	// 		<div className="is-flex is-flex-direction-row is-flex-wrap-wrap">
+	// 			{imageIDs.map((image) => (
+	// 				<div key={image} className="box mx-3 has-text-centered">
+	// 					<figure className="image is-128x128">
+	// 						<img src={`${API_URL}/user/images/${image}`} alt="Placeholder image" />
+	// 					</figure>
+	// 					<button
+	// 						className="button is-small is-centered mt-3"
+	// 						id={image}
+	// 						onClick={handleClick}
+	// 					>
+	// 						Remove
+	// 					</button>
+	// 				</div>
+	// 			))}
+	// 		</div>
+	// 	</div>
+	// 	</div>
+	// ) : (
+	// );
 };

@@ -99,12 +99,14 @@ export interface ITextArea {
 }
 
 export interface IThumbnails {
-  images?: string[];
+  preview: string[];
+  setPreview: SetStateAction<any>
   setFiles?: SetStateAction<any>
 }
 
 export interface IUpload {
   files: FileList | undefined;
   setFiles?: SetStateAction<any>
+  setPreview?: SetStateAction<any>
 
 }

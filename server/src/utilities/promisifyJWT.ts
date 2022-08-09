@@ -54,7 +54,6 @@ export const signAccessToken = async(user_id: RowDataPacket): Promise<string> =>
 export const signRefreshToken = async(user_id: RowDataPacket): Promise<string> => {
 	return new Promise(async(resolve, reject) => {
 		const expirationTime = '5 days'
-		console.log('Expiration time: ',expirationTime)
 		jwt.sign({
 				user_id: user_id
 			},
