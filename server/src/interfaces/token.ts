@@ -15,3 +15,9 @@ interface IUserToken {
 export interface ITokenList {
 	[key: string]: number
 }
+export interface IAccesstoken {
+	user_id: string,
+	iat: number,
+	exp: number,
+	iss: string
+}

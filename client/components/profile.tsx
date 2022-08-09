@@ -412,7 +412,7 @@ export const Thumbnails = () => {
 	) : null;
 };
 export const UploadButton = ({ files, setFiles }: IUpload) => {
-	const handleClick = () => {
+	const handleClick = async() => {
 		if (!files || files.length < 1) return;
 		// Add files to formData
 		const imageData = new FormData();
@@ -424,7 +424,8 @@ export const UploadButton = ({ files, setFiles }: IUpload) => {
 			console.log(pair[0] + ', ' + pair[1]);
 		}
 		// Upload to browser
-		authAPI.post('/image', imageData);
+		const response = await authAPI.post('/image', imageData);
+		console.log(response.data.filenames)
 		setFiles([])
 	};
 
