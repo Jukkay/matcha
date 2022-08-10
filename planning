@@ -40,15 +40,15 @@ V Logout
 V Password reset
 Fill profile information after first login
     Don't allow access to other parts of the site until this is completed.
-    Gender
-    Sexual preference
-    Profile text
-    "Interested in" tags
-    Pictures (max 5)
+    V Gender
+    V Sexual preference
+    V Profile text
+    V "Interested in" tags
+    V Pictures (max 5)
         Choose one as profile picture
 Control panel
     Change user information
-Edit profile
+V Edit profile
 Show profile views
 Show who liked you
 "Fame rating"
@@ -142,18 +142,29 @@ V Re-order profile so own profile and "looking for" are their own sections
 V Add picture upload (File API)
 V Make server side receive pictures and save them to database
 V Fix problem with userData received from API on Login not being saved to State
+V Save profile information to db
+V Add existing userdata as default values on profile page
+V Show users uploaded images on profile page 
+V Make sure user is authorized to make api changes in all routes
 
-Save profile information to db
-Add existing userdata as default values on profile page
-Show users uploaded images on profile page 
 Redirect to page after first login
+Add like/dislike buttons to profile page
+Send like data to db
+Create dummy userbase
+Make view profile page
+Make discover users page (all users matching criteria)
+Add search parameters
+Add geolocation
+Add IP location
+Use real location data instead of declared location
+Create matches page
+Integrate chat to matches page
 
-Make sure user is authorized to make api changes in all routes
-
-Show image counter
-Show upload complete notification
 
 # Later
+Change user_id into unique hash?
+Show image counter
+Show upload complete notification
 Move API url to docker secrets
 Make separate errorHandler for catch blocks
 Remove error message passthrough in user controller

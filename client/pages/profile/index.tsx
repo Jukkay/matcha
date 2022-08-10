@@ -6,7 +6,9 @@ import {
 	CitySelector,
 	CountrySelector,
 	EditButton,
+	EditGallery,
 	FileInput,
+	Gallery,
 	GenderSelector,
 	NewProfileButton,
 	ProfileView,
@@ -87,7 +89,7 @@ const EditMode = ({
 }: EditProps) => {
 	const { userData, accessToken } = useUserContext();
 	const [tagError, setTagError] = useState(false);
-
+	const [files, setFiles] = useState<FileList>();
 	const [interests, setInterests] = useState<string[]>([]);
 	const [query, setQuery] = useState('');
 	const [result, setResult] = useState<string[]>([]);
@@ -115,9 +117,9 @@ const EditMode = ({
 		<div>
 			<section className="section">
 				{profileExists ? (
-					<h3 className="title is-3">Tell us about yourself</h3>
-				) : (
 					<h3 className="title is-3">Edit profile</h3>
+				) : (
+					<h3 className="title is-3">Create new profile</h3>
 				)}
 				{/* Location */}
 				<CountrySelector profile={profile} setProfile={setProfile} />
@@ -186,7 +188,8 @@ const EditMode = ({
 					/>
 				</div>
 				{/* Pictures */}
-				<FileInput profileExists={profileExists} />
+				{profileExists ? <EditGallery files={files} /> : null}
+				<FileInput profileExists={profileExists} files={files} setFiles={setFiles}/>
 			</section>
 
 			<section className="section">
@@ -220,6 +223,7 @@ const EditMode = ({
 					setEditMode={setEditMode}
 					profile={profile}
 					interests={interests}
+					setProfileExists={setProfileExists}
 				/>
 			</section>
 		</div>

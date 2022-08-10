@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS users(
 	city VARCHAR(255),
 	country VARCHAR(255),
 	validated BOOLEAN DEFAULT FALSE,
+	profile_exists BOOLEAN DEFAULT FALSE,
 	password_reset_key VARCHAR(255),
 	`admin` BOOLEAN DEFAULT FALSE,
 	email_notification BOOLEAN DEFAULT TRUE,

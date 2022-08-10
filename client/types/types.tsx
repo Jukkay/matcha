@@ -24,6 +24,8 @@ export interface ViewProps {
 }
 export interface FileInputProps {
   profileExists: boolean;
+  files: FileList | undefined;
+  setFiles?: SetStateAction<any>
 }
 
 export interface ProfileViewProps {
@@ -35,6 +37,7 @@ export interface SaveButtonProps {
   setEditMode: (boolean: boolean) => void;
   profile: IProfile;
   interests: string[];
+  setProfileExists: SetStateAction<any>
 }
 export interface EditButtonProps {
   setEditMode: (boolean: boolean) => void;
@@ -88,7 +91,7 @@ export interface IProfile {
 
 export interface ITag {
   text: string;
-  key: string;
+  keyValue: string;
   interests: string[];
   setInterests: SetStateAction<any>;
   setTagError: SetStateAction<any>;
@@ -135,5 +138,7 @@ export interface IUpload {
   files: FileList | undefined;
   setFiles?: SetStateAction<any>
   setPreview?: SetStateAction<any>
-
+}
+export interface GalleryProps {
+  files: FileList | undefined;
 }

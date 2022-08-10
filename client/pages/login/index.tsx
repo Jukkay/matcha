@@ -1,4 +1,5 @@
 import type { NextPage } from "next";
+import { useRouter } from 'next/router';
 import { useState, useEffect } from "react";
 import { FaUser, FaLock } from "react-icons/fa";
 import { FormInput, SubmitButton, Notification } from "../../components/form";
@@ -14,6 +15,8 @@ const Login: NextPage = () => {
   const [notification, setNotification] = useState(false);
   const [notificationText, setNotificationText] = useState("");
 
+  // Router for redirect after login
+  const router = useRouter()
   // Get user data from context
   const {
     updateUserData,
@@ -115,6 +118,8 @@ const Login: NextPage = () => {
           sessionStorage.setItem("accessToken", response.data.accessToken);
           sessionStorage.setItem("refreshToken", response.data.refreshToken);
         }
+        if (!response.data.user.profile_exists)
+          router.replace('/profile')
       }
     } catch (err: any) {
       console.error(err);

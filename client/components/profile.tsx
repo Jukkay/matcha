@@ -20,11 +20,13 @@ import {
 	SaveButtonProps,
 	ProfileViewProps,
 	FileInputProps,
+	GalleryProps,
 } from '../types/types';
 import { Country, City } from 'country-state-city';
 import { ErrorMessage } from './form';
 import { authAPI } from '../utilities/api';
 import { useUserContext } from './UserContext';
+import axios from 'axios';
 
 export const EditButton = ({ setEditMode }: EditButtonProps) => {
 	return (
@@ -39,6 +41,7 @@ export const ProfileView = ({ profile, setEditMode }: ProfileViewProps) => {
 	return (
 		<div>
 			<section className="section">
+				<Gallery />
 				<div className="block">Name: {userData.name}</div>
 				<div className="block">Age: {userData.age}</div>
 				<div className="block">City: {profile.city}</div>
@@ -72,10 +75,12 @@ export const ProfileView = ({ profile, setEditMode }: ProfileViewProps) => {
 	);
 };
 export const NewProfileButton = ({ setEditMode }: EditButtonProps) => {
-	return (
+	return (<div className="section has-text-centered">
+		<h3 className="title is-3">Before we start, let's create a profile for you!</h3>
 		<button className="button is-primary" onClick={() => setEditMode(true)}>
 			Create new profile
 		</button>
+	</div>
 	);
 };
 
@@ -83,15 +88,23 @@ export const SaveButton = ({
 	setEditMode,
 	profile,
 	interests,
+	setProfileExists
 }: SaveButtonProps) => {
-	const handleClick = () => {
+	const handleClick = async() => {
 		// Add interests object to profile
 		let payload = profile;
-		payload.interests = Object.assign({}, interests);
-		// Save inputs to db
-		sessionStorage.setItem('profile', JSON.stringify(profile));
-		setEditMode(false);
-		authAPI.post('/profile', payload);
+		try {
+			payload.interests = Object.assign({}, interests);
+			// Save inputs to db
+			sessionStorage.setItem('profile', JSON.stringify(profile));
+			const response = await authAPI.post('/profile', payload);
+			if (response) {
+				setProfileExists(true);
+				setEditMode(false);
+			}
+		} catch (err) {
+			console.error(err);
+		}
 	};
 	return (
 		<button className="button is-primary" onClick={() => handleClick()}>
@@ -123,7 +136,7 @@ export const UpdateButton = ({
 
 export const Tag = ({
 	text,
-	key,
+	keyValue,
 	interests,
 	setInterests,
 	setTagError,
@@ -153,7 +166,7 @@ export const Tag = ({
 	return (
 		<span
 			className="tag is-success is-light is-medium is-rounded is-clickable"
-			key={key}
+			key={keyValue}
 			onClick={handleTagClick}
 		>
 			{text}
@@ -163,7 +176,7 @@ export const Tag = ({
 
 export const SelectedTag = ({
 	text,
-	key,
+	keyValue,
 	interests,
 	setInterests,
 	setTagError,
@@ -180,7 +193,7 @@ export const SelectedTag = ({
 	return (
 		<span
 			className="tag is-primary is-medium is-rounded is-clickable"
-			key={key}
+			key={keyValue}
 			onClick={handleTagClick}
 		>
 			{text}
@@ -200,7 +213,7 @@ export const SearchResult = ({
 			{interests.map((interest, index) => (
 				<SelectedTag
 					text={interest}
-					key={interest.concat(index.toString())}
+					keyValue={interest.concat(index.toString())}
 					interests={interests}
 					setInterests={setInterests}
 					setTagError={setTagError}
@@ -210,7 +223,7 @@ export const SearchResult = ({
 				interests.includes(interest) ? null : (
 					<Tag
 						text={interest}
-						key={interest.concat(index.toString())}
+						keyValue={interest.concat(index.toString())}
 						interests={interests}
 						setInterests={setInterests}
 						setTagError={setTagError}
@@ -243,7 +256,10 @@ export const CountrySelector = ({ profile, setProfile }: ISelectorProfile) => {
 						Choose your country
 					</option>
 					{Country.getAllCountries().map((country, index) => (
-						<option key={`${country.name}${index}`} value={country.isoCode}>
+						<option
+							key={`${country.name}${index}`}
+							value={country.isoCode}
+						>
 							{country.name}
 						</option>
 					))}
@@ -274,11 +290,16 @@ export const CitySelector = ({ profile, setProfile }: ISelectorProfile) => {
 					<option value={''} disabled>
 						Choose your city
 					</option>
-					{City.getCitiesOfCountry(profile.country)?.map((city, index) => (
-						<option key={`${city.name}${index}`} value={city.name}>
-							{city.name}
-						</option>
-					))}
+					{City.getCitiesOfCountry(profile.country)?.map(
+						(city, index) => (
+							<option
+								key={`${city.name}${index}`}
+								value={city.name}
+							>
+								{city.name}
+							</option>
+						)
+					)}
 				</select>
 			</div>
 		</div>
@@ -418,6 +439,101 @@ export const TextArea = ({
 		</div>
 	);
 };
+export const EditGallery = ({files}: GalleryProps) => {
+	const [images, setImages] = useState([]);
+	const { userData } = useUserContext();
+
+	// Remove uploaded image
+	const handleClick = async (event: PointerEvent<HTMLButtonElement>) => {
+		const removedImage = event.currentTarget.id.split('/').pop();
+		if (!removedImage) return
+		let response = await authAPI.delete(`/image/${removedImage}`);
+		if (response.status === 200) {
+			const newImages = images.filter((item) => item != removedImage);
+			setImages(newImages);
+		}
+	};
+
+	useEffect(() => {
+		const getUserImages = async () => {
+			let response = await authAPI.get(`/image/user/${userData.user_id}`);
+			if (response?.data?.photos) {
+				const filenames = response.data.photos.map(
+					(item: any) =>
+						`${authAPI.defaults.baseURL}/images/${item['filename']}`
+				);
+				setImages(filenames);
+			}
+		};
+		getUserImages();
+	}, [files]);
+
+	return images ? (
+		<div className="block">
+			<label htmlFor="gallery" className="label my-3">
+				Uploaded images:
+			</label>
+			<div className="is-flex is-flex-direction-row is-flex-wrap-wrap">
+				{images.map((image) => (
+					<div key={image} className="box mx-3 has-text-centered">
+						<figure className="image is-128x128">
+							<img
+								src={image}
+								alt="Placeholder image"
+								crossOrigin=""
+							/>
+						</figure>
+						<button
+							className="button is-small is-centered mt-3"
+							id={image}
+							onClick={handleClick}
+						>
+							Remove
+						</button>
+					</div>
+				))}
+			</div>
+		</div>
+	) : null;
+};
+
+export const Gallery = () => {
+	const [images, setImages] = useState([]);
+	const { userData } = useUserContext();
+
+	useEffect(() => {
+		const getUserImages = async () => {
+			let response = await authAPI.get(`/image/user/${userData.user_id}`);
+			if (response?.data?.photos) {
+				const filenames = response.data.photos.map(
+					(item: any) =>
+						`${authAPI.defaults.baseURL}/images/${item['filename']}`
+				);
+				setImages(filenames);
+			}
+		};
+		getUserImages();
+	}, []);
+
+	return images ? (
+		<div className="block">
+			<div className="is-flex is-flex-direction-row is-flex-wrap-wrap">
+				{images.map((image) => (
+					<div key={image} className="box mx-3 has-text-centered">
+						<figure className="image is-128x128">
+							<img
+								src={image}
+								alt="Placeholder image"
+								crossOrigin=""
+							/>
+						</figure>
+					</div>
+				))}
+			</div>
+		</div>
+	) : null;
+};
+
 
 export const FileInput = ({ profileExists }: FileInputProps) => {
 	const [files, setFiles] = useState<FileList>();
@@ -429,10 +545,10 @@ export const FileInput = ({ profileExists }: FileInputProps) => {
 		if (!event.target.files) return;
 		setFiles(event.target.files);
 	};
-	const getImages = async () => {
-		const response = await authAPI.get(`/image/user/${userData.user_id}`);
-		console.log(response.data.photos);
-	};
+	// const getImages = async () => {
+	// 	const response = await authAPI.get(`/image/user/${userData.user_id}`);
+	// 	console.log(response.data.photos);
+	// };
 
 	useEffect(() => {
 		if (!files || files.length < 1) return;
@@ -443,9 +559,9 @@ export const FileInput = ({ profileExists }: FileInputProps) => {
 		setPreview(imageData as never[]);
 	}, [files]);
 
-	useEffect(() => {
-		getImages();
-	}, [userImages]);
+	// useEffect(() => {
+	// 	getImages();
+	// }, [userImages]);
 
 	return (
 		<div>

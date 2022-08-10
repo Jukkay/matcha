@@ -34,6 +34,7 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
 		name: '',
 		email: '',
 		age: undefined,
+		profile_exists: false
 	});
 
 	useEffect(() => {
