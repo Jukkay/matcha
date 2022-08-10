@@ -8,14 +8,17 @@ import {
 	EditButton,
 	FileInput,
 	GenderSelector,
+	NewProfileButton,
+	ProfileView,
 	SaveButton,
 	SearchResult,
 	TextArea,
 } from '../../components/profile';
 import { useUserContext } from '../../components/UserContext';
-import { EditProps, IProfile } from '../../types/types';
+import { EditProps, IProfile, ViewProps } from '../../types/types';
 import { dummyData } from './data';
 import { Country, City } from 'country-state-city';
+import { authAPI } from '../../utilities/api';
 
 const NotLoggedIn = () => {
 	return (
@@ -30,25 +33,61 @@ const NotLoggedIn = () => {
 const LoggedIn = () => {
 	const { userData, accessToken } = useUserContext();
 	const [editMode, setEditMode] = useState(false);
-	return editMode ? (
-		<EditMode setEditMode={setEditMode} />
-	) : (
-		<ViewMode setEditMode={setEditMode} />
-	);
-};
-
-const EditMode = ({ setEditMode }: EditProps) => {
-	const { userData, accessToken } = useUserContext();
+	const [profileExists, setProfileExists] = useState(false);
 	const [profile, setProfile] = useState<IProfile>({
+		user_id: userData.user_id,
 		gender: '',
 		looking: '',
 		min_age: userData.age,
 		max_age: userData.age,
+		interests: {},
 		introduction: '',
 		country: '',
 		city: '',
 	});
+
+	useEffect(() => {
+		const getUserProfile = async () => {
+			let response = await authAPI.get(`/profile/${userData.user_id}`);
+			if (response?.data?.profile) {
+				setProfileExists(true);
+				response.data.profile.interests = JSON.parse(
+					response.data.profile.interests
+				);
+				console.log(response.data.profile.interests);
+				setProfile(response.data.profile);
+			} else setProfileExists(false);
+		};
+		getUserProfile();
+	}, []);
+
+	return editMode ? (
+		<EditMode
+			setEditMode={setEditMode}
+			profile={profile}
+			setProfile={setProfile}
+			profileExists={profileExists}
+			setProfileExists={setProfileExists}
+		/>
+	) : (
+		<ViewMode
+			setEditMode={setEditMode}
+			profile={profile}
+			profileExists={profileExists}
+		/>
+	);
+};
+
+const EditMode = ({
+	setEditMode,
+	profile,
+	setProfile,
+	profileExists,
+	setProfileExists,
+}: EditProps) => {
+	const { userData, accessToken } = useUserContext();
 	const [tagError, setTagError] = useState(false);
+
 	const [interests, setInterests] = useState<string[]>([]);
 	const [query, setQuery] = useState('');
 	const [result, setResult] = useState<string[]>([]);
@@ -57,7 +96,9 @@ const EditMode = ({ setEditMode }: EditProps) => {
 	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setQuery(event.target.value);
 	};
-
+	useEffect(() => {
+		setInterests(Object.values(profile.interests))
+	}, []);
 	// Live query interest from interest list
 	useEffect(() => {
 		if (!query) {
@@ -73,7 +114,11 @@ const EditMode = ({ setEditMode }: EditProps) => {
 	return (
 		<div>
 			<section className="section">
-			<h3 className="title is-3">Tell us about yourself</h3>
+				{profileExists ? (
+					<h3 className="title is-3">Tell us about yourself</h3>
+				) : (
+					<h3 className="title is-3">Edit profile</h3>
+				)}
 				{/* Location */}
 				<CountrySelector profile={profile} setProfile={setProfile} />
 				<CitySelector profile={profile} setProfile={setProfile} />
@@ -141,11 +186,10 @@ const EditMode = ({ setEditMode }: EditProps) => {
 					/>
 				</div>
 				{/* Pictures */}
-				<FileInput />
+				<FileInput profileExists={profileExists} />
+			</section>
 
-				</section>
-
-				<section className="section">
+			<section className="section">
 				<h3 className="title is-3">What are you looking for?</h3>
 				{/* Looking For */}
 				<GenderSelector
@@ -172,24 +216,20 @@ const EditMode = ({ setEditMode }: EditProps) => {
 				{/* Age range */}
 				<AgeRange profile={profile} setProfile={setProfile} />
 
-				<SaveButton setEditMode={setEditMode} profile={profile} />
+				<SaveButton
+					setEditMode={setEditMode}
+					profile={profile}
+					interests={interests}
+				/>
 			</section>
 		</div>
 	);
 };
-const ViewMode = ({ setEditMode }: EditProps) => {
-	const { userData, accessToken } = useUserContext();
-	return (
-		<div>
-			<section className="section">
-				<div className="block">{userData.username}</div>
-				<div className="block">{userData.email}</div>
-				<div className="block">{userData.name}</div>
-				<div className="block">{userData.user_id}</div>
-
-				<EditButton setEditMode={setEditMode} />
-			</section>
-		</div>
+const ViewMode = ({ setEditMode, profile, profileExists }: ViewProps) => {
+	return profileExists ? (
+		<ProfileView profile={profile} setEditMode={setEditMode} />
+	) : (
+		<NewProfileButton setEditMode={setEditMode} />
 	);
 };
 

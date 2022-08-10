@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import userRouter from './routes/user';
 import imageRouter from './routes/image';
+import profileRouter from './routes/profile';
 import { refreshToken, verifyEmailToken } from './controllers/token';
 import { resetPassword } from './controllers/resetpassword';
 import {
@@ -39,6 +40,9 @@ app.post('/setpassword', resetPassword);
 
 // User CRUD route
 app.use('/user', userRouter);
+
+// User CRUD route
+app.use('/profile', profileRouter);
 
 // Image CRUD route
 app.use('/image', imageRouter);

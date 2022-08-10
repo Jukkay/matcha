@@ -15,13 +15,18 @@ import {
 	ITextArea,
 	IThumbnails,
 	IUpload,
+	EditButtonProps,
+	ViewProps,
+	SaveButtonProps,
+	ProfileViewProps,
+	FileInputProps,
 } from '../types/types';
 import { Country, City } from 'country-state-city';
 import { ErrorMessage } from './form';
 import { authAPI } from '../utilities/api';
 import { useUserContext } from './UserContext';
 
-export const EditButton = ({ setEditMode }: EditProps) => {
+export const EditButton = ({ setEditMode }: EditButtonProps) => {
 	return (
 		<button className="button is-primary" onClick={() => setEditMode(true)}>
 			Edit profile
@@ -29,15 +34,89 @@ export const EditButton = ({ setEditMode }: EditProps) => {
 	);
 };
 
-export const SaveButton = ({ setEditMode, profile }: EditProps) => {
+export const ProfileView = ({ profile, setEditMode }: ProfileViewProps) => {
+	const { userData } = useUserContext();
+	return (
+		<div>
+			<section className="section">
+				<div className="block">Name: {userData.name}</div>
+				<div className="block">Age: {userData.age}</div>
+				<div className="block">City: {profile.city}</div>
+				<div className="block">Country: {profile.country}</div>
+				<div className="block">
+					Introduction: {profile.introduction}
+				</div>
+				<div className="block">
+					Interests:{' '}
+					{profile.interests
+						? Object.entries(profile.interests).map(
+								(interest, index) => (
+									<span
+										className="tag is-success is-medium is-rounded is-clickable mx-2 my-1"
+										key={index}
+									>
+										{interest[1] as string}
+									</span>
+								)
+						  )
+						: null}
+				</div>
+				<div className="block">Gender: {profile.gender}</div>
+				<div className="block">Looking for: {profile.looking}</div>
+				<div className="block">Minimum age: {profile.min_age}</div>
+				<div className="block">Maximum age: {profile.max_age}</div>
+				<div className="block">User ID: {profile.user_id}</div>
+				<EditButton setEditMode={setEditMode} />
+			</section>
+		</div>
+	);
+};
+export const NewProfileButton = ({ setEditMode }: EditButtonProps) => {
+	return (
+		<button className="button is-primary" onClick={() => setEditMode(true)}>
+			Create new profile
+		</button>
+	);
+};
+
+export const SaveButton = ({
+	setEditMode,
+	profile,
+	interests,
+}: SaveButtonProps) => {
 	const handleClick = () => {
+		// Add interests object to profile
+		let payload = profile;
+		payload.interests = Object.assign({}, interests);
 		// Save inputs to db
 		sessionStorage.setItem('profile', JSON.stringify(profile));
 		setEditMode(false);
+		authAPI.post('/profile', payload);
 	};
 	return (
 		<button className="button is-primary" onClick={() => handleClick()}>
 			Save profile
+		</button>
+	);
+};
+
+export const UpdateButton = ({
+	setEditMode,
+	profile,
+	interests,
+}: SaveButtonProps) => {
+	const handleClick = () => {
+		// Add interests object to profile
+		let payload = profile;
+		payload.interests = Object.assign({}, interests);
+		// Save inputs to db
+		sessionStorage.setItem('profile', JSON.stringify(profile));
+		setEditMode(false);
+		authAPI.patch('/profile', payload);
+	};
+	return (
+		<button className="button is-primary" onClick={() => handleClick()}>
+			Update profile
 		</button>
 	);
 };
@@ -55,12 +134,12 @@ export const Tag = ({
 		setTagError(false);
 		const interest = event.currentTarget.innerText;
 
-		// check if in array and remove if so
-		if (interests.includes(interest)) {
-			setInterests(interests.filter((item) => item !== interest));
-			setSelected(false);
-			return;
-		}
+		// // check if in array and remove if so
+		// if (interests.includes(interest)) {
+		// 	setInterests(interests.filter((item) => item !== interest));
+		// 	setSelected(false);
+		// 	return;
+		// }
 		// if array size is 5 show error message and return
 		if (interests.length >= 5) {
 			setTagError(true);
@@ -163,8 +242,8 @@ export const CountrySelector = ({ profile, setProfile }: ISelectorProfile) => {
 					<option value={''} disabled>
 						Choose your country
 					</option>
-					{Country.getAllCountries().map((country) => (
-						<option key={country.name} value={country.isoCode}>
+					{Country.getAllCountries().map((country, index) => (
+						<option key={`${country.name}${index}`} value={country.isoCode}>
 							{country.name}
 						</option>
 					))}
@@ -195,8 +274,8 @@ export const CitySelector = ({ profile, setProfile }: ISelectorProfile) => {
 					<option value={''} disabled>
 						Choose your city
 					</option>
-					{City.getCitiesOfCountry(profile.country)?.map((city) => (
-						<option key={city.name} value={city.name}>
+					{City.getCitiesOfCountry(profile.country)?.map((city, index) => (
+						<option key={`${city.name}${index}`} value={city.name}>
 							{city.name}
 						</option>
 					))}
@@ -340,33 +419,33 @@ export const TextArea = ({
 	);
 };
 
-export const FileInput = () => {
+export const FileInput = ({ profileExists }: FileInputProps) => {
 	const [files, setFiles] = useState<FileList>();
 	const [preview, setPreview] = useState<string[]>([]);
 	const [userImages, setUserImages] = useState<string[]>([]);
-	const {userData} = useUserContext()
-	console.log(userData)
+	const { userData } = useUserContext();
+
 	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		if (!event.target.files) return;
 		setFiles(event.target.files);
 	};
-	const getImages = async() => {
-		const response = await authAPI.get(`/image/user/${userData.user_id}`)
-		console.log(response.data.photos)
-	}
+	const getImages = async () => {
+		const response = await authAPI.get(`/image/user/${userData.user_id}`);
+		console.log(response.data.photos);
+	};
 
 	useEffect(() => {
 		if (!files || files.length < 1) return;
-		let imageData = []
+		let imageData = [];
 		for (let i = 0; i < files.length; i++) {
 			imageData.push(URL.createObjectURL(files[i]));
 		}
 		setPreview(imageData as never[]);
-	}, [files])
+	}, [files]);
 
 	useEffect(() => {
-		getImages()
-	}, [userImages])
+		getImages();
+	}, [userImages]);
 
 	return (
 		<div>
@@ -395,20 +474,23 @@ export const FileInput = () => {
 					</label>
 				</div>
 			</div>
-			<Thumbnails preview={preview} setPreview={setPreview}/>
+			<Thumbnails preview={preview} setPreview={setPreview} />
 			<div className="block">
-				<UploadButton files={files} setFiles={setFiles} setPreview={setPreview} />
+				<UploadButton
+					files={files}
+					setFiles={setFiles}
+					setPreview={setPreview}
+				/>
 			</div>
 		</div>
 	);
 };
 
-export const Thumbnails = ({preview, setPreview}: IThumbnails) => {
-
+export const Thumbnails = ({ preview, setPreview }: IThumbnails) => {
 	// Remove uploaded image
 	const handleClick = (event: PointerEvent<HTMLButtonElement>) => {
 		const removedImage = event.currentTarget.id;
-		const newPreview = preview.filter(item => item != removedImage)
+		const newPreview = preview.filter((item) => item != removedImage);
 		setPreview(newPreview);
 	};
 
@@ -437,14 +519,8 @@ export const UploadButton = ({ files, setFiles, setPreview }: IUpload) => {
 	const [imageIDs, setImageIDs] = useState([]);
 	const [images, setImages] = useState([]);
 
-	// useEffect(() => {
-	// 	imageIDs.map(async(image) => {
-	// 		const response = await authAPI.get(`image/${image}`)
-
-	// 	})
-	// }, [imageIDs])
 	const handleClick = async () => {
-		console.log(files)
+		console.log(files);
 		if (!files || files.length < 1) return;
 		// Add files to formData
 		const imageData = new FormData();
@@ -460,7 +536,7 @@ export const UploadButton = ({ files, setFiles, setPreview }: IUpload) => {
 		console.log(response.data.photo_IDs);
 		setImageIDs(response.data.photo_IDs);
 		setFiles([]);
-		setPreview([])
+		setPreview([]);
 	};
 
 	return (
@@ -468,30 +544,4 @@ export const UploadButton = ({ files, setFiles, setPreview }: IUpload) => {
 			Upload pictures
 		</button>
 	);
-	// imageIDs ? (<div>
-
-	// 	<button className="button is-primary" onClick={handleClick}>
-	// 		Upload pictures
-	// 	</button>
-	// 	<div className="block">
-	// 		<div className="is-flex is-flex-direction-row is-flex-wrap-wrap">
-	// 			{imageIDs.map((image) => (
-	// 				<div key={image} className="box mx-3 has-text-centered">
-	// 					<figure className="image is-128x128">
-	// 						<img src={`${API_URL}/user/images/${image}`} alt="Placeholder image" />
-	// 					</figure>
-	// 					<button
-	// 						className="button is-small is-centered mt-3"
-	// 						id={image}
-	// 						onClick={handleClick}
-	// 					>
-	// 						Remove
-	// 					</button>
-	// 				</div>
-	// 			))}
-	// 		</div>
-	// 	</div>
-	// 	</div>
-	// ) : (
-	// );
 };

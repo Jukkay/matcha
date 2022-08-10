@@ -10,9 +10,34 @@ export type SignupProps = {
 };
 
 export interface EditProps {
-  editMode?: boolean;
   setEditMode: (boolean: boolean) => void;
-  profile?: IProfile;
+  profile: IProfile;
+  setProfile: SetStateAction<any>;
+  profileExists: boolean;
+  setProfileExists: SetStateAction<any>;
+}
+
+export interface ViewProps {
+  setEditMode: (boolean: boolean) => void;
+  profile: IProfile;
+  profileExists: boolean;
+}
+export interface FileInputProps {
+  profileExists: boolean;
+}
+
+export interface ProfileViewProps {
+  setEditMode: (boolean: boolean) => void;
+  profile: IProfile;
+}
+
+export interface SaveButtonProps {
+  setEditMode: (boolean: boolean) => void;
+  profile: IProfile;
+  interests: string[];
+}
+export interface EditButtonProps {
+  setEditMode: (boolean: boolean) => void;
 }
 export interface IFormInputField {
   label?: string;
@@ -50,11 +75,13 @@ export interface IButton {
 }
 
 export interface IProfile {
+  user_id: number;
   gender: string;
   looking: string;
   min_age: number,
   max_age: number,
   introduction: string;
+  interests: {};
   country: string;
   city: string
 }

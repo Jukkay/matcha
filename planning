@@ -142,12 +142,16 @@ V Re-order profile so own profile and "looking for" are their own sections
 V Add picture upload (File API)
 V Make server side receive pictures and save them to database
 V Fix problem with userData received from API on Login not being saved to State
-Show users uploaded images on profile page 
-Show image counter
-Show upload complete notification
+
 Save profile information to db
+Add existing userdata as default values on profile page
+Show users uploaded images on profile page 
 Redirect to page after first login
 
+Make sure user is authorized to make api changes in all routes
+
+Show image counter
+Show upload complete notification
 
 # Later
 Move API url to docker secrets
