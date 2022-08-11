@@ -25,7 +25,7 @@ install-client:
 	docker-compose run --rm client "pnpm install"
 
 install-server:
-	docker-compose run --rm server "pnpm install"
+	docker-compose run --rm server "npm install"
 
 install: install-client install-server
 
@@ -42,4 +42,4 @@ logs:
 	docker-compose logs -f
 
 reset-db:
-	docker-compose exec server pnpm run reset-db
+	docker-compose exec server npm run reset-db

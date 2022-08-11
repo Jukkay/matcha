@@ -22,6 +22,16 @@ export interface ViewProps {
   profile: IProfile;
   profileExists: boolean;
 }
+
+export interface UserImagesProps {
+  user_id: number | undefined;
+}
+
+
+export interface OtherUserViewProps {
+  profile: IOtherUser;
+}
+
 export interface FileInputProps {
   profileExists: boolean;
   files: FileList | undefined;
@@ -38,6 +48,9 @@ export interface SaveButtonProps {
   profile: IProfile;
   interests: string[];
   setProfileExists: SetStateAction<any>
+  setInterestsError: SetStateAction<any>
+  files: FileList | undefined;
+	setFileError: SetStateAction<any>
 }
 export interface EditButtonProps {
   setEditMode: (boolean: boolean) => void;
@@ -87,6 +100,19 @@ export interface IProfile {
   interests: {};
   country: string;
   city: string
+}
+export interface IOtherUser {
+  user_id: number | undefined;
+  name: string | undefined;
+  age: number | undefined
+  gender: string | undefined;
+  looking: string | undefined;
+  min_age: number | undefined,
+  max_age: number | undefined,
+  introduction: string | undefined;
+  interests: {};
+  country: string | undefined;
+  city: string | undefined
 }
 
 export interface ITag {
@@ -141,4 +167,5 @@ export interface IUpload {
 }
 export interface GalleryProps {
   files: FileList | undefined;
+  setImageError: SetStateAction<any>
 }

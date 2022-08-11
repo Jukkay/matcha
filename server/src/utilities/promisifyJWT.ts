@@ -34,7 +34,7 @@ export const verifyJWT = async(userToken: string, serverToken: string): Promise<
 
 export const signAccessToken = async(user_id: RowDataPacket): Promise<string> => {
 	return new Promise(async(resolve, reject) => {
-		const expirationTime = 30
+		const expirationTime = '5m'
 		jwt.sign({
 				user_id: user_id
 			},

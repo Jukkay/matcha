@@ -118,8 +118,8 @@ const Login: NextPage = () => {
           sessionStorage.setItem("accessToken", response.data.accessToken);
           sessionStorage.setItem("refreshToken", response.data.refreshToken);
         }
-        if (!response.data.user.profile_exists)
-          router.replace('/profile')
+        const path = response.data.user.profile_exists ? '/' : '/profile'
+        setTimeout(() => router.replace(path), 3000);
       }
     } catch (err: any) {
       console.error(err);
@@ -147,7 +147,7 @@ const Login: NextPage = () => {
           <div className="box has-text-centered">
             <section className="section">
               <h3 className="title is-3">Login successful</h3>
-              <div>{userData.token}</div>
+
             </section>
           </div>
         </section>

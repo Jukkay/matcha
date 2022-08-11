@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS profiles(
 	interests JSON NOT NULL,
 	likes INT UNSIGNED DEFAULT 0,
 	creation_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+	UNIQUE (`user_id`),
 	PRIMARY KEY (profile_id)
 );
 

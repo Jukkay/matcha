@@ -146,12 +146,18 @@ V Save profile information to db
 V Add existing userdata as default values on profile page
 V Show users uploaded images on profile page 
 V Make sure user is authorized to make api changes in all routes
+V Redirect to page after first login
+V Disable viewing other pages if profile isn't complete
+V Check profile input validity before submitting
+V Add unique keys to tables
+V Remove separate upload pictures button from profile page and integrate to profile save/update
+V Remove picture upload requirement from profile update page
+V Add like button to profile page
+V Make view profile page
 
-Redirect to page after first login
-Add like/dislike buttons to profile page
+Make like endpoint to API
 Send like data to db
 Create dummy userbase
-Make view profile page
 Make discover users page (all users matching criteria)
 Add search parameters
 Add geolocation
@@ -162,6 +168,7 @@ Integrate chat to matches page
 
 
 # Later
+
 Change user_id into unique hash?
 Show image counter
 Show upload complete notification
@@ -172,5 +179,5 @@ Refactor interceptors to another file so they can use context instead of session
 Double slider for age range
 
 # Bonuses done
-JTW refresh automation
+JWT refresh automation
 Live search with interests

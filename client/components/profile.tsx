@@ -21,12 +21,24 @@ import {
 	ProfileViewProps,
 	FileInputProps,
 	GalleryProps,
+	UserImagesProps,
 } from '../types/types';
 import { Country, City } from 'country-state-city';
 import { ErrorMessage } from './form';
 import { authAPI } from '../utilities/api';
 import { useUserContext } from './UserContext';
 import axios from 'axios';
+import { dummyData } from '../pages/profile/data';
+
+export const LikeButton = () => {
+	return (
+		<button className="button">
+			<span className="icon is-small">
+				<i className="fas fa-bold"></i>
+			</span>
+		</button>
+	);
+};
 
 export const EditButton = ({ setEditMode }: EditButtonProps) => {
 	return (
@@ -41,7 +53,7 @@ export const ProfileView = ({ profile, setEditMode }: ProfileViewProps) => {
 	return (
 		<div>
 			<section className="section">
-				<Gallery />
+				<Gallery user_id={userData.user_id} />
 				<div className="block">Name: {userData.name}</div>
 				<div className="block">Age: {userData.age}</div>
 				<div className="block">City: {profile.city}</div>
@@ -74,63 +86,431 @@ export const ProfileView = ({ profile, setEditMode }: ProfileViewProps) => {
 		</div>
 	);
 };
-export const NewProfileButton = ({ setEditMode }: EditButtonProps) => {
-	return (<div className="section has-text-centered">
-		<h3 className="title is-3">Before we start, let's create a profile for you!</h3>
-		<button className="button is-primary" onClick={() => setEditMode(true)}>
-			Create new profile
-		</button>
-	</div>
-	);
-};
 
-export const SaveButton = ({
+export const CreateProfile = ({
 	setEditMode,
 	profile,
-	interests,
-	setProfileExists
-}: SaveButtonProps) => {
-	const handleClick = async() => {
-		// Add interests object to profile
-		let payload = profile;
+	setProfile,
+	profileExists,
+	setProfileExists,
+}: EditProps) => {
+	const [tagError, setTagError] = useState(false);
+	const [interestsError, setInterestsError] = useState(false);
+	const [fileError, setFileError] = useState(false);
+	const [files, setFiles] = useState<FileList>();
+	const [interests, setInterests] = useState<string[]>([]);
+	const [query, setQuery] = useState('');
+	const [result, setResult] = useState<string[]>([]);
+
+	// Update object values
+	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		setQuery(event.target.value);
+	};
+	useEffect(() => {
+		setInterests(Object.values(profile.interests));
+	}, []);
+	// Live query interest from interest list
+	useEffect(() => {
+		if (!query) {
+			setResult([]);
+			return;
+		}
+		const results = dummyData.filter((interest) =>
+			interest.toLowerCase().includes(query.toLowerCase())
+		);
+		setResult(results as string[]);
+	}, [query]);
+
+	const uploadPhotos = async () => {
+		// Check photos
+		if (!files || files.length < 1) {
+			setFileError(true);
+			return;
+		}
+		// Add files to formData
+		const imageData = new FormData();
+		for (let i = 0; i < files.length; i++) {
+			imageData.append('files', files[i], files[i].name);
+		}
+
+		// Upload to server
+		const response = await authAPI.post('/image', imageData);
+		return response;
+	};
+
+	const uploadProfile = async () => {
 		try {
+			// upload photos
+			const photoUpload = await uploadPhotos();
+			if (!photoUpload) {
+				setFileError(true);
+				return;
+			}
+
+			// Check interests amount
+			if (interests.length < 1) {
+				setInterestsError(true);
+				return;
+			}
+			// Add interests object to profile
+			let payload = profile;
 			payload.interests = Object.assign({}, interests);
 			// Save inputs to db
 			sessionStorage.setItem('profile', JSON.stringify(profile));
-			const response = await authAPI.post('/profile', payload);
-			if (response) {
-				setProfileExists(true);
-				setEditMode(false);
-			}
+			setEditMode(false);
+			await authAPI.post(`/profile`, payload);
+			setProfileExists(true);
 		} catch (err) {
 			console.error(err);
 		}
 	};
+
+	const handleSubmit = (event: React.FormEvent) => {
+		event.preventDefault();
+		uploadProfile();
+	};
 	return (
-		<button className="button is-primary" onClick={() => handleClick()}>
-			Save profile
-		</button>
+		<div>
+			<form onSubmit={handleSubmit}>
+				<section className="section">
+					<h3 className="title is-3">Create new profile</h3>
+
+					{/* Location */}
+					<CountrySelector
+						profile={profile}
+						setProfile={setProfile}
+					/>
+					<CitySelector profile={profile} setProfile={setProfile} />
+
+					{/* Gender */}
+					<GenderSelector
+						label="Gender *"
+						id="gender"
+						value={profile.gender}
+						placeholder="Choose your gender"
+						onChange={(event) =>
+							setProfile({
+								...profile,
+								gender: event.target.value,
+							})
+						}
+						options={[
+							'Male',
+							'Female',
+							'Non-binary',
+							'Trans-man',
+							'Trans-woman',
+							'Other',
+						]}
+					/>
+
+					{/* Introduction */}
+					<TextArea
+						label="Introduction *"
+						id="introduction"
+						value={profile.introduction}
+						placeholder="Introduction"
+						size={10}
+						onChange={(event) =>
+							setProfile({
+								...profile,
+								introduction: event.target.value,
+							})
+						}
+					/>
+
+					{/* Interests */}
+					<div className="block">
+						<label htmlFor="interests" className="label my-3">
+							Interests (choose 1 to 5) *
+						</label>
+						<input
+							className="input my-3"
+							type="text"
+							id="interests"
+							placeholder="Search for interests"
+							onChange={onChange}
+						></input>
+						<ErrorMessage
+							errorMessage="Maximum 5 interests. Please unselect something to select something new."
+							error={tagError}
+						/>
+						<ErrorMessage
+							errorMessage="You must choose at least one interest."
+							error={interestsError}
+						/>
+						<SearchResult
+							result={result}
+							setResult={setResult}
+							setTagError={setTagError}
+							interests={interests}
+							setInterests={setInterests}
+							query={query}
+						/>
+					</div>
+					<FileInput
+						profileExists={profileExists}
+						files={files}
+						setFiles={setFiles}
+					/>
+					<ErrorMessage
+						errorMessage="You must upload at least one picture."
+						error={fileError}
+					/>
+
+					<h3 className="title is-3 mt-6">
+						What kind of partner are you looking for?
+					</h3>
+					{/* Looking For */}
+					<GenderSelector
+						label="Gender *"
+						id="looking"
+						value={profile.looking}
+						placeholder="Choose a gender"
+						onChange={(event) =>
+							setProfile({
+								...profile,
+								looking: event.target.value,
+							})
+						}
+						options={[
+							'Male',
+							'Female',
+							'Non-binary',
+							'Trans-man',
+							'Trans-woman',
+							'Other',
+						]}
+					/>
+
+					{/* Age range */}
+					<AgeRange profile={profile} setProfile={setProfile} />
+					<button type="submit" className="button is-primary">
+						Save profile
+					</button>
+				</section>
+			</form>
+		</div>
 	);
 };
 
-export const UpdateButton = ({
+export const UpdateProfile = ({
 	setEditMode,
 	profile,
-	interests,
-}: SaveButtonProps) => {
-	const handleClick = () => {
-		// Add interests object to profile
-		let payload = profile;
-		payload.interests = Object.assign({}, interests);
-		// Save inputs to db
-		sessionStorage.setItem('profile', JSON.stringify(profile));
-		setEditMode(false);
-		authAPI.patch('/profile', payload);
+	setProfile,
+	profileExists,
+	setProfileExists,
+}: EditProps) => {
+	const [tagError, setTagError] = useState(false);
+	const [interestsError, setInterestsError] = useState(false);
+	const [imageError, setImageError] = useState(false);
+	const [files, setFiles] = useState<FileList>();
+	const [interests, setInterests] = useState<string[]>([]);
+	const [query, setQuery] = useState('');
+	const [result, setResult] = useState<string[]>([]);
+
+	// Update object values
+	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		setQuery(event.target.value);
+	};
+	useEffect(() => {
+		setInterests(Object.values(profile.interests));
+	}, []);
+	// Live query interest from interest list
+	useEffect(() => {
+		if (!query) {
+			setResult([]);
+			return;
+		}
+		const results = dummyData.filter((interest) =>
+			interest.toLowerCase().includes(query.toLowerCase())
+		);
+		setResult(results as string[]);
+	}, [query]);
+
+	const uploadPhotos = async () => {
+		// Check photos
+		if (!files || files.length < 1) {
+			return;
+		}
+		// Add files to formData
+		const imageData = new FormData();
+		for (let i = 0; i < files.length; i++) {
+			imageData.append('files', files[i], files[i].name);
+		}
+
+		// Upload to server
+		const response = await authAPI.post('/image', imageData);
+		return response;
+	};
+
+	const uploadProfile = async () => {
+		try {
+			// upload photos
+			await uploadPhotos();
+
+			// Check interests amount
+			if (interests.length < 1) {
+				setInterestsError(true);
+				return;
+			}
+			// Add interests object to profile
+			let payload = profile;
+			payload.interests = Object.assign({}, interests);
+			// Save inputs to db
+			sessionStorage.setItem('profile', JSON.stringify(profile));
+			setEditMode(false);
+			await authAPI.patch(`/profile`, payload);
+			setProfileExists(true);
+		} catch (err) {
+			console.error(err);
+		}
+	};
+
+	const handleSubmit = (event: React.FormEvent) => {
+		event.preventDefault();
+		uploadProfile();
 	};
 	return (
-		<button className="button is-primary" onClick={() => handleClick()}>
-			Update profile
-		</button>
+		<div>
+			<form onSubmit={handleSubmit}>
+				<section className="section">
+					<h3 className="title is-3">Edit profile</h3>
+
+					{/* Location */}
+					<CountrySelector
+						profile={profile}
+						setProfile={setProfile}
+					/>
+					<CitySelector profile={profile} setProfile={setProfile} />
+
+					{/* Gender */}
+					<GenderSelector
+						label="Gender *"
+						id="gender"
+						value={profile.gender}
+						placeholder="Choose your gender"
+						onChange={(event) =>
+							setProfile({
+								...profile,
+								gender: event.target.value,
+							})
+						}
+						options={[
+							'Male',
+							'Female',
+							'Non-binary',
+							'Trans-man',
+							'Trans-woman',
+							'Other',
+						]}
+					/>
+
+					{/* Introduction */}
+					<TextArea
+						label="Introduction *"
+						id="introduction"
+						value={profile.introduction}
+						placeholder="Introduction"
+						size={10}
+						onChange={(event) =>
+							setProfile({
+								...profile,
+								introduction: event.target.value,
+							})
+						}
+					/>
+
+					{/* Interests */}
+					<div className="block">
+						<label htmlFor="interests" className="label my-3">
+							Interests (choose 1 to 5) *
+						</label>
+						<input
+							className="input my-3"
+							type="text"
+							id="interests"
+							placeholder="Search for interests"
+							onChange={onChange}
+						></input>
+						<ErrorMessage
+							errorMessage="Maximum 5 interests. Please unselect something to select something new."
+							error={tagError}
+						/>
+						<ErrorMessage
+							errorMessage="You must choose at least one interest."
+							error={interestsError}
+						/>
+						<SearchResult
+							result={result}
+							setResult={setResult}
+							setTagError={setTagError}
+							interests={interests}
+							setInterests={setInterests}
+							query={query}
+						/>
+					</div>
+					{/* Pictures */}
+					<EditGallery files={files} setImageError={setImageError} />
+					<ErrorMessage
+						errorMessage="You must have at least one picture."
+						error={imageError}
+					/>
+					<FileInput
+						profileExists={profileExists}
+						files={files}
+						setFiles={setFiles}
+					/>
+
+					<h3 className="title is-3 mt-6">
+						What kind of partner are you looking for?
+					</h3>
+					{/* Looking For */}
+					<GenderSelector
+						label="Gender *"
+						id="looking"
+						value={profile.looking}
+						placeholder="Choose a gender"
+						onChange={(event) =>
+							setProfile({
+								...profile,
+								looking: event.target.value,
+							})
+						}
+						options={[
+							'Male',
+							'Female',
+							'Non-binary',
+							'Trans-man',
+							'Trans-woman',
+							'Other',
+						]}
+					/>
+
+					{/* Age range */}
+					<AgeRange profile={profile} setProfile={setProfile} />
+					<button type="submit" className="button is-primary">
+						Update profile
+					</button>
+				</section>
+			</form>
+		</div>
+	);
+};
+
+export const NewProfileButton = ({ setEditMode }: EditButtonProps) => {
+	return (
+		<div className="section has-text-centered">
+			<h3 className="title is-3">
+				Before we start, let's create a profile for you!
+			</h3>
+			<button
+				className="button is-primary"
+				onClick={() => setEditMode(true)}
+			>
+				Create new profile
+			</button>
+		</div>
 	);
 };
 
@@ -147,13 +527,6 @@ export const Tag = ({
 		setTagError(false);
 		const interest = event.currentTarget.innerText;
 
-		// // check if in array and remove if so
-		// if (interests.includes(interest)) {
-		// 	setInterests(interests.filter((item) => item !== interest));
-		// 	setSelected(false);
-		// 	return;
-		// }
-		// if array size is 5 show error message and return
 		if (interests.length >= 5) {
 			setTagError(true);
 			return;
@@ -213,7 +586,9 @@ export const SearchResult = ({
 			{interests.map((interest, index) => (
 				<SelectedTag
 					text={interest}
-					keyValue={interest.concat(index.toString())}
+					keyValue={'selected'.concat(
+						interest.concat(index.toString())
+					)}
 					interests={interests}
 					setInterests={setInterests}
 					setTagError={setTagError}
@@ -223,7 +598,9 @@ export const SearchResult = ({
 				interests.includes(interest) ? null : (
 					<Tag
 						text={interest}
-						keyValue={interest.concat(index.toString())}
+						keyValue={'not'.concat(
+							interest.concat(index.toString())
+						)}
 						interests={interests}
 						setInterests={setInterests}
 						setTagError={setTagError}
@@ -243,6 +620,7 @@ export const CountrySelector = ({ profile, setProfile }: ISelectorProfile) => {
 			<div className="select is-primary">
 				<select
 					id="country"
+					name="country"
 					value={profile.country}
 					onChange={(event) =>
 						setProfile({
@@ -278,6 +656,7 @@ export const CitySelector = ({ profile, setProfile }: ISelectorProfile) => {
 			<div className="select is-primary">
 				<select
 					id="city"
+					name="city"
 					value={profile.city}
 					onChange={(event) =>
 						setProfile({
@@ -435,18 +814,23 @@ export const TextArea = ({
 				placeholder={placeholder}
 				value={value}
 				onChange={onChange}
+				required
 			></textarea>
 		</div>
 	);
 };
-export const EditGallery = ({files}: GalleryProps) => {
+export const EditGallery = ({ files, setImageError }: GalleryProps) => {
 	const [images, setImages] = useState([]);
 	const { userData } = useUserContext();
 
 	// Remove uploaded image
 	const handleClick = async (event: PointerEvent<HTMLButtonElement>) => {
+		if (images.length < 2) {
+			setImageError(true)
+			return
+		}
 		const removedImage = event.currentTarget.id.split('/').pop();
-		if (!removedImage) return
+		if (!removedImage) return;
 		let response = await authAPI.delete(`/image/${removedImage}`);
 		if (response.status === 200) {
 			const newImages = images.filter((item) => item != removedImage);
@@ -497,13 +881,13 @@ export const EditGallery = ({files}: GalleryProps) => {
 	) : null;
 };
 
-export const Gallery = () => {
+export const Gallery = ({user_id}: UserImagesProps) => {
+
 	const [images, setImages] = useState([]);
-	const { userData } = useUserContext();
 
 	useEffect(() => {
 		const getUserImages = async () => {
-			let response = await authAPI.get(`/image/user/${userData.user_id}`);
+			let response = await authAPI.get(`/image/user/${user_id}`);
 			if (response?.data?.photos) {
 				const filenames = response.data.photos.map(
 					(item: any) =>
@@ -515,7 +899,7 @@ export const Gallery = () => {
 		getUserImages();
 	}, []);
 
-	return images ? (
+	return images && user_id ? (
 		<div className="block">
 			<div className="is-flex is-flex-direction-row is-flex-wrap-wrap">
 				{images.map((image) => (
@@ -534,9 +918,11 @@ export const Gallery = () => {
 	) : null;
 };
 
-
-export const FileInput = ({ profileExists }: FileInputProps) => {
-	const [files, setFiles] = useState<FileList>();
+export const FileInput = ({
+	profileExists,
+	files,
+	setFiles,
+}: FileInputProps) => {
 	const [preview, setPreview] = useState<string[]>([]);
 	const [userImages, setUserImages] = useState<string[]>([]);
 	const { userData } = useUserContext();
@@ -545,10 +931,6 @@ export const FileInput = ({ profileExists }: FileInputProps) => {
 		if (!event.target.files) return;
 		setFiles(event.target.files);
 	};
-	// const getImages = async () => {
-	// 	const response = await authAPI.get(`/image/user/${userData.user_id}`);
-	// 	console.log(response.data.photos);
-	// };
 
 	useEffect(() => {
 		if (!files || files.length < 1) return;
@@ -558,10 +940,6 @@ export const FileInput = ({ profileExists }: FileInputProps) => {
 		}
 		setPreview(imageData as never[]);
 	}, [files]);
-
-	// useEffect(() => {
-	// 	getImages();
-	// }, [userImages]);
 
 	return (
 		<div>
@@ -591,13 +969,6 @@ export const FileInput = ({ profileExists }: FileInputProps) => {
 				</div>
 			</div>
 			<Thumbnails preview={preview} setPreview={setPreview} />
-			<div className="block">
-				<UploadButton
-					files={files}
-					setFiles={setFiles}
-					setPreview={setPreview}
-				/>
-			</div>
 		</div>
 	);
 };
@@ -619,7 +990,8 @@ export const Thumbnails = ({ preview, setPreview }: IThumbnails) => {
 							<img src={image} alt="Placeholder image" />
 						</figure>
 						<button
-							className="button is-small is-centered mt-3"
+							type="button"
+							className="button is-small is-danger is-centered mt-3"
 							id={image}
 							onClick={handleClick}
 						>
@@ -631,33 +1003,29 @@ export const Thumbnails = ({ preview, setPreview }: IThumbnails) => {
 		</div>
 	) : null;
 };
-export const UploadButton = ({ files, setFiles, setPreview }: IUpload) => {
-	const [imageIDs, setImageIDs] = useState([]);
-	const [images, setImages] = useState([]);
+// export const UploadButton = ({ files, setFiles, setPreview }: IUpload) => {
+// 	const [imageIDs, setImageIDs] = useState([]);
+// 	const [images, setImages] = useState([]);
 
-	const handleClick = async () => {
-		console.log(files);
-		if (!files || files.length < 1) return;
-		// Add files to formData
-		const imageData = new FormData();
-		for (let i = 0; i < files.length; i++) {
-			imageData.append('files', files[i], files[i].name);
-		}
+// 	const handleClick = async () => {
+// 		if (!files || files.length < 1) return;
 
-		for (var pair of imageData.entries()) {
-			console.log(pair[0] + ', ' + pair[1]);
-		}
-		// Upload to browser
-		const response = await authAPI.post('/image', imageData);
-		console.log(response.data.photo_IDs);
-		setImageIDs(response.data.photo_IDs);
-		setFiles([]);
-		setPreview([]);
-	};
+// 		// Add files to formData
+// 		const imageData = new FormData();
+// 		for (let i = 0; i < files.length; i++) {
+// 			imageData.append('files', files[i], files[i].name);
+// 		}
 
-	return (
-		<button className="button is-primary" onClick={handleClick}>
-			Upload pictures
-		</button>
-	);
-};
+// 		// Upload to browser
+// 		const response = await authAPI.post('/image', imageData);
+// 		setImageIDs(response.data.photo_IDs);
+// 		setFiles([]);
+// 		setPreview([]);
+// 	};
+
+// 	return (
+// 		<div className="button is-primary" onClick={handleClick}>
+// 			Upload pictures
+// 		</div>
+// 	);
+// };
