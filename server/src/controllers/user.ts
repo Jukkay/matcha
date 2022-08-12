@@ -165,4 +165,16 @@ const updateUser = async (req: Request, res: Response) => {
 	});
 };
 
-export default { register, login, getUserInformation, deleteUser, updateUser };
+const blockUser = async (req: Request, res: Response) => {
+	// Get user_id
+	const user_id = await decodeUserFromAccesstoken(req);
+	if (!user_id)
+		return res.status(500).json({
+			message: 'Cannot parse user_id',
+		});
+	console.log('Block user. Function incomplete.');
+	return res.status(200).json({
+		message: 'Message',
+	});
+};
+export default { register, login, getUserInformation, deleteUser, updateUser, blockUser };

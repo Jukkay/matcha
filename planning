@@ -164,11 +164,13 @@ Add geolocation
 Add IP location
 Use real location data instead of declared location
 Create matches page
+Create notification system with socket.io or kafka
+Create messaging using the same system
 Integrate chat to matches page
 
 
 # Later
-
+Change language to very plain language for accessibility
 Change user_id into unique hash?
 Show image counter
 Show upload complete notification
