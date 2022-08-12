@@ -21,20 +21,10 @@ const NotLoggedIn = () => {
 };
 
 const LoggedIn = () => {
-	const { userData, accessToken } = useUserContext();
+	const { userData, profile, setProfile } = useUserContext();
 	const [editMode, setEditMode] = useState(false);
 	const [profileExists, setProfileExists] = useState(false);
-	const [profile, setProfile] = useState<IProfile>({
-		user_id: userData.user_id,
-		gender: '',
-		looking: '',
-		min_age: userData.age,
-		max_age: userData.age,
-		interests: {},
-		introduction: '',
-		country: '',
-		city: '',
-	});
+	
 
 	useEffect(() => {
 		const getUserProfile = async () => {
@@ -46,6 +36,7 @@ const LoggedIn = () => {
 				);
 				console.log(response.data.profile.interests);
 				setProfile(response.data.profile);
+				sessionStorage.setItem('profile', JSON.stringify(response.data.profile));
 			} else setProfileExists(false);
 		};
 		getUserProfile();

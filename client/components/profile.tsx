@@ -22,6 +22,8 @@ import {
 	FileInputProps,
 	GalleryProps,
 	UserImagesProps,
+	SearchProps,
+	AgeRangeProps,
 } from '../types/types';
 import { Country, City } from 'country-state-city';
 import { ErrorMessage } from './form';
@@ -754,6 +756,63 @@ export const AgeRange = ({ profile, setProfile }: ISelectorProfile) => {
 							onChange={(event) =>
 								setProfile({
 									...profile,
+									max_age: parseInt(event.target.value),
+								})
+							}
+						/>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+};
+
+export const SearchAgeRange = ({ searchParams, setSearchParams }: AgeRangeProps) => {
+	return (
+		<div className="block">
+			<label htmlFor="min_age" className="label">
+				Age range *
+			</label>
+
+			<div className="field is-horizontal">
+				<div className="field-label is-normal">
+					<label htmlFor="min_age" className="label">
+						Min
+					</label>
+				</div>
+				<div className="field-body">
+					<div className="field">
+						<input
+							type="number"
+							id="min_age"
+							className="input is-primary"
+							min="18"
+							max={searchParams?.max_age}
+							value={searchParams?.min_age}
+							onChange={(event) =>
+								setSearchParams({
+									...searchParams,
+									min_age: parseInt(event.target.value),
+								})
+							}
+						/>
+					</div>
+					<div className="field-label is-normal">
+						<label htmlFor="max_age" className="label">
+							Max
+						</label>
+					</div>
+					<div className="field">
+						<input
+							type="number"
+							id="max_age"
+							className="input is-primary"
+							min={searchParams?.min_age}
+							max="122"
+							value={searchParams?.max_age}
+							onChange={(event) =>
+								setSearchParams({
+									...searchParams,
 									max_age: parseInt(event.target.value),
 								})
 							}

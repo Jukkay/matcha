@@ -5,6 +5,7 @@ import react, {
 	useEffect,
 	useState,
 } from 'react';
+import { IProfile } from '../types/types';
 import { authAPI } from '../utilities/api';
 
 export type UserInfo = {
@@ -36,6 +37,19 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
 		age: undefined,
 		profile_exists: false
 	});
+	const [profile, setProfile] = useState<IProfile>({
+		user_id: undefined,
+		name: '',
+		age: undefined,
+		gender: '',
+		looking: '',
+		min_age: undefined,
+		max_age: undefined,
+		interests: {},
+		introduction: '',
+		country: '',
+		city: '',
+	});
 
 	useEffect(() => {
 		// Look for user information in session storage
@@ -44,7 +58,11 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
 			const userInfo = JSON.parse(storedInfo);
 			updateUserData(userInfo);
 		}
-
+		const storedProfile = sessionStorage.getItem('profile');
+		if (storedProfile) {
+			const userInfo = JSON.parse(storedProfile);
+			setProfile(userInfo);
+		}
 		const accessTokenStored = sessionStorage.getItem('accessToken');
 		const refreshTokenStored = sessionStorage.getItem('refreshToken');
 		if (accessTokenStored && refreshTokenStored) {
@@ -57,7 +75,9 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
 		<UserContext.Provider
 			value={{
 				userData,
+				profile,
 				updateUserData,
+				setProfile,
 				accessToken,
 				refreshToken,
 				updateAccessToken,

@@ -154,13 +154,13 @@ V Remove separate upload pictures button from profile page and integrate to prof
 V Remove picture upload requirement from profile update page
 V Add like button to profile page
 V Make view profile page
-
 V Make like endpoint to API
 V Send like data to db
-
 V Create dummy userbase
-Make discover users page (all users matching criteria)
-Add search parameters
+V Make discover users page (all users matching criteria)
+V Add search parameters
+Create endpoint for search
+
 Add geolocation
 Add IP location
 Use real location data instead of declared location

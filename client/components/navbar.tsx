@@ -91,9 +91,11 @@ const NavbarComponent = (args: any) => {
 				</div>
 				<div className="navbar-menu">
 					<div className="navbar-start">
-						<a className="navbar-item" href="/camera">
-							Link 1
+					<Link href="/discover">
+						<a className="navbar-item">
+							Discover
 						</a>
+					</Link>
 						<a className="navbar-item" href="/newpost">
 							Link 2
 						</a>

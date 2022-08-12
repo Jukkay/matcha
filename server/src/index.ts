@@ -14,6 +14,8 @@ import * as SQLConnect from './utilities/SQLConnect';
 import { getURL } from './utilities/getURL';
 import { login, logout } from './controllers/user';
 import likeRouter from './routes/like';
+import checkJWT from './middleware/checkJWT';
+import { searchProfiles } from './controllers/search';
 
 const app: express.Application = express();
 
@@ -27,17 +29,35 @@ app.use(helmet());
 app.use(cors());
 app.use('/images', express.static('./images'));
 
-// Routes
+// *** Endpoints without JWT auth ***
 app.get('/', (req: express.Request, res: express.Response) => {
 	res.send('backend server is running');
 });
+
+// Login and logout
 app.post('/login', login);
 app.post('/logout', logout);
+
+// Refresh token
 app.post('/token', refreshToken);
+
+// Request new verification email
 app.post('/emailtoken', sendNewEmailVerification);
+
+// Request password reset email
 app.post('/resetpasswordtoken', sendPasswordReset);
+
+// Verify email address
 app.post('/verifyemail', verifyEmailToken);
+
+
+// *** Auth endpoints ***
+
+// Reset password via email (auth with token posted in body)
 app.post('/setpassword', resetPassword);
+
+// Profile search
+app.post('/search', checkJWT, searchProfiles);
 
 // User CRUD route
 app.use('/user', userRouter);

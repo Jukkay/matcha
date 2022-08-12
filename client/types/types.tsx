@@ -91,15 +91,17 @@ export interface IButton {
 }
 
 export interface IProfile {
-  user_id: number;
-  gender: string;
-  looking: string;
-  min_age: number,
-  max_age: number,
-  introduction: string;
+  user_id: number | undefined;
+  name: string | undefined;
+  age: number | undefined
+  gender: string | undefined;
+  looking: string | undefined;
+  min_age: number | undefined,
+  max_age: number | undefined,
+  introduction: string | undefined;
   interests: {};
-  country: string;
-  city: string
+  country: string | undefined;
+  city: string | undefined
 }
 export interface IOtherUser {
   user_id: number | undefined;
@@ -141,8 +143,9 @@ export interface ISelector {
 }
 
 export interface ISelectorProfile {
-  profile: IProfile;
+  profile: IProfile ;
   setProfile: SetStateAction<any>
+  
 }
 
 export interface ITextArea {
@@ -168,4 +171,25 @@ export interface IUpload {
 export interface GalleryProps {
   files: FileList | undefined;
   setImageError: SetStateAction<any>
+}
+
+export interface SearchProps extends ResultsProps{
+  searchParams: ISearchParams
+  setSearchParams: SetStateAction<any>
+}
+
+export interface ResultsProps {
+  results: {}
+  setResults: SetStateAction<any>
+}
+
+export interface ISearchParams {
+  gender: string,
+  min_age: number,
+  max_age: number
+}
+
+export interface AgeRangeProps {
+  searchParams: ISearchParams
+  setSearchParams: SetStateAction<any>
 }

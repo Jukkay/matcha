@@ -3,7 +3,7 @@ import type { NextPage } from 'next';
 import React, { useState, useEffect } from 'react';
 import { Gallery } from '../../components/profile';
 import { useUserContext } from '../../components/UserContext';
-import { IOtherUser, OtherUserViewProps } from '../../types/types';
+import { IOtherUser, IProfile, OtherUserViewProps } from '../../types/types';
 import { authAPI } from '../../utilities/api';
 import { FcLike } from 'react-icons/fc';
 
@@ -18,22 +18,10 @@ const NotLoggedIn = () => {
 };
 
 const LoggedIn = () => {
-	const { userData, accessToken } = useUserContext();
+	const { profile, setProfile } = useUserContext();
 	const [editMode, setEditMode] = useState(false);
 	const [profileExists, setProfileExists] = useState(false);
-	const [profile, setProfile] = useState<IOtherUser>({
-		user_id: undefined,
-		name: '',
-		age: undefined,
-		gender: '',
-		looking: '',
-		min_age: undefined,
-		max_age: undefined,
-		interests: {},
-		introduction: '',
-		country: '',
-		city: '',
-	});
+
 	const router = useRouter();
 
 	const getUserProfile = async () => {
