@@ -1,16 +1,11 @@
 import { useRouter } from 'next/router';
 import type { NextPage } from 'next';
 import React, { useState, useEffect } from 'react';
-import {
-	Gallery,
-} from '../../components/profile';
+import { Gallery } from '../../components/profile';
 import { useUserContext } from '../../components/UserContext';
-import {
-	IOtherUser,
-	OtherUserViewProps,
-} from '../../types/types';
+import { IOtherUser, OtherUserViewProps } from '../../types/types';
 import { authAPI } from '../../utilities/api';
-import { FcLike } from "react-icons/fc";
+import { FcLike } from 'react-icons/fc';
 
 const NotLoggedIn = () => {
 	return (
@@ -26,12 +21,10 @@ const LoggedIn = () => {
 	const { userData, accessToken } = useUserContext();
 	const [editMode, setEditMode] = useState(false);
 	const [profileExists, setProfileExists] = useState(false);
-	const router = useRouter();
-	const { user_id } = router.query;
 	const [profile, setProfile] = useState<IOtherUser>({
 		user_id: undefined,
-    name: '',
-    age: undefined,
+		name: '',
+		age: undefined,
 		gender: '',
 		looking: '',
 		min_age: undefined,
@@ -41,21 +34,24 @@ const LoggedIn = () => {
 		country: '',
 		city: '',
 	});
+	const router = useRouter();
 
+	const getUserProfile = async () => {
+		const { user_id } = router.query;
+		let response = await authAPI.get(`/profile/${user_id}`);
+		if (response?.data?.profile) {
+			setProfileExists(true);
+			response.data.profile.interests = JSON.parse(
+				response.data.profile.interests
+			);
+			setProfile(response.data.profile);
+		} else setProfileExists(false);
+	};
 	useEffect(() => {
-		const getUserProfile = async () => {
-			let response = await authAPI.get(`/profile/${user_id}`);
-			if (response?.data?.profile) {
-				setProfileExists(true);
-				response.data.profile.interests = JSON.parse(
-					response.data.profile.interests
-				);
-				console.log(response.data.profile.interests);
-				setProfile(response.data.profile);
-			} else setProfileExists(false);
-		};
-		getUserProfile();
-	}, []);
+		if (router.isReady) {
+			getUserProfile();
+		}
+	}, [router.isReady]);
 
 	return profileExists ? (
 		<ViewMode profile={profile} />
@@ -67,15 +63,22 @@ const LoggedIn = () => {
 };
 
 const ViewMode = ({ profile }: OtherUserViewProps) => {
-  const handleClick = () => {
-    const { userData } = useUserContext();
-    const liked = profile.user_id
-    const liker = userData.user_id
-    
-    // Send like to db
-  }
+	const { userData } = useUserContext();
 
-  return (
+	const likeProfile = async () => {
+		const liked = profile.user_id;
+		const liker = userData.user_id;
+
+		const response = await authAPI.post('/like', {
+			liker: liker,
+			liked: liked,
+		});
+	};
+	const handleClick = () => {
+		likeProfile();
+	};
+
+	return (
 		<div>
 			<section className="section">
 				<Gallery user_id={profile.user_id} />
@@ -106,9 +109,17 @@ const ViewMode = ({ profile }: OtherUserViewProps) => {
 				<div className="block">Minimum age: {profile.min_age}</div>
 				<div className="block">Maximum age: {profile.max_age}</div>
 				<div className="block">User ID: {profile.user_id}</div>
-        <div className="block buttons">
-        <button className="button is-primary is-medium" onClick={handleClick}><span className="icon is-medium"><FcLike /></span><span>Like</span></button>
-        </div>
+				<div className="block buttons">
+					<button
+						className="button is-primary is-medium"
+						onClick={handleClick}
+					>
+						<span className="icon is-medium">
+							<FcLike />
+						</span>
+						<span>Like</span>
+					</button>
+				</div>
 			</section>
 		</div>
 	);

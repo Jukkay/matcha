@@ -4,6 +4,9 @@ import { execute } from '../utilities/SQLConnect';
 import { decodeUserFromAccesstoken } from './token';
 
 export const createMatch = async (user1: number, user2: number) => {
+	// Check for duplicates
+	const duplicate = await findMatch(user1, user2);
+	if (duplicate) return;
 	// Create Match
 	const sql = 'INSERT INTO matches(user1, user2) VALUES (?, ?)';
 	const response = await execute(sql, [user1, user2]);
@@ -44,15 +47,17 @@ const getAllMatches = async (req: Request, res: Response) => {
 export const findMatch = async (user1: number, user2: number) => {
 	// Check if it's a match
 	const sql =
-		'SELECT * FROM matches (WHERE user1 = ? AND WHERE user2 = ?) OR (WHERE user1 = ? AND WHERE user2 = ?)';
+		'SELECT * FROM matches WHERE (user1 = ? AND user2 = ?) OR (user1 = ? AND user2 = ?)';
 	const response = await execute(sql, [user1, user2, user2, user1]);
-	return response;
+	return response.length > 0 ? true : false;
 };
 
 export const removeMatch = async (user1: number, user2: number) => {
-	const sql =
-		'DELETE FROM matches (WHERE user1 = ? AND WHERE user2 = ?) OR (WHERE user1 = ? AND WHERE user2 = ?)';
-	const response = await execute(sql, [user1, user2, user2, user1]);
+	let sql =
+		'DELETE FROM matches WHERE (user1 = ? AND user2 = ?) OR (user1 = ? AND user2 = ?)';
+	let response = await execute(sql, [user1, user2, user2, user1]);
+    sql = 'DELETE FROM likes WHERE (user_id = ? AND target_id = ?) OR (user_id = ? AND target_id = ?)';
+    response = await execute(sql, [user1, user2, user2, user1]);
 	return response;
 };
 

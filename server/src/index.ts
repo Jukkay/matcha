@@ -13,6 +13,7 @@ import {
 import * as SQLConnect from './utilities/SQLConnect';
 import { getURL } from './utilities/getURL';
 import { login, logout } from './controllers/user';
+import likeRouter from './routes/like';
 
 const app: express.Application = express();
 
@@ -41,11 +42,14 @@ app.post('/setpassword', resetPassword);
 // User CRUD route
 app.use('/user', userRouter);
 
-// User CRUD route
+// Profile CRUD route
 app.use('/profile', profileRouter);
 
 // Image CRUD route
 app.use('/image', imageRouter);
+
+// Like CRUD route
+app.use('/like', likeRouter);
 
 // Server start
 app.listen(process.env.PORT, () => {

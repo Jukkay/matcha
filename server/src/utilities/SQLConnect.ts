@@ -23,3 +23,14 @@ export const execute = async(query: string, queryParams: Array<any>): Promise<Ro
 			resolve(result)
 	})
 })
+
+export const query = async(query: string): Promise<RowDataPacket[]> => new Promise((resolve, reject) => {
+	if (!pool)
+		throw new Error('No connection pool available')
+	pool.query<RowDataPacket[]>(query, (err, result) => {
+		if (err)
+			reject(err)
+		else
+			resolve(result)
+	})
+})

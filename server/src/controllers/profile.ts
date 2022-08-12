@@ -32,8 +32,8 @@ const newProfile = async (req: Request, res: Response) => {
 		// Get user_id
 		const user_id = await decodeUserFromAccesstoken(req);
 		if (!user_id)
-			return res.status(500).json({
-				message: 'Cannot parse user_id',
+			return res.status(401).json({
+				message: 'Unauthorized',
 			});
 		const sql =
 			'INSERT INTO profiles(user_id, country, city, gender, looking, min_age, max_age, introduction, interests) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
@@ -77,7 +77,6 @@ const getProfile = async (req: Request, res: Response) => {
 		const profile_data = await execute(sql, [user_id]);
 		if (profile_data) {
 			// TODO Create notification of profile visit
-
 			return res.status(200).json({
 				message: 'Profile data retrieved successfully',
 				profile: profile_data[0],
@@ -111,8 +110,8 @@ const updateProfile = async (req: Request, res: Response) => {
 		// Get user_id
 		const user_id = await decodeUserFromAccesstoken(req);
 		if (!user_id)
-			return res.status(500).json({
-				message: 'Cannot parse user_id',
+			return res.status(401).json({
+				message: 'Unauthorized',
 			});
 		const response = await execute(sql, [
 			country,
@@ -141,8 +140,8 @@ const deleteProfile = async (req: Request, res: Response) => {
 	// Get user_id
 	const user_id = await decodeUserFromAccesstoken(req);
 	if (!user_id)
-		return res.status(500).json({
-			message: 'Cannot parse user_id',
+		return res.status(401).json({
+			message: 'Unauthorized',
 		});
 	console.log('in deleteProfile. Function incomplete.');
 	return res.status(200).json({

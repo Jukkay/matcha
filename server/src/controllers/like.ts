@@ -14,21 +14,31 @@ const addNewLike = async (req: Request, res: Response) => {
 		// Get user_id
 		const user_id = await decodeUserFromAccesstoken(req);
 		if (!user_id)
-			return res.status(500).json({
-				message: 'Cannot parse user_id',
+			return res.status(401).json({
+				message: 'Unauthorized',
 			});
 		if (user_id !== liker)
 			return res.status(400).json({
 				message: 'ID mismatch. Are you doing something shady?',
 			});
-		// Check if it's a match
-		const sql =
-			'SELECT * FROM likes WHERE user_id = ? AND WHERE target_id = ?';
-		const response = await execute(sql, [liked, user_id]);
-		if (response) {
-			// TODO create match
-			const match = await createMatch(parseInt(user_id), parseInt(liked));
-			if (!match) throw new Error('Failed to create match');
+		// Check for duplicate like
+		let sql = 'SELECT * FROM likes WHERE user_id = ? AND target_id = ?';
+		let response = await execute(sql, [liker, liked]);
+		if (response.length > 0)
+			return res.status(400).json({
+				message: 'You already liked this person',
+			});
+		// Check if liked likes liker
+		sql = 'SELECT * FROM likes WHERE user_id = ? AND target_id = ?';
+		response = await execute(sql, [liked, liker]);
+		if (response.length > 0) {
+			// Create match
+			const match = await createMatch(parseInt(liker), parseInt(liked));
+			if (!match)
+				return res.status(200).json({
+					match: true,
+					message: 'Match already exists',
+				});
 			// TODO Send notification
 
 			return res.status(200).json({
@@ -37,10 +47,9 @@ const addNewLike = async (req: Request, res: Response) => {
 			});
 		}
 		// Create like
-		const sql2 = 'INSERT INTO likes(user_id, target_id) VALUES (?, ?)';
-		const response2 = await execute(sql2, [user_id, liked]);
-
-		if (response2)
+		sql = 'INSERT INTO likes(user_id, target_id) VALUES (?, ?)';
+		response = await execute(sql, [liker, liked]);
+		if (response.length > 0)
 			return res.status(200).json({
 				match: false,
 				message: 'Like added successfully',
@@ -61,13 +70,13 @@ const getLikesForProfile = async (req: Request, res: Response) => {
 		return res.status(400).json({
 			message: 'No user id given',
 		});
-	const sql = 'SELECT * FROM profiles WHERE user_id = ?';
+	const sql = 'SELECT user_id FROM likes WHERE target_id = ?';
 	try {
-		const profile_data = await execute(sql, [user_id]);
-		if (profile_data)
+		const likes = await execute(sql, [user_id]);
+		if (likes)
 			return res.status(200).json({
-				message: 'Profile data retrieved successfully',
-				profile: profile_data[0],
+				message: 'Like history retrieved successfully',
+				profile: likes,
 			});
 		return res.status(400).json({
 			message: 'No user found',
@@ -90,18 +99,13 @@ const removeLike = async (req: Request, res: Response) => {
 		// Get user_id
 		const user_id = await decodeUserFromAccesstoken(req);
 		if (!user_id)
-			return res.status(500).json({
-				message: 'Cannot parse user_id',
+			return res.status(401).json({
+				message: 'Unauthorized',
 			});
 		if (user_id !== liker)
 			return res.status(400).json({
 				message: 'ID mismatch. Are you doing something shady?',
 			});
-		// Remove like
-		const sql =
-			'DELETE FROM likes WHERE user_id = ? AND WHERE target_id = ?';
-		const response = await execute(sql, [user_id, liked]);
-
 		// Check if it's a match
 		const isMatch = await findMatch(parseInt(user_id), parseInt(liked));
 		if (isMatch) {
@@ -116,10 +120,17 @@ const removeLike = async (req: Request, res: Response) => {
 				message: 'Like and match removed successfully',
 			});
 		}
-		if (response)
+		// Remove like
+		const sql = 'DELETE FROM likes WHERE user_id = ? AND target_id = ?';
+		const response = await execute(sql, [user_id, liked]);
+
+		if (response.length > 0)
 			return res.status(200).json({
 				message: 'Like removed successfully',
 			});
+		return res.status(400).json({
+			message: 'No like found',
+		});
 	} catch (err) {
 		console.error(err);
 		return res.status(500).json({

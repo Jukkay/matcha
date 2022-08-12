@@ -155,9 +155,10 @@ V Remove picture upload requirement from profile update page
 V Add like button to profile page
 V Make view profile page
 
-Make like endpoint to API
-Send like data to db
-Create dummy userbase
+V Make like endpoint to API
+V Send like data to db
+
+V Create dummy userbase
 Make discover users page (all users matching criteria)
 Add search parameters
 Add geolocation
