@@ -3,9 +3,10 @@ import type { NextPage } from 'next';
 import React, { useState, useEffect } from 'react';
 import { Gallery } from '../../components/profile';
 import { useUserContext } from '../../components/UserContext';
-import { IOtherUser, IProfile, OtherUserViewProps } from '../../types/types';
+import { OtherUserViewProps, ProfileViewProps } from '../../types/types';
 import { authAPI } from '../../utilities/api';
 import { FcLike } from 'react-icons/fc';
+import { convertBirthdayToAge } from '../../utilities/helpers';
 
 const NotLoggedIn = () => {
 	return (
@@ -71,7 +72,7 @@ const ViewMode = ({ profile }: OtherUserViewProps) => {
 			<section className="section">
 				<Gallery user_id={profile.user_id} />
 				<div className="block">Name: {profile.name}</div>
-				<div className="block">Age: {profile.age}</div>
+				<div className="block">Age: {profile.birthday && convertBirthdayToAge(profile.birthday)}</div>
 				<div className="block">City: {profile.city}</div>
 				<div className="block">Country: {profile.country}</div>
 				<div className="block">

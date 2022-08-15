@@ -1,21 +1,17 @@
-import { useRouter } from 'next/router';
 import type { NextPage } from 'next';
-import React, { useState, useEffect, ReactNode } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-	AgeRange,
-	Gallery,
 	GenderSelector,
 	SearchAgeRange,
 } from '../../components/profile';
 import { useUserContext } from '../../components/UserContext';
 import {
-	IOtherUser,
 	OtherUserViewProps,
 	ResultsProps,
 	SearchProps,
 } from '../../types/types';
 import { authAPI } from '../../utilities/api';
-import { FcLike } from 'react-icons/fc';
+import { convertAgeToBirthday, convertBirthdayToAge } from '../../utilities/helpers';
 
 const NotLoggedIn = () => {
 	return (
@@ -30,7 +26,8 @@ const NotLoggedIn = () => {
 const LoggedIn = () => {
 	const { profile } = useUserContext();
 	const [searchParams, setSearchParams] = useState({
-		gender: profile.looking,
+		gender: profile.gender,
+		looking: profile.looking,
 		min_age: profile.min_age,
 		max_age: profile.max_age,
 	});
@@ -51,13 +48,21 @@ const LoggedIn = () => {
 
 const Search = ({ searchParams, setSearchParams, setResults }: SearchProps) => {
 	const searchDatabase = async () => {
+		const query = {
+			gender: searchParams.gender,
+			looking: searchParams.looking,
+			min_age: convertAgeToBirthday(searchParams.min_age),
+			max_age: convertAgeToBirthday(searchParams.max_age)
+		}
 		let response = await authAPI.post(`/search`, {
-			search: searchParams,
+			search: query,
 		});
 		console.log(response.data.results);
 		if (response?.data?.results) {
 			setResults(response.data.results);
 		}
+		else
+			setResults([])
 	};
 
 	useEffect(() => {
@@ -84,7 +89,7 @@ const Search = ({ searchParams, setSearchParams, setResults }: SearchProps) => {
 					onChange={(event) =>
 						setSearchParams({
 							...searchParams,
-							gender: event.target.value,
+							looking: event.target.value,
 						})
 					}
 					options={[
@@ -107,7 +112,7 @@ const Search = ({ searchParams, setSearchParams, setResults }: SearchProps) => {
 const Results = ({ results }: ResultsProps) => {
 	const { userData } = useUserContext();
 
-	return results ? (
+	return results.length > 0 ? (
 		<section className="section has-text-centered">
 			{results.map((result) => (
 				<SearchResultItem profile={result} />
@@ -120,7 +125,7 @@ const Results = ({ results }: ResultsProps) => {
 	);
 };
 
-const SearchResultItem = ({ profile }) => {
+const SearchResultItem = ({ profile }: OtherUserViewProps) => {
 	return (
 		<div>
 			<div className="card">
@@ -134,7 +139,7 @@ const SearchResultItem = ({ profile }) => {
 					</figure>
 				</div>
 				<div className="block">Name: {profile.name}</div>
-				<div className="block">Age: {profile.age}</div>
+				<div className="block">Age: {profile.birthday && convertBirthdayToAge(profile.birthday)}</div>
 				<div className="block">City: {profile.city}</div>
 				<div className="block">Country: {profile.country}</div>
 			</div>

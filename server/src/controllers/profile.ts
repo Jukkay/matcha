@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { OkPacket, RowDataPacket } from 'mysql';
+import { reformatDate } from '../utilities/helpers';
 import { execute } from '../utilities/SQLConnect';
 import { decodeUserFromAccesstoken } from './token';
 
@@ -9,23 +10,25 @@ const newProfile = async (req: Request, res: Response) => {
 		country,
 		city,
 		gender,
-		age,
+		birthday,
 		looking,
 		min_age,
 		max_age,
 		introduction,
 		interests,
+		name
 	} = req.body;
 	if (
 		!country ||
 		!city ||
 		!gender ||
-		!age ||
+		!birthday ||
 		!looking ||
 		!min_age ||
 		!max_age ||
 		!introduction ||
-		!interests
+		!interests ||
+		!name
 	)
 		return res.status(400).json({
 			message: 'Incomplete profile information',
@@ -38,18 +41,19 @@ const newProfile = async (req: Request, res: Response) => {
 				message: 'Unauthorized',
 			});
 		const sql =
-			'INSERT INTO profiles(user_id, country, city, gender, age, looking, min_age, max_age, introduction, interests) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+			'INSERT INTO profiles(user_id, country, city, gender, birthday, looking, min_age, max_age, introduction, interests, name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 		const response = await execute(sql, [
 			user_id,
 			country,
 			city,
 			gender,
-			age,
+			reformatDate(birthday),
 			looking,
 			min_age,
 			max_age,
 			introduction,
 			JSON.stringify(interests),
+			name,
 		]);
 		const sql2 = 'UPDATE users SET profile_exists = "1" WHERE user_id = ?;';
 		const response2 = await execute(sql2, [user_id]);
@@ -101,15 +105,17 @@ const updateProfile = async (req: Request, res: Response) => {
 		country,
 		city,
 		gender,
-		age,
+		birthday,
 		looking,
 		min_age,
 		max_age,
 		introduction,
 		interests,
+		profile_image
 	} = req.body;
+	console.log(req.body);
 	const sql =
-		'UPDATE profiles SET country=?, city=?, gender=?, age=?, looking=?, min_age=?, max_age=?, introduction=?, interests=? WHERE user_id = ?;';
+		'UPDATE profiles SET country=?, city=?, gender=?, birthday=?, looking=?, min_age=?, max_age=?, introduction=?, interests=?, profile_image=? WHERE user_id = ?;';
 	try {
 		// Get user_id
 		const user_id = await decodeUserFromAccesstoken(req);
@@ -121,12 +127,13 @@ const updateProfile = async (req: Request, res: Response) => {
 			country,
 			city,
 			gender,
-			age,
+			birthday,
 			looking,
 			min_age,
 			max_age,
 			introduction,
 			JSON.stringify(interests),
+			profile_image,
 			user_id,
 		]);
 		if (response)

@@ -87,8 +87,9 @@ export const login = async (req: Request, res: Response) => {
 					user_id: user[0].user_id,
 					email: user[0].email,
 					name: user[0].name,
-					age: convertBirthdayToAge(user[0].birthday),
-					profile_exists: user[0].profile_exists
+					birthday: user[0].birthday,
+					profile_exists: user[0].profile_exists,
+					profile_image: user[0].profile_image
 				},
 				accessToken: accessToken,
 				refreshToken: refreshToken,

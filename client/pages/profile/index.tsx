@@ -34,7 +34,6 @@ const LoggedIn = () => {
 				response.data.profile.interests = JSON.parse(
 					response.data.profile.interests
 				);
-				console.log(response.data.profile.interests);
 				setProfile(response.data.profile);
 				sessionStorage.setItem('profile', JSON.stringify(response.data.profile));
 			} else setProfileExists(false);

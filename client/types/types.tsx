@@ -27,11 +27,6 @@ export interface UserImagesProps {
   user_id: number | undefined;
 }
 
-
-export interface OtherUserViewProps {
-  profile: IOtherUser;
-}
-
 export interface FileInputProps {
   profileExists: boolean;
   files: FileList | undefined;
@@ -40,6 +35,10 @@ export interface FileInputProps {
 
 export interface ProfileViewProps {
   setEditMode: (boolean: boolean) => void;
+  profile: IProfile;
+}
+
+export interface OtherUserViewProps {
   profile: IProfile;
 }
 
@@ -93,20 +92,8 @@ export interface IButton {
 export interface IProfile {
   user_id: number | undefined;
   name: string | undefined;
-  age: number | undefined
-  gender: string | undefined;
-  looking: string | undefined;
-  min_age: number | undefined,
-  max_age: number | undefined,
-  introduction: string | undefined;
-  interests: {};
-  country: string | undefined;
-  city: string | undefined
-}
-export interface IOtherUser {
-  user_id: number | undefined;
-  name: string | undefined;
-  age: number | undefined
+  birthday: string | undefined;
+  profile_image: string | undefined;
   gender: string | undefined;
   looking: string | undefined;
   min_age: number | undefined,
@@ -118,8 +105,8 @@ export interface IOtherUser {
 }
 
 export interface ITag {
+  key: string;
   text: string;
-  keyValue: string;
   interests: string[];
   setInterests: SetStateAction<any>;
   setTagError: SetStateAction<any>;
@@ -185,6 +172,7 @@ export interface ResultsProps {
 
 export interface ISearchParams {
   gender: string,
+  looking: string,
   min_age: number,
   max_age: number
 }

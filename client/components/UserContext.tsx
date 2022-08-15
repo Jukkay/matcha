@@ -13,9 +13,10 @@ export type UserInfo = {
 	user_id: number | undefined;
 	name: string | undefined;
 	email: string | undefined;
-	age: number | undefined;
-};
-
+	birthday: string | undefined;
+	profile_image: string | undefined;
+	profile_exists: boolean | undefined;
+}
 export interface IUser {
 	user?: UserInfo;
 	updateUser?: (user: UserInfo) => void;
@@ -34,13 +35,15 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
 		user_id: undefined,
 		name: '',
 		email: '',
-		age: undefined,
-		profile_exists: false
+		birthday: '',
+		profile_exists: false,
+		profile_image: 'default.png'
 	});
 	const [profile, setProfile] = useState<IProfile>({
 		user_id: undefined,
 		name: '',
-		age: undefined,
+		birthday: '',
+		profile_image: 'default.png',
 		gender: '',
 		looking: '',
 		min_age: undefined,

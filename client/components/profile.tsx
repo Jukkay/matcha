@@ -103,6 +103,7 @@ export const CreateProfile = ({
 	const [interests, setInterests] = useState<string[]>([]);
 	const [query, setQuery] = useState('');
 	const [result, setResult] = useState<string[]>([]);
+	const { userData } = useUserContext();
 
 	// Update object values
 	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -111,6 +112,7 @@ export const CreateProfile = ({
 	useEffect(() => {
 		setInterests(Object.values(profile.interests));
 	}, []);
+
 	// Live query interest from interest list
 	useEffect(() => {
 		if (!query) {
@@ -124,7 +126,6 @@ export const CreateProfile = ({
 	}, [query]);
 
 	const uploadPhotos = async () => {
-		// Check photos
 		if (!files || files.length < 1) {
 			setFileError(true);
 			return;
@@ -142,13 +143,11 @@ export const CreateProfile = ({
 
 	const uploadProfile = async () => {
 		try {
-			// upload photos
-			const photoUpload = await uploadPhotos();
-			if (!photoUpload) {
+			// Check photos
+			if (!files || files.length < 1) {
 				setFileError(true);
 				return;
 			}
-
 			// Check interests amount
 			if (interests.length < 1) {
 				setInterestsError(true);
@@ -157,11 +156,21 @@ export const CreateProfile = ({
 			// Add interests object to profile
 			let payload = profile;
 			payload.interests = Object.assign({}, interests);
+			// Add other information user can't change
+			payload.birthday = userData.birthday;
+			payload.name = userData.name;
 			// Save inputs to db
 			sessionStorage.setItem('profile', JSON.stringify(profile));
-			setEditMode(false);
+
+			// upload photos
+			const photoUpload = await uploadPhotos();
+			if (!photoUpload) {
+				setFileError(true);
+				return;
+			}
 			await authAPI.post(`/profile`, payload);
 			setProfileExists(true);
+			setEditMode(false);
 		} catch (err) {
 			console.error(err);
 		}
@@ -310,6 +319,7 @@ export const UpdateProfile = ({
 	const [interests, setInterests] = useState<string[]>([]);
 	const [query, setQuery] = useState('');
 	const [result, setResult] = useState<string[]>([]);
+	const { userData } = useUserContext();
 
 	// Update object values
 	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -331,7 +341,6 @@ export const UpdateProfile = ({
 	}, [query]);
 
 	const uploadPhotos = async () => {
-		// Check photos
 		if (!files || files.length < 1) {
 			return;
 		}
@@ -348,22 +357,28 @@ export const UpdateProfile = ({
 
 	const uploadProfile = async () => {
 		try {
-			// upload photos
-			await uploadPhotos();
-
 			// Check interests amount
 			if (interests.length < 1) {
 				setInterestsError(true);
 				return;
 			}
+			// Check photos
+			if (files && files.length > 0) {
+				// upload photos
+				await uploadPhotos();
+			}
 			// Add interests object to profile
 			let payload = profile;
 			payload.interests = Object.assign({}, interests);
+			// Add other information user can't change
+			payload.birthday = userData.birthday;
+			payload.name = userData.name;
 			// Save inputs to db
 			sessionStorage.setItem('profile', JSON.stringify(profile));
-			setEditMode(false);
+
+			// Upload profile
 			await authAPI.patch(`/profile`, payload);
-			setProfileExists(true);
+			setEditMode(false);
 		} catch (err) {
 			console.error(err);
 		}
@@ -516,13 +531,7 @@ export const NewProfileButton = ({ setEditMode }: EditButtonProps) => {
 	);
 };
 
-export const Tag = ({
-	text,
-	keyValue,
-	interests,
-	setInterests,
-	setTagError,
-}: ITag) => {
+export const Tag = ({ text, interests, setInterests, setTagError }: ITag) => {
 	const [selected, setSelected] = useState(false);
 
 	const handleTagClick = (event: PointerEvent<HTMLSpanElement>) => {
@@ -541,7 +550,6 @@ export const Tag = ({
 	return (
 		<span
 			className="tag is-success is-light is-medium is-rounded is-clickable"
-			key={keyValue}
 			onClick={handleTagClick}
 		>
 			{text}
@@ -551,7 +559,6 @@ export const Tag = ({
 
 export const SelectedTag = ({
 	text,
-	keyValue,
 	interests,
 	setInterests,
 	setTagError,
@@ -568,7 +575,6 @@ export const SelectedTag = ({
 	return (
 		<span
 			className="tag is-primary is-medium is-rounded is-clickable"
-			key={keyValue}
 			onClick={handleTagClick}
 		>
 			{text}
@@ -583,14 +589,12 @@ export const SearchResult = ({
 	setTagError,
 	query,
 }: ISearchResult) => {
-	return (
+	return interests ? (
 		<div className="tags" id="interests">
 			{interests.map((interest, index) => (
 				<SelectedTag
+					key={'selected'.concat(interest.concat(index.toString()))}
 					text={interest}
-					keyValue={'selected'.concat(
-						interest.concat(index.toString())
-					)}
 					interests={interests}
 					setInterests={setInterests}
 					setTagError={setTagError}
@@ -600,7 +604,7 @@ export const SearchResult = ({
 				interests.includes(interest) ? null : (
 					<Tag
 						text={interest}
-						keyValue={'not'.concat(
+						key={'selected'.concat(
 							interest.concat(index.toString())
 						)}
 						interests={interests}
@@ -610,7 +614,7 @@ export const SearchResult = ({
 				)
 			)}
 		</div>
-	);
+	) : null;
 };
 
 export const CountrySelector = ({ profile, setProfile }: ISelectorProfile) => {
@@ -767,7 +771,10 @@ export const AgeRange = ({ profile, setProfile }: ISelectorProfile) => {
 	);
 };
 
-export const SearchAgeRange = ({ searchParams, setSearchParams }: AgeRangeProps) => {
+export const SearchAgeRange = ({
+	searchParams,
+	setSearchParams,
+}: AgeRangeProps) => {
 	return (
 		<div className="block">
 			<label htmlFor="min_age" className="label">
@@ -880,21 +887,33 @@ export const TextArea = ({
 };
 export const EditGallery = ({ files, setImageError }: GalleryProps) => {
 	const [images, setImages] = useState([]);
-	const { userData } = useUserContext();
+	const { userData, updateUserData, profile, setProfile } = useUserContext();
 
 	// Remove uploaded image
 	const handleClick = async (event: PointerEvent<HTMLButtonElement>) => {
+		event.preventDefault();
 		if (images.length < 2) {
-			setImageError(true)
-			return
+			setImageError(true);
+			return;
 		}
-		const removedImage = event.currentTarget.id.split('/').pop();
+		const url = event.currentTarget.id;
+		const removedImage = url.substring(url.lastIndexOf('/') + 1);
 		if (!removedImage) return;
 		let response = await authAPI.delete(`/image/${removedImage}`);
 		if (response.status === 200) {
 			const newImages = images.filter((item) => item != removedImage);
 			setImages(newImages);
 		}
+	};
+
+	// Set as profile picture
+	const handleProfilePicture = (event: PointerEvent<HTMLButtonElement>) => {
+		event.preventDefault();
+		const url = event.currentTarget.id;
+		const chosenImage = url.substring(url.lastIndexOf('/') + 1);
+		console.log(chosenImage)
+		setProfile({ ...profile, profile_image: chosenImage });
+		updateUserData({ ...userData, profile_image: chosenImage });
 	};
 
 	useEffect(() => {
@@ -926,13 +945,22 @@ export const EditGallery = ({ files, setImageError }: GalleryProps) => {
 								crossOrigin=""
 							/>
 						</figure>
-						<button
-							className="button is-small is-centered mt-3"
-							id={image}
-							onClick={handleClick}
-						>
-							Remove
-						</button>
+						<div className="buttons">
+							<button
+								className="button is-small is-danger is-centered mt-3"
+								id={image}
+								onClick={handleClick}
+							>
+								Remove
+							</button>
+							<button
+								className="button is-small is-primary is-centered mt-3"
+								id={image}
+								onClick={handleProfilePicture}
+							>
+								Set as profile picture
+							</button>
+						</div>
 					</div>
 				))}
 			</div>
@@ -940,8 +968,7 @@ export const EditGallery = ({ files, setImageError }: GalleryProps) => {
 	) : null;
 };
 
-export const Gallery = ({user_id}: UserImagesProps) => {
-
+export const Gallery = ({ user_id }: UserImagesProps) => {
 	const [images, setImages] = useState([]);
 
 	useEffect(() => {
@@ -984,7 +1011,6 @@ export const FileInput = ({
 }: FileInputProps) => {
 	const [preview, setPreview] = useState<string[]>([]);
 	const [userImages, setUserImages] = useState<string[]>([]);
-	const { userData } = useUserContext();
 
 	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		if (!event.target.files) return;
@@ -1033,11 +1059,22 @@ export const FileInput = ({
 };
 
 export const Thumbnails = ({ preview, setPreview }: IThumbnails) => {
+	const { userData, updateUserData, profile, setProfile } = useUserContext();
 	// Remove uploaded image
-	const handleClick = (event: PointerEvent<HTMLButtonElement>) => {
+	const handleRemove = (event: PointerEvent<HTMLButtonElement>) => {
+		event.preventDefault();
 		const removedImage = event.currentTarget.id;
 		const newPreview = preview.filter((item) => item != removedImage);
 		setPreview(newPreview);
+	};
+	// Set as profile picture
+	const handleProfilePicture = (event: PointerEvent<HTMLButtonElement>) => {
+		event.preventDefault();
+		const url = event.currentTarget.id;
+		const chosenImage = url.substring(url.lastIndexOf('/') + 1);
+
+		setProfile({ ...profile, profile_image: chosenImage });
+		updateUserData({ ...userData, profile_image: chosenImage });
 	};
 
 	return preview ? (
@@ -1052,9 +1089,18 @@ export const Thumbnails = ({ preview, setPreview }: IThumbnails) => {
 							type="button"
 							className="button is-small is-danger is-centered mt-3"
 							id={image}
-							onClick={handleClick}
+							onClick={handleRemove}
 						>
 							Remove
+						</button>
+						{}
+						<button
+							type="button"
+							className="button is-small is-primary is-centered mt-3"
+							id={image}
+							onClick={handleProfilePicture}
+						>
+							Set as profile picture
 						</button>
 					</div>
 				))}
@@ -1062,29 +1108,3 @@ export const Thumbnails = ({ preview, setPreview }: IThumbnails) => {
 		</div>
 	) : null;
 };
-// export const UploadButton = ({ files, setFiles, setPreview }: IUpload) => {
-// 	const [imageIDs, setImageIDs] = useState([]);
-// 	const [images, setImages] = useState([]);
-
-// 	const handleClick = async () => {
-// 		if (!files || files.length < 1) return;
-
-// 		// Add files to formData
-// 		const imageData = new FormData();
-// 		for (let i = 0; i < files.length; i++) {
-// 			imageData.append('files', files[i], files[i].name);
-// 		}
-
-// 		// Upload to browser
-// 		const response = await authAPI.post('/image', imageData);
-// 		setImageIDs(response.data.photo_IDs);
-// 		setFiles([]);
-// 		setPreview([]);
-// 	};
-
-// 	return (
-// 		<div className="button is-primary" onClick={handleClick}>
-// 			Upload pictures
-// 		</div>
-// 	);
-// };

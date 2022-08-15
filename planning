@@ -161,10 +161,14 @@ V Make discover users page (all users matching criteria)
 V Add search parameters
 V Create endpoint for search
 V Show search results
+V Make profile search work with dates instead of age.
 
+Fix photos uploading when profile creation fails
+Fix age not showing in own profile view
+Fix exiting editing mode when removing a photo
 Choose profile image when creating account
 Save information to db
-Add age and profile image to profile create and modify
+Add profile image to profile create and modify
 
 Add geolocation
 Add IP location
@@ -173,7 +177,6 @@ Create matches page
 Create notification system with socket.io or kafka
 Create messaging using the same system
 Integrate chat to matches page
-
 
 # Later
 Change language to very plain language for accessibility
