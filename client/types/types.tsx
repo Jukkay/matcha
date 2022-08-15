@@ -179,7 +179,7 @@ export interface SearchProps extends ResultsProps{
 }
 
 export interface ResultsProps {
-  results: {}
+  results: IProfile[]
   setResults: SetStateAction<any>
 }
 

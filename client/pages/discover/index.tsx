@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import type { NextPage } from 'next';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ReactNode } from 'react';
 import {
 	AgeRange,
 	Gallery,
@@ -34,7 +34,7 @@ const LoggedIn = () => {
 		min_age: profile.min_age,
 		max_age: profile.max_age,
 	});
-	const [results, setResults] = useState({});
+	const [results, setResults] = useState([]);
 
 	return (
 		<>
@@ -49,12 +49,15 @@ const LoggedIn = () => {
 	);
 };
 
-const Search = ({ searchParams, setSearchParams }: SearchProps) => {
-
+const Search = ({ searchParams, setSearchParams, setResults }: SearchProps) => {
 	const searchDatabase = async () => {
 		let response = await authAPI.post(`/search`, {
 			search: searchParams,
 		});
+		console.log(response.data.results);
+		if (response?.data?.results) {
+			setResults(response.data.results);
+		}
 	};
 
 	useEffect(() => {
@@ -64,7 +67,7 @@ const Search = ({ searchParams, setSearchParams }: SearchProps) => {
 	const handleSubmit = (event: React.FormEvent) => {
 		event.preventDefault();
 		searchDatabase();
-	}
+	};
 
 	return (
 		<div>
@@ -104,10 +107,38 @@ const Search = ({ searchParams, setSearchParams }: SearchProps) => {
 const Results = ({ results }: ResultsProps) => {
 	const { userData } = useUserContext();
 
-	return (
+	return results ? (
+		<section className="section has-text-centered">
+			{results.map((result) => (
+				<SearchResultItem profile={result} />
+			))}
+		</section>
+	) : (
 		<section className="section has-text-centered">
 			<h3 className="title is-3">No matching profiles found</h3>
 		</section>
+	);
+};
+
+const SearchResultItem = ({ profile }) => {
+	return (
+		<div>
+			<div className="card">
+				<div className="p-3 has-text-centered">
+					<figure className="image is-128x128">
+						<img
+							src={profile.profile_image}
+							alt="Placeholder image"
+							crossOrigin=""
+						/>
+					</figure>
+				</div>
+				<div className="block">Name: {profile.name}</div>
+				<div className="block">Age: {profile.age}</div>
+				<div className="block">City: {profile.city}</div>
+				<div className="block">Country: {profile.country}</div>
+			</div>
+		</div>
 	);
 };
 

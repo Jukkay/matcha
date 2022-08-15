@@ -159,7 +159,12 @@ V Send like data to db
 V Create dummy userbase
 V Make discover users page (all users matching criteria)
 V Add search parameters
-Create endpoint for search
+V Create endpoint for search
+V Show search results
+
+Choose profile image when creating account
+Save information to db
+Add age and profile image to profile create and modify
 
 Add geolocation
 Add IP location

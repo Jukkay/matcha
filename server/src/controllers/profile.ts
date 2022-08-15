@@ -9,6 +9,7 @@ const newProfile = async (req: Request, res: Response) => {
 		country,
 		city,
 		gender,
+		age,
 		looking,
 		min_age,
 		max_age,
@@ -19,6 +20,7 @@ const newProfile = async (req: Request, res: Response) => {
 		!country ||
 		!city ||
 		!gender ||
+		!age ||
 		!looking ||
 		!min_age ||
 		!max_age ||
@@ -36,12 +38,13 @@ const newProfile = async (req: Request, res: Response) => {
 				message: 'Unauthorized',
 			});
 		const sql =
-			'INSERT INTO profiles(user_id, country, city, gender, looking, min_age, max_age, introduction, interests) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+			'INSERT INTO profiles(user_id, country, city, gender, age, looking, min_age, max_age, introduction, interests) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 		const response = await execute(sql, [
 			user_id,
 			country,
 			city,
 			gender,
+			age,
 			looking,
 			min_age,
 			max_age,
@@ -98,6 +101,7 @@ const updateProfile = async (req: Request, res: Response) => {
 		country,
 		city,
 		gender,
+		age,
 		looking,
 		min_age,
 		max_age,
@@ -105,7 +109,7 @@ const updateProfile = async (req: Request, res: Response) => {
 		interests,
 	} = req.body;
 	const sql =
-		'UPDATE profiles SET country=?, city=?, gender=?, looking=?, min_age=?, max_age=?, introduction=?, interests=? WHERE user_id = ?;';
+		'UPDATE profiles SET country=?, city=?, gender=?, age=?, looking=?, min_age=?, max_age=?, introduction=?, interests=? WHERE user_id = ?;';
 	try {
 		// Get user_id
 		const user_id = await decodeUserFromAccesstoken(req);
@@ -117,6 +121,7 @@ const updateProfile = async (req: Request, res: Response) => {
 			country,
 			city,
 			gender,
+			age,
 			looking,
 			min_age,
 			max_age,
