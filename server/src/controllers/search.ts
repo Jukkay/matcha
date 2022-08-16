@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { convertMAX_AGE, convertMIN_AGE } from '../utilities/helpers';
 import { execute } from '../utilities/SQLConnect';
 import { decodeUserFromAccesstoken } from './token';
 
@@ -9,7 +10,10 @@ export const searchProfiles = async (req: Request, res: Response) => {
 		return res.status(400).json({
 			message: 'Insufficient search parameters',
 		});
-
+	// Convert min_age and max_age to date strings
+	const minDate = convertMIN_AGE(min_age)
+	const maxDate = convertMAX_AGE(max_age)
+	console.log(minDate, maxDate);
 	try {
 		// Get user_id
 		const user_id = await decodeUserFromAccesstoken(req);
@@ -19,7 +23,7 @@ export const searchProfiles = async (req: Request, res: Response) => {
 			});
 		const sql =
 			'SELECT * FROM profiles WHERE DATE(birthday) BETWEEN ? AND ? AND gender = ? AND user_id != ? AND looking = ?';
-		const results = await execute(sql, [max_age, min_age, looking, user_id, gender]);
+		const results = await execute(sql, [maxDate, minDate, looking, user_id, gender]);
 		console.log('Results: ',results);
 		if (results.length > 0) {
 			// TODO Create notification of profile visit

@@ -5,11 +5,11 @@ import controller from '../controllers/profile'
 const profileRouter: express.Router = express.Router();
 
 profileRouter.post('/', controller.newProfile)
+profileRouter.patch('/', checkJWT, controller.updateProfile)
 // userRouter.get('/images', controller.getUserImageIDs)
 profileRouter
 	.route('/:id')
 	.get(checkJWT, controller.getProfile)
-	.patch(checkJWT, controller.updateProfile)
 	.delete(checkJWT, controller.deleteProfile)
 
 export default profileRouter

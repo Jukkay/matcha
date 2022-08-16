@@ -70,7 +70,7 @@ imageRouter.post(
 			// Send filenames as response
 			return res.status(200).json({
 				message: 'Files uploaded successfully',
-				photo_IDs: photo_IDs,
+				filenames: filenames,
 			});
 		} catch (err) {
 			console.log(err);

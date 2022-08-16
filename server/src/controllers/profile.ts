@@ -16,6 +16,7 @@ const newProfile = async (req: Request, res: Response) => {
 		max_age,
 		introduction,
 		interests,
+		profile_image,
 		name
 	} = req.body;
 	if (
@@ -28,7 +29,8 @@ const newProfile = async (req: Request, res: Response) => {
 		!max_age ||
 		!introduction ||
 		!interests ||
-		!name
+		!name ||
+		!profile_image
 	)
 		return res.status(400).json({
 			message: 'Incomplete profile information',
@@ -41,7 +43,7 @@ const newProfile = async (req: Request, res: Response) => {
 				message: 'Unauthorized',
 			});
 		const sql =
-			'INSERT INTO profiles(user_id, country, city, gender, birthday, looking, min_age, max_age, introduction, interests, name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+			'INSERT INTO profiles(user_id, country, city, gender, birthday, looking, min_age, max_age, introduction, interests, name, profile_image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 		const response = await execute(sql, [
 			user_id,
 			country,
@@ -54,9 +56,10 @@ const newProfile = async (req: Request, res: Response) => {
 			introduction,
 			JSON.stringify(interests),
 			name,
+			profile_image
 		]);
-		const sql2 = 'UPDATE users SET profile_exists = "1" WHERE user_id = ?;';
-		const response2 = await execute(sql2, [user_id]);
+		const sql2 = 'UPDATE users SET profile_exists = "1", profile_image = ? WHERE user_id = ?;';
+		const response2 = await execute(sql2, [profile_image, user_id]);
 		if (response && response2)
 			return res.status(200).json({
 				message: 'Profile created',
@@ -127,7 +130,7 @@ const updateProfile = async (req: Request, res: Response) => {
 			country,
 			city,
 			gender,
-			birthday,
+			reformatDate(birthday),
 			looking,
 			min_age,
 			max_age,
@@ -136,7 +139,9 @@ const updateProfile = async (req: Request, res: Response) => {
 			profile_image,
 			user_id,
 		]);
-		if (response)
+		const sql2 = 'UPDATE users SET profile_exists = "1", profile_image = ? WHERE user_id = ?;';
+		const response2 = await execute(sql2, [profile_image, user_id]);
+		if (response && response2)
 			return res.status(200).json({
 				message: 'Profile updated successfully',
 			});

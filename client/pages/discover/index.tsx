@@ -51,8 +51,8 @@ const Search = ({ searchParams, setSearchParams, setResults }: SearchProps) => {
 		const query = {
 			gender: searchParams.gender,
 			looking: searchParams.looking,
-			min_age: convertAgeToBirthday(searchParams.min_age),
-			max_age: convertAgeToBirthday(searchParams.max_age)
+			min_age: searchParams.min_age,
+			max_age: searchParams.max_age
 		}
 		let response = await authAPI.post(`/search`, {
 			search: query,
@@ -132,7 +132,7 @@ const SearchResultItem = ({ profile }: OtherUserViewProps) => {
 				<div className="p-3 has-text-centered">
 					<figure className="image is-128x128">
 						<img
-							src={profile.profile_image}
+							src={`${authAPI.defaults.baseURL}/images/${profile.profile_image}`}
 							alt="Placeholder image"
 							crossOrigin=""
 						/>

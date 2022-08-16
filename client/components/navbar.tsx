@@ -1,9 +1,11 @@
 import Link from 'next/link';
+import { useEffect } from 'react';
 import { IconContext } from 'react-icons';
 import { FaCog, FaHeart, FaBars, FaRegBell } from 'react-icons/fa';
+import { authAPI } from '../utilities/api';
 import { useUserContext } from './UserContext';
 
-const logoutButton = () => {
+const LogoutButton = () => {
 	return (
 		<Link href="/logout">
 			<a className="button">Log out</a>
@@ -11,7 +13,7 @@ const logoutButton = () => {
 	);
 };
 
-const loginSignupButtons = () => {
+const LoginSignupButtons = () => {
 	return (
 		<>
 			<Link href="/signup">
@@ -23,7 +25,29 @@ const loginSignupButtons = () => {
 		</>
 	);
 };
-const NavbarComponent = (args: any) => {
+
+const ProfilePicture = () => {
+	const { userData, profile } = useUserContext();
+
+	return (
+		<a className="navbar-item">
+		<p className="mr-3">
+			<strong>{userData.username}</strong>
+		</p>
+
+		<figure className="image">
+			<img
+				className="is-rounded"
+				src={profile.profile_image ? `${authAPI.defaults.baseURL}/images/${profile.profile_image}` : '/default.png'}
+				alt="Profile picture"
+				crossOrigin=""
+			/>
+		</figure>
+	</a>
+	);
+};
+
+const NavbarComponent = () => {
 	// Token state
 	const { accessToken } = useUserContext();
 	return (
@@ -104,24 +128,13 @@ const NavbarComponent = (args: any) => {
 						<div className="navbar-item">
 							<div className="buttons" id="buttons">
 								{accessToken
-									? logoutButton()
-									: loginSignupButtons()}
+									? LogoutButton()
+									: LoginSignupButtons()}
 							</div>
 						</div>
 						<div className="navbar-item" id="profile">
 							<Link href="/profile">
-								<a className="navbar-item">
-									<p className="mr-3">
-										<strong></strong>
-									</p>
-
-									<figure className="image">
-										<img
-											className="is-rounded"
-											src="https://placeimg.com/80/80/people"
-										/>
-									</figure>
-								</a>
+									<ProfilePicture />
 							</Link>
 						</div>
 						<div className="navbar-item" id="controlpanel">

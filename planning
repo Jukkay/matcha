@@ -162,13 +162,20 @@ V Add search parameters
 V Create endpoint for search
 V Show search results
 V Make profile search work with dates instead of age.
+V Fix photos uploading when profile creation fails
+V Choose profile image when creating account
+V Save information to db
+V Add profile image to profile create and modify
 
-Fix photos uploading when profile creation fails
-Fix age not showing in own profile view
+V Fix error with date conversion
+V Make image upload return filenames
+V Save returned filename to profile image before uploading profile
+V Remove picture elements when removing picture from uploaded images
+V Make profile picture visible in profile page
+V Make profile picture visible in navbar
+Fix age not showing in own profile view and search parameters
+Make current profile pic selection visible in the gallery
 Fix exiting editing mode when removing a photo
-Choose profile image when creating account
-Save information to db
-Add profile image to profile create and modify
 
 Add geolocation
 Add IP location

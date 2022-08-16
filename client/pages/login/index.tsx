@@ -119,7 +119,7 @@ const Login: NextPage = () => {
           sessionStorage.setItem("refreshToken", response.data.refreshToken);
         }
         const path = response.data.user.profile_exists ? '/' : '/profile'
-        setTimeout(() => router.replace(path), 3000);
+        setTimeout(() => router.replace(path), 2000);
       }
     } catch (err: any) {
       console.error(err);

@@ -97,6 +97,7 @@ export const CreateProfile = ({
 	setProfileExists,
 }: EditProps) => {
 	const [tagError, setTagError] = useState(false);
+	const [success, setSuccess] = useState(false);
 	const [interestsError, setInterestsError] = useState(false);
 	const [fileError, setFileError] = useState(false);
 	const [files, setFiles] = useState<FileList>();
@@ -135,7 +136,7 @@ export const CreateProfile = ({
 		for (let i = 0; i < files.length; i++) {
 			imageData.append('files', files[i], files[i].name);
 		}
-
+		if (!profile.profile_image) profile.profile_image = '0';
 		// Upload to server
 		const response = await authAPI.post('/image', imageData);
 		return response;
@@ -156,21 +157,29 @@ export const CreateProfile = ({
 			// Add interests object to profile
 			let payload = profile;
 			payload.interests = Object.assign({}, interests);
-			// Add other information user can't change
-			payload.birthday = userData.birthday;
-			payload.name = userData.name;
-			// Save inputs to db
-			sessionStorage.setItem('profile', JSON.stringify(profile));
-
 			// upload photos
 			const photoUpload = await uploadPhotos();
 			if (!photoUpload) {
 				setFileError(true);
 				return;
 			}
-			await authAPI.post(`/profile`, payload);
-			setProfileExists(true);
-			setEditMode(false);
+			// Get profile picture filename
+			const imageNumber = profile.profile_image || '0'
+			payload.profile_image = photoUpload.data.filenames[imageNumber]
+			// Add other information user can't change
+			payload.birthday = userData.birthday;
+			payload.name = userData.name;
+			// Upload profile
+			const response = await authAPI.post(`/profile`, payload);
+			if (response.status === 200) {
+				setSuccess(true);
+				setTimeout(() => {
+					setSuccess(false);
+					setEditMode(false);
+					setProfileExists(true);
+					sessionStorage.setItem('profile', JSON.stringify(payload));
+				}, 2000);
+			}
 		} catch (err) {
 			console.error(err);
 		}
@@ -180,7 +189,15 @@ export const CreateProfile = ({
 		event.preventDefault();
 		uploadProfile();
 	};
-	return (
+	return success ? (
+		<section className="section">
+			<div className="box has-text-centered">
+				<section className="section">
+					<h3 className="title is-3">Profile created successfully</h3>
+				</section>
+			</div>
+		</section>
+	) : (
 		<div>
 			<form onSubmit={handleSubmit}>
 				<section className="section">
@@ -313,6 +330,7 @@ export const UpdateProfile = ({
 	setProfileExists,
 }: EditProps) => {
 	const [tagError, setTagError] = useState(false);
+	const [success, setSuccess] = useState(false);
 	const [interestsError, setInterestsError] = useState(false);
 	const [imageError, setImageError] = useState(false);
 	const [files, setFiles] = useState<FileList>();
@@ -327,6 +345,7 @@ export const UpdateProfile = ({
 	};
 	useEffect(() => {
 		setInterests(Object.values(profile.interests));
+		setSuccess(false);
 	}, []);
 	// Live query interest from interest list
 	useEffect(() => {
@@ -373,12 +392,20 @@ export const UpdateProfile = ({
 			// Add other information user can't change
 			payload.birthday = userData.birthday;
 			payload.name = userData.name;
+			payload.profile_image = userData.profile_image;
 			// Save inputs to db
 			sessionStorage.setItem('profile', JSON.stringify(profile));
 
 			// Upload profile
-			await authAPI.patch(`/profile`, payload);
-			setEditMode(false);
+			const response = await authAPI.patch(`/profile`, payload);
+			if (response.status === 200) {
+				setSuccess(true);
+				setTimeout(() => {
+					setSuccess(false);
+					setEditMode(false);
+					sessionStorage.setItem('profile', JSON.stringify(payload));
+				}, 2000);
+			}
 		} catch (err) {
 			console.error(err);
 		}
@@ -388,7 +415,15 @@ export const UpdateProfile = ({
 		event.preventDefault();
 		uploadProfile();
 	};
-	return (
+	return success ? (
+		<section className="section">
+			<div className="box has-text-centered">
+				<section className="section">
+					<h3 className="title is-3">Profile updated successfully</h3>
+				</section>
+			</div>
+		</section>
+	) : (
 		<div>
 			<form onSubmit={handleSubmit}>
 				<section className="section">
@@ -508,6 +543,13 @@ export const UpdateProfile = ({
 					<AgeRange profile={profile} setProfile={setProfile} />
 					<button type="submit" className="button is-primary">
 						Update profile
+					</button>
+					<button
+						type="submit"
+						className="button is-primary"
+						onClick={() => setEditMode(false)}
+					>
+						Cancel
 					</button>
 				</section>
 			</form>
@@ -886,7 +928,7 @@ export const TextArea = ({
 	);
 };
 export const EditGallery = ({ files, setImageError }: GalleryProps) => {
-	const [images, setImages] = useState([]);
+	const [images, setImages] = useState<string[]>([]);
 	const { userData, updateUserData, profile, setProfile } = useUserContext();
 
 	// Remove uploaded image
@@ -899,10 +941,20 @@ export const EditGallery = ({ files, setImageError }: GalleryProps) => {
 		const url = event.currentTarget.id;
 		const removedImage = url.substring(url.lastIndexOf('/') + 1);
 		if (!removedImage) return;
+		if (removedImage == profile.profile_image) {
+			setProfile({
+				...profile,
+				profile_image: images[0].substring(url.lastIndexOf('/') + 1),
+			});
+			updateUserData({
+				...userData,
+				profile_image: images[0].substring(url.lastIndexOf('/') + 1),
+			});
+		}
 		let response = await authAPI.delete(`/image/${removedImage}`);
 		if (response.status === 200) {
-			const newImages = images.filter((item) => item != removedImage);
-			setImages(newImages);
+			const newImages = images.filter((item) => item != url);
+			setImages([...newImages]);
 		}
 	};
 
@@ -911,7 +963,7 @@ export const EditGallery = ({ files, setImageError }: GalleryProps) => {
 		event.preventDefault();
 		const url = event.currentTarget.id;
 		const chosenImage = url.substring(url.lastIndexOf('/') + 1);
-		console.log(chosenImage)
+		console.log(chosenImage);
 		setProfile({ ...profile, profile_image: chosenImage });
 		updateUserData({ ...userData, profile_image: chosenImage });
 	};
@@ -928,7 +980,7 @@ export const EditGallery = ({ files, setImageError }: GalleryProps) => {
 			}
 		};
 		getUserImages();
-	}, [files]);
+	}, []);
 
 	return images ? (
 		<div className="block">
@@ -1070,24 +1122,22 @@ export const Thumbnails = ({ preview, setPreview }: IThumbnails) => {
 	// Set as profile picture
 	const handleProfilePicture = (event: PointerEvent<HTMLButtonElement>) => {
 		event.preventDefault();
-		const url = event.currentTarget.id;
-		const chosenImage = url.substring(url.lastIndexOf('/') + 1);
-
-		setProfile({ ...profile, profile_image: chosenImage });
-		updateUserData({ ...userData, profile_image: chosenImage });
+		const imageNumber = event.currentTarget.id;
+		console.log(imageNumber);
+		setProfile({ ...profile, profile_image: imageNumber });
 	};
 
 	return preview ? (
 		<div className="block">
 			<div className="is-flex is-flex-direction-row is-flex-wrap-wrap">
-				{preview.map((image) => (
+				{preview.map((image, index) => (
 					<div key={image} className="box mx-3 has-text-centered">
 						<figure className="image is-128x128">
 							<img src={image} alt="Placeholder image" />
 						</figure>
 						<button
 							type="button"
-							className="button is-small is-danger is-centered mt-3"
+							className="button is-small is-danger is-centered mr-3 mt-3"
 							id={image}
 							onClick={handleRemove}
 						>
@@ -1097,7 +1147,7 @@ export const Thumbnails = ({ preview, setPreview }: IThumbnails) => {
 						<button
 							type="button"
 							className="button is-small is-primary is-centered mt-3"
-							id={image}
+							id={index.toString()}
 							onClick={handleProfilePicture}
 						>
 							Set as profile picture
