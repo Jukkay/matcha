@@ -30,20 +30,28 @@ const ProfilePicture = () => {
 	const { userData, profile } = useUserContext();
 
 	return (
-		<a className="navbar-item">
-		<p className="mr-3">
-			<strong>{userData.username}</strong>
-		</p>
+		<div className="navbar-item" id="profile">
+			<Link href="/profile">
+				<a className="navbar-item">
+					<p className="mr-3">
+						<strong>{userData.username}</strong>
+					</p>
 
-		<figure className="image">
-			<img
-				className="is-rounded"
-				src={profile.profile_image ? `${authAPI.defaults.baseURL}/images/${profile.profile_image}` : '/default.png'}
-				alt="Profile picture"
-				crossOrigin=""
-			/>
-		</figure>
-	</a>
+					<figure className="image">
+						<img
+							className="is-rounded"
+							src={
+								profile.profile_image
+									? `${authAPI.defaults.baseURL}/images/${profile.profile_image}`
+									: '/default.png'
+							}
+							alt="Profile picture"
+							crossOrigin=""
+						/>
+					</figure>
+				</a>
+			</Link>
+		</div>
 	);
 };
 
@@ -115,14 +123,12 @@ const NavbarComponent = () => {
 				</div>
 				<div className="navbar-menu">
 					<div className="navbar-start">
-					<Link href="/discover">
-						<a className="navbar-item">
-							Discover
-						</a>
-					</Link>
-						<a className="navbar-item" href="/newpost">
-							Link 2
-						</a>
+						<Link href="/discover">
+							<a className="navbar-item">Discover</a>
+						</Link>
+						<Link href="/history">
+							<a className="navbar-item">Recent profiles</a>
+						</Link>
 					</div>
 					<div className="navbar-end">
 						<div className="navbar-item">
@@ -132,11 +138,7 @@ const NavbarComponent = () => {
 									: LoginSignupButtons()}
 							</div>
 						</div>
-						<div className="navbar-item" id="profile">
-							<Link href="/profile">
-									<ProfilePicture />
-							</Link>
-						</div>
+						<ProfilePicture />
 						<div className="navbar-item" id="controlpanel">
 							<Link href="/controlpanel">
 								<a className="navbar-item">

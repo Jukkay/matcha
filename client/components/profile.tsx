@@ -24,6 +24,8 @@ import {
 	UserImagesProps,
 	SearchProps,
 	AgeRangeProps,
+	LogEntry,
+	IProfileCard,
 } from '../types/types';
 import { Country, City } from 'country-state-city';
 import { ErrorMessage } from './form';
@@ -31,6 +33,8 @@ import { authAPI } from '../utilities/api';
 import { useUserContext } from './UserContext';
 import axios from 'axios';
 import { dummyData } from '../pages/profile/data';
+import { convertBirthdayToAge } from '../utilities/helpers';
+import { SearchResultItem } from './discover';
 
 export const LikeButton = () => {
 	return (
@@ -55,9 +59,13 @@ export const ProfileView = ({ profile, setEditMode }: ProfileViewProps) => {
 	return (
 		<div>
 			<section className="section">
+			<h3 className="title is-3">Your profile</h3>
 				<Gallery user_id={userData.user_id} />
-				<div className="block">Name: {userData.name}</div>
-				<div className="block">Age: {userData.age}</div>
+				<div className="block">Name: {profile.name}</div>
+				<div className="block">
+					Age:{' '}
+					{profile.birthday && convertBirthdayToAge(profile.birthday)}
+				</div>
 				<div className="block">City: {profile.city}</div>
 				<div className="block">Country: {profile.country}</div>
 				<div className="block">
@@ -85,10 +93,52 @@ export const ProfileView = ({ profile, setEditMode }: ProfileViewProps) => {
 				<div className="block">User ID: {profile.user_id}</div>
 				<EditButton setEditMode={setEditMode} />
 			</section>
+			<VisitorLog user_id={userData.user_id}/>
 		</div>
 	);
 };
 
+export const VisitorLog = ({user_id}: any) => {
+	const [pageVisited, setPageVisited] = useState(false)
+	const [log, setLog] = useState([])
+	useEffect(() => {
+		const getVisitorLog = async () => {
+			let response = await authAPI.get(`/log/${user_id}`);
+			if (response.status === 200) {
+				console.log(response.data.log)
+				setPageVisited(true)
+				setLog(response.data.log)
+
+
+			}
+		}
+		getVisitorLog();
+	}, []);
+
+	return pageVisited && log ? (
+		<section className="section">
+			<h3 className="title is-3">Visitor log</h3>
+				<div className="block">
+				{log.map((result: IProfileCard) => (
+				<SearchResultItem
+					user_id={result.user_id}
+					profile_image={result.profile_image}
+					name={result.name}
+					birthday={result.birthday}
+					city={result.city}
+					country={result.country}
+				/>
+			))}
+				</div>
+	
+			</section>
+	) : (
+	<section className="section">
+	<h3 className="title is-3">Visitor log</h3>
+		<div className="block">No visits yet</div>
+
+	</section>)
+}
 export const CreateProfile = ({
 	setEditMode,
 	profile,
@@ -164,8 +214,8 @@ export const CreateProfile = ({
 				return;
 			}
 			// Get profile picture filename
-			const imageNumber = profile.profile_image || '0'
-			payload.profile_image = photoUpload.data.filenames[imageNumber]
+			const imageNumber = profile.profile_image || '0';
+			payload.profile_image = photoUpload.data.filenames[imageNumber];
 			// Add other information user can't change
 			payload.birthday = userData.birthday;
 			payload.name = userData.name;
@@ -1005,13 +1055,24 @@ export const EditGallery = ({ files, setImageError }: GalleryProps) => {
 							>
 								Remove
 							</button>
-							<button
-								className="button is-small is-primary is-centered mt-3"
-								id={image}
-								onClick={handleProfilePicture}
-							>
-								Set as profile picture
-							</button>
+							{profile.profile_image ==
+							image.substring(image.lastIndexOf('/') + 1) ? (
+								<button
+									className="button is-small is-centered mt-3"
+									id={image}
+									onClick={handleProfilePicture}
+								>
+									Current profile picture
+								</button>
+							) : (
+								<button
+									className="button is-small is-primary is-centered mt-3"
+									id={image}
+									onClick={handleProfilePicture}
+								>
+									Set as profile picture
+								</button>
+							)}
 						</div>
 					</div>
 				))}

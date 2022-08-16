@@ -38,14 +38,14 @@ V Sign up
 V Login
 V Logout
 V Password reset
-Fill profile information after first login
-    Don't allow access to other parts of the site until this is completed.
+V Fill profile information after first login
+    V Don't allow access to other parts of the site until this is completed.
     V Gender
     V Sexual preference
     V Profile text
     V "Interested in" tags
     V Pictures (max 5)
-        Choose one as profile picture
+        V Choose one as profile picture
 Control panel
     Change user information
 V Edit profile
@@ -173,10 +173,14 @@ V Save returned filename to profile image before uploading profile
 V Remove picture elements when removing picture from uploaded images
 V Make profile picture visible in profile page
 V Make profile picture visible in navbar
-Fix age not showing in own profile view and search parameters
-Make current profile pic selection visible in the gallery
-Fix exiting editing mode when removing a photo
+V Fix age not showing in own profile view and search parameters
+V Make current profile pic selection visible in the gallery
+V Fix exiting editing mode when removing a photo
+V Link from search results to profile page
 
+V Log profile visits to db
+V Show visitors on own profile page
+V Show own visits
 Add geolocation
 Add IP location
 Use real location data instead of declared location

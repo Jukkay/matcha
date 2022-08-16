@@ -16,6 +16,8 @@ import { login, logout } from './controllers/user';
 import likeRouter from './routes/like';
 import checkJWT from './middleware/checkJWT';
 import { searchProfiles } from './controllers/search';
+import { logVisitor } from './controllers/log';
+import logRouter from './routes/log';
 
 const app: express.Application = express();
 
@@ -59,6 +61,9 @@ app.post('/setpassword', resetPassword);
 // Profile search
 app.post('/search', checkJWT, searchProfiles);
 
+// Log CRUD route
+app.use('/log', logRouter);
+
 // User CRUD route
 app.use('/user', userRouter);
 
@@ -70,6 +75,7 @@ app.use('/image', imageRouter);
 
 // Like CRUD route
 app.use('/like', likeRouter);
+
 
 // Server start
 app.listen(process.env.PORT, () => {

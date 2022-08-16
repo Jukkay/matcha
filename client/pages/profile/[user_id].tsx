@@ -3,7 +3,11 @@ import type { NextPage } from 'next';
 import React, { useState, useEffect } from 'react';
 import { Gallery } from '../../components/profile';
 import { useUserContext } from '../../components/UserContext';
-import { OtherUserViewProps, ProfileViewProps } from '../../types/types';
+import {
+	IProfile,
+	OtherUserViewProps,
+	ProfileViewProps,
+} from '../../types/types';
 import { authAPI } from '../../utilities/api';
 import { FcLike } from 'react-icons/fc';
 import { convertBirthdayToAge } from '../../utilities/helpers';
@@ -19,22 +23,53 @@ const NotLoggedIn = () => {
 };
 
 const LoggedIn = () => {
-	const { profile, setProfile } = useUserContext();
-	const [editMode, setEditMode] = useState(false);
+	const [profile, setProfile] = useState<IProfile>({
+		user_id: undefined,
+		name: '',
+		birthday: '',
+		profile_image: '',
+		gender: '',
+		looking: '',
+		min_age: undefined,
+		max_age: undefined,
+		interests: {},
+		introduction: '',
+		country: '',
+		city: '',
+	});
+	const { userData } = useUserContext()
 	const [profileExists, setProfileExists] = useState(false);
-
 	const router = useRouter();
 
+	const logVisit = async () => {
+		try {
+			const { user_id } = router.query;
+			await authAPI.post('/log', {
+				visiting_user: userData.user_id.toString(),
+				visited_user: user_id,
+				username: userData.username
+			});
+		} catch (err) {
+			console.error(err);
+		}
+	};
+
 	const getUserProfile = async () => {
-		const { user_id } = router.query;
-		let response = await authAPI.get(`/profile/${user_id}`);
-		if (response?.data?.profile) {
-			setProfileExists(true);
-			response.data.profile.interests = JSON.parse(
-				response.data.profile.interests
-			);
-			setProfile(response.data.profile);
-		} else setProfileExists(false);
+		try {
+			const { user_id } = router.query;
+			let response = await authAPI.get(`/profile/${user_id}`);
+			if (response?.data?.profile) {
+				setProfileExists(true);
+				response.data.profile.interests = JSON.parse(
+					response.data.profile.interests
+				);
+				setProfile(response.data.profile);
+			} else setProfileExists(false);
+		} catch (err) {
+			console.error(err);
+		} finally {
+			logVisit()
+		}
 	};
 	useEffect(() => {
 		if (router.isReady) {
@@ -72,7 +107,10 @@ const ViewMode = ({ profile }: OtherUserViewProps) => {
 			<section className="section">
 				<Gallery user_id={profile.user_id} />
 				<div className="block">Name: {profile.name}</div>
-				<div className="block">Age: {profile.birthday && convertBirthdayToAge(profile.birthday)}</div>
+				<div className="block">
+					Age:{' '}
+					{profile.birthday && convertBirthdayToAge(profile.birthday)}
+				</div>
 				<div className="block">City: {profile.city}</div>
 				<div className="block">Country: {profile.country}</div>
 				<div className="block">

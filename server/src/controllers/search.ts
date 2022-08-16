@@ -13,7 +13,6 @@ export const searchProfiles = async (req: Request, res: Response) => {
 	// Convert min_age and max_age to date strings
 	const minDate = convertMIN_AGE(min_age)
 	const maxDate = convertMAX_AGE(max_age)
-	console.log(minDate, maxDate);
 	try {
 		// Get user_id
 		const user_id = await decodeUserFromAccesstoken(req);
@@ -22,7 +21,7 @@ export const searchProfiles = async (req: Request, res: Response) => {
 				message: 'Unauthorized',
 			});
 		const sql =
-			'SELECT * FROM profiles WHERE DATE(birthday) BETWEEN ? AND ? AND gender = ? AND user_id != ? AND looking = ?';
+			'SELECT name, birthday, city, country, profile_image, user_id FROM profiles WHERE DATE(birthday) BETWEEN ? AND ? AND gender = ? AND user_id != ? AND looking = ?';
 		const results = await execute(sql, [maxDate, minDate, looking, user_id, gender]);
 		console.log('Results: ',results);
 		if (results.length > 0) {

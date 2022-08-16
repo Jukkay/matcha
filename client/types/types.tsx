@@ -166,7 +166,7 @@ export interface SearchProps extends ResultsProps{
 }
 
 export interface ResultsProps {
-  results: IProfile[]
+  results: IProfileCard[]
   setResults: SetStateAction<any>
 }
 
@@ -180,4 +180,18 @@ export interface ISearchParams {
 export interface AgeRangeProps {
   searchParams: ISearchParams
   setSearchParams: SetStateAction<any>
+}
+
+export interface LogEntry {
+  username: string
+  visit_date: string
+}
+
+export interface IProfileCard {
+  user_id?: string
+  name: string
+  birthday: string
+  city: string
+  country: string
+  profile_image: string
 }
