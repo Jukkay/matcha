@@ -18,8 +18,6 @@ CREATE TABLE IF NOT EXISTS users(
 	password_reset_key VARCHAR(255),
 	`admin` BOOLEAN DEFAULT FALSE,
 	email_notification BOOLEAN DEFAULT TRUE,
-	location_gps VARCHAR(255),
-	location_ip VARCHAR(255),
 	UNIQUE (email, username),
 	PRIMARY KEY (`user_id`)
 );
@@ -38,6 +36,10 @@ CREATE TABLE IF NOT EXISTS profiles(
 	introduction VARCHAR(4096) NOT NULL,
 	interests JSON NOT NULL,
 	likes INT UNSIGNED DEFAULT 0,
+	geolocation JSON DEFAULT NULL,
+	ip_location: JSON DEFAULT NULL,
+	latitude VARCHAR(32) DEFAULT NULL,
+	longitude VARCHAR(32) DEFAULT NULL,
 	creation_date DATETIME DEFAULT CURRENT_TIMESTAMP,
 	UNIQUE (`user_id`),
 	PRIMARY KEY (profile_id)

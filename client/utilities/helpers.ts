@@ -11,3 +11,4 @@ export const convertAgeToBirthday = (age: number) => {
 	const bd = new Date(now - ageInMilliseconds)
     return `${bd.getFullYear()}-${bd.getMonth()}-${bd.getDate()}`
 }
+

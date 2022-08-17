@@ -52,7 +52,15 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
 		introduction: '',
 		country: '',
 		city: '',
+		geolocation: {},
+		ip_location: {},
+		latitude: '', 
+		longitude: ''
 	});
+	const [useGPS, setUseGPS] = useState(false);
+	const [useIPLocation, setUseIPLocation] = useState(false);
+	const [useUserCoordinates, setUseUserCoordinates] = useState(false);
+
 
 	useEffect(() => {
 		// Look for user information in session storage
@@ -85,6 +93,9 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
 				refreshToken,
 				updateAccessToken,
 				updateRefreshToken,
+				useGPS,
+				useIPLocation,
+				useUserCoordinates
 			}}
 		>
 			{children}

@@ -1,5 +1,6 @@
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 import { useUserContext } from '../components/UserContext';
 
 const NotLoggedIn = () => {
@@ -11,12 +12,20 @@ const NotLoggedIn = () => {
 };
 
 const LoggedIn = () => {
-	const { userData } = useUserContext();
+	const { userData, profile, setProfile } = useUserContext();
 	// Router for redirect after login
 	const router = useRouter();
 
 	if (!userData.profile_exists) router.replace('/profile');
 
+	useEffect(() => {
+		if ('geolocation' in navigator) {
+			navigator.geolocation.getCurrentPosition(
+				(position) => setProfile({...profile, geolocation: position}), 
+				(error) => console.log('Geolocation not permitted by user.', error))
+		}
+	}, []);
+	
 	return <div>Profile is complete. Front page here.</div>;
 };
 

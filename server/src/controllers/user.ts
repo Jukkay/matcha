@@ -7,6 +7,7 @@ import { convertBirthdayToAge } from '../utilities/helpers';
 import { validateRegistrationInput } from '../utilities/validators';
 import { decodeUserFromAccesstoken, deleteRefreshToken, updateRefreshTokenList } from './token';
 
+
 const register = async (req: Request, res: Response) => {
   const validationResponse = await validateRegistrationInput(req, res);
   if (validationResponse !== undefined) return;
@@ -50,6 +51,8 @@ export const login = async (req: Request, res: Response) => {
 				field: 'password',
 				message: 'Missing password',
 			});
+
+		// Get user data
 		const sql = `SELECT user_id, username, password, email, name, validated, birthday, profile_exists FROM users WHERE username = ?;`;
 		const user = await execute(sql, username);
 		if (!user[0]) {
@@ -59,6 +62,7 @@ export const login = async (req: Request, res: Response) => {
 				message: 'Invalid user',
 			});
 		}
+		// Check password
 		const match = await bcryptjs.compare(password, user[0].password);
 		if (!match) {
 			return res.status(401).json({
@@ -67,6 +71,7 @@ export const login = async (req: Request, res: Response) => {
 				message: 'Invalid password',
 			});
 		}
+		// Check email validation
 		if (user[0].validated != true) {
 			return res.status(401).json({
 				auth: false,
@@ -76,8 +81,10 @@ export const login = async (req: Request, res: Response) => {
 			});
 		}
 
+		// Create new tokens
 		const accessToken = await signAccessToken(user[0].user_id);
 		const refreshToken = await signRefreshToken(user[0].user_id);
+		// Return user data to frontend
 		if (accessToken && refreshToken) {
 			await updateRefreshTokenList(refreshToken, user[0].user_id);
 			return res.status(200).json({

@@ -17,7 +17,7 @@ const NotLoggedIn = () => {
 };
 
 const LoggedIn = () => {
-	const { profile } = useUserContext();
+	const { profile, setProfile } = useUserContext();
 	const [searchParams, setSearchParams] = useState({
 		gender: profile.gender,
 		looking: profile.looking,
@@ -25,6 +25,14 @@ const LoggedIn = () => {
 		max_age: profile.max_age,
 	});
 	const [results, setResults] = useState<IProfileCard[]>([]);
+
+	useEffect(() => {
+		if ('geolocation' in navigator) {
+			navigator.geolocation.getCurrentPosition(
+				(position) => setProfile({...profile, geolocation: position}), 
+				(error) => console.log('Geolocation not permitted by user.', error))
+		}
+	}, []);
 
 	return (
 		<>

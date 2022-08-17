@@ -101,7 +101,11 @@ export interface IProfile {
   introduction: string | undefined;
   interests: {};
   country: string | undefined;
-  city: string | undefined
+  city: string | undefined;
+  geolocation: {} | undefined;
+  ip_location: {} | undefined;
+  latitude: string | undefined;
+  longitude: string | undefined;
 }
 
 export interface ITag {

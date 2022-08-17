@@ -36,6 +36,9 @@ const LoggedIn = () => {
 		introduction: '',
 		country: '',
 		city: '',
+		geolocation: {},
+		ip_location: {},
+		userCoordinates: {}
 	});
 	const { userData } = useUserContext()
 	const [profileExists, setProfileExists] = useState(false);

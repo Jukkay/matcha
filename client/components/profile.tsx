@@ -2,7 +2,6 @@ import React, {
 	useState,
 	PointerEvent,
 	useEffect,
-	SetStateAction,
 } from 'react';
 import { FaUpload } from 'react-icons/fa';
 
@@ -14,24 +13,18 @@ import {
 	ISelectorProfile,
 	ITextArea,
 	IThumbnails,
-	IUpload,
 	EditButtonProps,
-	ViewProps,
-	SaveButtonProps,
 	ProfileViewProps,
 	FileInputProps,
 	GalleryProps,
 	UserImagesProps,
-	SearchProps,
 	AgeRangeProps,
-	LogEntry,
 	IProfileCard,
 } from '../types/types';
 import { Country, City } from 'country-state-city';
 import { ErrorMessage } from './form';
 import { authAPI } from '../utilities/api';
 import { useUserContext } from './UserContext';
-import axios from 'axios';
 import { dummyData } from '../pages/profile/data';
 import { convertBirthdayToAge } from '../utilities/helpers';
 import { SearchResultItem } from './discover';
@@ -91,6 +84,20 @@ export const ProfileView = ({ profile, setEditMode }: ProfileViewProps) => {
 				<div className="block">Minimum age: {profile.min_age}</div>
 				<div className="block">Maximum age: {profile.max_age}</div>
 				<div className="block">User ID: {profile.user_id}</div>
+				<div className="block">Geolocation: {profile.geolocation
+						? Object.entries(profile.geolocation).map(
+								(item, index) => (
+									<span
+										className="mx-2 my-1"
+										key={index}
+									>
+										{item as unknown as string}
+									</span>
+								)
+						  )
+						: null}</div>
+				<div className="block">Latitude: {profile.latitude}</div>
+				<div className="block">Logitude: {profile.longitude}</div>
 				<EditButton setEditMode={setEditMode} />
 			</section>
 			<VisitorLog user_id={userData.user_id}/>
@@ -105,7 +112,6 @@ export const VisitorLog = ({user_id}: any) => {
 		const getVisitorLog = async () => {
 			let response = await authAPI.get(`/log/${user_id}`);
 			if (response.status === 200) {
-				console.log(response.data.log)
 				setPageVisited(true)
 				setLog(response.data.log)
 
@@ -119,8 +125,9 @@ export const VisitorLog = ({user_id}: any) => {
 		<section className="section">
 			<h3 className="title is-3">Visitor log</h3>
 				<div className="block">
-				{log.map((result: IProfileCard) => (
+				{log.map((result: IProfileCard, index) => (
 				<SearchResultItem
+					key={index}
 					user_id={result.user_id}
 					profile_image={result.profile_image}
 					name={result.name}
@@ -382,6 +389,7 @@ export const UpdateProfile = ({
 	const [tagError, setTagError] = useState(false);
 	const [success, setSuccess] = useState(false);
 	const [interestsError, setInterestsError] = useState(false);
+	const [coordinateError, setCoordinateError] = useState(false);
 	const [imageError, setImageError] = useState(false);
 	const [files, setFiles] = useState<FileList>();
 	const [interests, setInterests] = useState<string[]>([]);
@@ -393,10 +401,12 @@ export const UpdateProfile = ({
 	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setQuery(event.target.value);
 	};
+
 	useEffect(() => {
 		setInterests(Object.values(profile.interests));
 		setSuccess(false);
 	}, []);
+
 	// Live query interest from interest list
 	useEffect(() => {
 		if (!query) {
@@ -426,6 +436,14 @@ export const UpdateProfile = ({
 
 	const uploadProfile = async () => {
 		try {
+			if (profile.latitude && profile.longitude) {
+				const latitudeTest = /^(-?[1-8]?\d(?:\.\d{1,18})?|90(?:\.0{1,18})?)$/.test(profile.latitude)
+				const longitudeTest = /^(-?(?:1[0-7]|[1-9])?\d(?:\.\d{1,18})?|180(?:\.0{1,18})?)$/.test(profile.longitude)
+				if (!latitudeTest || !longitudeTest) {
+					setCoordinateError(true);
+					return
+				}
+			}
 			// Check interests amount
 			if (interests.length < 1) {
 				setInterestsError(true);
@@ -443,9 +461,10 @@ export const UpdateProfile = ({
 			payload.birthday = userData.birthday;
 			payload.name = userData.name;
 			payload.profile_image = userData.profile_image;
-			// Save inputs to db
+			// Save inputs to sessionStorage
 			sessionStorage.setItem('profile', JSON.stringify(profile));
-
+			console.log(JSON.stringify(payload.geolocation))
+			console.log(JSON.stringify(payload.ip_location))
 			// Upload profile
 			const response = await authAPI.patch(`/profile`, payload);
 			if (response.status === 200) {
@@ -485,7 +504,7 @@ export const UpdateProfile = ({
 						setProfile={setProfile}
 					/>
 					<CitySelector profile={profile} setProfile={setProfile} />
-
+			
 					{/* Gender */}
 					<GenderSelector
 						label="Gender *"
@@ -591,6 +610,12 @@ export const UpdateProfile = ({
 
 					{/* Age range */}
 					<AgeRange profile={profile} setProfile={setProfile} />
+					{/* User coordinate input */}
+					<GPSCoordinateInput profile={profile} setProfile={setProfile}/>
+					<ErrorMessage
+						errorMessage="Invalid coordinates."
+						error={coordinateError}
+					/>
 					<button type="submit" className="button is-primary">
 						Update profile
 					</button>
@@ -607,6 +632,29 @@ export const UpdateProfile = ({
 	);
 };
 
+export const GPSCoordinateInput = ({profile, setProfile}: any) => {
+
+	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		setProfile({ ...profile, [event.target.name]: event.target.value });
+	  };
+	return (
+		<div className="block">
+			<label htmlFor="GPS" className="label my-3">
+				Manually set GPS location
+			</label>
+			<div className="block">
+			<label htmlFor="latitude" className="label my-3">
+				Latitude:
+			</label>
+				<input type="text" className="input is-primary" name="latitude" onChange={onChange} value={profile.latitude}></input>
+				<label htmlFor="longitude" className="label my-3">
+				Longitude:
+			</label>
+				<input type="text" className="input is-primary" name="longitude" onChange={onChange} value={profile.longitude}></input>
+			</div>
+		</div>
+	);
+}
 export const NewProfileButton = ({ setEditMode }: EditButtonProps) => {
 	return (
 		<div className="section has-text-centered">
@@ -1013,7 +1061,6 @@ export const EditGallery = ({ files, setImageError }: GalleryProps) => {
 		event.preventDefault();
 		const url = event.currentTarget.id;
 		const chosenImage = url.substring(url.lastIndexOf('/') + 1);
-		console.log(chosenImage);
 		setProfile({ ...profile, profile_image: chosenImage });
 		updateUserData({ ...userData, profile_image: chosenImage });
 	};
@@ -1184,7 +1231,6 @@ export const Thumbnails = ({ preview, setPreview }: IThumbnails) => {
 	const handleProfilePicture = (event: PointerEvent<HTMLButtonElement>) => {
 		event.preventDefault();
 		const imageNumber = event.currentTarget.id;
-		console.log(imageNumber);
 		setProfile({ ...profile, profile_image: imageNumber });
 	};
 

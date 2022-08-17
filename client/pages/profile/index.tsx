@@ -34,11 +34,28 @@ const LoggedIn = () => {
 				response.data.profile.interests = JSON.parse(
 					response.data.profile.interests
 				);
+				response.data.profile.geolocation = JSON.parse(
+					response.data.profile.geolocation
+				);
+				response.data.profile.ip_location = JSON.parse(
+					response.data.profile.ip_location
+				);
 				setProfile(response.data.profile);
 				sessionStorage.setItem('profile', JSON.stringify(response.data.profile));
 			} else setProfileExists(false);
 		};
 		getUserProfile();
+	}, []);
+
+	useEffect(() => {
+		if ('geolocation' in navigator) {
+			navigator.geolocation.getCurrentPosition(
+				(position) => {
+					if (position)
+						setProfile({...profile, geolocation: position})
+					}, 
+				(error) => console.log('Geolocation not permitted by user.', error))
+		}
 	}, []);
 
 	return editMode ? (
