@@ -51,8 +51,10 @@ const LoggedIn = () => {
 		if ('geolocation' in navigator) {
 			navigator.geolocation.getCurrentPosition(
 				(position) => {
-					if (position)
+					if (position) {
 						setProfile({...profile, geolocation: position})
+						console.log('geolocation', position)
+					}
 					}, 
 				(error) => console.log('Geolocation not permitted by user.', error))
 		}
