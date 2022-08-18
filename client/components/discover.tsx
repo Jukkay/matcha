@@ -85,8 +85,9 @@ export const Results = ({ results }: ResultsProps) => {
 
 	return results.length > 0 ? (
 		<section className="section has-text-centered">
-			{results.map((result) => (
+			{results.map((result, index) => (
 				<SearchResultItem
+					key={index}
 					user_id={result.user_id}
 					profile_image={result.profile_image}
 					name={result.name}

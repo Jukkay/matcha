@@ -192,6 +192,7 @@ V Create user input for GPS location in profile edit
 V Calculate famerating and add to db
 V Make famerating info visible to profile
 V Order by famerating on db query
+Create dummy users for search testing
 Default sorting on front end
     Closest first
         Use the most accurate location data available of user
