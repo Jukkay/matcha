@@ -30,3 +30,19 @@ export const convertMAX_AGE = (age: number) => {
 	const bd = new Date(now - ageInMilliseconds)
     return `${bd.getFullYear()}-${bd.getMonth()}-${bd.getDate()}`
 }
+
+import geoip from 'fast-geoip'
+import requestIP from 'request-ip';
+import { Request} from 'express';
+
+export const locateIP = async(req: Request) => {
+   // Get and locate IP
+    // const ip = requestIP.getClientIp(req) || '127.0.0.1'
+    const ip = '194.136.126.53'
+    console.log(ip);
+    const ip_location = await geoip.lookup(ip)
+    console.log(ip_location);
+    return ip_location
+    // const sql = 'UPDATE profiles SET ip_location = ? WHERE user_id = ?;';
+    // await execute(sql, [JSON.stringify(ip_location), user_id]);
+}

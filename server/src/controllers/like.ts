@@ -4,6 +4,34 @@ import { execute } from '../utilities/SQLConnect';
 import { createMatch, findMatch, removeMatch } from './match';
 import { decodeUserFromAccesstoken } from './token';
 
+const updateFamerating = async(liker: string, liked: string) => {
+	const likerFamerating = await calculateFamerating(liker)
+	const sql = `UPDATE profiles SET famerating = ? WHERE user_id = ?`;
+	await execute(sql, [likerFamerating, liker]);
+	const likedFamerating = await calculateFamerating(liked)
+	await execute(sql, [likedFamerating, liked]);
+	console.log('Famerating updated: ', likerFamerating, likedFamerating);
+}
+
+const calculateFamerating = async(user_id: string) => {
+	// get number of likes received during last month
+	let sql = 'SELECT COUNT(*) AS like_count FROM likes WHERE target_id = ? AND DATE(like_date) BETWEEN (CURRENT_DATE - INTERVAL 1 MONTH) AND CURRENT_DATE';
+	const likesReceived = await execute(sql, [user_id]);
+	
+	// get number matches during last month
+	sql = 'SELECT COUNT(*) AS match_count FROM matches WHERE user1 = ? OR user2 = ? AND DATE(match_date) BETWEEN (CURRENT_DATE - INTERVAL 1 MONTH) AND CURRENT_DATE';
+	const matches = await execute(sql, [user_id, user_id]);
+
+	// get number of messages during last month
+	sql = 'SELECT COUNT(*) AS message_count FROM messages WHERE user_id = ? AND DATE(message_time) BETWEEN (CURRENT_DATE - INTERVAL 1 MONTH) AND CURRENT_DATE';
+	const messages = await execute(sql, [user_id]);
+
+	// Calculate famerating
+	if (!likesReceived[0].like_count || !matches[0].match_count || !messages[0].message_count) return 0
+	else return likesReceived[0].like_count as number + (messages[0].message_count as number / matches[0].match_count as number)
+
+
+}
 const addNewLike = async (req: Request, res: Response) => {
 	const { liker, liked } = req.body;
 	if (!liker || !liked)
@@ -28,6 +56,7 @@ const addNewLike = async (req: Request, res: Response) => {
 			return res.status(400).json({
 				message: 'You already liked this person',
 			});
+
 		// Check if liked likes liker
 		sql = 'SELECT * FROM likes WHERE user_id = ? AND target_id = ?';
 		response = await execute(sql, [liked, liker]);
@@ -41,6 +70,9 @@ const addNewLike = async (req: Request, res: Response) => {
 				});
 			// TODO Send notification
 
+			// Update famerating
+			await updateFamerating(liker, liked)
+
 			return res.status(200).json({
 				match: true,
 				message: 'Match',
@@ -49,11 +81,15 @@ const addNewLike = async (req: Request, res: Response) => {
 		// Create like
 		sql = 'INSERT INTO likes(user_id, target_id) VALUES (?, ?)';
 		response = await execute(sql, [liker, liked]);
-		if (response.length > 0)
+		if (response.length > 0) {
+			// Update famerating
+			await updateFamerating(liker, liked)
+
 			return res.status(200).json({
 				match: false,
 				message: 'Like added successfully',
 			});
+		}
 	} catch (err) {
 		console.error(err);
 		return res.status(500).json({

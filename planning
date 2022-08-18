@@ -189,15 +189,13 @@ V IP location only in backend gets written in db always when
    V profile creation
    V profile update
 V Create user input for GPS location in profile edit
-Add fame rating to profile
-    Likes received during last month
-    percentage of chats opened of matches
-    Activity during last month
-Weigh Discovery search results by favoring
-    Location
+V Calculate famerating and add to db
+V Make famerating info visible to profile
+V Order by famerating on db query
+Default sorting on front end
+    Closest first
         Use the most accurate location data available of user
     Maximum common tags
-    With maximum fame rating
 Sort search results by
     Age
     Location

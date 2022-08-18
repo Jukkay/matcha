@@ -3,7 +3,7 @@ import { execute } from '../utilities/SQLConnect';
 import bcryptjs from 'bcryptjs';
 import { signAccessToken, signRefreshToken } from '../utilities/promisifyJWT';
 import { sendEmailVerification } from '../utilities/sendEmailVerification';
-import { convertBirthdayToAge } from '../utilities/helpers';
+import { convertBirthdayToAge, locateIP } from '../utilities/helpers';
 import { validateRegistrationInput } from '../utilities/validators';
 import { decodeUserFromAccesstoken, deleteRefreshToken, updateRefreshTokenList } from './token';
 

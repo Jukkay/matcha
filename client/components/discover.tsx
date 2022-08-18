@@ -93,6 +93,7 @@ export const Results = ({ results }: ResultsProps) => {
 					birthday={result.birthday}
 					city={result.city}
 					country={result.country}
+					famerating={result.famerating}
 				/>
 			))}
 		</section>
@@ -110,6 +111,7 @@ export const SearchResultItem = ({
 	birthday,
 	city,
 	country,
+	famerating
 }: IProfileCard) => {
 	return (
 		<Link href={`/profile/${user_id}`}>
@@ -128,6 +130,7 @@ export const SearchResultItem = ({
 					<div className="block">
 						Age: {birthday && convertBirthdayToAge(birthday)}
 					</div>
+					<div className="block">Famerating: {famerating}</div>
 					<div className="block">City: {city}</div>
 					<div className="block">Country: {country}</div>
 				</div>

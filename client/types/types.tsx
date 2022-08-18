@@ -102,10 +102,9 @@ export interface IProfile {
   interests: {};
   country: string | undefined;
   city: string | undefined;
-  geolocation: {} | undefined;
-  ip_location: {} | undefined;
-  latitude: string | undefined;
-  longitude: string | undefined;
+  latitude?: string | undefined;
+  longitude?: string | undefined;
+  famerating: number | undefined;
 }
 
 export interface ITag {
@@ -164,13 +163,14 @@ export interface GalleryProps {
   setImageError: SetStateAction<any>
 }
 
-export interface SearchProps extends ResultsProps{
+export interface SearchProps {
   searchParams: ISearchParams
   setSearchParams: SetStateAction<any>
+  setResults: SetStateAction<any>
 }
 
 export interface ResultsProps {
-  results: IProfileCard[]
+  results: IProfile[]
   setResults: SetStateAction<any>
 }
 
@@ -192,10 +192,31 @@ export interface LogEntry {
 }
 
 export interface IProfileCard {
-  user_id?: string
-  name: string
-  birthday: string
-  city: string
-  country: string
-  profile_image: string
+  user_id?: number
+  name: string | undefined
+  birthday: string | undefined
+  city: string | undefined
+  country: string | undefined
+  profile_image: string | undefined
+  famerating: number | undefined
+}
+
+export enum SortType {
+  AGE = 'Age',
+  LOCATION = 'Location',
+  FAMERATING = 'Famerating',
+  TAGS = 'Tags',
+}
+
+export enum LoadStatus {
+  IDLE = 'Idle',
+  LOADING = 'Loading',
+  ERROR = 'Error',
+  SUCCESS = 'Success',
+}
+
+export enum LocationType {
+  USER = 'User',
+  GEOLOCATION = 'Geolocation',
+  IP = 'IP',
 }

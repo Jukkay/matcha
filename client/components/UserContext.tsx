@@ -52,10 +52,9 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
 		introduction: '',
 		country: '',
 		city: '',
-		geolocation: {},
-		ip_location: {},
 		latitude: '', 
-		longitude: ''
+		longitude: '',
+		famerating: undefined
 	});
 	const [useGPS, setUseGPS] = useState(false);
 	const [useIPLocation, setUseIPLocation] = useState(false);

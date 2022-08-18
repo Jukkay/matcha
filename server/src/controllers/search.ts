@@ -21,7 +21,7 @@ export const searchProfiles = async (req: Request, res: Response) => {
 				message: 'Unauthorized',
 			});
 		const sql =
-			'SELECT name, birthday, city, country, profile_image, user_id FROM profiles WHERE DATE(birthday) BETWEEN ? AND ? AND gender = ? AND user_id != ? AND looking = ?';
+			'SELECT * FROM profiles WHERE DATE(birthday) BETWEEN ? AND ? AND gender = ? AND user_id != ? AND looking = ? ORDER BY famerating DESC';
 		const results = await execute(sql, [maxDate, minDate, looking, user_id, gender]);
 		console.log('Results: ',results);
 		if (results.length > 0) {

@@ -36,9 +36,9 @@ const LoggedIn = () => {
 		introduction: '',
 		country: '',
 		city: '',
-		geolocation: {},
-		ip_location: {},
-		userCoordinates: {}
+		latitude: '',
+		longitude: '',
+		famerating: undefined,
 	});
 	const { userData } = useUserContext()
 	const [profileExists, setProfileExists] = useState(false);
@@ -109,6 +109,7 @@ const ViewMode = ({ profile }: OtherUserViewProps) => {
 		<div>
 			<section className="section">
 				<Gallery user_id={profile.user_id} />
+				<div className="block">Famerating: {profile.famerating}</div>
 				<div className="block">Name: {profile.name}</div>
 				<div className="block">
 					Age:{' '}

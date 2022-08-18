@@ -54,6 +54,7 @@ export const ProfileView = ({ profile, setEditMode }: ProfileViewProps) => {
 			<section className="section">
 			<h3 className="title is-3">Your profile</h3>
 				<Gallery user_id={userData.user_id} />
+				<div className="block">Famerating: {profile.famerating}</div>
 				<div className="block">Name: {profile.name}</div>
 				<div className="block">
 					Age:{' '}
@@ -84,18 +85,6 @@ export const ProfileView = ({ profile, setEditMode }: ProfileViewProps) => {
 				<div className="block">Minimum age: {profile.min_age}</div>
 				<div className="block">Maximum age: {profile.max_age}</div>
 				<div className="block">User ID: {profile.user_id}</div>
-				<div className="block">Geolocation: {profile.geolocation
-						? Object.entries(profile.geolocation).map(
-								(item, index) => (
-									<span
-										className="mx-2 my-1"
-										key={index}
-									>
-										{item as unknown as string}
-									</span>
-								)
-						  )
-						: null}</div>
 				<div className="block">Latitude: {profile.latitude}</div>
 				<div className="block">Logitude: {profile.longitude}</div>
 				<EditButton setEditMode={setEditMode} />
@@ -134,6 +123,7 @@ export const VisitorLog = ({user_id}: any) => {
 					birthday={result.birthday}
 					city={result.city}
 					country={result.country}
+					famerating={result.famerating}
 				/>
 			))}
 				</div>
@@ -460,11 +450,6 @@ export const UpdateProfile = ({
 			// Add other information user can't change
 			payload.birthday = userData.birthday;
 			payload.name = userData.name;
-			payload.profile_image = userData.profile_image;
-			// Save inputs to sessionStorage
-			sessionStorage.setItem('profile', JSON.stringify(profile));
-			console.log(JSON.stringify(payload.geolocation))
-			console.log(JSON.stringify(payload.ip_location))
 			// Upload profile
 			const response = await authAPI.patch(`/profile`, payload);
 			if (response.status === 200) {

@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import { OkPacket, RowDataPacket } from 'mysql';
-import { reformatDate } from '../utilities/helpers';
+import { locateIP, reformatDate } from '../utilities/helpers';
 import { execute } from '../utilities/SQLConnect';
 import { decodeUserFromAccesstoken } from './token';
-import geoip from 'fast-geoip'
+import geoip from 'fast-geoip';
 import requestIP from 'request-ip';
 
 const newProfile = async (req: Request, res: Response) => {
@@ -20,8 +20,8 @@ const newProfile = async (req: Request, res: Response) => {
 		interests,
 		profile_image,
 		name,
-		geolocation,
 	} = req.body;
+	let { latitude, longitude } = req.body;
 	if (
 		!country ||
 		!city ||
@@ -46,14 +46,14 @@ const newProfile = async (req: Request, res: Response) => {
 				message: 'Unauthorized',
 			});
 		// Get and locate IP
-	
-		const ip = requestIP.getClientIp(req) || '127.0.0.1'
-		console.log(ip);
-		const ip_location = await geoip.lookup(ip)
-		console.log(ip_location);
+		if (!latitude || !longitude) {
+			const location = await locateIP(req);
+			latitude = location?.ll[0] || '60.16952';
+			longitude = location?.ll[1] || '24.93545';
+		}
 
 		const sql =
-			'INSERT INTO profiles(user_id, country, city, gender, birthday, looking, min_age, max_age, introduction, interests, name, profile_image, geolocation, ip_location) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+			'INSERT INTO profiles(user_id, country, city, gender, birthday, looking, min_age, max_age, introduction, interests, name, profile_image, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 		const response = await execute(sql, [
 			user_id,
 			country,
@@ -67,10 +67,11 @@ const newProfile = async (req: Request, res: Response) => {
 			JSON.stringify(interests),
 			name,
 			profile_image,
-			JSON.stringify(geolocation),
-			JSON.stringify(ip_location),
+			latitude,
+			longitude,
 		]);
-		const sql2 = 'UPDATE users SET profile_exists = "1", profile_image = ? WHERE user_id = ?;';
+		const sql2 =
+			'UPDATE users SET profile_exists = "1", profile_image = ? WHERE user_id = ?;';
 		const response2 = await execute(sql2, [profile_image, user_id]);
 		if (response && response2)
 			return res.status(200).json({
@@ -127,13 +128,11 @@ const updateProfile = async (req: Request, res: Response) => {
 		introduction,
 		interests,
 		profile_image,
-		geolocation,
-		latitude,
-		longitude
 	} = req.body;
+	let { latitude, longitude } = req.body;
 	console.log(req.body);
 	const sql =
-		'UPDATE profiles SET country=?, city=?, gender=?, birthday=?, looking=?, min_age=?, max_age=?, introduction=?, interests=?, profile_image=?, geolocation=?, ip_location=?, latitude=?, longitude=? WHERE user_id = ?;';
+		'UPDATE profiles SET country=?, city=?, gender=?, birthday=?, looking=?, min_age=?, max_age=?, introduction=?, interests=?, profile_image=?, latitude=?, longitude=? WHERE user_id = ?;';
 	try {
 		// Get user_id
 		const user_id = await decodeUserFromAccesstoken(req);
@@ -142,11 +141,11 @@ const updateProfile = async (req: Request, res: Response) => {
 				message: 'Unauthorized',
 			});
 		// Get and locate IP
-	
-		const ip = requestIP.getClientIp(req) || '127.0.0.1'
-		console.log(ip);
-		const ip_location = await geoip.lookup(ip)
-		console.log(ip_location);
+		if (!latitude || !longitude) {
+			const location = await locateIP(req);
+			latitude = location?.ll[0] || '60.16952';
+			longitude = location?.ll[1] || '24.93545';
+		}
 
 		const response = await execute(sql, [
 			country,
@@ -159,13 +158,12 @@ const updateProfile = async (req: Request, res: Response) => {
 			introduction,
 			JSON.stringify(interests),
 			profile_image,
-			JSON.stringify(geolocation),
-			JSON.stringify(ip_location),
 			latitude,
 			longitude,
 			user_id,
 		]);
-		const sql2 = 'UPDATE users SET profile_exists = "1", profile_image = ? WHERE user_id = ?;';
+		const sql2 =
+			'UPDATE users SET profile_exists = "1", profile_image = ? WHERE user_id = ?;';
 		const response2 = await execute(sql2, [profile_image, user_id]);
 		if (response && response2)
 			return res.status(200).json({
