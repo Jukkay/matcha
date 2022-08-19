@@ -71,8 +71,8 @@ const newProfile = async (req: Request, res: Response) => {
 			longitude,
 		]);
 		const sql2 =
-			'UPDATE users SET profile_exists = "1", profile_image = ? WHERE user_id = ?;';
-		const response2 = await execute(sql2, [profile_image, user_id]);
+			'UPDATE users SET profile_exists = "1" WHERE user_id = ?;';
+		const response2 = await execute(sql2, [user_id]);
 		if (response && response2)
 			return res.status(200).json({
 				message: 'Profile created',
@@ -98,16 +98,15 @@ const getProfile = async (req: Request, res: Response) => {
 	const sql = 'SELECT * FROM profiles WHERE user_id = ?';
 	try {
 		const profile_data = await execute(sql, [user_id]);
-		if (profile_data) {
+		console.log(profile_data);
+		if (profile_data.length > 0) {
 			// TODO Create notification of profile visit
 			return res.status(200).json({
 				message: 'Profile data retrieved successfully',
 				profile: profile_data[0],
 			});
 		}
-		return res.status(400).json({
-			message: 'No user found',
-		});
+		return res.status(204)
 	} catch (err) {
 		console.error(err);
 		return res.status(500).json({
@@ -163,8 +162,8 @@ const updateProfile = async (req: Request, res: Response) => {
 			user_id,
 		]);
 		const sql2 =
-			'UPDATE users SET profile_exists = "1", profile_image = ? WHERE user_id = ?;';
-		const response2 = await execute(sql2, [profile_image, user_id]);
+			'UPDATE users SET profile_exists = "1" WHERE user_id = ?;';
+		const response2 = await execute(sql2, [user_id]);
 		if (response && response2)
 			return res.status(200).json({
 				message: 'Profile updated successfully',

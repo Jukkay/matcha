@@ -57,12 +57,7 @@ const getUsersImages = async (req: Request, res: Response) => {
 	const sql = 'SELECT filename FROM photos WHERE user_id = ?';
 	try {
 		// Get user_id
-		const user_id = await decodeUserFromAccesstoken(req);
-		if (!user_id)
-			return res.status(500).json({
-				message: 'Cannot parse user_id',
-			});
-		
+		const user_id = req.params.id;
 		const photos = await execute(sql, [user_id]);
 		return res.status(200).json({
 			message: 'Photo filenames retrieved',

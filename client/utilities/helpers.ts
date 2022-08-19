@@ -1,3 +1,5 @@
+import { IResultsProfile } from '../types/types';
+
 export const convertBirthdayToAge = (birthday: string) => {
 	const now = new Date().getTime();
 	const bd = new Date(birthday).getTime();
@@ -9,7 +11,7 @@ export const convertAgeToBirthday = (age: number) => {
 	const now = new Date().getTime();
 	const ageInMilliseconds = age * 31556952000 + 364 * 86400000;
 	const bd = new Date(now - ageInMilliseconds);
-	return `${bd.getFullYear()}-${bd.getMonth()}-${bd.getDate()}`;
+	return `${bd.getFullYear()}-${bd.getMonth() + 1}-${bd.getDate()}`;
 };
 
 export const distanceBetweenPoints = (
@@ -30,10 +32,44 @@ export const distanceBetweenPoints = (
 
 	const a =
 		Math.sin(latDistance / 2) * Math.sin(latDistance / 2) +
-		Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2) *
+		Math.sin(lonDistance / 2) *
+			Math.sin(lonDistance / 2) *
 			Math.cos(lat1Radians) *
-			Math.cos(lat2Radians)
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-    const distance = c * earthRadius
-    return distance;
+			Math.cos(lat2Radians);
+	const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+	const distance = Math.floor(c * earthRadius / 1000);
+	return distance;
 };
+
+export const addDistanceToProfiles = (
+	results: IResultsProfile[],
+	latitude: string,
+	longitude: string
+) => {
+	const resultsWithDistance = results.map((profile) => ({
+		...profile,
+		distance: distanceBetweenPoints(
+			latitude,
+			longitude,
+			profile.latitude as string,
+			profile.longitude as string
+		),
+	}));
+	return resultsWithDistance;
+};
+
+export const addCommonTagsToProfiles = (
+	results: IResultsProfile[],
+	ownTags: {}
+) => {
+	const resultsWithCommonTags = results.map((profile) => ({
+		...profile,
+		common_tags: countCommonTags(JSON.parse(profile.interests), ownTags)
+	}));
+	return resultsWithCommonTags;
+};
+
+export const countCommonTags = (profileTags: {}, ownTags: {}) => {
+	const count = Object.values(profileTags).filter((tag) => Object.values(ownTags).includes(tag)).length
+	return count
+}

@@ -14,6 +14,7 @@ const Logout: NextPage = (props) => {
 				sessionStorage?.removeItem('accessToken');
 				sessionStorage?.removeItem('refreshToken');
 				sessionStorage?.removeItem('userData');
+				sessionStorage?.removeItem('profile')
 			}
 		})
 	}, [])

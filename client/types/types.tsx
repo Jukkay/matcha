@@ -107,6 +107,27 @@ export interface IProfile {
   famerating: number | undefined;
 }
 
+export interface IResultsProfile {
+  user_id: number
+  name: string
+  birthday: string
+  profile_image: string
+  gender: string
+  looking: string
+  min_age: number
+  max_age: number
+  introduction: string
+  interests: string
+  country: string
+  city: string
+  latitude: string
+  longitude: string
+  famerating: number
+  distance: number
+  common_tags: number
+}
+
+
 export interface ITag {
   key: string;
   text: string;
@@ -170,7 +191,7 @@ export interface SearchProps {
 }
 
 export interface ResultsProps {
-  results: IProfile[]
+  results: IResultsProfile[]
   setResults: SetStateAction<any>
 }
 
@@ -192,20 +213,26 @@ export interface LogEntry {
 }
 
 export interface IProfileCard {
-  user_id?: number
-  name: string | undefined
-  birthday: string | undefined
-  city: string | undefined
-  country: string | undefined
-  profile_image: string | undefined
-  famerating: number | undefined
+  user_id: number
+  name: string
+  birthday: string
+  city: string
+  country: string
+  profile_image: string
+  famerating: number
+  distance: number
+  interests: string
 }
 
 export enum SortType {
-  AGE = 'Age',
-  LOCATION = 'Location',
-  FAMERATING = 'Famerating',
-  TAGS = 'Tags',
+  AGE = 'Age younger first',
+  REVERSE_AGE = 'Age older first',
+  DISTANCE = 'Distance near to far',
+  REVERSE_DISTANCE = 'Distance far to near',
+  FAMERATING = 'Famerating high to low',
+  REVERSE_FAMERATING = 'Famerating low to high',
+  TAGS = 'More common tags first',
+  REVERSE_TAGS = 'Less common tags first',
 }
 
 export enum LoadStatus {
@@ -219,4 +246,10 @@ export enum LocationType {
   USER = 'User',
   GEOLOCATION = 'Geolocation',
   IP = 'IP',
+}
+
+
+export interface SortProps {
+  sort: SortType,
+  setSort: SetStateAction<any>
 }

@@ -37,13 +37,12 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
 		email: '',
 		birthday: '',
 		profile_exists: false,
-		profile_image: 'default.png'
 	});
 	const [profile, setProfile] = useState<IProfile>({
 		user_id: undefined,
 		name: '',
 		birthday: '',
-		profile_image: '',
+		profile_image: 'default.png',
 		gender: '',
 		looking: '',
 		min_age: undefined,
@@ -56,10 +55,6 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
 		longitude: '',
 		famerating: undefined
 	});
-	const [useGPS, setUseGPS] = useState(false);
-	const [useIPLocation, setUseIPLocation] = useState(false);
-	const [useUserCoordinates, setUseUserCoordinates] = useState(false);
-
 
 	useEffect(() => {
 		// Look for user information in session storage
@@ -91,10 +86,7 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
 				accessToken,
 				refreshToken,
 				updateAccessToken,
-				updateRefreshToken,
-				useGPS,
-				useIPLocation,
-				useUserCoordinates
+				updateRefreshToken
 			}}
 		>
 			{children}

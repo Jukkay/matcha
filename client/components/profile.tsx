@@ -124,6 +124,8 @@ export const VisitorLog = ({user_id}: any) => {
 					city={result.city}
 					country={result.country}
 					famerating={result.famerating}
+					distance={result.distance}
+					interests={result.interests}
 				/>
 			))}
 				</div>
@@ -183,7 +185,6 @@ export const CreateProfile = ({
 		for (let i = 0; i < files.length; i++) {
 			imageData.append('files', files[i], files[i].name);
 		}
-		if (!profile.profile_image) profile.profile_image = '0';
 		// Upload to server
 		const response = await authAPI.post('/image', imageData);
 		return response;
@@ -745,7 +746,7 @@ export const SearchResult = ({
 export const CountrySelector = ({ profile, setProfile }: ISelectorProfile) => {
 	return (
 		<div className="block">
-			<label htmlFor="county" className="label my-3">
+			<label htmlFor="country" className="label my-3">
 				Country *
 			</label>
 			<div className="select is-primary">
@@ -781,7 +782,7 @@ export const CountrySelector = ({ profile, setProfile }: ISelectorProfile) => {
 export const CitySelector = ({ profile, setProfile }: ISelectorProfile) => {
 	return profile.country ? (
 		<div className="block">
-			<label htmlFor="county" className="label my-3">
+			<label htmlFor="city" className="label my-3">
 				City *
 			</label>
 			<div className="select is-primary">

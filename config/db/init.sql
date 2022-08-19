@@ -3,11 +3,10 @@ USE matcha;
 CREATE TABLE IF NOT EXISTS users(
 	`user_id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 	birthday DATE NOT NULL,
-	username VARCHAR(32) NOT NULL,
+	username VARCHAR(32) NOT NULL UNIQUE,
 	`password` VARCHAR(255) NOT NULL,
 	`name` VARCHAR(255) DEFAULT username,
-	email VARCHAR(320) NOT NULL,
-	profile_image VARCHAR(255) DEFAULT "default.png",
+	email VARCHAR(320) NOT NULL UNIQUE,
 	biography VARCHAR(4096),
 	gender VARCHAR(255),
 	gender_preference VARCHAR(255),
@@ -18,12 +17,11 @@ CREATE TABLE IF NOT EXISTS users(
 	password_reset_key VARCHAR(255),
 	`admin` BOOLEAN DEFAULT FALSE,
 	email_notification BOOLEAN DEFAULT TRUE,
-	UNIQUE (email, username),
 	PRIMARY KEY (`user_id`)
 );
 CREATE TABLE IF NOT EXISTS profiles(
 	profile_id BIGINT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-	`user_id` INT(10) UNSIGNED NOT NULL,
+	`user_id` INT(10) UNSIGNED NOT NULL UNIQUE,
 	`name` VARCHAR(255) NOT NULL,
 	profile_image VARCHAR(255) DEFAULT "default.png",
 	country VARCHAR(56) NOT NULL,
@@ -40,7 +38,6 @@ CREATE TABLE IF NOT EXISTS profiles(
 	latitude VARCHAR(32),
 	longitude VARCHAR(32),
 	creation_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-	UNIQUE (`user_id`),
 	PRIMARY KEY (profile_id)
 );
 

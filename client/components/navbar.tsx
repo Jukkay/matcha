@@ -41,9 +41,8 @@ const ProfilePicture = () => {
 						<img
 							className="is-rounded"
 							src={
-								profile.profile_image
-									? `${authAPI.defaults.baseURL}/images/${profile.profile_image}`
-									: '/default.png'
+								profile.profile_image === 'default.png' || !profile.profile_image
+									? '/default.png' : `${authAPI.defaults.baseURL}/images/${profile.profile_image}`
 							}
 							alt="Profile picture"
 							crossOrigin=""

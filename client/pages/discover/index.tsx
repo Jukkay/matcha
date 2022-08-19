@@ -1,7 +1,7 @@
 import type { NextPage } from 'next';
 
 import React, { useState, useEffect } from 'react';
-import { Results, Search } from '../../components/discover';
+import { Results, Search, SortSelector } from '../../components/discover';
 
 import { useUserContext } from '../../components/UserContext';
 import {
@@ -10,8 +10,10 @@ import {
 	LocationType,
 	SortType,
 	IProfile,
+	IResultsProfile,
 } from '../../types/types';
 import { distanceBetweenPoints } from '../../utilities/helpers';
+import { farFirst, highFameratingFirst, lessCommonTagsFirst, lowFameratingFirst, moreCommonTagsFirst, nearFirst, oldFirst,  youngFirst } from '../../utilities/sort';
 
 const NotLoggedIn = () => {
 	return (
@@ -25,10 +27,7 @@ const NotLoggedIn = () => {
 
 const LoggedIn = () => {
 	const { profile, setProfile } = useUserContext();
-	const [location, setLocation] = useState<LocationType>(
-		LocationType.GEOLOCATION
-	);
-	const [sort, setSort] = useState<SortType>(SortType.LOCATION);
+	const [sort, setSort] = useState<SortType>(SortType.DISTANCE);
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
 	const [searchParams, setSearchParams] = useState({
 		gender: profile.gender,
@@ -36,30 +35,8 @@ const LoggedIn = () => {
 		min_age: profile.min_age,
 		max_age: profile.max_age,
 	});
-	const [results, setResults] = useState<IProfile[]>([]);
+	const [results, setResults] = useState<IResultsProfile[]>([]);
 
-	const sortByDistance = () => {
-		const mappedResults = results.map((item, index) => {
-			return {
-				index,
-				distance: distanceBetweenPoints(
-					profile.latitude,
-					profile.longitude,
-					item.latitude as string,
-					item.longitude as string
-				),
-			};
-		});
-		mappedResults.sort((a, b) => a.distance - b.distance);
-		const sortedResults = mappedResults.map(
-			(item) => results[item.distance]
-		);
-		console.log(sortedResults);
-		setResults(sortedResults)
-	};
-	const sortByAge = () => {};
-	const sortByCommonTags = () => {};
-	const sortByFamerating = () => {};
 	useEffect(() => {
 		if ('geolocation' in navigator) {
 			navigator.geolocation.getCurrentPosition(
@@ -71,10 +48,15 @@ const LoggedIn = () => {
 	}, []);
 
 	useEffect(() => {
-		if (sort === SortType.LOCATION) sortByDistance();
-		if (sort === SortType.AGE) sortByAge();
-		if (sort === SortType.TAGS) sortByCommonTags();
-		if (sort === SortType.FAMERATING) sortByFamerating();
+		if (results.length < 1) return
+		if (sort === SortType.DISTANCE) setResults(nearFirst(results, profile.latitude, profile.longitude));
+		if (sort === SortType.REVERSE_DISTANCE) setResults(farFirst(results, profile.latitude, profile.longitude));
+		if (sort === SortType.AGE) setResults(youngFirst(results));
+		if (sort === SortType.REVERSE_AGE) setResults(oldFirst(results));
+		if (sort === SortType.TAGS) setResults(moreCommonTagsFirst(results));
+		if (sort === SortType.REVERSE_TAGS) setResults(lessCommonTagsFirst(results));
+		if (sort === SortType.FAMERATING) setResults(highFameratingFirst(results));
+		if (sort === SortType.REVERSE_FAMERATING) setResults(lowFameratingFirst(results));
 	}, [sort]);
 
 	return (
@@ -84,7 +66,8 @@ const LoggedIn = () => {
 				setSearchParams={setSearchParams}
 				setResults={setResults}
 			/>
-			<Results results={results} setResults={setResults} />
+			<SortSelector sort={sort} setSort={setSort} />
+			<Results results={results as IResultsProfile[]} setResults={setResults} />
 		</>
 	);
 };

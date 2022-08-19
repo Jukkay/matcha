@@ -192,22 +192,33 @@ V Create user input for GPS location in profile edit
 V Calculate famerating and add to db
 V Make famerating info visible to profile
 V Order by famerating on db query
-Create dummy users for search testing
-Default sorting on front end
-    Closest first
+V Create dummy users for search testing
+V Fix date conversion
+V Fix profile information not clearing when profile is removed
+V Remove profile_image from user table and use profile instead
+V Add distance to search results
+V Add sort selector
+V Default sorting on front end
+    V Closest first
         Use the most accurate location data available of user
-    Maximum common tags
-Sort search results by
-    Age
-    Location
-    Fame rating
-    Common tags
+    V Maximum common tags
+V Sort search results by
+    V Age
+    V Location
+    V Fame rating
+    V Common tags
+V Add tags to search results
+V Check why profile view page shows wrong images
+Add profile image to db for each dummy user
+Create userbase so there's less options for random interests
+Show default profile image if not found
 Create matches page
 Create notification system with socket.io or kafka
 Create messaging using the same system
 Integrate chat to matches page
 
 # Later
+Make sure profile image is changed to default on logout
 Change language to very plain language for accessibility
 Change user_id into unique hash?
 Show image counter
