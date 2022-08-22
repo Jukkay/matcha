@@ -209,7 +209,7 @@ V Sort search results by
     V Common tags
 V Add tags to search results
 V Check why profile view page shows wrong images
-Add profile image to db for each dummy user
+V Add profile image to db for each dummy user
 Create userbase so there's less options for random interests
 Show default profile image if not found
 Create matches page

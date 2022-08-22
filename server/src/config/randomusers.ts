@@ -61,24 +61,27 @@ const removeDuplicates = (data: any) => {
 const createUsers = async (data: any) => {
 	// Create users
 	for (let key in data) {
-		await SQLConnect.execute(sql, [
-			data[key].login.username,
-			hash,
-			data[key].email,
-			data[key].name.first,
-			reformatDate(data[key].dob.date),
-		]);
+		if (data[key].login.username)
+			await SQLConnect.execute(sql, [
+				data[key].login.username,
+				hash,
+				data[key].email,
+				data[key].name.first,
+				reformatDate(data[key].dob.date),
+			]);
 	}
 	console.log('Users created');
 };
 const getUserIDs = async (data: any) => {
 	// Get user_ids
 	for (let key in data) {
-		const result = await SQLConnect.execute(sql3, [
-			data[key].login.username,
-		]);
-		if (result[0] && result[0]['user_id']) {
-			userIDs.set(data[key].login.username, result[0]['user_id']);
+		if (data[key].login.username) {
+			const result = await SQLConnect.execute(sql3, [
+				data[key].login.username,
+			]);
+			if (result[0] && result[0]['user_id']) {
+				userIDs.set(data[key].login.username, result[0]['user_id']);
+			}
 		}
 	}
 	console.log('User IDs fetched');
@@ -86,14 +89,24 @@ const getUserIDs = async (data: any) => {
 
 const createProfile = async (data: any) => {
 	// Create profiles
+	let profile_image = '';
 	for (let key in data) {
 		let interests: { [k: string]: string } = {};
 		for (let i = 0; i < 5; i++) {
 			interests[i as unknown as string] =
 				dummyData[Math.floor(Math.random() * dummyData.length)];
 		}
+		profile_image =
+			data[key].gender == 'male'
+				? malePictureOptions[
+						Math.floor(Math.random() * malePictureOptions.length)
+				  ]
+				: femalePictureOptions[
+						Math.floor(Math.random() * femalePictureOptions.length)
+				  ];
+		const user_id = userIDs.get(data[key].login.username);
 		await SQLConnect.execute(sql2, [
-			userIDs.get(data[key].login.username),
+			user_id,
 			data[key].nat,
 			data[key].location.city,
 			data[key].gender[0].toUpperCase() +
@@ -105,17 +118,15 @@ const createProfile = async (data: any) => {
 			'Random user introduction',
 			JSON.stringify(interests),
 			data[key].name.first,
-			data[key].gender == 'male'
-				? malePictureOptions[
-						Math.floor(Math.random() * malePictureOptions.length)
-				  ]
-				: femalePictureOptions[
-						Math.floor(Math.random() * femalePictureOptions.length)
-				  ],
+			profile_image,
 			data[key].location.coordinates.latitude,
 			data[key].location.coordinates.longitude,
 			Math.floor(Math.random() * (1000 - 1) + 1),
 		]);
+		await SQLConnect.execute(
+			'INSERT IGNORE INTO photos(user_id, filename) VALUES (?, ?)',
+			[user_id, profile_image]
+		);
 	}
 	console.log('Profiles created');
 };
