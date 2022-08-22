@@ -224,6 +224,17 @@ export interface IProfileCard {
   interests: string
 }
 
+export interface IMatch {
+  match_id: number
+  name: string
+  profile_image: string
+  match_date: string
+}
+
+export interface ChatProps {
+  chat: IMatch
+  setChat: SetStateAction<any>
+}
 export enum SortType {
   AGE = 'Age younger first',
   REVERSE_AGE = 'Age older first',

@@ -51,28 +51,28 @@ Control panel
 V Edit profile
 Show profile views
 Show who liked you
-"Fame rating"
-    Show in profile
-GPS location
-    Geolocation API
-    Locate with ip if GPS is not allowed
+V "Fame rating"
+   V Show in profile
+V GPS location
+   V Geolocation API
+   V Locate with ip if GPS is not allowed
         https://openbase.com/js/geoip-lite
-    Allow user to change GPS position in profile
-Browsing
+   V Allow user to change GPS position in profile
+V Browsing
     Show suggestions that match preferences
     Match
         Sexual preference
         Location
         Maximum common tags
         With maximum fame rating
-    Prioritise people from same area
-    Sort by
-        Age
-        Location
-        Fame rating
-        Common tags
+   V Prioritise people from same area
+   V Sort by
+       V Age
+       V Location
+       V Fame rating
+       V Common tags
 Advanced search
-    Age gap
+   V Age gap
     Fame rating gap
     Location
     Interest tag
@@ -80,17 +80,17 @@ Advanced search
     Sort and filter by same as previously
     Filtering (can be same as the search?)
 Profile of other users
-    Visits to profile must be stored to user's visit history
+   V Visits to profile must be stored to user's visit history
     Notification of visit to profile owner
-    Show
-        all profile information
-        Fame rating
+   V Show
+       V all profile information
+       V Fame rating
         Online/Offline
         Last login date and time
         If likes you
     Like
-        Must have at least one picture to like someone
-        If both like each other they're matched
+       V Must have at least one picture to like someone
+       V If both like each other they're matched
             Allows chatting
     Unlike
     Report fake account
@@ -108,7 +108,7 @@ Notifications
     Liked user liked back
     Connected user unliked
     Notifications visible on any page
-Database
+V Database
     relational or graph
     Can't be noSQL
     Build your own ORM
@@ -210,14 +210,20 @@ V Sort search results by
 V Add tags to search results
 V Check why profile view page shows wrong images
 V Add profile image to db for each dummy user
-Create userbase so there's less options for random interests
-Show default profile image if not found
-Create matches page
+V Show default profile image if not found
+V Create matches page
+V Make profile pictures show on match list
+V Add matches page to navbar
+V Add notification and message icons to navbar
+Put logout inside dropdown menu if allowed to clean up navbar
+Make sure userdata is loaded on every page on first load
 Create notification system with socket.io or kafka
 Create messaging using the same system
 Integrate chat to matches page
+Make last message show on match list
 
 # Later
+Create userbase so there's less options for random interests
 Make sure profile image is changed to default on logout
 Change language to very plain language for accessibility
 Change user_id into unique hash?

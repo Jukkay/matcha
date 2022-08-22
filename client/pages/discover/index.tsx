@@ -1,4 +1,5 @@
 import type { NextPage } from 'next';
+import router from 'next/router';
 
 import React, { useState, useEffect } from 'react';
 import { Results, Search, SortSelector } from '../../components/discover';
@@ -26,7 +27,7 @@ const NotLoggedIn = () => {
 };
 
 const LoggedIn = () => {
-	const { profile, setProfile } = useUserContext();
+	const { profile, setProfile, userData } = useUserContext();
 	const [sort, setSort] = useState<SortType>(SortType.DISTANCE);
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
 	const [searchParams, setSearchParams] = useState({
@@ -36,7 +37,8 @@ const LoggedIn = () => {
 		max_age: profile.max_age,
 	});
 	const [results, setResults] = useState<IResultsProfile[]>([]);
-
+	if (!userData.profile_exists) router.replace('/profile');
+	
 	useEffect(() => {
 		if ('geolocation' in navigator) {
 			navigator.geolocation.getCurrentPosition(

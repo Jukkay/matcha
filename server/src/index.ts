@@ -18,6 +18,7 @@ import checkJWT from './middleware/checkJWT';
 import { searchProfiles } from './controllers/search';
 import { logVisitor } from './controllers/log';
 import logRouter from './routes/log';
+import matchRouter from './routes/match';
 
 const app: express.Application = express();
 
@@ -75,6 +76,9 @@ app.use('/image', imageRouter);
 
 // Like CRUD route
 app.use('/like', likeRouter);
+
+// Match CRUD route
+app.use('/match', matchRouter);
 
 
 // Server start

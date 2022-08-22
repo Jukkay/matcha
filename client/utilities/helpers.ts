@@ -14,6 +14,19 @@ export const convertAgeToBirthday = (age: number) => {
 	return `${bd.getFullYear()}-${bd.getMonth() + 1}-${bd.getDate()}`;
 };
 
+
+// export const calculateTimeSinceMatching = (timestamp: string) => {
+// 	const now = new Date().getTime();
+// 	const before = new Date(timestamp).getTime()
+// 	const timeElapsed = new Date(now - before);
+// 	return `Matched ${timeElapsed.getFullYear()} years, ${timeElapsed.getMonth() + 1} months and${timeElapsed.getDate()} days ago`;
+// }
+
+export const reformatDate = (date: string) => {
+    const dateObject = new Date(date)
+    return `${dateObject.getFullYear()}-${dateObject.getMonth() + 1}-${dateObject.getDate()}`
+}
+
 export const distanceBetweenPoints = (
 	latitude1: string,
 	longitude1: string,

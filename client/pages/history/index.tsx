@@ -1,5 +1,6 @@
 import type { NextPage } from 'next';
 import Link from 'next/link';
+import router from 'next/router';
 import React, { useState, useEffect } from 'react';
 import {
 	GenderSelector,
@@ -26,8 +27,11 @@ const NotLoggedIn = () => {
 };
 
 const LoggedIn = () => {
-	const { userData } = useUserContext();
+	const { userData, profile, setProfile } = useUserContext();
     const [log, setLog] = useState([])
+
+	if (!userData.profile_exists) router.replace('/profile');
+	
 	useEffect(() => {
 		const getVisitorLog = async () => {
 			let response = await authAPI.get(`/log`);
@@ -37,6 +41,16 @@ const LoggedIn = () => {
 			}
 		}
 		getVisitorLog();
+	}, []);
+
+	useEffect(() => {
+		if ('geolocation' in navigator) {
+			navigator.geolocation.getCurrentPosition(
+				(position) => setProfile({ ...profile, geolocation: position }),
+				(error) =>
+					console.log('Geolocation not permitted by user.', error)
+			);
+		}
 	}, []);
 
 	return log.length > 0 ? (

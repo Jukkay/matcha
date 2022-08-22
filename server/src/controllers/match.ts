@@ -25,16 +25,17 @@ const getAllMatches = async (req: Request, res: Response) => {
 		return res.status(400).json({
 			message: 'No user id given',
 		});
-	const sql = 'SELECT * FROM profiles WHERE user_id = ?';
+	const sql = 'SELECT matches.*, p1.profile_image, p1.name, p2.profile_image, p2.name FROM matches INNER JOIN profiles AS p1 ON p1.user_id = matches.user1 INNER JOIN profiles AS p2 ON p2.user_id = matches.user2 WHERE matches.user1 = ? OR matches.user2 = ? ORDER BY matches.match_date DESC';
 	try {
-		const profile_data = await execute(sql, [user_id]);
-		if (profile_data)
+		const matches = await execute(sql, [user_id, user_id, user_id, user_id]);
+		console.log(matches);
+		if (matches.length > 0)
 			return res.status(200).json({
-				message: 'Profile data retrieved successfully',
-				profile: profile_data[0],
+				message: 'Matches retrieved successfully',
+				matches: matches,
 			});
-		return res.status(400).json({
-			message: 'No user found',
+		return res.status(204).json({
+			message: 'No matches found',
 		});
 	} catch (err) {
 		console.error(err);
@@ -61,4 +62,37 @@ export const removeMatch = async (user1: number, user2: number) => {
 	return response;
 };
 
-export default { getAllMatches };
+export const removeMatchEndpoint = async (req: Request, res: Response) => {
+	try {
+		const { user1, user2 } = req.body;
+		if (!user1 || !user2)
+		return res.status(400).json({
+			message: 'Incomplete match information',
+		});
+		// Get user_id
+		const user_id = await decodeUserFromAccesstoken(req);
+		if (!user_id)
+			return res.status(401).json({
+				message: 'Unauthorized',
+			});
+		if (user_id !== user1 || user_id !== user2)
+			return res.status(400).json({
+				message: 'ID mismatch. Are you doing something shady?',
+			});
+		const response = await removeMatch(user1, user2);
+		if (response)
+			return res.status(200).json({
+				message: 'Match removed successfully',
+			});
+		return res.status(400).json({
+			message: 'No user found',
+		});
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({
+			message: 'Something went wrong',
+		});
+	}
+};
+
+export default { getAllMatches, removeMatchEndpoint};

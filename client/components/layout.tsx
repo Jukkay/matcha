@@ -9,9 +9,9 @@ const Layout = ({ children }: { children: ReactNode }) => {
 
   return (
     <UserContextProvider>
-      <div className="columns is-flex-direction-column is-fullheight-100vh">
+      <div className="">
         <NavbarComponent />
-        <div className="column">
+        <div className="">
           <main>{children}</main>
         </div>
         <Footer />

@@ -1,19 +1,12 @@
 import Link from 'next/link';
 import { useEffect } from 'react';
 import { IconContext } from 'react-icons';
-import { FaCog, FaHeart, FaBars, FaRegBell } from 'react-icons/fa';
+import { FaCog, FaHeart, FaBars, FaRegBell, FaBell } from 'react-icons/fa';
+import { BsFillChatFill } from 'react-icons/bs';
 import { authAPI } from '../utilities/api';
 import { useUserContext } from './UserContext';
 
-const LogoutButton = () => {
-	return (
-		<Link href="/logout">
-			<a className="button">Log out</a>
-		</Link>
-	);
-};
-
-const LoginSignupButtons = () => {
+const LoggedOutControls = () => {
 	return (
 		<>
 			<Link href="/signup">
@@ -21,6 +14,68 @@ const LoginSignupButtons = () => {
 			</Link>
 			<Link href="/login">
 				<a className="button">Log in</a>
+			</Link>
+		</>
+	);
+};
+
+const LoggedInControls = () => {
+	return (
+		<>
+			<div className="navbar-item" id="notifications">
+				<a className="navbar-item">
+					<span className="icon is-medium">
+						<IconContext.Provider
+							value={{
+								size: '1.2rem',
+								className: 'react-icons',
+							}}
+						>
+							<div>
+								<BsFillChatFill />
+							</div>
+						</IconContext.Provider>
+					</span>
+				</a>
+			</div>
+			<div className="navbar-item" id="notifications">
+				<a className="navbar-item">
+					<span className="icon is-medium">
+						<IconContext.Provider
+							value={{
+								size: '1.2rem',
+								className: 'react-icons',
+							}}
+						>
+							<div>
+								<FaBell />
+							</div>
+						</IconContext.Provider>
+					</span>
+				</a>
+			</div>
+			<ProfilePicture />
+			<div className="navbar-item" id="controlpanel">
+				<Link href="/controlpanel">
+					<a className="navbar-item">
+						<span className="icon is-medium">
+							<IconContext.Provider
+								value={{
+									size: '1.2rem',
+									className: 'react-icons',
+								}}
+							>
+								<div>
+									<FaCog />
+								</div>
+							</IconContext.Provider>
+						</span>
+					</a>
+				</Link>
+			</div>
+
+			<Link href="/logout">
+				<a className="button">Log out</a>
 			</Link>
 		</>
 	);
@@ -41,9 +96,15 @@ const ProfilePicture = () => {
 						<img
 							className="is-rounded"
 							src={
-								profile.profile_image === 'default.png' || !profile.profile_image
-									? '/default.png' : `${authAPI.defaults.baseURL}/images/${profile.profile_image}`
+								profile.profile_image === 'default.png' ||
+								!profile.profile_image
+									? '/default.png'
+									: `${authAPI.defaults.baseURL}/images/${profile.profile_image}`
 							}
+							onError={({ currentTarget }) => {
+								currentTarget.onerror = null;
+								currentTarget.src = '/default.png';
+							}}
 							alt="Profile picture"
 							crossOrigin=""
 						/>
@@ -128,33 +189,17 @@ const NavbarComponent = () => {
 						<Link href="/history">
 							<a className="navbar-item">Recent profiles</a>
 						</Link>
+						<Link href="/messages">
+							<a className="navbar-item">Messages</a>
+						</Link>
 					</div>
 					<div className="navbar-end">
 						<div className="navbar-item">
 							<div className="buttons" id="buttons">
 								{accessToken
-									? LogoutButton()
-									: LoginSignupButtons()}
+									? LoggedInControls()
+									: LoggedOutControls()}
 							</div>
-						</div>
-						<ProfilePicture />
-						<div className="navbar-item" id="controlpanel">
-							<Link href="/controlpanel">
-								<a className="navbar-item">
-									<span className="icon is-medium">
-										<IconContext.Provider
-											value={{
-												size: '1.2rem',
-												className: 'react-icons',
-											}}
-										>
-											<div>
-												<FaCog />
-											</div>
-										</IconContext.Provider>
-									</span>
-								</a>
-							</Link>
 						</div>
 					</div>
 				</div>
