@@ -3,9 +3,52 @@ import { useRouter } from 'next/router';
 import { useState, useEffect } from "react";
 import { FaUser, FaLock } from "react-icons/fa";
 import { FormInput, SubmitButton, Notification } from "../../components/form";
-import { UserInfo, useUserContext } from "../../components/UserContext";
-import {API} from "../../utilities/api";
+import { useUserContext } from "../../components/UserContext";
+import {API, authAPI} from "../../utilities/api";
 import Link from "next/link";
+
+const LoginSuccess = () => {
+  const { setProfile, userData, updateUserData } = useUserContext();
+  const router = useRouter();
+  useEffect(() => {
+		const getUserProfile = async () => {
+			try {
+				let response = await authAPI.get(
+					`/profile/${userData.user_id}`
+				);
+				if (response?.data?.profile) {
+					updateUserData({ ...userData, profile_exists: true });
+					response.data.profile.interests = JSON.parse(
+						response.data.profile.interests
+					);
+					setProfile(response.data.profile);
+					sessionStorage.setItem(
+						'profile',
+						JSON.stringify(response.data.profile)
+					);
+				} else updateUserData({ ...userData, profile_exists: false });
+			} catch (err) {
+				console.error(err);
+			} finally {
+				if (!userData.profile_exists) router.replace('/profile');
+			}
+		};
+		getUserProfile();
+	}, []);
+
+  return <div className="columns">
+  <div className="column is-half is-offset-one-quarter">
+    <section className="section">
+      <div className="box has-text-centered">
+        <section className="section">
+          <h3 className="title is-3">Login successful</h3>
+
+        </section>
+      </div>
+    </section>
+  </div>
+</div>
+}
 
 const Login: NextPage = () => {
   // Form states
@@ -140,20 +183,7 @@ const Login: NextPage = () => {
     }
   };
 
-  return success ? (
-    <div className="columns">
-      <div className="column is-half is-offset-one-quarter">
-        <section className="section">
-          <div className="box has-text-centered">
-            <section className="section">
-              <h3 className="title is-3">Login successful</h3>
-
-            </section>
-          </div>
-        </section>
-      </div>
-    </div>
-  ) : (
+  return success ? <LoginSuccess /> : (
     <div className="columns">
       <div className="column is-half is-offset-one-quarter">
         <section className="section">

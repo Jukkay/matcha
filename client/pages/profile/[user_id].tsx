@@ -40,9 +40,11 @@ const LoggedIn = () => {
 		longitude: '',
 		famerating: undefined,
 	});
-	const { userData } = useUserContext()
+	const { userData, updateUserData} = useUserContext()
 	const [profileExists, setProfileExists] = useState(false);
+	
 	const router = useRouter();
+	if (!userData.profile_exists) router.replace('/profile');
 
 	const logVisit = async () => {
 		try {
@@ -74,6 +76,7 @@ const LoggedIn = () => {
 			logVisit()
 		}
 	};
+
 	useEffect(() => {
 		if (router.isReady) {
 			getUserProfile();

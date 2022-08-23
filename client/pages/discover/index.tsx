@@ -1,20 +1,27 @@
 import type { NextPage } from 'next';
-import router from 'next/router';
+import { useRouter } from 'next/router';
 
 import React, { useState, useEffect } from 'react';
 import { Results, Search, SortSelector } from '../../components/discover';
 
 import { useUserContext } from '../../components/UserContext';
 import {
-	IProfileCard,
 	LoadStatus,
-	LocationType,
 	SortType,
-	IProfile,
 	IResultsProfile,
 } from '../../types/types';
-import { distanceBetweenPoints } from '../../utilities/helpers';
-import { farFirst, highFameratingFirst, lessCommonTagsFirst, lowFameratingFirst, moreCommonTagsFirst, nearFirst, oldFirst,  youngFirst } from '../../utilities/sort';
+import { authAPI } from '../../utilities/api';
+import { convertBirthdayToAge } from '../../utilities/helpers';
+import {
+	farFirst,
+	highFameratingFirst,
+	lessCommonTagsFirst,
+	lowFameratingFirst,
+	moreCommonTagsFirst,
+	nearFirst,
+	oldFirst,
+	youngFirst,
+} from '../../utilities/sort';
 
 const NotLoggedIn = () => {
 	return (
@@ -27,18 +34,19 @@ const NotLoggedIn = () => {
 };
 
 const LoggedIn = () => {
-	const { profile, setProfile, userData } = useUserContext();
+	const { profile, setProfile, userData, updateUserData } = useUserContext();
 	const [sort, setSort] = useState<SortType>(SortType.DISTANCE);
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
 	const [searchParams, setSearchParams] = useState({
 		gender: profile.gender,
 		looking: profile.looking,
-		min_age: profile.min_age,
-		max_age: profile.max_age,
+		min_age: profile.min_age || (convertBirthdayToAge(profile.birthday) - 5),
+		max_age: profile.max_age || (convertBirthdayToAge(profile.birthday) + 5),
 	});
 	const [results, setResults] = useState<IResultsProfile[]>([]);
+	const router = useRouter();
 	if (!userData.profile_exists) router.replace('/profile');
-	
+
 	useEffect(() => {
 		if ('geolocation' in navigator) {
 			navigator.geolocation.getCurrentPosition(
@@ -50,15 +58,20 @@ const LoggedIn = () => {
 	}, []);
 
 	useEffect(() => {
-		if (results.length < 1) return
-		if (sort === SortType.DISTANCE) setResults(nearFirst(results, profile.latitude, profile.longitude));
-		if (sort === SortType.REVERSE_DISTANCE) setResults(farFirst(results, profile.latitude, profile.longitude));
+		if (results.length < 1) return;
+		if (sort === SortType.DISTANCE)
+			setResults(nearFirst(results, profile.latitude, profile.longitude));
+		if (sort === SortType.REVERSE_DISTANCE)
+			setResults(farFirst(results, profile.latitude, profile.longitude));
 		if (sort === SortType.AGE) setResults(youngFirst(results));
 		if (sort === SortType.REVERSE_AGE) setResults(oldFirst(results));
 		if (sort === SortType.TAGS) setResults(moreCommonTagsFirst(results));
-		if (sort === SortType.REVERSE_TAGS) setResults(lessCommonTagsFirst(results));
-		if (sort === SortType.FAMERATING) setResults(highFameratingFirst(results));
-		if (sort === SortType.REVERSE_FAMERATING) setResults(lowFameratingFirst(results));
+		if (sort === SortType.REVERSE_TAGS)
+			setResults(lessCommonTagsFirst(results));
+		if (sort === SortType.FAMERATING)
+			setResults(highFameratingFirst(results));
+		if (sort === SortType.REVERSE_FAMERATING)
+			setResults(lowFameratingFirst(results));
 	}, [sort]);
 
 	return (
@@ -69,7 +82,10 @@ const LoggedIn = () => {
 				setResults={setResults}
 			/>
 			<SortSelector sort={sort} setSort={setSort} />
-			<Results results={results as IResultsProfile[]} setResults={setResults} />
+			<Results
+				results={results as IResultsProfile[]}
+				setResults={setResults}
+			/>
 		</>
 	);
 };

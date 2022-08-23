@@ -13,14 +13,11 @@ export interface EditProps {
   setEditMode: (boolean: boolean) => void;
   profile: IProfile;
   setProfile: SetStateAction<any>;
-  profileExists: boolean;
-  setProfileExists: SetStateAction<any>;
 }
 
 export interface ViewProps {
   setEditMode: (boolean: boolean) => void;
   profile: IProfile;
-  profileExists: boolean;
 }
 
 export interface UserImagesProps {
@@ -28,7 +25,6 @@ export interface UserImagesProps {
 }
 
 export interface FileInputProps {
-  profileExists: boolean;
   files: FileList | undefined;
   setFiles?: SetStateAction<any>
 }
@@ -46,7 +42,6 @@ export interface SaveButtonProps {
   setEditMode: (boolean: boolean) => void;
   profile: IProfile;
   interests: string[];
-  setProfileExists: SetStateAction<any>
   setInterestsError: SetStateAction<any>
   files: FileList | undefined;
 	setFileError: SetStateAction<any>

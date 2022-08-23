@@ -21,22 +21,29 @@ const NotLoggedIn = () => {
 };
 
 const LoggedIn = () => {
-	const { userData, profile, setProfile } = useUserContext();
+	const { userData, updateUserData, profile, setProfile } = useUserContext();
 	const [editMode, setEditMode] = useState(false);
-	const [profileExists, setProfileExists] = useState(false);
 	
-
 	useEffect(() => {
 		const getUserProfile = async () => {
-			let response = await authAPI.get(`/profile/${userData.user_id}`);
-			if (response?.data?.profile) {
-				setProfileExists(true);
-				response.data.profile.interests = JSON.parse(
-					response.data.profile.interests
+			try {
+				let response = await authAPI.get(
+					`/profile/${userData.user_id}`
 				);
-				setProfile(response.data.profile);
-				sessionStorage.setItem('profile', JSON.stringify(response.data.profile));
-			} else setProfileExists(false);
+				if (response?.data?.profile) {
+					updateUserData({ ...userData, profile_exists: true });
+					response.data.profile.interests = JSON.parse(
+						response.data.profile.interests
+					);
+					setProfile(response.data.profile);
+					sessionStorage.setItem(
+						'profile',
+						JSON.stringify(response.data.profile)
+					);
+				} else updateUserData({ ...userData, profile_exists: false });
+			} catch (err) {
+				console.error(err);
+			} 
 		};
 		getUserProfile();
 	}, []);
@@ -59,14 +66,11 @@ const LoggedIn = () => {
 			setEditMode={setEditMode}
 			profile={profile}
 			setProfile={setProfile}
-			profileExists={profileExists}
-			setProfileExists={setProfileExists}
 		/>
 	) : (
 		<ViewMode
 			setEditMode={setEditMode}
 			profile={profile}
-			profileExists={profileExists}
 		/>
 	);
 };
@@ -74,30 +78,26 @@ const LoggedIn = () => {
 const EditMode = ({
 	setEditMode,
 	profile,
-	setProfile,
-	profileExists,
-	setProfileExists,
+	setProfile
 }: EditProps) => {
-	return profileExists ? (
+	const { userData } = useUserContext();
+	return userData.profile_exists ? (
 		<UpdateProfile
 			setEditMode={setEditMode}
 			profile={profile}
 			setProfile={setProfile}
-			profileExists={profileExists}
-			setProfileExists={setProfileExists}
 		/>
 	) : (
 		<CreateProfile
 			setEditMode={setEditMode}
 			profile={profile}
 			setProfile={setProfile}
-			profileExists={profileExists}
-			setProfileExists={setProfileExists}
 		/>
 	);
 };
-const ViewMode = ({ setEditMode, profile, profileExists }: ViewProps) => {
-	return profileExists ? (
+const ViewMode = ({ setEditMode, profile }: ViewProps) => {
+	const { userData } = useUserContext();
+	return userData.profile_exists ? (
 		<ProfileView profile={profile} setEditMode={setEditMode} />
 	) : (
 		<NewProfileButton setEditMode={setEditMode} />

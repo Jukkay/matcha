@@ -33,28 +33,32 @@ export const Search = ({
 			min_age: searchParams.min_age,
 			max_age: searchParams.max_age,
 		};
-		let response = await authAPI.post(`/search`, {
-			search: query,
-		});
-		if (response?.data?.results) {
-			// Calculate distances
-			const resultsWithDistance = addDistanceToProfiles(
-				response.data.results,
-				profile.latitude,
-				profile.longitude
-			);
-			// Count common interests
-			const resultsWithTags = addCommonTagsToProfiles(
-				resultsWithDistance,
-				profile.interests
-			);
-			// Default sort by distance
-			const sortedResults = nearFirst(
-				resultsWithTags,
-				profile.latitude,
-				profile.longitude
-			);
-			setResults(sortedResults);
+		try {
+			let response = await authAPI.post(`/search`, {
+				search: query,
+			});
+			if (response?.data?.results) {
+				// Calculate distances
+				const resultsWithDistance = addDistanceToProfiles(
+					response.data.results,
+					profile.latitude,
+					profile.longitude
+				);
+				// Count common interests
+				const resultsWithTags = addCommonTagsToProfiles(
+					resultsWithDistance,
+					profile.interests
+				);
+				// Default sort by distance
+				const sortedResults = nearFirst(
+					resultsWithTags,
+					profile.latitude,
+					profile.longitude
+				);
+				setResults(sortedResults);
+			}
+		} catch (err) {
+			console.error(err);
 		}
 	};
 

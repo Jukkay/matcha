@@ -215,12 +215,12 @@ V Create matches page
 V Make profile pictures show on match list
 V Add matches page to navbar
 V Add notification and message icons to navbar
-Put logout inside dropdown menu if allowed to clean up navbar
-Make sure userdata is loaded on every page on first load
+V Make sure userdata is loaded on every page where userdata is needed
 Create notification system with socket.io or kafka
 Create messaging using the same system
 Integrate chat to matches page
 Make last message show on match list
+Put logout inside dropdown menu if allowed to clean up navbar
 
 # Later
 Create userbase so there's less options for random interests

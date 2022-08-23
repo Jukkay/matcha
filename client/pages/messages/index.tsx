@@ -5,7 +5,7 @@ import { LoadStatus, IMatch, ChatProps } from '../../types/types';
 import { authAPI } from '../../utilities/api';
 import { reformatDate } from '../../utilities/helpers';
 import { IoMdSend } from 'react-icons/io';
-import router from 'next/router';
+import { useRouter } from 'next/router';
 
 const NotLoggedIn = () => {
 	return (
@@ -18,7 +18,7 @@ const NotLoggedIn = () => {
 };
 
 const LoggedIn = () => {
-	const { profile, setProfile, userData } = useUserContext();
+	const { profile, setProfile, userData, updateUserData } = useUserContext();
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
 	const [chat, setChat] = useState({
 		match_id: 0,
@@ -26,6 +26,7 @@ const LoggedIn = () => {
 		profile_image: '',
 		match_date: '',
 	});
+	const router = useRouter();
 	if (!userData.profile_exists) router.replace('/profile');
 
 	useEffect(() => {
@@ -65,7 +66,7 @@ const MatchList = ({ chat, setChat }: ChatProps) => {
 		<div className="column is-one-quarter">
             <h5 className="title is-5">Matches</h5>
 			{matches.map((match, index) => (
-				<MatchListItem key={index} match={match} setChat={setChat} />
+				<MatchListItem key={index} chat={chat} match={match} setChat={setChat} />
 			))}
 		</div>
 	) : (
@@ -77,7 +78,7 @@ const MatchList = ({ chat, setChat }: ChatProps) => {
 	);
 };
 
-const MatchListItem = ({ match, setChat }: any) => {
+const MatchListItem = ({ match, chat, setChat }: any) => {
 	const handleClick = (event: React.MouseEvent) => {
 		event.preventDefault();
 		setChat({
@@ -87,7 +88,39 @@ const MatchListItem = ({ match, setChat }: any) => {
 			match_date: match.match_date,
 		});
 	};
-	return (
+	return chat.match_id === match.match_id ? (
+		<article className="media has-background-grey-lighter p-2" onClick={handleClick}>
+			<figure className="media-left">
+				<p className="image is-64x64">
+					<img
+						className="is-rounded"
+						src={`${authAPI.defaults.baseURL}/images/${match.profile_image}`}
+						onError={({ currentTarget }) => {
+							currentTarget.onerror = null;
+							currentTarget.src = '/default.png';
+						}}
+						alt="Profile picture"
+						crossOrigin=""
+					/>
+				</p>
+			</figure>
+			<div className="media-content">
+				<div className="content">
+					<p>
+						<strong className="is-size-7">{match.name}</strong>
+						<br />
+						<span className="is-italic has-text-grey-light is-size-7">
+							"Last message"
+						</span>
+						<br />
+						<p className="help">{`Matched on ${reformatDate(
+							match.match_date
+						)}`}</p>
+					</p>
+				</div>
+			</div>
+		</article>
+	) : (
 		<article className="media" onClick={handleClick}>
 			<figure className="media-left">
 				<p className="image is-64x64">

@@ -1,20 +1,13 @@
 import type { NextPage } from 'next';
 import Link from 'next/link';
-import router from 'next/router';
+import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react';
-import {
-	GenderSelector,
-	SearchAgeRange,
-} from '../../components/profile';
 import { useUserContext } from '../../components/UserContext';
 import {
     LogEntry,
-	OtherUserViewProps,
-	ResultsProps,
-	SearchProps
 } from '../../types/types';
 import { authAPI } from '../../utilities/api';
-import { convertAgeToBirthday, convertBirthdayToAge } from '../../utilities/helpers';
+import {  convertBirthdayToAge } from '../../utilities/helpers';
 
 const NotLoggedIn = () => {
 	return (
@@ -27,9 +20,9 @@ const NotLoggedIn = () => {
 };
 
 const LoggedIn = () => {
-	const { userData, profile, setProfile } = useUserContext();
+	const { userData, updateUserData, profile, setProfile } = useUserContext();
     const [log, setLog] = useState([])
-
+	const router = useRouter();
 	if (!userData.profile_exists) router.replace('/profile');
 	
 	useEffect(() => {

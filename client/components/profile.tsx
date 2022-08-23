@@ -141,9 +141,7 @@ export const VisitorLog = ({user_id}: any) => {
 export const CreateProfile = ({
 	setEditMode,
 	profile,
-	setProfile,
-	profileExists,
-	setProfileExists,
+	setProfile
 }: EditProps) => {
 	const [tagError, setTagError] = useState(false);
 	const [success, setSuccess] = useState(false);
@@ -153,7 +151,7 @@ export const CreateProfile = ({
 	const [interests, setInterests] = useState<string[]>([]);
 	const [query, setQuery] = useState('');
 	const [result, setResult] = useState<string[]>([]);
-	const { userData } = useUserContext();
+	const { userData, updateUserData } = useUserContext();
 
 	// Update object values
 	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -224,7 +222,7 @@ export const CreateProfile = ({
 				setTimeout(() => {
 					setSuccess(false);
 					setEditMode(false);
-					setProfileExists(true);
+					updateUserData({...userData, profile_exists: true});
 					sessionStorage.setItem('profile', JSON.stringify(payload));
 				}, 2000);
 			}
@@ -325,7 +323,6 @@ export const CreateProfile = ({
 						/>
 					</div>
 					<FileInput
-						profileExists={profileExists}
 						files={files}
 						setFiles={setFiles}
 					/>
@@ -374,8 +371,6 @@ export const UpdateProfile = ({
 	setEditMode,
 	profile,
 	setProfile,
-	profileExists,
-	setProfileExists,
 }: EditProps) => {
 	const [tagError, setTagError] = useState(false);
 	const [success, setSuccess] = useState(false);
@@ -386,7 +381,7 @@ export const UpdateProfile = ({
 	const [interests, setInterests] = useState<string[]>([]);
 	const [query, setQuery] = useState('');
 	const [result, setResult] = useState<string[]>([]);
-	const { userData } = useUserContext();
+	const { userData, updateUserData } = useUserContext();
 
 	// Update object values
 	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -564,7 +559,6 @@ export const UpdateProfile = ({
 						error={imageError}
 					/>
 					<FileInput
-						profileExists={profileExists}
 						files={files}
 						setFiles={setFiles}
 					/>
@@ -920,8 +914,8 @@ export const SearchAgeRange = ({
 							id="min_age"
 							className="input is-primary"
 							min="18"
-							max={searchParams?.max_age}
-							value={searchParams?.min_age}
+							max={searchParams.max_age}
+							value={searchParams.min_age}
 							onChange={(event) =>
 								setSearchParams({
 									...searchParams,
@@ -940,9 +934,9 @@ export const SearchAgeRange = ({
 							type="number"
 							id="max_age"
 							className="input is-primary"
-							min={searchParams?.min_age}
+							min={searchParams.min_age}
 							max="122"
-							value={searchParams?.max_age}
+							value={searchParams.max_age}
 							onChange={(event) =>
 								setSearchParams({
 									...searchParams,
@@ -1151,12 +1145,10 @@ export const Gallery = ({ user_id }: UserImagesProps) => {
 };
 
 export const FileInput = ({
-	profileExists,
 	files,
 	setFiles,
 }: FileInputProps) => {
 	const [preview, setPreview] = useState<string[]>([]);
-	const [userImages, setUserImages] = useState<string[]>([]);
 
 	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		if (!event.target.files) return;
