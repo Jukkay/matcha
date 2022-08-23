@@ -227,8 +227,8 @@ export interface IMatch {
 }
 
 export interface ChatProps {
-  chat: IMatch
-  setChat: SetStateAction<any>
+  matchID: number
+  setMatchID: SetStateAction<any>
 }
 export enum SortType {
   AGE = 'Age younger first',

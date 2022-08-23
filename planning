@@ -216,7 +216,9 @@ V Make profile pictures show on match list
 V Add matches page to navbar
 V Add notification and message icons to navbar
 V Make sure userdata is loaded on every page where userdata is needed
-Create notification system with socket.io or kafka
+Create notification system with socket.io
+setup socket.io
+
 Create messaging using the same system
 Integrate chat to matches page
 Make last message show on match list

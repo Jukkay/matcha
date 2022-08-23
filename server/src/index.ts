@@ -19,8 +19,36 @@ import { searchProfiles } from './controllers/search';
 import { logVisitor } from './controllers/log';
 import logRouter from './routes/log';
 import matchRouter from './routes/match';
+import {Server} from 'socket.io'
+import {createServer} from 'http'
 
 const app: express.Application = express();
+// Server start
+const httpServer = app.listen(process.env.PORT, () => {
+	console.log(`backend server running at ${getURL()}`);
+});
+
+// Socket.io initialization
+const io = new Server(httpServer,{
+	cors: {
+		origin: "http://localhost:3000",
+		methods: ["GET", "POST"]
+	}
+})
+
+io.on("connection", (socket) => {
+	console.log('User connected')
+	socket.on("active_chat", (data) => {
+		console.log(data)
+		socket.join(data)
+	})
+
+	socket.on("send_message", (data) => {
+		console.log(data)
+		socket.to(data.match_id).emit("receive_message", data)
+	})
+  }
+  );
 
 // initialize db pool
 SQLConnect.init();
@@ -79,9 +107,3 @@ app.use('/like', likeRouter);
 
 // Match CRUD route
 app.use('/match', matchRouter);
-
-
-// Server start
-app.listen(process.env.PORT, () => {
-	console.log(`backend server running at ${getURL()}`);
-});

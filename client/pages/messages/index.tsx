@@ -6,6 +6,8 @@ import { authAPI } from '../../utilities/api';
 import { reformatDate } from '../../utilities/helpers';
 import { IoMdSend } from 'react-icons/io';
 import { useRouter } from 'next/router';
+import { io } from 'socket.io-client';
+import { profile } from 'console';
 
 const NotLoggedIn = () => {
 	return (
@@ -20,12 +22,7 @@ const NotLoggedIn = () => {
 const LoggedIn = () => {
 	const { profile, setProfile, userData, updateUserData } = useUserContext();
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
-	const [chat, setChat] = useState({
-		match_id: 0,
-		name: '',
-		profile_image: '',
-		match_date: '',
-	});
+	const [matchID, setMatchID] = useState(0);
 	const router = useRouter();
 	if (!userData.profile_exists) router.replace('/profile');
 
@@ -41,13 +38,13 @@ const LoggedIn = () => {
 
 	return (
 		<div className="columns">
-			<ChatWindow chat={chat} />
-			<MatchList chat={chat} setChat={setChat} />
+			<ChatWindow matchID={matchID} />
+			<MatchList matchID={matchID} setMatchID={setMatchID} />
 		</div>
 	);
 };
 
-const MatchList = ({ chat, setChat }: ChatProps) => {
+const MatchList = ({matchID, setMatchID}: ChatProps) => {
 	const { profile, setProfile } = useUserContext();
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
 	const [matches, setMatches] = useState<IMatch[]>([]);
@@ -64,9 +61,14 @@ const MatchList = ({ chat, setChat }: ChatProps) => {
 
 	return matches.length > 0 ? (
 		<div className="column is-one-quarter">
-            <h5 className="title is-5">Matches</h5>
+			<h5 className="title is-5">Matches</h5>
 			{matches.map((match, index) => (
-				<MatchListItem key={index} chat={chat} match={match} setChat={setChat} />
+				<MatchListItem
+					key={index}
+					match={match}
+					matchID={matchID}
+					setMatchID={setMatchID}
+				/>
 			))}
 		</div>
 	) : (
@@ -78,18 +80,16 @@ const MatchList = ({ chat, setChat }: ChatProps) => {
 	);
 };
 
-const MatchListItem = ({ match, chat, setChat }: any) => {
+const MatchListItem = ({ match, matchID, setMatchID }: any) => {
 	const handleClick = (event: React.MouseEvent) => {
 		event.preventDefault();
-		setChat({
-			match_id: match.match_id,
-			name: match.name,
-			profile_image: match.profile_image,
-			match_date: match.match_date,
-		});
+		setMatchID(match.match_id);
 	};
-	return chat.match_id === match.match_id ? (
-		<article className="media has-background-grey-lighter p-2" onClick={handleClick}>
+	return matchID === match.match_id ? (
+		<article
+			className="media has-background-grey-lighter p-2"
+			onClick={handleClick}
+		>
 			<figure className="media-left">
 				<p className="image is-64x64">
 					<img
@@ -113,9 +113,9 @@ const MatchListItem = ({ match, chat, setChat }: any) => {
 							"Last message"
 						</span>
 						<br />
-						<p className="help">{`Matched on ${reformatDate(
+						<span className="help">{`Matched on ${reformatDate(
 							match.match_date
-						)}`}</p>
+						)}`}</span>
 					</p>
 				</div>
 			</div>
@@ -145,34 +145,82 @@ const MatchListItem = ({ match, chat, setChat }: any) => {
 							"Last message"
 						</span>
 						<br />
-						<p className="help">{`Matched on ${reformatDate(
+						<span className="help">{`Matched on ${reformatDate(
 							match.match_date
-						)}`}</p>
+						)}`}</span>
 					</p>
 				</div>
 			</div>
 		</article>
 	);
 };
-const ChatWindow = ({ chat }: any) => {
+
+const ChatWindow = ({ matchID }: any) => {
+	const [received, setReceived] = useState<{}[]>([]);
+	const [outgoing, setOutgoing] = useState('');
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
-	const handleSubmit = async (event: React.SyntheticEvent) => {
+	const { profile } = useUserContext();
+
+	const socket = io('http://localhost:4000');
+
+	const onChange = (event: React.ChangeEvent<HTMLInputElement>) =>
+		setOutgoing(event.target.value);
+
+	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		setLoadStatus(LoadStatus.LOADING);
+		try {
+			setLoadStatus(LoadStatus.LOADING);
+			const payload = {
+				match_id: matchID,
+				user_id: profile.user_id,
+				name: profile.name,
+				time: Date.now(),
+				message: outgoing
+			}
+			socket.emit('send_message', payload);
+			setOutgoing('');
+		} catch (err) {
+			console.error(err);
+		}
 	};
-	return chat.match_id ? (
+
+	useEffect(() => {
+		try {
+			socket.on('receive_message', (data) => {
+				console.log(data);
+				setReceived((current) => [...current, data]);
+			});
+		} catch (err) {
+			console.error(err);
+		}
+	}, [socket]);
+
+	useEffect(() => {
+		try {
+			socket.emit('active_chat', matchID);
+		} catch (err) {
+			console.error(err);
+		}
+	}, [matchID]);
+
+	return matchID ? (
 		<div className="column">
 			<section className="section">
-				<p>Now chatting with {chat.name}</p>
+				{received.map((item, index) => (
+					<ChatMessage key={index} item={item} />
+				))}
 			</section>
 			<div className="media-content">
 				<form onSubmit={handleSubmit}>
 					<div className="field has-addons">
 						<div className="control textareawrapper">
 							<input
-                                type="text"
+								type="text"
 								className="input is-primary"
 								placeholder="Write something"
+								name="message"
+								onChange={onChange}
+								value={outgoing}
 							/>
 						</div>
 						<div className="control">
@@ -192,6 +240,22 @@ const ChatWindow = ({ chat }: any) => {
 			<section className="section">
 				<p>Select one of your matches and start chatting!</p>
 			</section>
+		</div>
+	);
+};
+
+const ChatMessage = ({ item }: any) => {
+	return (
+		<div className="columns">
+			<div className="column is-1">
+				{new Date(item.time).toLocaleTimeString()}
+			</div>
+			<div className="column is-1">
+				{item.name}
+			</div>
+			<div className="column">
+				{item.message}
+			</div>
 		</div>
 	);
 };
