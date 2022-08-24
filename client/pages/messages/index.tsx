@@ -44,7 +44,7 @@ const LoggedIn = () => {
 	);
 };
 
-const MatchList = ({matchID, setMatchID}: ChatProps) => {
+const MatchList = ({ matchID, setMatchID }: ChatProps) => {
 	const { profile, setProfile } = useUserContext();
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
 	const [matches, setMatches] = useState<IMatch[]>([]);
@@ -175,8 +175,8 @@ const ChatWindow = ({ matchID }: any) => {
 				user_id: profile.user_id,
 				name: profile.name,
 				time: Date.now(),
-				message: outgoing
-			}
+				message: outgoing,
+			};
 			socket.emit('send_message', payload);
 			setOutgoing('');
 		} catch (err) {
@@ -210,30 +210,29 @@ const ChatWindow = ({ matchID }: any) => {
 					<ChatMessage key={index} item={item} />
 				))}
 			</section>
-			<div className="media-content">
-				<form onSubmit={handleSubmit}>
-					<div className="field has-addons">
-						<div className="control textareawrapper">
-							<input
-								type="text"
-								className="input is-primary"
-								placeholder="Write something"
-								name="message"
-								onChange={onChange}
-								value={outgoing}
-							/>
-						</div>
-						<div className="control">
-							<button className="button is-primary mr-3">
-								<span className="icon">
-									<IoMdSend />
-								</span>
-								<span>Send</span>
-							</button>
-						</div>
+
+			<form onSubmit={handleSubmit}>
+				<div className="field has-addons">
+					<div className="control textareawrapper">
+						<input
+							type="text"
+							className="input is-primary"
+							placeholder="Write something"
+							name="message"
+							onChange={onChange}
+							value={outgoing}
+						/>
 					</div>
-				</form>
-			</div>
+					<div className="control">
+						<button className="button is-primary mr-3">
+							<span className="icon">
+								<IoMdSend />
+							</span>
+							<span>Send</span>
+						</button>
+					</div>
+				</div>
+			</form>
 		</div>
 	) : (
 		<div className="column">
@@ -250,12 +249,8 @@ const ChatMessage = ({ item }: any) => {
 			<div className="column is-1">
 				{new Date(item.time).toLocaleTimeString()}
 			</div>
-			<div className="column is-1">
-				{item.name}
-			</div>
-			<div className="column">
-				{item.message}
-			</div>
+			<div className="column is-1">{item.name}</div>
+			<div className="column">{item.message}</div>
 		</div>
 	);
 };

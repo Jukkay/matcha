@@ -216,6 +216,7 @@ V Make profile pictures show on match list
 V Add matches page to navbar
 V Add notification and message icons to navbar
 V Make sure userdata is loaded on every page where userdata is needed
+V Fix text input width
 Create notification system with socket.io
 setup socket.io
 
