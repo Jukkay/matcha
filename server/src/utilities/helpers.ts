@@ -46,3 +46,6 @@ export const locateIP = async(req: Request) => {
     // const sql = 'UPDATE profiles SET ip_location = ? WHERE user_id = ?;';
     // await execute(sql, [JSON.stringify(ip_location), user_id]);
 }
+
+// Socket.io middleware wrapper
+export const wrap = (middleware: any) => (socket: any, next: any) => middleware(socket.request, {}, next);

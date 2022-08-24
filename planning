@@ -217,12 +217,18 @@ V Add matches page to navbar
 V Add notification and message icons to navbar
 V Make sure userdata is loaded on every page where userdata is needed
 V Fix text input width
-Create notification system with socket.io
-setup socket.io
+V setup socket.io
+V Create chat window
+V Integrate chat to matches page
+V Figure out why Emilia sees her own name and face in match list
 
-Create messaging using the same system
-Integrate chat to matches page
+Create socket listeners for notifications
+Create endpoints for notifications
+Create frontend functionality for notifications
 Make last message show on match list
+Figure out why some messages show double on receive_message
+Make chat window scrollable and automatically go to bottom
+Refactor SQL queries using ``
 Put logout inside dropdown menu if allowed to clean up navbar
 
 # Later

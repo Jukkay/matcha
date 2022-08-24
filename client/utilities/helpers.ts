@@ -86,3 +86,7 @@ export const countCommonTags = (profileTags: {}, ownTags: {}) => {
 	const count = Object.values(profileTags).filter((tag) => Object.values(ownTags).includes(tag)).length
 	return count
 }
+
+export const createSQLDatetimeString = () => {
+	return new Date().toISOString().slice(0, 19).replace('T', ' ')
+}

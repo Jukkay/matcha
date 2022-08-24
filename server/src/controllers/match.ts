@@ -8,7 +8,12 @@ export const createMatch = async (user1: number, user2: number) => {
 	const duplicate = await findMatch(user1, user2);
 	if (duplicate) return;
 	// Create Match
-	const sql = 'INSERT INTO matches(user1, user2) VALUES (?, ?)';
+	const sql = `
+				INSERT INTO
+					matches(user1, user2)
+				VALUES
+					(?, ?)
+				`;
 	const response = await execute(sql, [user1, user2]);
 
 	if (response) {
@@ -25,7 +30,28 @@ const getAllMatches = async (req: Request, res: Response) => {
 		return res.status(400).json({
 			message: 'No user id given',
 		});
-	const sql = 'SELECT matches.*, p1.profile_image, p1.name, p2.profile_image, p2.name FROM matches INNER JOIN profiles AS p1 ON p1.user_id = matches.user1 INNER JOIN profiles AS p2 ON p2.user_id = matches.user2 WHERE matches.user1 = ? OR matches.user2 = ? ORDER BY matches.match_date DESC';
+	const sql = `
+				SELECT
+					matches.*,
+					p1.profile_image AS image1,
+					p1.name AS name1,
+					p2.profile_image AS image2,
+					p2.name AS name2
+				FROM
+					matches
+				INNER JOIN
+					profiles AS p1
+						ON p1.user_id = matches.user1
+				INNER JOIN
+					profiles AS p2
+						ON p2.user_id = matches.user2
+				WHERE
+					matches.user1 = ?
+					OR
+					matches.user2 = ?
+				ORDER BY
+					matches.match_date DESC
+				`;
 	try {
 		const matches = await execute(sql, [user_id, user_id, user_id, user_id]);
 		console.log(matches);
@@ -48,16 +74,39 @@ const getAllMatches = async (req: Request, res: Response) => {
 export const findMatch = async (user1: number, user2: number) => {
 	// Check if it's a match
 	const sql =
-		'SELECT * FROM matches WHERE (user1 = ? AND user2 = ?) OR (user1 = ? AND user2 = ?)';
+		`
+		SELECT
+			*
+		FROM
+			matches
+		WHERE
+			(user1 = ? AND user2 = ?)
+			OR
+			(user1 = ? AND user2 = ?)
+		`;
 	const response = await execute(sql, [user1, user2, user2, user1]);
 	return response.length > 0 ? true : false;
 };
 
 export const removeMatch = async (user1: number, user2: number) => {
 	let sql =
-		'DELETE FROM matches WHERE (user1 = ? AND user2 = ?) OR (user1 = ? AND user2 = ?)';
+		`
+		DELETE FROM
+			matches
+		WHERE
+			(user1 = ? AND user2 = ?)
+			OR
+			(user1 = ? AND user2 = ?)
+		`;
 	let response = await execute(sql, [user1, user2, user2, user1]);
-    sql = 'DELETE FROM likes WHERE (user_id = ? AND target_id = ?) OR (user_id = ? AND target_id = ?)';
+    sql = `
+		DELETE FROM
+			likes
+		WHERE
+			(user_id = ? AND target_id = ?)
+			OR
+			(user_id = ? AND target_id = ?)
+		`;
     response = await execute(sql, [user1, user2, user2, user1]);
 	return response;
 };
