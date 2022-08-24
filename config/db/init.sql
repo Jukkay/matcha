@@ -88,3 +88,13 @@ CREATE TABLE IF NOT EXISTS visitors(
 	visit_date DATETIME DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY (log_id)
 );
+
+CREATE TABLE IF NOT EXISTS notifications(
+	notification_id BIGINT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`user_id` INT(10) UNSIGNED NOT NULL,
+	notification_text VARCHAR(255) NOT NULL,
+	notification_type VARCHAR(16) NOT NULL,
+	sender INT(10) UNSIGNED NOT NULL,
+	notification_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (notification_id)
+);

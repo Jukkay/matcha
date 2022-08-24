@@ -222,9 +222,17 @@ V Create chat window
 V Integrate chat to matches page
 V Figure out why Emilia sees her own name and face in match list
 
-Create socket listeners for notifications
-Create endpoints for notifications
-Create frontend functionality for notifications
+V Create socket listeners for notifications
+V Create endpoints for notifications
+
+Change messaging so notification receiver's user_id can be added to the object
+Make sure notifications work with messaging
+Add notifications to 
+    Likes
+    Profile views
+    Liked user liked back
+    Connected user unliked
+    Notifications visible on any page
 Make last message show on match list
 Figure out why some messages show double on receive_message
 Make chat window scrollable and automatically go to bottom

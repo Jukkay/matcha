@@ -1,10 +1,14 @@
 import Link from 'next/link';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { IconContext } from 'react-icons';
 import { FaCog, FaHeart, FaBars, FaRegBell, FaBell } from 'react-icons/fa';
 import { BsFillChatFill } from 'react-icons/bs';
 import { authAPI } from '../utilities/api';
 import { useUserContext } from './UserContext';
+import { io } from 'socket.io-client';
+
+const API = authAPI.defaults.baseURL || 'http://localhost:4000';
+const socket = io(API);
 
 const LoggedOutControls = () => {
 	return (
@@ -116,6 +120,43 @@ const ProfilePicture = () => {
 };
 
 const NavbarComponent = () => {
+	const [notifications, setNotifications] = useState<{}[]>([]);
+	const [notificationCount, setNotificationCount] = useState(0);
+	const { userData } = useUserContext();
+
+	// Subscribe for and fetch notifications
+	useEffect(() => {
+		const getNotifications = async () => {
+			try {
+				console.log('in get notifications', userData.user_id)
+				if (!userData.user_id) return;
+				socket.emit('set_user', userData.user_id);
+				const response = await authAPI(
+					`/notifications/${userData.user_id}`
+				);
+				if (response?.data?.notifications?.length > 0)
+					setNotifications([...response.data.notifications]);
+				console.log(response.data.notifications)
+			} catch (err) {
+				console.error(err);
+			}
+		};
+		getNotifications();
+	}, [userData.user_id]);
+
+	// Listen for notifications
+	useEffect(() => {
+		try {
+			socket.on('receive_notification', (user_id, data) => {
+				console.log(user_id, data);
+				setNotifications((current) => [...current, data]);
+				setNotificationCount((current) => current + 1);
+			});
+		} catch (err) {
+			console.error(err);
+		}
+	}, [socket]);
+
 	// Token state
 	const { accessToken } = useUserContext();
 	return (
@@ -189,9 +230,12 @@ const NavbarComponent = () => {
 						<Link href="/history">
 							<a className="navbar-item">Recent profiles</a>
 						</Link>
-						<Link href="/messages">
+						{notificationCount ? <Link href="/messages">
+							<a className="navbar-item"><span title="Badge top right" className="badge is-right is-danger">{notificationCount}</span>Messages</a>
+						</Link> : <Link href="/messages">
 							<a className="navbar-item">Messages</a>
-						</Link>
+						</Link>}
+						
 					</div>
 					<div className="navbar-end">
 						<div className="navbar-item">

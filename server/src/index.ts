@@ -23,6 +23,7 @@ import { Server } from 'socket.io';
 import { createServer } from 'http';
 import { getChatMessages, saveMessageToDatabase } from './controllers/chat';
 import { wrap } from './utilities/helpers'
+import { getNotifications, saveNotificationToDatabase } from './controllers/notification';
 
 const app: express.Application = express();
 
@@ -56,11 +57,12 @@ const io = new Server(httpServer, {
 io.on('connection', (socket) => {
 	try {
 		console.log(socket.id, 'connected');
+
+		// Chat
 		socket.on('active_chat', (data) => {
 			console.log(data);
 			socket.join(data);
 		});
-
 		socket.on('send_message', (matchID, data) => {
 			if (!matchID) return;
 			console.log(matchID, data);
@@ -72,6 +74,24 @@ io.on('connection', (socket) => {
 			// Emit to receiver
 			socket.to(matchID).emit('receive_message', matchID, data);
 		});
+
+		// Notifications
+		
+		socket.on('set_user', (data) => {
+			console.log('Notifications for user_id: ', data)
+			socket.join(data)
+		})
+
+		socket.on('send_notification', (user_id, data) => {
+			if(!user_id) return;
+
+			// Save notification to database
+			const response = saveNotificationToDatabase(data)
+			if(!response) throw new Error('Failed to save notification')
+
+			// Emit to user
+			socket.to(user_id).emit('receive_notification', user_id, data)
+		})
 		socket.on('disconnect', () => console.log(socket.id, 'disconnected'));
 	} catch (err) {
 		console.error(err);
@@ -127,3 +147,6 @@ app.use('/match', matchRouter);
 
 // Messages GET
 app.get('/messages/:id', checkJWT, getChatMessages);
+
+// Notifications GET
+app.get('/notifications/:id', checkJWT, getNotifications);

@@ -9,7 +9,8 @@ import { useRouter } from 'next/router';
 import { io } from 'socket.io-client';
 import { profile } from 'console';
 
-const socket = io('http://localhost:4000');
+const API = authAPI.defaults.baseURL || 'http://localhost:4000'
+const socket = io(API);
 
 const NotLoggedIn = () => {
 	return (
@@ -184,7 +185,14 @@ const ChatWindow = ({ matchID }: any) => {
 				message_text: outgoing,
 				message_time: createSQLDatetimeString(),
 			};
+			const notification = {
+				user_id: profile.user_id,
+				notification_type: 'message',
+				notification_text: 'You received a new message.',
+				sender: profile.user_id,
+			}
 			socket.emit('send_message', matchID, payload);
+			socket.emit('send_notification', profile.user_id, )
 			setReceived((current) => [...current, payload]);
 			setOutgoing('');
 		} catch (err) {
