@@ -3,21 +3,21 @@ import { Request, Response } from 'express';
 import { decodeUserFromAccesstoken } from "./token";
 
 export const saveNotificationToDatabase = async(data: {
-    user_id: number
+    receiver_id: number
     notification_type: string
     notification_text: string
-    sender: number
+    sender_id: number
 }) => {
     const sql = `
                 INSERT INTO
                     notifications (
-                        user_id,
+                        receiver_id,
                         notification_text,
                         notification_type,
-                        sender)
+                        sender_id)
                 VALUES (?, ?, ?, ?)
                 `
-    const response = await execute(sql, [data.user_id, data.notification_text, data.notification_type, data.sender]);
+    const response = await execute(sql, [data.receiver_id, data.notification_text, data.notification_type, data.sender_id]);
     if (response.length > 0) {
         return true;
     }
@@ -26,10 +26,10 @@ export const saveNotificationToDatabase = async(data: {
 }
 
 export const getNotifications = async(req: Request, res: Response) => {
-    const requestedID = req.params.id;
-    console.log("Getting notifications")
+   const user_id = req.params.id;
+    console.log("Getting notifications for user_id: ", user_id);
 	try {
-		if (!requestedID)
+		if (!user_id)
 			return res.status(400).json({
 				message: 'No user_id given',
 			});
@@ -42,13 +42,13 @@ export const getNotifications = async(req: Request, res: Response) => {
                     INNER JOIN
                         profiles
                         ON
-                        profiles.user_id = notifications.sender
+                        profiles.user_id = notifications.sender_id
                     WHERE
-                        notifications.user_id = ?
+                        notifications.receiver_id = ?
                     ORDER BY
                         notification_time
                     `
-		const notifications = await execute(sql, [requestedID]);
+		const notifications = await execute(sql, [user_id]);
         console.log(notifications);
 		if (notifications.length > 0)
 			return res.status(200).json({

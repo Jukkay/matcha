@@ -225,8 +225,9 @@ V Figure out why Emilia sees her own name and face in match list
 V Create socket listeners for notifications
 V Create endpoints for notifications
 
-Change messaging so notification receiver's user_id can be added to the object
-Make sure notifications work with messaging
+V Change messaging so notification receiver's user_id can be added to the object
+V Make sure notifications work with messaging
+Check why notifications count shows doubled
 Add notifications to 
     Likes
     Profile views

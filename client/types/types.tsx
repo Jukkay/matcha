@@ -226,9 +226,15 @@ export interface IMatch {
   match_date: string
 }
 
+export interface IMatchData {
+  match_id: number
+	sender_id: number
+	receiver_id: number
+}
+
 export interface ChatProps {
-  matchID: number
-  setMatchID: SetStateAction<any>
+  matchData: IMatchData
+  setMatchData: SetStateAction<any>
 }
 export enum SortType {
   AGE = 'Age younger first',

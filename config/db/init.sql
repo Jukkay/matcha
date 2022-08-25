@@ -94,7 +94,8 @@ CREATE TABLE IF NOT EXISTS notifications(
 	`user_id` INT(10) UNSIGNED NOT NULL,
 	notification_text VARCHAR(255) NOT NULL,
 	notification_type VARCHAR(16) NOT NULL,
-	sender INT(10) UNSIGNED NOT NULL,
+	sender_id INT(10) UNSIGNED NOT NULL,
+	notification_read BOOLEAN DEFAULT FALSE,
 	notification_time DATETIME DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY (notification_id)
 );

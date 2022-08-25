@@ -8,9 +8,7 @@ import { IoMdSend } from 'react-icons/io';
 import { useRouter } from 'next/router';
 import { io } from 'socket.io-client';
 import { profile } from 'console';
-
-const API = authAPI.defaults.baseURL || 'http://localhost:4000'
-const socket = io(API);
+import { useSocketContext } from '../../components/SocketContext';
 
 const NotLoggedIn = () => {
 	return (
@@ -25,7 +23,11 @@ const NotLoggedIn = () => {
 const LoggedIn = () => {
 	const { profile, setProfile, userData, updateUserData } = useUserContext();
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
-	const [matchID, setMatchID] = useState(0);
+	const [matchData, setMatchData] = useState({
+		match_id: 0,
+		sender_id: 0,
+		receiver_id: 0,
+	});
 	const router = useRouter();
 	if (!userData.profile_exists) router.replace('/profile');
 
@@ -41,13 +43,13 @@ const LoggedIn = () => {
 
 	return (
 		<div className="column is-11 is-flex is-flex-direction-row is-justify-content-center is-align-content-center fullwidth">
-			<ChatWindow matchID={matchID} />
-			<MatchList matchID={matchID} setMatchID={setMatchID} />
+			<ChatWindow matchData={matchData} />
+			<MatchList matchData={matchData} setMatchData={setMatchData} />
 		</div>
 	);
 };
 
-const MatchList = ({ matchID, setMatchID }: ChatProps) => {
+const MatchList = ({ matchData, setMatchData }: ChatProps) => {
 	const { profile, setProfile } = useUserContext();
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
 	const [matches, setMatches] = useState<IMatch[]>([]);
@@ -69,8 +71,8 @@ const MatchList = ({ matchID, setMatchID }: ChatProps) => {
 				<MatchListItem
 					key={index}
 					match={match}
-					matchID={matchID}
-					setMatchID={setMatchID}
+					matchData={matchData}
+					setMatchData={setMatchData}
 					user_id={profile.user_id}
 				/>
 			))}
@@ -84,17 +86,22 @@ const MatchList = ({ matchID, setMatchID }: ChatProps) => {
 	);
 };
 
-const MatchListItem = ({ match, matchID, setMatchID, user_id }: any) => {
-	// Which if user is user1 or user2
+const MatchListItem = ({ match, matchData, setMatchData, user_id }: any) => {
+	// Check if user is user1 or user2
 	const name = user_id === match.user1 ? match.name2 : match.name1;
 	const profile_image = user_id === match.user1 ? match.image2 : match.image1;
+	const receiver_id = user_id === match.user1 ? match.user2 : match.user1
 
 	const handleClick = (event: React.MouseEvent) => {
 		event.preventDefault();
-		setMatchID(match.match_id);
+		setMatchData({
+			match_id: match.match_id,
+			sender_id: user_id,
+			receiver_id: receiver_id
+		});
 	};
 
-	return matchID === match.match_id ? (
+	return matchData.match_id === match.match_id ? (
 		<article
 			className="media has-background-grey-lighter is-clickable"
 			onClick={handleClick}
@@ -164,12 +171,12 @@ const MatchListItem = ({ match, matchID, setMatchID, user_id }: any) => {
 	);
 };
 
-const ChatWindow = ({ matchID }: any) => {
+const ChatWindow = ({ matchData }: any) => {
 	const [received, setReceived] = useState<{}[]>([]);
 	const [outgoing, setOutgoing] = useState('');
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
 	const { profile } = useUserContext();
-
+	const socket = useSocketContext()
 	const onChange = (event: React.ChangeEvent<HTMLInputElement>) =>
 		setOutgoing(event.target.value);
 
@@ -179,21 +186,26 @@ const ChatWindow = ({ matchID }: any) => {
 		try {
 			setLoadStatus(LoadStatus.LOADING);
 			const payload = {
-				match_id: matchID,
-				user_id: profile.user_id,
+				match_id: matchData.match_id,
+				sender_id: matchData.sender_id,
+				receiver_id: matchData.receiver_id,
 				name: profile.name,
 				message_text: outgoing,
 				message_time: createSQLDatetimeString(),
 			};
 			const notification = {
-				user_id: profile.user_id,
+				sender_id: matchData.sender_id,
+				receiver_id: matchData.receiver_id,
 				notification_type: 'message',
 				notification_text: 'You received a new message.',
-				sender: profile.user_id,
 			}
-			socket.emit('send_message', matchID, payload);
-			socket.emit('send_notification', profile.user_id, )
-			setReceived((current) => [...current, payload]);
+			setReceived(current => [...current, payload])
+			socket.emit('send_message', matchData.match_id, payload);
+			console.log('Sent message event')
+			socket.emit('set_user', matchData.receiver_id)
+			socket.emit('send_notification', matchData.receiver_id, notification)
+			console.log('Sent notification event')
+			selectChat()
 			setOutgoing('');
 		} catch (err) {
 			console.error(err);
@@ -201,20 +213,21 @@ const ChatWindow = ({ matchID }: any) => {
 	};
 	const selectChat = async () => {
 		try {
-			if (!matchID) return;
+			if (!matchData.match_id) return;
 			setReceived([]);
-			socket.emit('active_chat', matchID);
-			const response = await authAPI(`/messages/${matchID}`);
-			if (response?.data?.messages.length > 0)
+			socket.emit('active_chat', matchData.match_id);
+			const response = await authAPI(`/messages/${matchData.match_id}`);
+			if (response?.data?.messages?.length > 0)
 				setReceived([...response.data.messages]);
 		} catch (err) {
 			console.error(err);
 		}
 	};
+
 	useEffect(() => {
 		try {
-			socket.on('receive_message', (matchID, data) => {
-				console.log(matchID, data);
+			socket.on('receive_message', (data) => {
+				console.log('Received message');
 				setReceived((current) => [...current, data]);
 			});
 		} catch (err) {
@@ -224,9 +237,9 @@ const ChatWindow = ({ matchID }: any) => {
 
 	useEffect(() => {
 		selectChat();
-	}, [matchID]);
+	}, [matchData.match_id]);
 
-	return matchID ? (
+	return matchData.match_id ? (
 		<div className="fullwidth is-clipped">
 			<div className="section is-flex is-flex-direction-column is-justify-content-center is-align-content-center">
 				{received.map((item, index) => (
@@ -271,7 +284,6 @@ const ChatWindow = ({ matchID }: any) => {
 };
 
 const ChatMessage = ({ item, user_id }: any) => {
-	console.log(user_id, item.user_id);
 	return user_id === item.user_id ? (
 		<div className="card has-background-primary-light  is-align-self-flex-end m-3">
 			<div className="m-3">{item.message_text}</div>

@@ -4,7 +4,7 @@ import { decodeUserFromAccesstoken } from "./token";
 
 export const saveMessageToDatabase = async(data: {
     match_id: number
-    user_id: number
+    sender_id: number
     message_text: string
     message_time: string
 }) => {
@@ -18,7 +18,7 @@ export const saveMessageToDatabase = async(data: {
 				VALUES
 					(?, ?, ?, ?)
 				`
-    const response = await execute(sql, [data.match_id, data.user_id, data.message_text, data.message_time]);
+    const response = await execute(sql, [data.match_id, data.sender_id, data.message_text, data.message_time]);
     if (response.length > 0) {
         return true;
     }

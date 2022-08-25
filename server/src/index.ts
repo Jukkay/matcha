@@ -72,7 +72,7 @@ io.on('connection', (socket) => {
 			if(!response) throw new Error('Failed to save message. Please try again.')
 
 			// Emit to receiver
-			socket.to(matchID).emit('receive_message', matchID, data);
+			socket.to(matchID).emit('receive_message', data);
 		});
 
 		// Notifications
@@ -90,7 +90,8 @@ io.on('connection', (socket) => {
 			if(!response) throw new Error('Failed to save notification')
 
 			// Emit to user
-			socket.to(user_id).emit('receive_notification', user_id, data)
+			socket.to(user_id).emit('receive_notification', data)
+			console.log('Notification sent to user_id', user_id)
 		})
 		socket.on('disconnect', () => console.log(socket.id, 'disconnected'));
 	} catch (err) {

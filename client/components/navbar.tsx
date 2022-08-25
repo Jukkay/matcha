@@ -5,10 +5,7 @@ import { FaCog, FaHeart, FaBars, FaRegBell, FaBell } from 'react-icons/fa';
 import { BsFillChatFill } from 'react-icons/bs';
 import { authAPI } from '../utilities/api';
 import { useUserContext } from './UserContext';
-import { io } from 'socket.io-client';
-
-const API = authAPI.defaults.baseURL || 'http://localhost:4000';
-const socket = io(API);
+import { useSocketContext } from './SocketContext';
 
 const LoggedOutControls = () => {
 	return (
@@ -123,20 +120,24 @@ const NavbarComponent = () => {
 	const [notifications, setNotifications] = useState<{}[]>([]);
 	const [notificationCount, setNotificationCount] = useState(0);
 	const { userData } = useUserContext();
+	const socket = useSocketContext()
 
 	// Subscribe for and fetch notifications
 	useEffect(() => {
 		const getNotifications = async () => {
 			try {
-				console.log('in get notifications', userData.user_id)
 				if (!userData.user_id) return;
+				console.log('fetching notifications', userData.user_id)
 				socket.emit('set_user', userData.user_id);
 				const response = await authAPI(
 					`/notifications/${userData.user_id}`
 				);
-				if (response?.data?.notifications?.length > 0)
+				console.log(response.data)
+				if (response?.data?.notifications?.length > 0) {
 					setNotifications([...response.data.notifications]);
-				console.log(response.data.notifications)
+					setNotificationCount(response.data.notifications.length)
+					console.log(response.data.notifications.length)
+				}
 			} catch (err) {
 				console.error(err);
 			}
@@ -147,15 +148,19 @@ const NavbarComponent = () => {
 	// Listen for notifications
 	useEffect(() => {
 		try {
-			socket.on('receive_notification', (user_id, data) => {
-				console.log(user_id, data);
+			socket.on('receive_notification', (data) => {
+				console.log('Notification received');
 				setNotifications((current) => [...current, data]);
-				setNotificationCount((current) => current + 1);
 			});
 		} catch (err) {
 			console.error(err);
 		}
 	}, [socket]);
+
+	// Count notifications and update badge
+	useEffect(() => {
+		setNotificationCount(notifications?.length)
+	}, [notifications]);
 
 	// Token state
 	const { accessToken } = useUserContext();
