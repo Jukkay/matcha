@@ -19,10 +19,7 @@ export const saveMessageToDatabase = async(data: {
 					(?, ?, ?, ?)
 				`
     const response = await execute(sql, [data.match_id, data.sender_id, data.message_text, data.message_time]);
-    if (response.length > 0) {
-        return true;
-    }
-    return false;
+	return response
 
 }
 
@@ -50,7 +47,6 @@ export const getChatMessages = async(req: Request, res: Response) => {
 				message_time
 			`
 		const messages = await execute(sql, [requestedID]);
-        console.log(messages)
 		if (messages.length > 0)
 			return res.status(200).json({
 				message: 'Chat log retrieved successfully',

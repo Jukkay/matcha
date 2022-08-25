@@ -54,46 +54,57 @@ const io = new Server(httpServer, {
 // io.use(wrap(checkJWT))
 
 // Socket.io listeners
+let previousChat: any;
+let previousUser: any;
 io.on('connection', (socket) => {
 	try {
 		console.log(socket.id, 'connected');
 
 		// Chat
 		socket.on('active_chat', (data) => {
-			console.log(data);
+			if (previousChat) {
+				socket.leave(previousChat);
+			}
 			socket.join(data);
+			previousChat = data;
+			console.log('active chat is ', data)
 		});
-		socket.on('send_message', (matchID, data) => {
+		socket.on('send_message', async(matchID, data) => {
 			if (!matchID) return;
-			console.log(matchID, data);
 
 			// Save message to database
-			const response = saveMessageToDatabase(data)
-			if(!response) throw new Error('Failed to save message. Please try again.')
+			const response = await saveMessageToDatabase(data)
+			if (!response) throw new Error('Failed to save message. Please try again.')
 
 			// Emit to receiver
 			socket.to(matchID).emit('receive_message', data);
+			console.log('Message sent to match ', matchID)
 		});
 
 		// Notifications
 		
 		socket.on('set_user', (data) => {
+			if (previousUser) {
+				socket.leave(previousUser);
+			}
 			console.log('Notifications for user_id: ', data)
 			socket.join(data)
+			previousUser = data;
 		})
 
-		socket.on('send_notification', (user_id, data) => {
+		socket.on('send_notification', async(user_id, data) => {
 			if(!user_id) return;
 
 			// Save notification to database
-			const response = saveNotificationToDatabase(data)
-			if(!response) throw new Error('Failed to save notification')
+			const response = await saveNotificationToDatabase(data)
+			if (!response) throw new Error('Failed to save notification')
 
 			// Emit to user
 			socket.to(user_id).emit('receive_notification', data)
 			console.log('Notification sent to user_id', user_id)
 		})
-		socket.on('disconnect', () => console.log(socket.id, 'disconnected'));
+
+		socket.on('disconnection', () => console.log(socket.rooms, 'disconnected'));
 	} catch (err) {
 		console.error(err);
 	}

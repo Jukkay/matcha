@@ -180,6 +180,13 @@ const ChatWindow = ({ matchData }: any) => {
 	const onChange = (event: React.ChangeEvent<HTMLInputElement>) =>
 		setOutgoing(event.target.value);
 
+	const emitMessageAndNotification = (matchData: any, payload: {}, notification: {}) => {
+		socket.emit('send_message', matchData.match_id, payload);
+		console.log('Sent message event')
+		socket.emit('send_notification', matchData.receiver_id, notification)
+		console.log('Sent notification event')
+	}
+
 	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		if (outgoing.length < 1) return;
@@ -200,11 +207,7 @@ const ChatWindow = ({ matchData }: any) => {
 				notification_text: 'You received a new message.',
 			}
 			setReceived(current => [...current, payload])
-			socket.emit('send_message', matchData.match_id, payload);
-			console.log('Sent message event')
-			socket.emit('set_user', matchData.receiver_id)
-			socket.emit('send_notification', matchData.receiver_id, notification)
-			console.log('Sent notification event')
+			emitMessageAndNotification(matchData, payload, notification);
 			selectChat()
 			setOutgoing('');
 		} catch (err) {

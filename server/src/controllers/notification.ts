@@ -18,10 +18,7 @@ export const saveNotificationToDatabase = async(data: {
                 VALUES (?, ?, ?, ?)
                 `
     const response = await execute(sql, [data.receiver_id, data.notification_text, data.notification_type, data.sender_id]);
-    if (response.length > 0) {
-        return true;
-    }
-    return false;
+    return response
 
 }
 

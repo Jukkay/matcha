@@ -122,28 +122,32 @@ const NavbarComponent = () => {
 	const { userData } = useUserContext();
 	const socket = useSocketContext()
 
+	const getNotifications = async () => {
+		try {
+			if (!userData.user_id) return;
+			console.log('fetching notifications', userData.user_id)
+			socket.emit('set_user', userData.user_id);
+			console.log('Set user')
+			const response = await authAPI(
+				`/notifications/${userData.user_id}`
+			);
+			console.log(response.data)
+			if (response?.data?.notifications?.length > 0) {
+				setNotifications([...response.data.notifications]);
+				setNotificationCount(response.data.notifications.length)
+				console.log(response.data.notifications.length)
+			}
+			else setNotificationCount(0)
+		} catch (err) {
+			console.error(err);
+		}
+	};
+
 	// Subscribe for and fetch notifications
 	useEffect(() => {
-		const getNotifications = async () => {
-			try {
-				if (!userData.user_id) return;
-				console.log('fetching notifications', userData.user_id)
-				socket.emit('set_user', userData.user_id);
-				const response = await authAPI(
-					`/notifications/${userData.user_id}`
-				);
-				console.log(response.data)
-				if (response?.data?.notifications?.length > 0) {
-					setNotifications([...response.data.notifications]);
-					setNotificationCount(response.data.notifications.length)
-					console.log(response.data.notifications.length)
-				}
-			} catch (err) {
-				console.error(err);
-			}
-		};
 		getNotifications();
 	}, [userData.user_id]);
+
 
 	// Listen for notifications
 	useEffect(() => {
