@@ -1,5 +1,6 @@
 import type { NextPage } from 'next';
 import React, { useState, useEffect } from 'react';
+import { useNotificationContext } from '../../components/NotificationContext';
 import {
 	CreateProfile,
 	NewProfileButton,
@@ -7,7 +8,7 @@ import {
 	UpdateProfile,
 } from '../../components/profile';
 import { useUserContext } from '../../components/UserContext';
-import { EditProps, IProfile, ViewProps } from '../../types/types';
+import { ActivePage, EditProps, IProfile, ViewProps } from '../../types/types';
 import { authAPI } from '../../utilities/api';
 
 const NotLoggedIn = () => {
@@ -22,6 +23,7 @@ const NotLoggedIn = () => {
 
 const LoggedIn = () => {
 	const { userData, updateUserData, profile, setProfile } = useUserContext();
+	const { setActivePage } = useNotificationContext()
 	const [editMode, setEditMode] = useState(false);
 	
 	useEffect(() => {
@@ -46,6 +48,7 @@ const LoggedIn = () => {
 			} 
 		};
 		getUserProfile();
+		setActivePage(ActivePage.PROFILE)
 	}, []);
 
 	useEffect(() => {

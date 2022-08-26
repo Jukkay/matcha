@@ -5,16 +5,17 @@ import Footer from "./footer";
 import { UserContextProvider } from "./UserContext";
 import NavbarComponent from "./navbar";
 import { SocketContextProvider } from "./SocketContext";
+import { NotificationContextProvider } from "./NotificationContext";
 const Layout = ({ children }: { children: ReactNode }) => {
 
   return (
     <UserContextProvider>
       <SocketContextProvider>
-      <div className="">
+      <NotificationContextProvider>
         <NavbarComponent />
           <main>{children}</main>
         <Footer />
-      </div>
+      </NotificationContextProvider>
       </SocketContextProvider>
     </UserContextProvider>
   );

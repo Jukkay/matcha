@@ -8,7 +8,7 @@ likeRouter.post('/', controller.addNewLike)
 // userRouter.get('/images', controller.getUserImageIDs)
 likeRouter
 	.route('/:id')
-	.get(checkJWT, controller.getLikesForProfile)
+	.get(checkJWT, controller.getLikerProfiles)
 	.delete(checkJWT, controller.removeLike)
 
 export default likeRouter

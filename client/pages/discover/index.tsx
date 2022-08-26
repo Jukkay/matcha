@@ -3,12 +3,14 @@ import { useRouter } from 'next/router';
 
 import React, { useState, useEffect } from 'react';
 import { Results, Search, SortSelector } from '../../components/discover';
+import { useNotificationContext } from '../../components/NotificationContext';
 
 import { useUserContext } from '../../components/UserContext';
 import {
 	LoadStatus,
 	SortType,
 	IResultsProfile,
+	ActivePage,
 } from '../../types/types';
 import { authAPI } from '../../utilities/api';
 import { convertBirthdayToAge } from '../../utilities/helpers';
@@ -35,6 +37,7 @@ const NotLoggedIn = () => {
 
 const LoggedIn = () => {
 	const { profile, setProfile, userData, updateUserData } = useUserContext();
+	const { setActivePage } = useNotificationContext()
 	const [sort, setSort] = useState<SortType>(SortType.DISTANCE);
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
 	const [searchParams, setSearchParams] = useState({
@@ -55,6 +58,7 @@ const LoggedIn = () => {
 					console.log('Geolocation not permitted by user.', error)
 			);
 		}
+		setActivePage(ActivePage.DISCOVER)
 	}, []);
 
 	useEffect(() => {

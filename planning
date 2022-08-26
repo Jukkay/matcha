@@ -227,20 +227,26 @@ V Create endpoints for notifications
 
 V Change messaging so notification receiver's user_id can be added to the object
 V Make sure notifications work with messaging
-Check why notifications count shows doubled
-Add notifications to 
-    Likes
-    Profile views
-    Liked user liked back
-    Connected user unliked
-    Notifications visible on any page
-Make last message show on match list
-Figure out why some messages show double on receive_message
+V Check why notifications count shows doubled
+V Make notifications bagde show on top of notifications icon
+V Add dropdown menu to icon
+V Show notifications in menu
+V Figure out why some messages show double on receive_message
+V Add likes page
+V Notifications visible on any page
+V Add notifications to Likes
+V Add notifications to Profile views
+V Update read notifications read
+V Clean up notifications
+Add unlike button to profile page
+Add notifications to Liked user liked back (Matches)
+Add notifications to Connected user unliked
 Make chat window scrollable and automatically go to bottom
-Refactor SQL queries using ``
 Put logout inside dropdown menu if allowed to clean up navbar
 
 # Later
+Make last message show on match list
+Refactor SQL queries using ``
 Create userbase so there's less options for random interests
 Make sure profile image is changed to default on logout
 Change language to very plain language for accessibility

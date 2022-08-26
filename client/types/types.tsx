@@ -85,21 +85,21 @@ export interface IButton {
 }
 
 export interface IProfile {
-  user_id: number | undefined;
-  name: string | undefined;
-  birthday: string | undefined;
-  profile_image: string | undefined;
-  gender: string | undefined;
-  looking: string | undefined;
-  min_age: number | undefined,
-  max_age: number | undefined,
-  introduction: string | undefined;
+  user_id: number;
+  name: string;
+  birthday: string;
+  profile_image: string;
+  gender: string;
+  looking: string;
+  min_age: number,
+  max_age: number,
+  introduction: string;
   interests: {};
-  country: string | undefined;
-  city: string | undefined;
-  latitude?: string | undefined;
-  longitude?: string | undefined;
-  famerating: number | undefined;
+  country: string;
+  city: string;
+  latitude?: string;
+  longitude?: string;
+  famerating: number;
 }
 
 export interface IResultsProfile {
@@ -264,4 +264,41 @@ export enum LocationType {
 export interface SortProps {
   sort: SortType,
   setSort: SetStateAction<any>
+}
+
+export interface INotification {
+  notification_id: number,
+  receiver_id: number,
+  notification_text: string,
+  notification_type: string,
+  sender_id: number,
+  notification_time: string,
+  notification_read: boolean,
+  link: string
+}
+
+export enum ActivePage {
+  MESSAGES = 'Messages',
+  DISCOVER = 'Discover',
+  MAIN = 'Main',
+  PROFILE = 'Profile',
+  OTHER_PROFILE = 'Other profile',
+  HISTORY = 'History',
+  CONTROL_PANEL = 'Control panel',
+  LIKES = 'Likes',
+  NONE = 'None'
+}
+
+export enum NotificationType {
+  MESSAGE = 'Message',
+  VIEW = 'View',
+  LIKE = 'Like',
+  MATCH = 'Match',
+  UNLIKE = 'Unlike',
+  UNMATCH = 'Unmatch',
+}
+
+export interface ILikeProfile extends IProfileCard {
+  like_date: string,
+  target_id: number
 }

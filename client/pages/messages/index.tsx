@@ -1,14 +1,13 @@
 import type { NextPage } from 'next';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, MutableRefObject } from 'react';
 import { useUserContext } from '../../components/UserContext';
-import { LoadStatus, IMatch, ChatProps } from '../../types/types';
+import { LoadStatus, IMatch, ChatProps, ActivePage, NotificationType } from '../../types/types';
 import { authAPI } from '../../utilities/api';
 import { createSQLDatetimeString, reformatDate } from '../../utilities/helpers';
 import { IoMdSend } from 'react-icons/io';
 import { useRouter } from 'next/router';
-import { io } from 'socket.io-client';
-import { profile } from 'console';
 import { useSocketContext } from '../../components/SocketContext';
+import { useNotificationContext } from '../../components/NotificationContext';
 
 const NotLoggedIn = () => {
 	return (
@@ -21,14 +20,11 @@ const NotLoggedIn = () => {
 };
 
 const LoggedIn = () => {
-	const { profile, setProfile, userData, updateUserData } = useUserContext();
+	const { profile, setProfile, userData } = useUserContext();
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
-	const [matchData, setMatchData] = useState({
-		match_id: 0,
-		sender_id: 0,
-		receiver_id: 0,
-	});
+	const { setNotificationCount, setMessageCount, setLikeCount } = useNotificationContext();
 	const router = useRouter();
+
 	if (!userData.profile_exists) router.replace('/profile');
 
 	useEffect(() => {
@@ -39,20 +35,31 @@ const LoggedIn = () => {
 					console.log('Geolocation not permitted by user.', error)
 			);
 		}
+		markMessageNotificationsRead()
 	}, []);
 
+	
+	const markMessageNotificationsRead = async() => {
+		const response = await authAPI.patch('/notifications', {type: NotificationType.MESSAGE, user_id: userData.user_id})
+		if (response.status === 200) {
+			setNotificationCount(0)
+			setMessageCount(0)
+			setLikeCount(0)
+		}
+	}
 	return (
 		<div className="column is-11 is-flex is-flex-direction-row is-justify-content-center is-align-content-center fullwidth">
-			<ChatWindow matchData={matchData} />
-			<MatchList matchData={matchData} setMatchData={setMatchData} />
+			<ChatWindow />
+			<MatchList />
 		</div>
 	);
 };
 
-const MatchList = ({ matchData, setMatchData }: ChatProps) => {
+const MatchList = () => {
 	const { profile, setProfile } = useUserContext();
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
 	const [matches, setMatches] = useState<IMatch[]>([]);
+	const {matchData, setMatchData, setActivePage} = useNotificationContext()
 
 	useEffect(() => {
 		const getUsersMatches = async () => {
@@ -62,10 +69,11 @@ const MatchList = ({ matchData, setMatchData }: ChatProps) => {
 			}
 		};
 		getUsersMatches();
+		setActivePage(ActivePage.MESSAGES)
 	}, []);
 
 	return matches.length > 0 ? (
-		<div className="is-flex is-flex-direction-column">
+		<div className="is-flex is-flex-direction-column match-list">
 			<h5 className="title is-5">Matches</h5>
 			{matches.map((match, index) => (
 				<MatchListItem
@@ -86,11 +94,12 @@ const MatchList = ({ matchData, setMatchData }: ChatProps) => {
 	);
 };
 
-const MatchListItem = ({ match, matchData, setMatchData, user_id }: any) => {
+const MatchListItem = ({ match, user_id }: any) => {
 	// Check if user is user1 or user2
 	const name = user_id === match.user1 ? match.name2 : match.name1;
 	const profile_image = user_id === match.user1 ? match.image2 : match.image1;
 	const receiver_id = user_id === match.user1 ? match.user2 : match.user1
+	const {matchData, setMatchData, setActiveChatUser} = useNotificationContext()
 
 	const handleClick = (event: React.MouseEvent) => {
 		event.preventDefault();
@@ -99,6 +108,7 @@ const MatchListItem = ({ match, matchData, setMatchData, user_id }: any) => {
 			sender_id: user_id,
 			receiver_id: receiver_id
 		});
+		setActiveChatUser(receiver_id)
 	};
 
 	return matchData.match_id === match.match_id ? (
@@ -171,20 +181,25 @@ const MatchListItem = ({ match, matchData, setMatchData, user_id }: any) => {
 	);
 };
 
-const ChatWindow = ({ matchData }: any) => {
+const ChatWindow = () => {
 	const [received, setReceived] = useState<{}[]>([]);
 	const [outgoing, setOutgoing] = useState('');
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
 	const { profile } = useUserContext();
 	const socket = useSocketContext()
+	const {matchData} = useNotificationContext()
+	const windowBottom: MutableRefObject<any> = useRef(null)
+
 	const onChange = (event: React.ChangeEvent<HTMLInputElement>) =>
 		setOutgoing(event.target.value);
 
+	const scrollToBottom = () => {
+		windowBottom?.current?.scrollIntoView()
+	}
+
 	const emitMessageAndNotification = (matchData: any, payload: {}, notification: {}) => {
 		socket.emit('send_message', matchData.match_id, payload);
-		console.log('Sent message event')
 		socket.emit('send_notification', matchData.receiver_id, notification)
-		console.log('Sent notification event')
 	}
 
 	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -203,13 +218,15 @@ const ChatWindow = ({ matchData }: any) => {
 			const notification = {
 				sender_id: matchData.sender_id,
 				receiver_id: matchData.receiver_id,
-				notification_type: 'message',
+				notification_type: NotificationType.MESSAGE,
 				notification_text: 'You received a new message.',
+				link: '/messages'
 			}
 			setReceived(current => [...current, payload])
 			emitMessageAndNotification(matchData, payload, notification);
 			selectChat()
 			setOutgoing('');
+			scrollToBottom()
 		} catch (err) {
 			console.error(err);
 		}
@@ -222,6 +239,7 @@ const ChatWindow = ({ matchData }: any) => {
 			const response = await authAPI(`/messages/${matchData.match_id}`);
 			if (response?.data?.messages?.length > 0)
 				setReceived([...response.data.messages]);
+				scrollToBottom();
 		} catch (err) {
 			console.error(err);
 		}
@@ -230,9 +248,9 @@ const ChatWindow = ({ matchData }: any) => {
 	useEffect(() => {
 		try {
 			socket.on('receive_message', (data) => {
-				console.log('Received message');
 				setReceived((current) => [...current, data]);
 			});
+			return () => { socket.removeAllListeners("receive_message")};
 		} catch (err) {
 			console.error(err);
 		}
@@ -243,8 +261,8 @@ const ChatWindow = ({ matchData }: any) => {
 	}, [matchData.match_id]);
 
 	return matchData.match_id ? (
-		<div className="fullwidth is-clipped">
-			<div className="section is-flex is-flex-direction-column is-justify-content-center is-align-content-center">
+		<div className="fullwidth">
+			<div className="section is-flex is-flex-direction-column is-justify-content-center is-align-content-center chat-window">
 				{received.map((item, index) => (
 					<ChatMessage
 						key={index}
@@ -252,9 +270,10 @@ const ChatWindow = ({ matchData }: any) => {
 						user_id={profile.user_id}
 					/>
 				))}
+				<div ref={windowBottom} className="is-invisible">.</div>
 			</div>
 
-			<form onSubmit={handleSubmit} className="m-6">
+			<form onSubmit={handleSubmit} className="m-6 chat-input has-background-white">
 				<div className="field has-addons">
 					<div className="control fullwidth">
 						<input

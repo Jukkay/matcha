@@ -98,21 +98,73 @@ const addNewLike = async (req: Request, res: Response) => {
 	}
 };
 
-// Is this needed?
-const getLikesForProfile = async (req: Request, res: Response) => {
+const getLikerProfiles = async (req: Request, res: Response) => {
+	const user_id = req.params.id;
+	if (!user_id)
+		return res.status(400).json({
+			message: 'No user id given',
+		});
+	const sql = `
+				SELECT
+					*
+				FROM 
+					likes 
+				INNER JOIN
+					profiles
+					ON
+					profiles.user_id = likes.user_id
+				WHERE 
+					likes.target_id = ?
+				ORDER BY
+					likes.like_date DESC
+				LIMIT 15
+				`;
+	try {
+		const likes = await execute(sql, [user_id]);
+		if (likes.length > 0)
+			return res.status(200).json({
+				message: 'Like history retrieved successfully',
+				profiles: likes,
+			});
+		return res.status(400).json({
+			message: 'No user found',
+		});
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({
+			message: 'Something went wrong',
+		});
+	}
+};
+
+export const getProfilesUserLikes = async (req: Request, res: Response) => {
 	// no auth required
 	const user_id = req.params.id;
 	if (!user_id)
 		return res.status(400).json({
 			message: 'No user id given',
 		});
-	const sql = 'SELECT user_id FROM likes WHERE target_id = ?';
+		const sql = `
+				SELECT
+					*
+				FROM 
+					likes 
+				INNER JOIN
+					profiles
+					ON
+					profiles.user_id = likes.target_id
+				WHERE 
+					likes.user_id = ?
+				ORDER BY
+					likes.like_date DESC
+				LIMIT 15
+				`;
 	try {
 		const likes = await execute(sql, [user_id]);
-		if (likes)
+		if (likes.length > 0)
 			return res.status(200).json({
 				message: 'Like history retrieved successfully',
-				profile: likes,
+				profiles: likes,
 			});
 		return res.status(400).json({
 			message: 'No user found',
@@ -175,4 +227,4 @@ const removeLike = async (req: Request, res: Response) => {
 	}
 };
 
-export default { addNewLike, getLikesForProfile, removeLike };
+export default { addNewLike, getLikerProfiles, removeLike };

@@ -39,21 +39,21 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
 		profile_exists: false,
 	});
 	const [profile, setProfile] = useState<IProfile>({
-		user_id: undefined,
+		user_id: 0,
 		name: '',
 		birthday: '',
 		profile_image: 'default.png',
 		gender: '',
 		looking: '',
-		min_age: undefined,
-		max_age: undefined,
+		min_age: 0,
+		max_age: 0,
 		interests: {},
 		introduction: '',
 		country: '',
 		city: '',
 		latitude: '', 
 		longitude: '',
-		famerating: undefined
+		famerating: 0
 	});
 
 	useEffect(() => {

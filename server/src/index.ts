@@ -23,7 +23,8 @@ import { Server } from 'socket.io';
 import { createServer } from 'http';
 import { getChatMessages, saveMessageToDatabase } from './controllers/chat';
 import { wrap } from './utilities/helpers'
-import { getNotifications, saveNotificationToDatabase } from './controllers/notification';
+import { getNotifications, markNotificationsRead, saveNotificationToDatabase } from './controllers/notification';
+import { getProfilesUserLikes } from './controllers/like'
 
 const app: express.Application = express();
 
@@ -92,9 +93,9 @@ io.on('connection', (socket) => {
 			previousUser = data;
 		})
 
+
 		socket.on('send_notification', async(user_id, data) => {
 			if(!user_id) return;
-
 			// Save notification to database
 			const response = await saveNotificationToDatabase(data)
 			if (!response) throw new Error('Failed to save notification')
@@ -162,3 +163,9 @@ app.get('/messages/:id', checkJWT, getChatMessages);
 
 // Notifications GET
 app.get('/notifications/:id', checkJWT, getNotifications);
+
+// Notifications PATCH
+app.patch('/notifications/', checkJWT, markNotificationsRead);
+
+// Get profiles user likes
+app.get('/likedprofiles/:id', checkJWT, getProfilesUserLikes);

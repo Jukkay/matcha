@@ -2,8 +2,10 @@ import type { NextPage } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react';
+import { useNotificationContext } from '../../components/NotificationContext';
 import { useUserContext } from '../../components/UserContext';
 import {
+	ActivePage,
     LogEntry,
 } from '../../types/types';
 import { authAPI } from '../../utilities/api';
@@ -21,6 +23,7 @@ const NotLoggedIn = () => {
 
 const LoggedIn = () => {
 	const { userData, updateUserData, profile, setProfile } = useUserContext();
+	const { setActivePage } = useNotificationContext()
     const [log, setLog] = useState([])
 	const router = useRouter();
 	if (!userData.profile_exists) router.replace('/profile');
@@ -34,6 +37,7 @@ const LoggedIn = () => {
 			}
 		}
 		getVisitorLog();
+		setActivePage(ActivePage.HISTORY)
 	}, []);
 
 	useEffect(() => {

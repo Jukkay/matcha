@@ -1,6 +1,6 @@
 const Footer = () => {
 	return (
-		<footer className="column is-narrow footer p-10 bg-primary text-secondary-content">
+		<footer className="footer">
 			<p>This is footer</p>
 		</footer>
 	  )

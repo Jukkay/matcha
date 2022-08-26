@@ -4,13 +4,17 @@ import React, { useState, useEffect } from 'react';
 import { Gallery } from '../../components/profile';
 import { useUserContext } from '../../components/UserContext';
 import {
+	ActivePage,
 	IProfile,
+	NotificationType,
 	OtherUserViewProps,
 	ProfileViewProps,
 } from '../../types/types';
 import { authAPI } from '../../utilities/api';
 import { FcLike } from 'react-icons/fc';
 import { convertBirthdayToAge } from '../../utilities/helpers';
+import { useNotificationContext } from '../../components/NotificationContext';
+import { useSocketContext } from '../../components/SocketContext';
 
 const NotLoggedIn = () => {
 	return (
@@ -24,25 +28,26 @@ const NotLoggedIn = () => {
 
 const LoggedIn = () => {
 	const [profile, setProfile] = useState<IProfile>({
-		user_id: undefined,
+		user_id: 0,
 		name: '',
 		birthday: '',
 		profile_image: '',
 		gender: '',
 		looking: '',
-		min_age: undefined,
-		max_age: undefined,
+		min_age: 0,
+		max_age: 0,
 		interests: {},
 		introduction: '',
 		country: '',
 		city: '',
 		latitude: '',
 		longitude: '',
-		famerating: undefined,
+		famerating: 0,
 	});
 	const { userData, updateUserData} = useUserContext()
+	const { setActivePage } = useNotificationContext()
 	const [profileExists, setProfileExists] = useState(false);
-	
+	const socket = useSocketContext()
 	const router = useRouter();
 	if (!userData.profile_exists) router.replace('/profile');
 
@@ -50,10 +55,19 @@ const LoggedIn = () => {
 		try {
 			const { user_id } = router.query;
 			await authAPI.post('/log', {
-				visiting_user: userData.user_id.toString(),
+				visiting_user: userData.user_id,
 				visited_user: user_id,
 				username: userData.username
 			});
+			// Emit notification
+			const notification = {
+			sender_id: userData.user_id,
+			receiver_id: Number(user_id),
+			notification_type: NotificationType.VIEW,
+			notification_text: `Somebody viewed your profile!`,
+			link: `/profile/${userData.user_id}`
+			}
+			socket.emit('send_notification', Number(user_id), notification)
 		} catch (err) {
 			console.error(err);
 		}
@@ -81,6 +95,7 @@ const LoggedIn = () => {
 		if (router.isReady) {
 			getUserProfile();
 		}
+		setActivePage(ActivePage.OTHER_PROFILE)
 	}, [router.isReady]);
 
 	return profileExists ? (
@@ -94,15 +109,27 @@ const LoggedIn = () => {
 
 const ViewMode = ({ profile }: OtherUserViewProps) => {
 	const { userData } = useUserContext();
+	const socket = useSocketContext()
 
 	const likeProfile = async () => {
 		const liked = profile.user_id;
 		const liker = userData.user_id;
-
+		
 		const response = await authAPI.post('/like', {
 			liker: liker,
 			liked: liked,
 		});
+		console.log('Sending like')
+		
+		// Emit notification
+		const notification = {
+			sender_id: liker,
+			receiver_id: liked,
+			notification_type: NotificationType.LIKE,
+			notification_text: `Somebody liked you!`,
+			link: `/profile/${liker}`
+		}
+		socket.emit('send_notification', liked, notification)
 	};
 	const handleClick = () => {
 		likeProfile();
