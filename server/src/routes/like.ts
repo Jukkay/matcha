@@ -5,6 +5,7 @@ import controller from '../controllers/like'
 const likeRouter: express.Router = express.Router();
 
 likeRouter.post('/', controller.addNewLike)
+likeRouter.delete('/',checkJWT, controller.removeLike)
 // userRouter.get('/images', controller.getUserImageIDs)
 likeRouter
 	.route('/:id')

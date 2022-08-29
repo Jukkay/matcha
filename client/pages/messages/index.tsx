@@ -196,6 +196,9 @@ const ChatWindow = () => {
 	const scrollToBottom = () => {
 		windowBottom?.current?.scrollIntoView()
 	}
+	useEffect(() => {
+		scrollToBottom()
+	}, [received])
 
 	const emitMessageAndNotification = (matchData: any, payload: {}, notification: {}) => {
 		socket.emit('send_message', matchData.match_id, payload);
@@ -226,7 +229,6 @@ const ChatWindow = () => {
 			emitMessageAndNotification(matchData, payload, notification);
 			selectChat()
 			setOutgoing('');
-			scrollToBottom()
 		} catch (err) {
 			console.error(err);
 		}
@@ -239,7 +241,6 @@ const ChatWindow = () => {
 			const response = await authAPI(`/messages/${matchData.match_id}`);
 			if (response?.data?.messages?.length > 0)
 				setReceived([...response.data.messages]);
-				scrollToBottom();
 		} catch (err) {
 			console.error(err);
 		}
@@ -282,6 +283,7 @@ const ChatWindow = () => {
 							placeholder="Write something"
 							name="message"
 							onChange={onChange}
+							onFocus={scrollToBottom}
 							value={outgoing}
 						/>
 					</div>

@@ -46,11 +46,11 @@ V Fill profile information after first login
     V "Interested in" tags
     V Pictures (max 5)
         V Choose one as profile picture
-Control panel
-    Change user information
+V Control panel
+   V Change user information
 V Edit profile
-Show profile views
-Show who liked you
+V Show profile views
+V Show who liked you
 V "Fame rating"
    V Show in profile
 V GPS location
@@ -238,13 +238,26 @@ V Add notifications to Likes
 V Add notifications to Profile views
 V Update read notifications read
 V Clean up notifications
-Add unlike button to profile page
-Add notifications to Liked user liked back (Matches)
-Add notifications to Connected user unliked
-Make chat window scrollable and automatically go to bottom
-Put logout inside dropdown menu if allowed to clean up navbar
+V Add unlike button to profile page
+V Notify of match if like creates match
+V Check why notifications get marked read automatically
+V Add notifications to Liked user liked back (Matches)
+V Give liker notification if it's a match
+V Add notifications to Connected user unliked
+V Make chat window scrollable and automatically go to bottom
+V Put logout inside dropdown menu if allowed to clean up navbar
+V Make control panel 
+Add dropdown arrow to match items
+    Make block user functionality
+    Make report user functionality
+Add famerating range selectors to search
+Add distance range selectors to search
+Add location selectors to search
+Fine tune default search result sorting so it prioritises most people with best famerating and most common tags.
 
 # Later
+Fix chat window ui
+Get higher resolution profile pictures from unsplash
 Make last message show on match list
 Refactor SQL queries using ``
 Create userbase so there's less options for random interests

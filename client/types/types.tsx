@@ -35,7 +35,13 @@ export interface ProfileViewProps {
 }
 
 export interface OtherUserViewProps {
-  profile: IProfile;
+  profile: IOtherUserProfile;
+  setProfile: SetStateAction<any>
+}
+export interface LikeButtonProps {
+  profile: IOtherUserProfile;
+  setProfile: SetStateAction<any>
+  setNotification: SetStateAction<any>
 }
 
 export interface SaveButtonProps {
@@ -100,6 +106,26 @@ export interface IProfile {
   latitude?: string;
   longitude?: string;
   famerating: number;
+}
+
+export interface IOtherUserProfile {
+  user_id: number;
+  name: string;
+  birthday: string;
+  profile_image: string;
+  gender: string;
+  looking: string;
+  min_age: number,
+  max_age: number,
+  introduction: string;
+  interests: {};
+  country: string;
+  city: string;
+  latitude?: string;
+  longitude?: string;
+  famerating: number;
+  like_id: number;
+  match_id: number
 }
 
 export interface IResultsProfile {

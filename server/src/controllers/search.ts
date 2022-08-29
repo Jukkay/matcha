@@ -21,8 +21,31 @@ export const searchProfiles = async (req: Request, res: Response) => {
 				message: 'Unauthorized',
 			});
 		const sql =
-			'SELECT * FROM profiles WHERE DATE(birthday) BETWEEN ? AND ? AND gender = ? AND user_id != ? AND looking = ? ORDER BY famerating DESC';
-		const results = await execute(sql, [maxDate, minDate, looking, user_id, gender]);
+			`
+			SELECT 
+				profiles.*,
+				likes.like_id
+			FROM
+				profiles
+			LEFT JOIN
+				likes
+				ON
+					likes.target_id = profiles.user_id
+					AND
+					likes.user_id = ?
+
+			WHERE 
+				DATE(birthday) BETWEEN ? AND ? 
+				AND 
+				gender = ? 
+				AND 
+				profiles.user_id != ? 
+				AND 
+				looking = ? 
+			ORDER BY 
+				famerating DESC
+			`;
+		const results = await execute(sql, [user_id, maxDate, minDate, looking, user_id, gender]);
 		console.log('Results: ',results);
 		if (results.length > 0) {
 			// TODO Create notification of profile visit

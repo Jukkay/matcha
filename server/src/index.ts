@@ -63,9 +63,6 @@ io.on('connection', (socket) => {
 
 		// Chat
 		socket.on('active_chat', (data) => {
-			if (previousChat) {
-				socket.leave(previousChat);
-			}
 			socket.join(data);
 			previousChat = data;
 			console.log('active chat is ', data)

@@ -86,8 +86,12 @@ const newProfile = async (req: Request, res: Response) => {
 };
 
 const getProfile = async (req: Request, res: Response) => {
-	// no auth required
-
+	// Get user_id
+	const requester = await decodeUserFromAccesstoken(req);
+	if (!requester)
+		return res.status(401).json({
+			message: 'Unauthorized',
+		});
 	// TODO Check that requester is not blocked by requested user
 
 	const user_id = req.params.id;
@@ -95,9 +99,34 @@ const getProfile = async (req: Request, res: Response) => {
 		return res.status(400).json({
 			message: 'No user id given',
 		});
-	const sql = 'SELECT * FROM profiles WHERE user_id = ?';
+	const sql = `
+				SELECT 
+					profiles.*, 
+					likes.like_id,
+					matches.match_id
+				FROM 
+					profiles 
+				LEFT JOIN
+					likes
+					ON
+					likes.target_id = profiles.user_id
+					AND
+					likes.user_id = ?
+				LEFT JOIN
+					matches
+					ON
+					(matches.user1 = profiles.user_id
+					AND
+					matches.user2 = ?)
+					OR
+					(matches.user2 = profiles.user_id
+					AND
+					matches.user1 = ?)					
+				WHERE 
+					profiles.user_id = ?
+				`;
 	try {
-		const profile_data = await execute(sql, [user_id]);
+		const profile_data = await execute(sql, [requester, requester, requester, user_id]);
 		console.log(profile_data);
 		if (profile_data.length > 0) {
 			// TODO Create notification of profile visit

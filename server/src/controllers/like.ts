@@ -56,11 +56,14 @@ const addNewLike = async (req: Request, res: Response) => {
 			return res.status(400).json({
 				message: 'You already liked this person',
 			});
-
+		console.log('User', liker, 'likes user', liked)
 		// Check if liked likes liker
 		sql = 'SELECT * FROM likes WHERE user_id = ? AND target_id = ?';
 		response = await execute(sql, [liked, liker]);
 		if (response.length > 0) {
+			// Create like
+			sql = 'INSERT INTO likes(user_id, target_id) VALUES (?, ?)';
+			response = await execute(sql, [liker, liked]);
 			// Create match
 			const match = await createMatch(parseInt(liker), parseInt(liked));
 			if (!match)
@@ -68,11 +71,10 @@ const addNewLike = async (req: Request, res: Response) => {
 					match: true,
 					message: 'Match already exists',
 				});
-			// TODO Send notification
-
+			
 			// Update famerating
 			await updateFamerating(liker, liked)
-
+			
 			return res.status(200).json({
 				match: true,
 				message: 'Match',
@@ -81,7 +83,7 @@ const addNewLike = async (req: Request, res: Response) => {
 		// Create like
 		sql = 'INSERT INTO likes(user_id, target_id) VALUES (?, ?)';
 		response = await execute(sql, [liker, liked]);
-		if (response.length > 0) {
+		if (response) {
 			// Update famerating
 			await updateFamerating(liker, liked)
 
@@ -178,7 +180,8 @@ export const getProfilesUserLikes = async (req: Request, res: Response) => {
 };
 
 const removeLike = async (req: Request, res: Response) => {
-	const { liker, liked } = req.body;
+	const { liker, liked } = req.query;
+	console.log('user', liker, 'removes like to user', liked)
 	if (!liker || !liked)
 		return res.status(400).json({
 			message: 'Incomplete like information',
@@ -190,17 +193,18 @@ const removeLike = async (req: Request, res: Response) => {
 			return res.status(401).json({
 				message: 'Unauthorized',
 			});
-		if (user_id !== liker)
+		console.log('liker is', liker, 'user_id is', user_id);
+		if (user_id != liker)
 			return res.status(400).json({
 				message: 'ID mismatch. Are you doing something shady?',
 			});
 		// Check if it's a match
-		const isMatch = await findMatch(parseInt(user_id), parseInt(liked));
+		const isMatch = await findMatch(parseInt(user_id), parseInt(liked as string));
 		if (isMatch) {
 			// TODO remove match
 			const removed = await removeMatch(
 				parseInt(user_id),
-				parseInt(liked)
+				parseInt(liked as string)
 			);
 			if (!removed) throw new Error('Failed to remove match');
 
@@ -211,8 +215,7 @@ const removeLike = async (req: Request, res: Response) => {
 		// Remove like
 		const sql = 'DELETE FROM likes WHERE user_id = ? AND target_id = ?';
 		const response = await execute(sql, [user_id, liked]);
-
-		if (response.length > 0)
+		if (response)
 			return res.status(200).json({
 				message: 'Like removed successfully',
 			});

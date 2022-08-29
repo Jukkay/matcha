@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { IconContext } from 'react-icons';
 import { FaCog, FaHeart, FaBars, FaRegBell, FaBell } from 'react-icons/fa';
+import { FiMenu } from 'react-icons/fi';
 import { BsFillChatFill } from 'react-icons/bs';
 import { authAPI } from '../utilities/api';
 import { useUserContext } from './UserContext';
@@ -28,32 +29,47 @@ const LoggedInControls = () => {
 			<NotificationDropdownMenu />
 			<MessageIcon />
 			<ProfilePicture />
-			<div className="navbar-item" id="controlpanel">
-				<Link href="/controlpanel">
-					<a className="navbar-item">
-						<span className="icon is-medium">
-							<IconContext.Provider
-								value={{
-									size: '1.2rem',
-									className: 'react-icons',
-								}}
-							>
-								<div>
-									<FaCog />
-								</div>
-							</IconContext.Provider>
-						</span>
-					</a>
-				</Link>
-			</div>
-
-			<Link href="/logout">
-				<a className="button">Log out</a>
-			</Link>
+			<MainDropdownMenu />
 		</>
 	);
 };
 
+const MainDropdownMenu = () => {
+	return (
+		<div className="dropdown is-hoverable">
+			<div className="dropdown-trigger">
+				<div className="navbar-item" id="controlpanel">
+					<Link href="/controlpanel">
+						<a className="navbar-item">
+							<span className="icon is-medium">
+								<IconContext.Provider
+									value={{
+										size: '1.5rem',
+										className: 'react-icons',
+									}}
+								>
+									<div>
+										<FiMenu />
+									</div>
+								</IconContext.Provider>
+							</span>
+						</a>
+					</Link>
+				</div>
+			</div>
+			<div className="dropdown-menu" id="dropdown-menu" role="menu">
+				<div className="dropdown-content">
+					<Link href="/controlpanel">
+						<a className="dropdown-item">User settings</a>
+					</Link>
+					<Link href="/logout">
+						<a className="dropdown-item">Log out</a>
+					</Link>
+				</div>
+			</div>
+		</div>
+	);
+};
 const MessageIcon = () => {
 	const {
 		messageCount,
@@ -106,15 +122,22 @@ const NotificationDropdownMenu = () => {
 		setNotificationCount,
 		setMessageCount,
 		setLikeCount,
+		setNotifications,
 	} = useNotificationContext();
 	const { userData } = useUserContext();
 
 	const markNotificationsRead = async () => {
-		const response = await authAPI.patch('/notifications', {
+		console.log('markNotificationsRead running');
+		if (!userData.user_id) return;
+		const response = await authAPI(`/notifications/${userData.user_id}`);
+		if (response?.data?.notifications?.length > 0) {
+			setNotifications([...response.data.notifications]);
+		}
+		const response2 = await authAPI.patch('/notifications', {
 			type: 'all',
 			user_id: userData.user_id,
 		});
-		if (response.status === 200) {
+		if (response2.status === 200) {
 			setNotificationCount(0);
 			setMessageCount(0);
 			setLikeCount(0);
@@ -124,7 +147,7 @@ const NotificationDropdownMenu = () => {
 		<div className="dropdown is-hoverable">
 			<div
 				className="dropdown-trigger"
-				onMouseOver={markNotificationsRead}
+				onMouseEnter={markNotificationsRead}
 			>
 				<div className="navbar-item" id="notifications">
 					{notificationCount ? (
@@ -245,6 +268,7 @@ const NavbarComponent = () => {
 	const socket = useSocketContext();
 
 	const getNotifications = async () => {
+		console.log('getNotifications running');
 		try {
 			if (!userData.user_id) return;
 			socket.emit('set_user', userData.user_id);
@@ -272,10 +296,17 @@ const NavbarComponent = () => {
 	useEffect(() => {
 		try {
 			socket.on('receive_notification', (data) => {
-				setNotifications((current: INotification[]) => [
-					...current,
-					data,
-				]);
+				console.log('Received notification', data);
+				if (
+					activePage === data.notification_type ||
+					activeChatUser === data.sender_id
+				)
+					return;
+				if (data.notification_type === NotificationType.MESSAGE)
+					setMessageCount(messageCount + 1);
+				if (data.notification_type === NotificationType.LIKE)
+					setLikeCount(likeCount + 1);
+				setNotificationCount(notificationCount + 1);
 			});
 			return () => {
 				socket.removeAllListeners('receive_notification');
@@ -319,7 +350,7 @@ const NavbarComponent = () => {
 			return false;
 		}).length;
 		setMessageCount(messages);
-	}, [notifications, activeChatUser]);
+	}, [notifications, activeChatUser, activePage]);
 
 	// Token state
 	const { accessToken } = useUserContext();
@@ -362,28 +393,29 @@ const NavbarComponent = () => {
 					id="navbar-mobile"
 				>
 					<div className="navbar-end">
-						<a className="navbar-item" href="/camera">
-							Take picture
-						</a>
-						<a className="navbar-item" href="/newpost">
-							New post
-						</a>
-						<a className="navbar-item" href="/profile">
-							Profile
-						</a>
-						<a className="navbar-item" href="/controlpanel">
-							Control panel
-						</a>
-						<hr className="navbar-divider" />
-						<a className="navbar-item" href="/logout">
-							Logout
-						</a>
-						<a className="navbar-item" href="/signup">
-							Sign up
-						</a>
-						<a className="navbar-item" href="/login">
-							Login
-						</a>
+						<Link href="/discover">
+							<a className="navbar-item">Discover</a>
+						</Link>
+						<Link href="/history">
+							<a className="navbar-item">Recent profiles</a>
+						</Link>
+						{likeCount ? (
+							<Link href="/likes">
+								<a className="navbar-item">
+									<span
+										title="Badge top right"
+										className="badge is-danger"
+									>
+										{likeCount}
+									</span>
+									Likes
+								</a>
+							</Link>
+						) : (
+							<Link href="/likes">
+								<a className="navbar-item">Likes</a>
+							</Link>
+						)}
 					</div>
 				</div>
 				<div className="navbar-menu">

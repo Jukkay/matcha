@@ -3,19 +3,22 @@ import { execute } from '../utilities/SQLConnect';
 import bcryptjs from 'bcryptjs';
 import { signAccessToken, signRefreshToken } from '../utilities/promisifyJWT';
 import { sendEmailVerification } from '../utilities/sendEmailVerification';
-import { convertBirthdayToAge, locateIP } from '../utilities/helpers';
+import { convertBirthdayToAge, locateIP, reformatDate } from '../utilities/helpers';
 import { validateRegistrationInput } from '../utilities/validators';
-import { decodeUserFromAccesstoken, deleteRefreshToken, updateRefreshTokenList } from './token';
-
+import {
+	decodeUserFromAccesstoken,
+	deleteRefreshToken,
+	updateRefreshTokenList,
+} from './token';
 
 const register = async (req: Request, res: Response) => {
-  const validationResponse = await validateRegistrationInput(req, res);
-  if (validationResponse !== undefined) return;
-  const { username, password, name, email, birthday } = req.body;
-  const hash = await bcryptjs.hash(password, 10);
-  const sql = `INSERT INTO users (username, password, email, name, birthday) VALUES (?, ?, ?, ?, ?);`;
-  try {
-  const result = await execute(sql, [
+	const validationResponse = await validateRegistrationInput(req, res);
+	if (validationResponse !== undefined) return;
+	const { username, password, name, email, birthday } = req.body;
+	const hash = await bcryptjs.hash(password, 10);
+	const sql = `INSERT INTO users (username, password, email, name, birthday) VALUES (?, ?, ?, ?, ?);`;
+	try {
+		const result = await execute(sql, [
 			username,
 			hash,
 			email,
@@ -132,16 +135,44 @@ export const logout = async (req: Request, res: Response) => {
 
 const getUserInformation = async (req: Request, res: Response) => {
 	// Get user_id
-	const user_id = await decodeUserFromAccesstoken(req);
-	if (!user_id)
-		return res.status(500).json({
-			message: 'Cannot parse user_id',
+	const requester = await decodeUserFromAccesstoken(req);
+	if (!requester)
+		return res.status(401).json({
+			message: 'Unauthorized',
 		});
-	console.log('in getUserInformation', req.get('authorization'));
-	return res.status(200).json({
-		message: 'Message',
-		data: 'empty',
-	});
+
+	const user_id = req.params.id;
+	if (!user_id)
+		return res.status(400).json({
+			message: 'No user id given',
+		});
+	const sql = `
+				SELECT 
+					username,
+					email,
+					birthday,
+					name
+				FROM 
+					users 
+				WHERE 
+					user_id = ?
+				`;
+	try {
+		const userData = await execute(sql, [user_id]);
+		console.log(userData);
+		if (userData.length > 0) {
+			return res.status(200).json({
+				message: 'User data retrieved successfully',
+				userData: userData[0],
+			});
+		}
+		return res.status(204);
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({
+			message: 'Something went wrong',
+		});
+	}
 };
 
 const deleteUser = async (req: Request, res: Response) => {
@@ -159,17 +190,44 @@ const deleteUser = async (req: Request, res: Response) => {
 };
 
 const updateUser = async (req: Request, res: Response) => {
-	// Get user_id
-	const user_id = await decodeUserFromAccesstoken(req);
-	if (!user_id)
+	const { 
+		username, 
+		password, 
+		name, 
+		email, 
+		birthday
+	} = req.body;
+	console.log(req.body);
+	const sql =
+		'UPDATE users SET username=?, password=?, email=?, name=?, birthday=? WHERE user_id = ?;';
+	try {
+		// Get user_id
+		const user_id = await decodeUserFromAccesstoken(req);
+		if (!user_id)
+			return res.status(401).json({
+				message: 'Unauthorized',
+			});
+		// Hash password
+		const hash = await bcryptjs.hash(password, 10);
+		const response = await execute(sql, [
+			username, 
+			hash, 
+			email, 
+			name,
+			reformatDate(birthday),
+			user_id,
+		]);
+		console.log(response)
+		if (response)
+			return res.status(200).json({
+				message: 'User information updated successfully',
+			});
+	} catch (err) {
+		console.error(err);
 		return res.status(500).json({
-			message: 'Cannot parse user_id',
+			message: 'Something went wrong',
 		});
-	console.log('in updateUser', req.get('authorization'));
-	return res.status(200).json({
-		message: 'Message',
-		data: 'empty',
-	});
+	}
 };
 
 const blockUser = async (req: Request, res: Response) => {
@@ -184,4 +242,11 @@ const blockUser = async (req: Request, res: Response) => {
 		message: 'Message',
 	});
 };
-export default { register, login, getUserInformation, deleteUser, updateUser, blockUser };
+export default {
+	register,
+	login,
+	getUserInformation,
+	deleteUser,
+	updateUser,
+	blockUser,
+};

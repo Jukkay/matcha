@@ -12,11 +12,11 @@ userRouter.get('/', (req: express.Request, res: express.Response) => {
 })
 
 userRouter.post('/', controller.register)
+userRouter.patch('/', checkJWT, controller.updateUser)
 // userRouter.get('/images', controller.getUserImageIDs)
 userRouter
 	.route('/:id')
 	.get(checkJWT, controller.getUserInformation)
-	.patch(checkJWT, controller.updateUser)
 	.delete(checkJWT, controller.deleteUser)
 
 export default userRouter
