@@ -124,8 +124,11 @@ export interface IOtherUserProfile {
   latitude?: string;
   longitude?: string;
   famerating: number;
-  like_id: number;
+  liked: number;
+  likes_requester: number;
   match_id: number
+  online: boolean;
+  last_login: string;
 }
 
 export interface IResultsProfile {
@@ -146,6 +149,7 @@ export interface IResultsProfile {
   famerating: number
   distance: number
   common_tags: number
+  online: boolean
 }
 
 
@@ -221,6 +225,9 @@ export interface ISearchParams {
   looking: string,
   min_age: number,
   max_age: number
+  min_famerating: number,
+  max_famerating: number,
+  max_distance: number
 }
 
 export interface AgeRangeProps {
@@ -243,6 +250,7 @@ export interface IProfileCard {
   famerating: number
   distance: number
   interests: string
+  online: boolean
 }
 
 export interface IMatch {
@@ -327,4 +335,8 @@ export enum NotificationType {
 export interface ILikeProfile extends IProfileCard {
   like_date: string,
   target_id: number
+}
+
+export interface BooleanProp {
+  onlineStatus: boolean
 }

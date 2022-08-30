@@ -34,8 +34,10 @@ const getAllMatches = async (req: Request, res: Response) => {
 				SELECT
 					matches.*,
 					p1.profile_image AS image1,
+					p1.online,
 					p1.name AS name1,
 					p2.profile_image AS image2,
+					p2.online,
 					p2.name AS name2
 				FROM
 					matches
@@ -89,16 +91,32 @@ export const findMatch = async (user1: number, user2: number) => {
 };
 
 export const removeMatch = async (user1: number, user2: number) => {
-	let sql =
+	// get match id
+	let sql = 
 		`
-		DELETE FROM
+		SELECT
+			match_id
+		FROM
 			matches
 		WHERE
 			(user1 = ? AND user2 = ?)
 			OR
-			(user1 = ? AND user2 = ?)
+			(user2 = ? AND user1 = ?)
+		`
+	let response = await execute(sql, [user1, user2, user1, user2]);
+
+	// Delete match
+	const match_id = response[0]?.match_id;
+	sql =
+		`
+		DELETE FROM
+			matches
+		WHERE
+			match_id = ?
 		`;
-	let response = await execute(sql, [user1, user2, user2, user1]);
+	response = await execute(sql, [match_id]);
+
+	// Delete likes
     sql = `
 		DELETE FROM
 			likes
@@ -108,6 +126,15 @@ export const removeMatch = async (user1: number, user2: number) => {
 			(user_id = ? AND target_id = ?)
 		`;
     response = await execute(sql, [user1, user2, user2, user1]);
+
+	// Delete messages
+	sql = `
+		DELETE FROM
+			messages
+		WHERE
+			match_id = ?
+		`;	
+	response = await execute(sql, [match_id]);
 	return response;
 };
 

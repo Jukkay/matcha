@@ -39,22 +39,20 @@ const MainDropdownMenu = () => {
 		<div className="dropdown is-hoverable">
 			<div className="dropdown-trigger">
 				<div className="navbar-item" id="controlpanel">
-					<Link href="/controlpanel">
-						<a className="navbar-item">
-							<span className="icon is-medium">
-								<IconContext.Provider
-									value={{
-										size: '1.5rem',
-										className: 'react-icons',
-									}}
-								>
-									<div>
-										<FiMenu />
-									</div>
-								</IconContext.Provider>
-							</span>
-						</a>
-					</Link>
+					<a className="navbar-item">
+						<span className="icon is-medium">
+							<IconContext.Provider
+								value={{
+									size: '1.5rem',
+									className: 'react-icons',
+								}}
+							>
+								<div>
+									<FiMenu />
+								</div>
+							</IconContext.Provider>
+						</span>
+					</a>
 				</div>
 			</div>
 			<div className="dropdown-menu" id="dropdown-menu" role="menu">

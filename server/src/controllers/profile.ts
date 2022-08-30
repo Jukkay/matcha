@@ -1,10 +1,7 @@
 import { Request, Response } from 'express';
-import { OkPacket, RowDataPacket } from 'mysql';
 import { locateIP, reformatDate } from '../utilities/helpers';
 import { execute } from '../utilities/SQLConnect';
 import { decodeUserFromAccesstoken } from './token';
-import geoip from 'fast-geoip';
-import requestIP from 'request-ip';
 
 const newProfile = async (req: Request, res: Response) => {
 	console.log(req.body);
@@ -86,13 +83,13 @@ const newProfile = async (req: Request, res: Response) => {
 };
 
 const getProfile = async (req: Request, res: Response) => {
+	try {
 	// Get user_id
 	const requester = await decodeUserFromAccesstoken(req);
 	if (!requester)
 		return res.status(401).json({
 			message: 'Unauthorized',
 		});
-	// TODO Check that requester is not blocked by requested user
 
 	const user_id = req.params.id;
 	if (!user_id)
@@ -102,31 +99,47 @@ const getProfile = async (req: Request, res: Response) => {
 	const sql = `
 				SELECT 
 					profiles.*, 
-					likes.like_id,
-					matches.match_id
+					liked.like_id AS liked,
+					likes.like_id AS likes_requester,
+					matches.match_id,
+					blocks.block_id
 				FROM 
-					profiles 
+					profiles
+				LEFT JOIN
+					blocks
+					ON
+						blocks.blocker = profiles.user_id
+					AND
+						blocks.blocked = ?
 				LEFT JOIN
 					likes
 					ON
-					likes.target_id = profiles.user_id
+						likes.user_id = profiles.user_id
 					AND
-					likes.user_id = ?
+						likes.target_id = ?
+				LEFT JOIN
+					likes AS liked
+					ON
+						liked.target_id = profiles.user_id
+					AND
+						liked.user_id = ?
 				LEFT JOIN
 					matches
 					ON
-					(matches.user1 = profiles.user_id
-					AND
-					matches.user2 = ?)
+						(matches.user1 = profiles.user_id
+						AND
+						matches.user2 = ?)
 					OR
-					(matches.user2 = profiles.user_id
-					AND
-					matches.user1 = ?)					
+						(matches.user2 = profiles.user_id
+						AND
+						matches.user1 = ?)					
 				WHERE 
 					profiles.user_id = ?
+					AND
+					blocks.block_id IS NULL
 				`;
-	try {
-		const profile_data = await execute(sql, [requester, requester, requester, user_id]);
+
+		const profile_data = await execute(sql, [requester, requester, requester, requester, requester, user_id]);
 		console.log(profile_data);
 		if (profile_data.length > 0) {
 			// TODO Create notification of profile visit

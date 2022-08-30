@@ -1,10 +1,11 @@
 import { useRouter } from 'next/router';
 import type { NextPage } from 'next';
 import React, { useState, useEffect } from 'react';
-import { Gallery } from '../../components/profile';
+import { Gallery, OnlineIndicator } from '../../components/profile';
 import { useUserContext } from '../../components/UserContext';
 import {
 	ActivePage,
+	BooleanProp,
 	IOtherUserProfile,
 	IProfile,
 	LikeButtonProps,
@@ -14,7 +15,7 @@ import {
 } from '../../types/types';
 import { authAPI } from '../../utilities/api';
 import { FcLike, FcDislike } from 'react-icons/fc';
-import { convertBirthdayToAge } from '../../utilities/helpers';
+import { convertBirthdayToAge, reformatDate } from '../../utilities/helpers';
 import { useNotificationContext } from '../../components/NotificationContext';
 import { useSocketContext } from '../../components/SocketContext';
 
@@ -45,8 +46,11 @@ const LoggedIn = () => {
 		latitude: '',
 		longitude: '',
 		famerating: 0,
-		like_id: 0,
+		liked: 0,
+		likes_requester: 0,
 		match_id: 0,
+		online: false,
+		last_login: ''
 	});
 	const { userData, updateUserData } = useUserContext();
 	const { setActivePage } = useNotificationContext();
@@ -211,6 +215,7 @@ const UnlikeButton = ({ profile, setProfile }: OtherUserViewProps) => {
 		</button>
 	);
 };
+
 const ViewMode = ({ profile, setProfile }: OtherUserViewProps) => {
 	const [notification, setNotification] = useState(false)
 
@@ -221,6 +226,7 @@ const ViewMode = ({ profile, setProfile }: OtherUserViewProps) => {
 		<div>
 			<section className="section">
 				<Gallery user_id={profile.user_id} />
+				<OnlineIndicator onlineStatus={profile.online}/>
 				<div className="block">Famerating: {profile.famerating}</div>
 				<div className="block">Name: {profile.name}</div>
 				<div className="block">
@@ -252,16 +258,24 @@ const ViewMode = ({ profile, setProfile }: OtherUserViewProps) => {
 				<div className="block">Minimum age: {profile.min_age}</div>
 				<div className="block">Maximum age: {profile.max_age}</div>
 				<div className="block">User ID: {profile.user_id}</div>
-				<div className="block">Like ID: {profile.like_id}</div>
+				<div className="block">Like ID: {profile.liked}</div>
+				<div className="block">Like ID: {profile.likes_requester}</div>
 				<div className="block">Match ID: {profile.match_id}</div>
+				<div className="block">Online: {profile.online}</div>
+				<div className="block">Last login: {reformatDate(profile.last_login)}</div>
 				{profile.match_id && notification ? (
 					<div className="notification is-primary">
 						<button className="delete" onClick={closeNotification}></button>
 						<h3 className="title is-3">It's a match!</h3>
 					</div>
 				) : null}
+				{profile.likes_requester && !profile.match_id ? (
+					<div className="notification is-primary is-light">
+						<p className="is-3">{`${profile.name} likes you. Like them back to match them!`}</p>
+					</div>
+				) : null}
 				<div className="block buttons">
-					{profile.like_id ? (
+					{profile.liked ? (
 						<UnlikeButton
 							profile={profile}
 							setProfile={setProfile}

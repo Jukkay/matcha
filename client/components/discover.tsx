@@ -1,9 +1,10 @@
 import type { NextPage } from 'next';
 import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
-import { GenderSelector, SearchAgeRange } from './profile';
+import { GenderSelector, OnlineIndicator, SearchAgeRange } from './profile';
 import { useUserContext } from './UserContext';
 import {
+	AgeRangeProps,
 	IProfileCard,
 	OtherUserViewProps,
 	ResultsProps,
@@ -32,6 +33,8 @@ export const Search = ({
 			looking: searchParams.looking,
 			min_age: searchParams.min_age,
 			max_age: searchParams.max_age,
+			min_famerating: searchParams.min_famerating,
+			max_famerating: searchParams.max_famerating,
 		};
 		try {
 			let response = await authAPI.post(`/search`, {
@@ -78,6 +81,14 @@ export const Search = ({
 					searchParams={searchParams}
 					setSearchParams={setSearchParams}
 				/>
+				<FameratingRange
+					searchParams={searchParams}
+					setSearchParams={setSearchParams}
+				/>
+				<DistanceRange
+					searchParams={searchParams}
+					setSearchParams={setSearchParams}
+				/>
 				<GenderSelector
 					label="Gender *"
 					id="looking"
@@ -106,6 +117,92 @@ export const Search = ({
 	);
 };
 
+const FameratingRange = ({ searchParams, setSearchParams }: AgeRangeProps) => {
+	return (
+		<div className="block">
+			<label htmlFor="min_age" className="label">
+				Famerating range *
+			</label>
+
+			<div className="field is-horizontal">
+				<div className="field-label is-normal">
+					<label htmlFor="min_famerating" className="label">
+						Min
+					</label>
+				</div>
+				<div className="field-body">
+					<div className="field">
+						<input
+							type="number"
+							id="min_famerating"
+							className="input is-primary"
+							min="1"
+							max={searchParams.max_famerating}
+							value={searchParams.min_famerating}
+							onChange={(event) =>
+								setSearchParams({
+									...searchParams,
+									min_famerating: parseInt(
+										event.target.value
+									),
+								})
+							}
+						/>
+					</div>
+					<div className="field-label is-normal">
+						<label htmlFor="max_famerating" className="label">
+							Max
+						</label>
+					</div>
+					<div className="field">
+						<input
+							type="number"
+							id="max_famerating"
+							className="input is-primary"
+							min={searchParams.min_famerating}
+							max="1000"
+							value={searchParams.max_famerating}
+							onChange={(event) =>
+								setSearchParams({
+									...searchParams,
+									max_famerating: parseInt(
+										event.target.value
+									),
+								})
+							}
+						/>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+};
+
+const DistanceRange = ({ searchParams, setSearchParams }: AgeRangeProps) => {
+	return (
+		<div className="block">
+			<label htmlFor="max_distance" className="label my-3">
+				Maximum distance (km)
+			</label>
+			<div className="field">
+				<input
+					type="number"
+					id="max_distance"
+					className="input is-primary"
+					min={1}
+					value={searchParams.max_distance}
+					onChange={(event) =>
+						setSearchParams({
+							...searchParams,
+							max_distance: parseInt(event.target.value),
+						})
+					}
+				/>
+			</div>
+		</div>
+	);
+};
+
 export const Results = ({ results }: ResultsProps) => {
 	return results.length > 0 ? (
 		<section className="section has-text-centered">
@@ -121,6 +218,7 @@ export const Results = ({ results }: ResultsProps) => {
 					distance={result.distance}
 					famerating={result.famerating}
 					interests={result.interests}
+					online={result.online}
 				/>
 			))}
 		</section>
@@ -141,6 +239,7 @@ export const SearchResultItem = ({
 	famerating,
 	distance,
 	interests,
+	online,
 }: IProfileCard) => {
 	return (
 		<Link href={`/profile/${user_id}`}>
@@ -155,6 +254,7 @@ export const SearchResultItem = ({
 							/>
 						</figure>
 					</div>
+					<OnlineIndicator onlineStatus={online}/>
 					<div className="block">Name: {name}</div>
 					<div className="block">
 						Age: {birthday && convertBirthdayToAge(birthday)}

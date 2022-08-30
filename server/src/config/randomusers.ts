@@ -127,6 +127,10 @@ const createProfile = async (data: any) => {
 			'INSERT IGNORE INTO photos(user_id, filename) VALUES (?, ?)',
 			[user_id, profile_image]
 		);
+		await SQLConnect.execute(
+			'UPDATE profiles SET online=?, last_login=now() WHERE user_id = ?',
+			[(Math.random() < 0.5), user_id]
+		);
 	}
 	console.log('Profiles created');
 };

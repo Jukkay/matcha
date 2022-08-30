@@ -73,7 +73,7 @@ V Browsing
        V Common tags
 Advanced search
    V Age gap
-    Fame rating gap
+   V Fame rating gap
     Location
     Interest tag
         One or more
@@ -81,36 +81,36 @@ Advanced search
     Filtering (can be same as the search?)
 Profile of other users
    V Visits to profile must be stored to user's visit history
-    Notification of visit to profile owner
+   V Notification of visit to profile owner
    V Show
        V all profile information
        V Fame rating
         Online/Offline
         Last login date and time
         If likes you
-    Like
+    V Like
        V Must have at least one picture to like someone
        V If both like each other they're matched
-            Allows chatting
-    Unlike
-    Report fake account
-    Block user
-        Hides blocked user from search
-        Disables chat
-        Removes notifications
-Chat
-    Available when users like each other
-    Notification for new message must be available on any page
-Notifications
-    Likes
-    Profile views
-    New messages
-    Liked user liked back
-    Connected user unliked
-    Notifications visible on any page
+       V Allows chatting
+    V Unlike
+    V Report fake account
+    V Block user
+       V Hides blocked user from search
+       V Disables chat
+       V Removes notifications
+V Chat
+   V Available when users like each other
+   V Notification for new message must be available on any page
+V Notifications
+    V Likes
+    V Profile views
+    V New messages
+    V Liked user liked back
+    V Connected user unliked
+    V Notifications visible on any page
 V Database
-    relational or graph
-    Can't be noSQL
+   V relational or graph
+   V Can't be noSQL
     Build your own ORM
 Bonuses
     Facebook/google login/signup
@@ -247,12 +247,29 @@ V Add notifications to Connected user unliked
 V Make chat window scrollable and automatically go to bottom
 V Put logout inside dropdown menu if allowed to clean up navbar
 V Make control panel 
-Add dropdown arrow to match items
-    Make block user functionality
-    Make report user functionality
-Add famerating range selectors to search
-Add distance range selectors to search
+V Add dropdown arrow to match items
+    V Make block user functionality
+    V Make report user functionality
+V Add db tables for reports and blocks
+V Make endpoints for block and report
+V Remove messages when match is removed
+V Prevent blocked users from showing in searches
+V Block blocked user from accessing blockers profile
+V Add famerating range selectors to search
+V Add famerating to sql search
+V Add distance range selectors to search
+
+V Add last login to profile page
+V Add report menu to profile page
+V Add "they like you" indicator to profile page
+V Add online/offline indicator to profile page
+V Add online/offline indicator to chat
+
 Add location selectors to search
+Add tag selector to search
+Hide most selectors under "advanced search" button
+Add delete profile functionality
+Add delete account functionality
 Fine tune default search result sorting so it prioritises most people with best famerating and most common tags.
 
 # Later

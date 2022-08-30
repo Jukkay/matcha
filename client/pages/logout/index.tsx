@@ -4,9 +4,11 @@ import { useState, useEffect, useContext } from "react";
 import { useUserContext} from "../../components/UserContext";
 
 const Logout: NextPage = (props) => {
-	const {updateAccessToken, updateRefreshToken, updateUserData, refreshToken} = useUserContext()
+	const {updateAccessToken, updateRefreshToken, userData, updateUserData, refreshToken} = useUserContext()
 	useEffect(() => {
-		API.post('/logout/', {refreshToken: refreshToken }).then(res => {
+		API.post('/logout/', {
+			user_id: userData.user_id,
+			refreshToken: refreshToken }).then(res => {
 			if (res.status === 200) {
 				updateAccessToken('')
 				updateRefreshToken('')

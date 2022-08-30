@@ -45,6 +45,9 @@ const LoggedIn = () => {
 		looking: profile.looking,
 		min_age: profile.min_age || (convertBirthdayToAge(profile.birthday) - 5),
 		max_age: profile.max_age || (convertBirthdayToAge(profile.birthday) + 5),
+		min_famerating: 1,
+		max_famerating: 1000,
+		max_distance: 1000
 	});
 	const [results, setResults] = useState<IResultsProfile[]>([]);
 	const router = useRouter();
@@ -78,6 +81,12 @@ const LoggedIn = () => {
 			setResults(lowFameratingFirst(results));
 	}, [sort]);
 
+	useEffect(() => {
+		if (searchParams.max_distance < 1) return;
+		const filteredByMaxDistance = [...results].filter((item) => item.distance <= searchParams.max_distance * 1000);
+		setResults(filteredByMaxDistance);
+	}, [searchParams.max_distance]);
+
 	return (
 		<>
 			<Search
@@ -98,7 +107,7 @@ const Discover: NextPage = () => {
 	const { accessToken } = useUserContext();
 	return (
 		<div className="columns is-centered">
-			<div className="column is-half">
+			<div className="column is-three-quarters mt-6 pt-6">
 				{accessToken ? <LoggedIn /> : <NotLoggedIn />}
 			</div>
 		</div>

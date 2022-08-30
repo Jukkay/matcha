@@ -12,7 +12,7 @@ import {
 } from './controllers/mailer';
 import * as SQLConnect from './utilities/SQLConnect';
 import { getURL } from './utilities/getURL';
-import { login, logout } from './controllers/user';
+import { blockUser, login, logout, reportUser } from './controllers/user';
 import likeRouter from './routes/like';
 import checkJWT from './middleware/checkJWT';
 import { searchProfiles } from './controllers/search';
@@ -166,3 +166,9 @@ app.patch('/notifications/', checkJWT, markNotificationsRead);
 
 // Get profiles user likes
 app.get('/likedprofiles/:id', checkJWT, getProfilesUserLikes);
+
+// Report user
+app.post('/reportuser', checkJWT, reportUser);
+
+// Block user
+app.post('/blockuser', checkJWT, blockUser);

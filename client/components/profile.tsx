@@ -20,6 +20,7 @@ import {
 	UserImagesProps,
 	AgeRangeProps,
 	IProfileCard,
+	BooleanProp,
 } from '../types/types';
 import { Country, City } from 'country-state-city';
 import { ErrorMessage } from './form';
@@ -126,6 +127,7 @@ export const VisitorLog = ({user_id}: any) => {
 					famerating={result.famerating}
 					distance={result.distance}
 					interests={result.interests}
+					online={result.online}
 				/>
 			))}
 				</div>
@@ -1243,3 +1245,7 @@ export const Thumbnails = ({ preview, setPreview }: IThumbnails) => {
 		</div>
 	) : null;
 };
+
+export const OnlineIndicator = ({onlineStatus}: BooleanProp) => {
+	return onlineStatus ? (<span className="tag is-primary">Online</span>) : (<span className="tag is-danger">Offline</span>)
+}
