@@ -18,9 +18,9 @@ import {
 	FileInputProps,
 	GalleryProps,
 	UserImagesProps,
-	AgeRangeProps,
 	IProfileCard,
 	BooleanProp,
+	SearchParamsProps,
 } from '../types/types';
 import { Country, City } from 'country-state-city';
 import { ErrorMessage } from './form';
@@ -68,14 +68,14 @@ export const ProfileView = ({ profile, setEditMode }: ProfileViewProps) => {
 				</div>
 				<div className="block">
 					Interests:{' '}
-					{profile.interests
-						? Object.entries(profile.interests).map(
+					{profile.interests.length > 0
+						? profile.interests.map(
 								(interest, index) => (
 									<span
 										className="tag is-success is-medium is-rounded is-clickable mx-2 my-1"
 										key={index}
 									>
-										{interest[1] as string}
+										{interest}
 									</span>
 								)
 						  )
@@ -160,7 +160,7 @@ export const CreateProfile = ({
 		setQuery(event.target.value);
 	};
 	useEffect(() => {
-		setInterests(Object.values(profile.interests));
+		setInterests(profile.interests);
 	}, []);
 
 	// Live query interest from interest list
@@ -204,7 +204,7 @@ export const CreateProfile = ({
 			}
 			// Add interests object to profile
 			let payload = profile;
-			payload.interests = Object.assign({}, interests);
+			payload.interests = interests
 			// upload photos
 			const photoUpload = await uploadPhotos();
 			if (!photoUpload) {
@@ -391,7 +391,7 @@ export const UpdateProfile = ({
 	};
 
 	useEffect(() => {
-		setInterests(Object.values(profile.interests));
+		setInterests(profile.interests);
 		setSuccess(false);
 	}, []);
 
@@ -444,7 +444,7 @@ export const UpdateProfile = ({
 			}
 			// Add interests object to profile
 			let payload = profile;
-			payload.interests = Object.assign({}, interests);
+			payload.interests = interests
 			// Add other information user can't change
 			payload.birthday = userData.birthday;
 			payload.name = userData.name;
@@ -896,7 +896,7 @@ export const AgeRange = ({ profile, setProfile }: ISelectorProfile) => {
 export const SearchAgeRange = ({
 	searchParams,
 	setSearchParams,
-}: AgeRangeProps) => {
+}: SearchParamsProps) => {
 	return (
 		<div className="block">
 			<label htmlFor="min_age" className="label">

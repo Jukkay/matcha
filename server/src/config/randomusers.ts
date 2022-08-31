@@ -91,10 +91,9 @@ const createProfile = async (data: any) => {
 	// Create profiles
 	let profile_image = '';
 	for (let key in data) {
-		let interests: { [k: string]: string } = {};
+		let interests: string[] = [];
 		for (let i = 0; i < 5; i++) {
-			interests[i as unknown as string] =
-				dummyData[Math.floor(Math.random() * dummyData.length)];
+			interests.push(dummyData[Math.floor(Math.random() * dummyData.length)]);
 		}
 		profile_image =
 			data[key].gender == 'male'

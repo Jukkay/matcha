@@ -43,11 +43,14 @@ const LoggedIn = () => {
 	const [searchParams, setSearchParams] = useState({
 		gender: profile.gender,
 		looking: profile.looking,
+		country: '',
+		city: '',
 		min_age: profile.min_age || (convertBirthdayToAge(profile.birthday) - 5),
 		max_age: profile.max_age || (convertBirthdayToAge(profile.birthday) + 5),
 		min_famerating: 1,
 		max_famerating: 1000,
-		max_distance: 1000
+		max_distance: 1000,
+		interests: []
 	});
 	const [results, setResults] = useState<IResultsProfile[]>([]);
 	const router = useRouter();

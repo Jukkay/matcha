@@ -48,7 +48,7 @@ services:
       - 4000:4000
 
   mariadb:
-    image: 'mariadb:10.6'
+    image: 'mariadb:10.9'
     container_name: 'matcha_db'
     working_dir: /server
     volumes:

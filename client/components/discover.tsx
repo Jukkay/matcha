@@ -1,13 +1,12 @@
 import type { NextPage } from 'next';
 import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
-import { GenderSelector, OnlineIndicator, SearchAgeRange } from './profile';
+import { GenderSelector, OnlineIndicator, SearchAgeRange, SearchResult } from './profile';
 import { useUserContext } from './UserContext';
 import {
-	AgeRangeProps,
 	IProfileCard,
-	OtherUserViewProps,
 	ResultsProps,
+	SearchParamsProps,
 	SearchProps,
 	SortProps,
 	SortType,
@@ -20,6 +19,9 @@ import {
 	convertBirthdayToAge,
 } from '../utilities/helpers';
 import { nearFirst } from '../utilities/sort';
+import { Country, City } from 'country-state-city';
+import { ErrorMessage } from './form';
+import { dummyData } from '../pages/profile/data';
 
 export const Search = ({
 	searchParams,
@@ -27,6 +29,8 @@ export const Search = ({
 	setResults,
 }: SearchProps) => {
 	const { profile } = useUserContext();
+	const [interests, setInterests] = useState<string[]>([]);
+
 	const searchDatabase = async () => {
 		const query = {
 			gender: searchParams.gender,
@@ -35,10 +39,13 @@ export const Search = ({
 			max_age: searchParams.max_age,
 			min_famerating: searchParams.min_famerating,
 			max_famerating: searchParams.max_famerating,
+			country: searchParams.country,
+			city: searchParams.city,
+			interests: JSON.stringify(interests)
 		};
 		try {
 			let response = await authAPI.post(`/search`, {
-				search: query,
+				data: query,
 			});
 			if (response?.data?.results) {
 				// Calculate distances
@@ -60,6 +67,7 @@ export const Search = ({
 				);
 				setResults(sortedResults);
 			}
+			else setResults([])
 		} catch (err) {
 			console.error(err);
 		}
@@ -78,14 +86,6 @@ export const Search = ({
 		<div>
 			<form onSubmit={handleSubmit}>
 				<SearchAgeRange
-					searchParams={searchParams}
-					setSearchParams={setSearchParams}
-				/>
-				<FameratingRange
-					searchParams={searchParams}
-					setSearchParams={setSearchParams}
-				/>
-				<DistanceRange
 					searchParams={searchParams}
 					setSearchParams={setSearchParams}
 				/>
@@ -109,6 +109,27 @@ export const Search = ({
 						'Other',
 					]}
 				/>
+				<CountrySearchSelector
+					searchParams={searchParams}
+					setSearchParams={setSearchParams}
+				/>
+				<CitySearchSelector
+					searchParams={searchParams}
+					setSearchParams={setSearchParams}
+				/>
+				<FameratingRange
+					searchParams={searchParams}
+					setSearchParams={setSearchParams}
+				/>
+				<DistanceRange
+					searchParams={searchParams}
+					setSearchParams={setSearchParams}
+				/>
+				<Interests
+					interests={interests}
+					setInterests={setInterests}
+				/>
+
 				<button type="submit" className="button is-primary">
 					Search
 				</button>
@@ -116,12 +137,65 @@ export const Search = ({
 		</div>
 	);
 };
+const Interests = ({
+	interests,
+	setInterests
+}: any) => {
+	const [tagError, setTagError] = useState(false);
+	const [query, setQuery] = useState('');
+	const [result, setResult] = useState<string[]>([]);
 
-const FameratingRange = ({ searchParams, setSearchParams }: AgeRangeProps) => {
+	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		setQuery(event.target.value);
+	};
+
+	// Live query interest from interest list
+	useEffect(() => {
+		if (!query) {
+			setResult([]);
+			return;
+		}
+		const results = dummyData.filter((interest) =>
+			interest.toLowerCase().includes(query.toLowerCase())
+		);
+		setResult(results);
+	}, [query]);
+
+	return (
+				<div className="block">
+				<label htmlFor="interests" className="label my-3">
+					Interests (choose 1 to 5) *
+				</label>
+				<input
+					className="input my-3"
+					type="text"
+					id="interests"
+					placeholder="Search for interests"
+					onChange={onChange}
+				></input>
+				<ErrorMessage
+					errorMessage="Maximum 5 interests. Please unselect something to select something new."
+					error={tagError}
+				/>
+				<SearchResult
+					result={result}
+					setResult={setResult}
+					setTagError={setTagError}
+					interests={interests}
+					setInterests={setInterests}
+					query={query}
+				/>
+			</div>
+	)
+}
+const FameratingRange = ({
+	searchParams,
+	setSearchParams,
+}: SearchParamsProps) => {
 	return (
 		<div className="block">
 			<label htmlFor="min_age" className="label">
-				Famerating range *
+				Famerating range
 			</label>
 
 			<div className="field is-horizontal">
@@ -178,7 +252,10 @@ const FameratingRange = ({ searchParams, setSearchParams }: AgeRangeProps) => {
 	);
 };
 
-const DistanceRange = ({ searchParams, setSearchParams }: AgeRangeProps) => {
+const DistanceRange = ({
+	searchParams,
+	setSearchParams,
+}: SearchParamsProps) => {
 	return (
 		<div className="block">
 			<label htmlFor="max_distance" className="label my-3">
@@ -254,7 +331,7 @@ export const SearchResultItem = ({
 							/>
 						</figure>
 					</div>
-					<OnlineIndicator onlineStatus={online}/>
+					<OnlineIndicator onlineStatus={online} />
 					<div className="block">Name: {name}</div>
 					<div className="block">
 						Age: {birthday && convertBirthdayToAge(birthday)}
@@ -318,6 +395,106 @@ export const SortSelector = ({ sort, setSort }: SortProps) => {
 					</option>
 					<option value={SortType.REVERSE_FAMERATING}>
 						Famerating low to high
+					</option>
+				</select>
+			</div>
+		</div>
+	);
+};
+
+export const CountrySearchSelector = ({
+	searchParams,
+	setSearchParams,
+}: SearchParamsProps) => {
+	return (
+		<div className="block">
+			<label htmlFor="country" className="label my-3">
+				Country
+			</label>
+			<div className="select is-primary">
+				<select
+					id="country"
+					name="country"
+					value={searchParams.country}
+					onChange={(event) =>
+						setSearchParams({
+							...searchParams,
+							country: event.target.value,
+						})
+					}
+				>
+					<option value={''} disabled>
+						Choose a country
+					</option>
+					{Country.getAllCountries().map((country, index) => (
+						<option
+							key={`${country.name}${index}`}
+							value={country.isoCode}
+						>
+							{country.name}
+						</option>
+					))}
+				</select>
+			</div>
+		</div>
+	);
+};
+
+export const CitySearchSelector = ({
+	searchParams,
+	setSearchParams,
+}: SearchParamsProps) => {
+	return searchParams.country ? (
+		<div className="block">
+			<label htmlFor="city" className="label my-3">
+				City
+			</label>
+			<div className="select is-primary">
+				<select
+					id="city"
+					name="city"
+					value={searchParams.city}
+					onChange={(event) =>
+						setSearchParams({
+							...searchParams,
+							city: event.target.value,
+						})
+					}
+				>
+					<option value={''} disabled>
+						Choose a city
+					</option>
+					{City.getCitiesOfCountry(searchParams.country)?.map(
+						(city, index) => (
+							<option
+								key={`${city.name}${index}`}
+								value={city.name}
+							>
+								{city.name}
+							</option>
+						)
+					)}
+				</select>
+			</div>
+		</div>
+	) : (
+		<div className="block">
+			<label htmlFor="county" className="label my-3">
+				City *
+			</label>
+			<div className="select is-primary disabled">
+				<select
+					id="city"
+					value={searchParams?.city}
+					onChange={(event) =>
+						setSearchParams({
+							...searchParams,
+							city: event.target.value,
+						})
+					}
+				>
+					<option value={''} disabled>
+						Choose a country first
 					</option>
 				</select>
 			</div>

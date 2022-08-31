@@ -39,7 +39,7 @@ const LoggedIn = () => {
 		looking: '',
 		min_age: 0,
 		max_age: 0,
-		interests: {},
+		interests: [],
 		introduction: '',
 		country: '',
 		city: '',
@@ -240,14 +240,14 @@ const ViewMode = ({ profile, setProfile }: OtherUserViewProps) => {
 				</div>
 				<div className="block">
 					Interests:{' '}
-					{profile.interests
-						? Object.entries(profile.interests).map(
+					{profile.interests.length > 0
+						? profile.interests.map(
 								(interest, index) => (
 									<span
 										className="tag is-success is-medium is-rounded is-clickable mx-2 my-1"
 										key={index}
 									>
-										{interest[1] as string}
+										{interest}
 									</span>
 								)
 						  )

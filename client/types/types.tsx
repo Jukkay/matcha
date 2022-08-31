@@ -100,7 +100,7 @@ export interface IProfile {
   min_age: number,
   max_age: number,
   introduction: string;
-  interests: {};
+  interests: string[];
   country: string;
   city: string;
   latitude?: string;
@@ -118,7 +118,7 @@ export interface IOtherUserProfile {
   min_age: number,
   max_age: number,
   introduction: string;
-  interests: {};
+  interests: string[];
   country: string;
   city: string;
   latitude?: string;
@@ -223,14 +223,17 @@ export interface ResultsProps {
 export interface ISearchParams {
   gender: string,
   looking: string,
+  country: string,
+  city: string,
   min_age: number,
   max_age: number
   min_famerating: number,
   max_famerating: number,
-  max_distance: number
+  max_distance: number,
+  interests: string[]
 }
 
-export interface AgeRangeProps {
+export interface SearchParamsProps {
   searchParams: ISearchParams
   setSearchParams: SetStateAction<any>
 }

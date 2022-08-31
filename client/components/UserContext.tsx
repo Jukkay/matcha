@@ -47,7 +47,7 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
 		looking: '',
 		min_age: 0,
 		max_age: 0,
-		interests: {},
+		interests: [],
 		introduction: '',
 		country: '',
 		city: '',
