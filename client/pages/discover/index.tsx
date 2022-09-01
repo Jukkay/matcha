@@ -53,6 +53,8 @@ const LoggedIn = () => {
 		interests: []
 	});
 	const [results, setResults] = useState<IResultsProfile[]>([]);
+	const [filteredResults, setFilteredResults] = useState<IResultsProfile[]>([]);
+	
 	const router = useRouter();
 	if (!userData.profile_exists) router.replace('/profile');
 
@@ -96,11 +98,15 @@ const LoggedIn = () => {
 				searchParams={searchParams}
 				setSearchParams={setSearchParams}
 				setResults={setResults}
+				results={results}
+				filteredResults={filteredResults}
+				setFilteredResults={setFilteredResults}
 			/>
 			<SortSelector sort={sort} setSort={setSort} />
 			<Results
 				results={results as IResultsProfile[]}
 				setResults={setResults}
+				filteredResults={filteredResults}
 			/>
 		</>
 	);

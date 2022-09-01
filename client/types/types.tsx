@@ -213,11 +213,21 @@ export interface SearchProps {
   searchParams: ISearchParams
   setSearchParams: SetStateAction<any>
   setResults: SetStateAction<any>
+  results: IResultsProfile[]
+  filteredResults: IResultsProfile[]
+  setFilteredResults: SetStateAction<any>
 }
 
+export interface AdvancedSearchProps {
+  searchParams: ISearchParams
+  setSearchParams: SetStateAction<any>
+  interests: string[]
+  setInterests: SetStateAction<any>
+}
 export interface ResultsProps {
   results: IResultsProfile[]
   setResults: SetStateAction<any>
+  filteredResults: IResultsProfile[]
 }
 
 export interface ISearchParams {

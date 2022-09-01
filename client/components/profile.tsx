@@ -1,8 +1,4 @@
-import React, {
-	useState,
-	PointerEvent,
-	useEffect,
-} from 'react';
+import React, { useState, PointerEvent, useEffect } from 'react';
 import { FaUpload } from 'react-icons/fa';
 
 import {
@@ -53,7 +49,7 @@ export const ProfileView = ({ profile, setEditMode }: ProfileViewProps) => {
 	return (
 		<div>
 			<section className="section">
-			<h3 className="title is-3">Your profile</h3>
+				<h3 className="title is-3">Your profile</h3>
 				<Gallery user_id={userData.user_id} />
 				<div className="block">Famerating: {profile.famerating}</div>
 				<div className="block">Name: {profile.name}</div>
@@ -69,16 +65,14 @@ export const ProfileView = ({ profile, setEditMode }: ProfileViewProps) => {
 				<div className="block">
 					Interests:{' '}
 					{profile.interests.length > 0
-						? profile.interests.map(
-								(interest, index) => (
-									<span
-										className="tag is-success is-medium is-rounded is-clickable mx-2 my-1"
-										key={index}
-									>
-										{interest}
-									</span>
-								)
-						  )
+						? profile.interests.map((interest, index) => (
+								<span
+									className="tag is-success is-medium is-rounded is-clickable mx-2 my-1"
+									key={index}
+								>
+									{interest}
+								</span>
+						  ))
 						: null}
 				</div>
 				<div className="block">Gender: {profile.gender}</div>
@@ -90,60 +84,57 @@ export const ProfileView = ({ profile, setEditMode }: ProfileViewProps) => {
 				<div className="block">Logitude: {profile.longitude}</div>
 				<EditButton setEditMode={setEditMode} />
 			</section>
-			<VisitorLog user_id={userData.user_id}/>
+			<VisitorLog user_id={userData.user_id} />
 		</div>
 	);
 };
 
-export const VisitorLog = ({user_id}: any) => {
-	const [pageVisited, setPageVisited] = useState(false)
-	const [log, setLog] = useState([])
+export const VisitorLog = ({ user_id }: any) => {
+	const [pageVisited, setPageVisited] = useState(false);
+	const [log, setLog] = useState([]);
 	useEffect(() => {
 		const getVisitorLog = async () => {
 			let response = await authAPI.get(`/log/${user_id}`);
 			if (response.status === 200) {
-				setPageVisited(true)
-				setLog(response.data.log)
-
-
+				setPageVisited(true);
+				setLog(response.data.log);
 			}
-		}
+		};
 		getVisitorLog();
 	}, []);
 
 	return pageVisited && log ? (
 		<section className="section">
 			<h3 className="title is-3">Visitor log</h3>
-				<div className="block">
+			<div className="block">
 				{log.map((result: IProfileCard, index) => (
-				<SearchResultItem
-					key={index}
-					user_id={result.user_id}
-					profile_image={result.profile_image}
-					name={result.name}
-					birthday={result.birthday}
-					city={result.city}
-					country={result.country}
-					famerating={result.famerating}
-					distance={result.distance}
-					interests={result.interests}
-					online={result.online}
-				/>
-			))}
-				</div>
-	
-			</section>
+					<SearchResultItem
+						key={index}
+						user_id={result.user_id}
+						profile_image={result.profile_image}
+						name={result.name}
+						birthday={result.birthday}
+						city={result.city}
+						country={result.country}
+						famerating={result.famerating}
+						distance={result.distance}
+						interests={result.interests}
+						online={result.online}
+					/>
+				))}
+			</div>
+		</section>
 	) : (
-	<section className="section">
-	<h3 className="title is-3">Visitor log</h3>
-		<div className="block">No visits yet</div>
-
-	</section>)
-}
+		<section className="section">
+			<h3 className="title is-3">Visitor log</h3>
+			<div className="block">No visits yet</div>
+		</section>
+	);
+};
 export const CreateProfile = ({
 	setEditMode,
 	profile,
-	setProfile
+	setProfile,
 }: EditProps) => {
 	const [tagError, setTagError] = useState(false);
 	const [success, setSuccess] = useState(false);
@@ -204,7 +195,7 @@ export const CreateProfile = ({
 			}
 			// Add interests object to profile
 			let payload = profile;
-			payload.interests = interests
+			payload.interests = interests;
 			// upload photos
 			const photoUpload = await uploadPhotos();
 			if (!photoUpload) {
@@ -224,7 +215,7 @@ export const CreateProfile = ({
 				setTimeout(() => {
 					setSuccess(false);
 					setEditMode(false);
-					updateUserData({...userData, profile_exists: true});
+					updateUserData({ ...userData, profile_exists: true });
 					sessionStorage.setItem('profile', JSON.stringify(payload));
 				}, 2000);
 			}
@@ -324,10 +315,7 @@ export const CreateProfile = ({
 							query={query}
 						/>
 					</div>
-					<FileInput
-						files={files}
-						setFiles={setFiles}
-					/>
+					<FileInput files={files} setFiles={setFiles} />
 					<ErrorMessage
 						errorMessage="You must upload at least one picture."
 						error={fileError}
@@ -376,6 +364,7 @@ export const UpdateProfile = ({
 }: EditProps) => {
 	const [tagError, setTagError] = useState(false);
 	const [success, setSuccess] = useState(false);
+	const [deleted, setDeleted] = useState(false);
 	const [interestsError, setInterestsError] = useState(false);
 	const [coordinateError, setCoordinateError] = useState(false);
 	const [imageError, setImageError] = useState(false);
@@ -425,11 +414,17 @@ export const UpdateProfile = ({
 	const uploadProfile = async () => {
 		try {
 			if (profile.latitude && profile.longitude) {
-				const latitudeTest = /^(-?[1-8]?\d(?:\.\d{1,18})?|90(?:\.0{1,18})?)$/.test(profile.latitude)
-				const longitudeTest = /^(-?(?:1[0-7]|[1-9])?\d(?:\.\d{1,18})?|180(?:\.0{1,18})?)$/.test(profile.longitude)
+				const latitudeTest =
+					/^(-?[1-8]?\d(?:\.\d{1,18})?|90(?:\.0{1,18})?)$/.test(
+						profile.latitude
+					);
+				const longitudeTest =
+					/^(-?(?:1[0-7]|[1-9])?\d(?:\.\d{1,18})?|180(?:\.0{1,18})?)$/.test(
+						profile.longitude
+					);
 				if (!latitudeTest || !longitudeTest) {
 					setCoordinateError(true);
-					return
+					return;
 				}
 			}
 			// Check interests amount
@@ -444,7 +439,7 @@ export const UpdateProfile = ({
 			}
 			// Add interests object to profile
 			let payload = profile;
-			payload.interests = interests
+			payload.interests = interests;
 			// Add other information user can't change
 			payload.birthday = userData.birthday;
 			payload.name = userData.name;
@@ -462,12 +457,31 @@ export const UpdateProfile = ({
 			console.error(err);
 		}
 	};
-
+	const deleteProfile = async () => {
+		const response = await authAPI.delete(`/profile/${profile.user_id}`);
+			if (response.status === 200) {
+				setDeleted(true);
+				setTimeout(() => {
+					updateUserData({...userData, profile_exists: false })
+					setDeleted(false);
+					setEditMode(false);
+					sessionStorage.removeItem('profile');
+				}, 2000);
+			}
+	}
 	const handleSubmit = (event: React.FormEvent) => {
 		event.preventDefault();
 		uploadProfile();
 	};
-	return success ? (
+	return deleted ? (
+		<section className="section">
+			<div className="box has-text-centered">
+				<section className="section">
+					<h3 className="title is-3">Profile deleted successfully</h3>
+				</section>
+			</div>
+		</section>
+	) : success ? (
 		<section className="section">
 			<div className="box has-text-centered">
 				<section className="section">
@@ -487,7 +501,7 @@ export const UpdateProfile = ({
 						setProfile={setProfile}
 					/>
 					<CitySelector profile={profile} setProfile={setProfile} />
-			
+
 					{/* Gender */}
 					<GenderSelector
 						label="Gender *"
@@ -560,10 +574,7 @@ export const UpdateProfile = ({
 						errorMessage="You must have at least one picture."
 						error={imageError}
 					/>
-					<FileInput
-						files={files}
-						setFiles={setFiles}
-					/>
+					<FileInput files={files} setFiles={setFiles} />
 
 					<h3 className="title is-3 mt-6">
 						What kind of partner are you looking for?
@@ -593,50 +604,78 @@ export const UpdateProfile = ({
 					{/* Age range */}
 					<AgeRange profile={profile} setProfile={setProfile} />
 					{/* User coordinate input */}
-					<GPSCoordinateInput profile={profile} setProfile={setProfile}/>
+					<GPSCoordinateInput
+						profile={profile}
+						setProfile={setProfile}
+					/>
 					<ErrorMessage
 						errorMessage="Invalid coordinates."
 						error={coordinateError}
 					/>
-					<button type="submit" className="button is-primary">
-						Update profile
-					</button>
-					<button
-						type="submit"
-						className="button is-primary"
-						onClick={() => setEditMode(false)}
-					>
-						Cancel
-					</button>
+					<div className="block buttons">
+						<button type="submit" className="button is-primary">
+							Update profile
+						</button>
+						<button
+							className="button is-primary"
+							onClick={() => setEditMode(false)}
+						>
+							Cancel
+						</button>
+					</div>
 				</section>
 			</form>
+
+			<section className="section">
+				<p className="block">
+					Caution: Removing profile is irreversible. If you remove
+					your profile, you won't be able to use the site normally
+					anymore unless you create a new profile. This action will
+					not remove your whole account. If you wish to remove your
+					account too, you can do that in User settings.
+				</p>
+				<button className="button is-danger" onClick={deleteProfile}>
+					Remove profile
+				</button>
+			</section>
 		</div>
 	);
 };
 
-export const GPSCoordinateInput = ({profile, setProfile}: any) => {
-
+export const GPSCoordinateInput = ({ profile, setProfile }: any) => {
 	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setProfile({ ...profile, [event.target.name]: event.target.value });
-	  };
+	};
 	return (
 		<div className="block">
 			<label htmlFor="GPS" className="label my-3">
 				Manually set GPS location
 			</label>
 			<div className="block">
-			<label htmlFor="latitude" className="label my-3">
-				Latitude:
-			</label>
-				<input type="text" className="input is-primary" name="latitude" onChange={onChange} value={profile.latitude}></input>
+				<label htmlFor="latitude" className="label my-3">
+					Latitude:
+				</label>
+				<input
+					type="text"
+					className="input is-primary"
+					name="latitude"
+					onChange={onChange}
+					value={profile.latitude}
+				></input>
 				<label htmlFor="longitude" className="label my-3">
-				Longitude:
-			</label>
-				<input type="text" className="input is-primary" name="longitude" onChange={onChange} value={profile.longitude}></input>
+					Longitude:
+				</label>
+				<input
+					type="text"
+					className="input is-primary"
+					name="longitude"
+					onChange={onChange}
+					value={profile.longitude}
+				></input>
 			</div>
 		</div>
 	);
-}
+};
 export const NewProfileButton = ({ setEditMode }: EditButtonProps) => {
 	return (
 		<div className="section has-text-centered">
@@ -1146,10 +1185,7 @@ export const Gallery = ({ user_id }: UserImagesProps) => {
 	) : null;
 };
 
-export const FileInput = ({
-	files,
-	setFiles,
-}: FileInputProps) => {
+export const FileInput = ({ files, setFiles }: FileInputProps) => {
 	const [preview, setPreview] = useState<string[]>([]);
 
 	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -1246,6 +1282,10 @@ export const Thumbnails = ({ preview, setPreview }: IThumbnails) => {
 	) : null;
 };
 
-export const OnlineIndicator = ({onlineStatus}: BooleanProp) => {
-	return onlineStatus ? (<span className="tag is-primary">Online</span>) : (<span className="tag is-danger">Offline</span>)
-}
+export const OnlineIndicator = ({ onlineStatus }: BooleanProp) => {
+	return onlineStatus ? (
+		<span className="tag is-primary">Online</span>
+	) : (
+		<span className="tag is-danger">Offline</span>
+	);
+};

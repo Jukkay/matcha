@@ -16,6 +16,7 @@ import {
 } from './token';
 import { findMatch, removeMatch } from './match';
 import { sendReportMessage } from '../utilities/sendReportMessage';
+import { unlink } from 'fs';
 
 const register = async (req: Request, res: Response) => {
 	const validationResponse = await validateRegistrationInput(req, res);
@@ -96,7 +97,7 @@ export const login = async (req: Request, res: Response) => {
 
 		// Update login information
 		const sql2 =
-		'UPDATE profiles SET online=TRUE, last_login=now() WHERE user_id = ?;';
+			'UPDATE profiles SET online=TRUE, last_login=now() WHERE user_id = ?;';
 		const response = await execute(sql2, user[0].user_id);
 		// Return user data to frontend
 		if (accessToken && refreshToken) {
@@ -132,8 +133,7 @@ export const logout = async (req: Request, res: Response) => {
 			return res.status(400).json({ message: 'Missing token' });
 		await deleteRefreshToken(refreshToken);
 		// Update login information
-		const sql2 =
-		'UPDATE profiles SET online=FALSE WHERE user_id = ?;';
+		const sql2 = 'UPDATE profiles SET online=FALSE WHERE user_id = ?;';
 		await execute(sql2, user_id);
 		return res.status(200).json({
 			message: 'Logout successful',
@@ -191,17 +191,147 @@ const getUserInformation = async (req: Request, res: Response) => {
 };
 
 const deleteUser = async (req: Request, res: Response) => {
-	// Get user_id
-	const user_id = await decodeUserFromAccesstoken(req);
+	const user_id = req.params.id;
+	console.log('Deleting user', user_id);
 	if (!user_id)
-		return res.status(500).json({
-			message: 'Cannot parse user_id',
+		return res.status(400).json({
+			message: 'Incomplete information',
 		});
-	console.log('in deleteUser', req.get('authorization'));
-	return res.status(200).json({
-		message: 'Message',
-		data: 'empty',
-	});
+	try {
+		// Get user_id
+		const decoded_user_id = await decodeUserFromAccesstoken(req);
+		if (!decoded_user_id)
+			return res.status(401).json({
+				message: 'Unauthorized',
+			});
+		if (user_id != decoded_user_id)
+			return res.status(400).json({
+				message: 'ID mismatch. Are you doing something shady?',
+			});
+		// Remove profile
+		let sql = 'DELETE FROM profiles WHERE user_id = ?';
+		let response = await execute(sql, [user_id]);
+
+		// Remove user data
+
+		// Delete matches
+		sql = `
+		DELETE FROM
+			matches
+		WHERE
+			user1 = ?
+			OR
+			user2 = ?
+		`;
+		response = await execute(sql, [user_id, user_id]);
+
+		// Delete likes
+		sql = `
+		DELETE FROM
+			likes
+		WHERE
+			user_id = ?
+			OR
+			target_id = ?
+		`;
+		response = await execute(sql, [user_id, user_id]);
+
+		// Delete messages
+		sql = `
+		DELETE FROM
+			messages
+		WHERE
+			user_id = ?
+		`;
+		response = await execute(sql, [user_id]);
+
+		// Delete blocks
+		sql = `
+			DELETE FROM 
+				blocks 
+			WHERE 
+				blocker = ?
+				OR
+				blocked = ?
+			`;
+		response = await execute(sql, [user_id, user_id]);
+
+		// Delete notifications
+		sql = `
+			DELETE FROM 
+				notifications 
+			WHERE 
+				receiver_id = ?
+				OR
+				sender_id = ?
+			`;
+		response = await execute(sql, [user_id, user_id]);
+
+		// Get user images
+		sql = `
+			SELECT filename FROM 
+				photos 
+			WHERE 
+				user_id = ?
+			`;
+		response = await execute(sql, [user_id]);
+		// Delete image files
+		response.map((file) =>
+			unlink(`./images/${file['filename']}`, (err) => {
+				if (err) console.error(err);
+			})
+		);
+		// Delete db entries
+		sql = `
+			DELETE FROM 
+				photos 
+			WHERE 
+				user_id = ?
+			`;
+		response = await execute(sql, [user_id]);
+
+		// Delete logs
+		sql = `
+			DELETE FROM 
+				visitors 
+			WHERE 
+				visited_user = ?
+				OR
+				visiting_user = ?
+			`;
+		response = await execute(sql, [user_id, user_id]);
+
+		// Delete tokens
+		sql = `
+			DELETE FROM 
+				tokens 
+			WHERE 
+				user_id = ?
+			`;
+		response = await execute(sql, [user_id]);
+
+		// Delete user
+		sql = `
+			DELETE FROM 
+				users 
+			WHERE 
+				user_id = ?
+			`;
+		response = await execute(sql, [user_id]);
+
+		if (response)
+			return res.status(200).json({
+				message: 'User data removed successfully',
+			});
+		return res.status(400).json({
+			message: 'No user found',
+		});
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({
+			message: 'Something went wrong',
+		});
+	}
 };
 
 const updateUser = async (req: Request, res: Response) => {
@@ -325,11 +455,11 @@ export const reportUser = async (req: Request, res: Response) => {
 				`;
 		const response = await execute(sql, [reporter, reported, reason]);
 		if (!response) throw new Error('Failed to save report to database');
-	
+
 		// Notify admin
 		const responseObject = JSON.parse(JSON.stringify(response));
-		const report_id = responseObject.insertId
-		sendReportMessage(report_id, reason)
+		const report_id = responseObject.insertId;
+		sendReportMessage(report_id, reason);
 		if (response)
 			return res.status(200).json({
 				message: 'User reported successfully',

@@ -258,21 +258,21 @@ V Block blocked user from accessing blockers profile
 V Add famerating range selectors to search
 V Add famerating to sql search
 V Add distance range selectors to search
-
 V Add last login to profile page
 V Add report menu to profile page
 V Add "they like you" indicator to profile page
 V Add online/offline indicator to profile page
 V Add online/offline indicator to chat
-
 V Add location selectors to search
 V Add tag selector to search
 V Add tag search to sql query
-Refactor interests object to array
-Hide most selectors under "advanced search" button
-Send different query for advanced and basic search
-Add delete profile functionality
-Add delete account functionality
+V Refactor interests object to array
+V Do interests search filtering in frontend
+V Hide most selectors under "advanced search" button
+V Add delete profile functionality
+V Add delete account functionality
+
+Fix the logic of how user defined coordinates are used so user coordinates override other methods
 Fine tune default search result sorting so it prioritises most people with best famerating and most common tags.
 
 # Later

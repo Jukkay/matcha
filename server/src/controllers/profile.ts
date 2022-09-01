@@ -219,16 +219,42 @@ const updateProfile = async (req: Request, res: Response) => {
 };
 
 const deleteProfile = async (req: Request, res: Response) => {
-	// Get user_id
-	const user_id = await decodeUserFromAccesstoken(req);
+	const user_id = req.params.id
+	console.log('Deleting profile for user', user_id)
 	if (!user_id)
-		return res.status(401).json({
-			message: 'Unauthorized',
+		return res.status(400).json({
+			message: 'Incomplete information',
 		});
-	console.log('in deleteProfile. Function incomplete.');
-	return res.status(200).json({
-		message: 'Message',
-	});
+	try {
+		// Get user_id
+		const decoded_user_id = await decodeUserFromAccesstoken(req);
+		if (!decoded_user_id)
+			return res.status(401).json({
+				message: 'Unauthorized',
+			});
+		if (user_id != decoded_user_id)
+			return res.status(400).json({
+				message: 'ID mismatch. Are you doing something shady?',
+			});
+		// Remove profile
+		const sql = 'DELETE FROM profiles WHERE user_id = ?';
+		const response = await execute(sql, [user_id]);
+		const sql2 =
+			'UPDATE users SET profile_exists = "0" WHERE user_id = ?;';
+		const response2 = await execute(sql2, [user_id]);
+		if (response && response2)
+			return res.status(200).json({
+				message: 'Profile removed successfully',
+			});
+		return res.status(400).json({
+			message: 'No profile found',
+		});
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({
+			message: 'Something went wrong',
+		});
+	}
 };
 
 export default { newProfile, getProfile, updateProfile, deleteProfile };

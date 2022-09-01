@@ -13,11 +13,9 @@ export const searchProfiles = async (req: Request, res: Response) => {
 		max_famerating,
 		country,
 		city,
-		interests
 	} = req.body.data;
 
-
-	if (!gender || !min_age || !max_age || !looking)
+	if (!gender || !min_age || !max_age || !looking || !min_famerating || !max_famerating)
 		return res.status(400).json({
 			message: 'Insufficient search parameters',
 		});
@@ -36,16 +34,13 @@ export const searchProfiles = async (req: Request, res: Response) => {
 		// Search logic
 		let sql;
 		let results;
-		if (min_famerating && max_famerating && country && city && interests !== '[]') {
-			console.log('Advanced search with:', req.body.data)
-			console.log(interests)
-			// Do advanced search
+		if (country && city) {
+
 			sql = `
 			SELECT 
 				profiles.*,
 				likes.like_id,
-				blocks.block_id,
-				JSON_OVERLAPS(profiles.interests, ?) AS interests_match
+				blocks.block_id
 			FROM
 				profiles
 			LEFT JOIN
@@ -78,14 +73,11 @@ export const searchProfiles = async (req: Request, res: Response) => {
 				city = ?
 				AND
 				blocks.block_id IS NULL
-			HAVING 
-				interests_match = 1
 			ORDER BY 
 				famerating DESC
 			`;
 
 			results = await execute(sql, [
-				JSON.stringify(interests),
 				user_id,
 				user_id,
 				maxDate,
@@ -98,8 +90,7 @@ export const searchProfiles = async (req: Request, res: Response) => {
 				country,
 				city,
 			]);
-		} else {
-			// Do basic search
+		} else if (country) {
 			sql = `
 			SELECT 
 				profiles.*,
@@ -122,12 +113,17 @@ export const searchProfiles = async (req: Request, res: Response) => {
 			WHERE 
 				DATE(birthday) 
 					BETWEEN ? AND ? 
+				AND 
+				famerating 
+					BETWEEN ? AND ?
 				AND
 				gender = ? 
 				AND 
 				profiles.user_id != ? 
 				AND 
 				looking = ?
+				AND
+				country = ?
 				AND
 				blocks.block_id IS NULL
 			ORDER BY 
@@ -139,15 +135,66 @@ export const searchProfiles = async (req: Request, res: Response) => {
 				user_id,
 				maxDate,
 				minDate,
+				min_famerating,
+				max_famerating,
+				looking,
+				user_id,
+				gender,
+				country,
+			]);
+		} else {
+			sql = `
+				SELECT 
+					profiles.*,
+					likes.like_id,
+					blocks.block_id
+				FROM
+					profiles
+				LEFT JOIN
+					likes
+					ON
+						likes.target_id = profiles.user_id
+						AND
+						likes.user_id = ?
+				LEFT JOIN
+					blocks
+					ON
+						blocks.blocked = profiles.user_id
+						AND
+						blocks.blocker = ?
+				WHERE 
+					DATE(birthday) 
+						BETWEEN ? AND ? 
+					AND 
+					famerating 
+						BETWEEN ? AND ?
+					AND
+					gender = ? 
+					AND 
+					profiles.user_id != ? 
+					AND 
+					looking = ?
+					AND
+					blocks.block_id IS NULL
+				ORDER BY 
+					famerating DESC
+				`;
+
+			results = await execute(sql, [
+				user_id,
+				user_id,
+				maxDate,
+				minDate,
+				min_famerating,
+				max_famerating,
 				looking,
 				user_id,
 				gender,
 			]);
-		}
-
+		} 
 		console.log('Results: ', results);
+		console.log('Searched with:', req.body.data);
 		if (results.length > 0) {
-			// TODO Create notification of profile visit
 			return res.status(200).json({
 				message: 'Profile data retrieved successfully',
 				results: results,

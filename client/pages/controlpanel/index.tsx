@@ -41,6 +41,7 @@ const LoggedIn = () => {
 	const [success, setSuccess] = useState(false);
 	const [showGenericError, setShowGenericError] = useState(false);
 	const [loading, setLoading] = useState(false);
+	const [deleted, setDeleted] = useState(false);
 
 	// input values
 	const [values, setValues] = useState({
@@ -297,8 +298,27 @@ const LoggedIn = () => {
 		}
 	};
 
+	const deleteUser = async () => {
+		const response = await authAPI.delete(`/user/${profile.user_id}`);
+			if (response.status === 200) {
+				setDeleted(true);
+				setTimeout(() => {
+					updateUserData({})
+					setDeleted(false);
+					sessionStorage.removeItem('userData');
+				}, 2000);
+			}
+	}
 	// Component
-	return success ? (
+	return deleted ? (
+		<section className="section">
+			<div className="box has-text-centered">
+				<section className="section">
+					<h3 className="title is-3">User account and data removed successfully</h3>
+				</section>
+			</div>
+		</section>
+	) : success ? (
 		<section className="section">
 			<div className="box has-text-centered">
 				<section className="section">
@@ -347,6 +367,12 @@ const LoggedIn = () => {
 						notificationState={showGenericError}
 						handleClick={() => setShowGenericError(false)}
 					/>
+				</section>
+				<section className="section">
+				<p className="block">
+					Caution: Removing account is irreversible and all data related to your account will be removed. If you want to come back you'll have to create a new account and profile.
+				</p>
+					<button className="button is-danger" onClick={deleteUser}>Delete account and user data</button>
 				</section>
 			</div>
 		</section>
