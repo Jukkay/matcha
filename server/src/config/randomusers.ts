@@ -1,6 +1,7 @@
 const { RandomUser } = require('random-user-api');
 import * as SQLConnect from '../utilities/SQLConnect';
 import { dummyData } from './data';
+import fs from 'fs';
 
 const reformatDate = (date: string) => {
 	const dateObject = new Date(date);
@@ -20,30 +21,8 @@ const sql2 =
 const sql3 = 'SELECT user_id FROM users WHERE username = ?';
 const hash = '$2a$10$FMUz0quSrsDNryT2TRvSJu7JavNK8iZPYKfF68K4408Y0jPBT/vpC';
 const genderOptions = ['Male', 'Female'];
-const malePictureOptions = [
-	'male.jpg',
-	'male2.jpg',
-	'male3.jpg',
-	'male4.jpg',
-	'male5.jpg',
-	'male6.jpg',
-	'male7.jpg',
-	'male8.jpg',
-	'male9.jpg',
-	'male10.jpg',
-];
-const femalePictureOptions = [
-	'female.jpg',
-	'female2.jpg',
-	'female3.jpg',
-	'female4.jpg',
-	'female5.jpg',
-	'female6.jpg',
-	'female7.jpg',
-	'female8.jpg',
-	'female9.jpg',
-	'female10.jpg',
-];
+const malePictureOptions = fs.readdirSync('./images/Men/')
+const femalePictureOptions = fs.readdirSync('./images/Women/')
 
 const removeDuplicates = (data: any) => {
 	return data.filter((item: any, index: number) => {
@@ -95,15 +74,20 @@ const createProfile = async (data: any) => {
 		for (let i = 0; i < 5; i++) {
 			interests.push(dummyData[Math.floor(Math.random() * dummyData.length)]);
 		}
-		profile_image =
-			data[key].gender == 'male'
-				? malePictureOptions[
-						Math.floor(Math.random() * malePictureOptions.length)
-				  ]
-				: femalePictureOptions[
-						Math.floor(Math.random() * femalePictureOptions.length)
-				  ];
 		const user_id = userIDs.get(data[key].login.username);
+		let filenames: string[][] = [];
+		for (let i = 0; i < 5; i++) {
+			const filename = data[key].gender == 'male'
+			? malePictureOptions[
+					Math.floor(Math.random() * malePictureOptions.length)
+			  ]
+			: femalePictureOptions[
+					Math.floor(Math.random() * femalePictureOptions.length)
+			  ]
+			const temp = [user_id, filename];
+			filenames.push(temp);
+		}
+		profile_image = filenames[0][1]
 		await SQLConnect.execute(sql2, [
 			user_id,
 			data[key].nat,
@@ -123,8 +107,8 @@ const createProfile = async (data: any) => {
 			Math.floor(Math.random() * (1000 - 1) + 1),
 		]);
 		await SQLConnect.execute(
-			'INSERT IGNORE INTO photos(user_id, filename) VALUES (?, ?)',
-			[user_id, profile_image]
+			'INSERT IGNORE INTO photos(user_id, filename) VALUES ?',
+			[filenames]
 		);
 		await SQLConnect.execute(
 			'UPDATE profiles SET online=?, last_login=now() WHERE user_id = ?',
@@ -151,7 +135,7 @@ const main = async () => {
 			.and()
 			.excludeAllFieldsBut('nat')
 			.nationality('fi')
-			.count(2000)
+			.count(4000)
 			.retrieve()
 			.then((res: any) => {
 				return res;

@@ -71,23 +71,23 @@ V Browsing
        V Location
        V Fame rating
        V Common tags
-Advanced search
+V Advanced search
    V Age gap
    V Fame rating gap
-    Location
-    Interest tag
-        One or more
-    Sort and filter by same as previously
-    Filtering (can be same as the search?)
+   V  Location
+   V Interest tag
+   V     One or more
+   V Sort and filter by same as previously
+   V Filtering (can be same as the search?)
 Profile of other users
    V Visits to profile must be stored to user's visit history
    V Notification of visit to profile owner
    V Show
        V all profile information
        V Fame rating
-        Online/Offline
-        Last login date and time
-        If likes you
+       V Online/Offline
+         Last login date and time
+       V If likes you
     V Like
        V Must have at least one picture to like someone
        V If both like each other they're matched
@@ -262,6 +262,7 @@ V Add last login to profile page
 V Add report menu to profile page
 V Add "they like you" indicator to profile page
 V Add online/offline indicator to profile page
+V Refactor interceptors to another file so they can use context instead of sessionStorage
 V Add online/offline indicator to chat
 V Add location selectors to search
 V Add tag selector to search
@@ -271,25 +272,27 @@ V Do interests search filtering in frontend
 V Hide most selectors under "advanced search" button
 V Add delete profile functionality
 V Add delete account functionality
+V Make separate errorHandler for catch blocks
+V Updated db reset scripts
+V Get higher resolution profile pictures from unsplash
+V Check why age range in profile creation doesn't default to own age
 
+Add carousel to profile views
+Show login time with login date
+Fix chat window ui
 Fix the logic of how user defined coordinates are used so user coordinates override other methods
 Fine tune default search result sorting so it prioritises most people with best famerating and most common tags.
+Check why invalid email address error doesn't clear on signup form
 
 # Later
-Fix chat window ui
-Get higher resolution profile pictures from unsplash
 Make last message show on match list
 Refactor SQL queries using ``
-Create userbase so there's less options for random interests
 Make sure profile image is changed to default on logout
 Change language to very plain language for accessibility
 Change user_id into unique hash?
 Show image counter
-Show upload complete notification
 Move API url to docker secrets
-Make separate errorHandler for catch blocks
 Remove error message passthrough in user controller
-Refactor interceptors to another file so they can use context instead of sessionStorage
 Double slider for age range
 
 # Bonuses done

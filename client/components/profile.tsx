@@ -145,6 +145,7 @@ export const CreateProfile = ({
 	const [query, setQuery] = useState('');
 	const [result, setResult] = useState<string[]>([]);
 	const { userData, updateUserData } = useUserContext();
+	const age = convertBirthdayToAge(userData.birthday)
 
 	// Update object values
 	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -152,6 +153,7 @@ export const CreateProfile = ({
 	};
 	useEffect(() => {
 		setInterests(profile.interests);
+		setProfile({...profile, min_age: age - 5, max_age: age + 5});
 	}, []);
 
 	// Live query interest from interest list

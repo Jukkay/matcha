@@ -7,6 +7,7 @@ import react, {
 } from 'react';
 import { IProfile } from '../types/types';
 import { authAPI } from '../utilities/api';
+import { convertBirthdayToAge } from '../utilities/helpers';
 
 export type UserInfo = {
 	username: string | undefined;
@@ -38,6 +39,7 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
 		birthday: '',
 		profile_exists: false,
 	});
+	
 	const [profile, setProfile] = useState<IProfile>({
 		user_id: 0,
 		name: '',

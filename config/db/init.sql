@@ -37,8 +37,8 @@ CREATE TABLE IF NOT EXISTS profiles(
 	famerating INT UNSIGNED DEFAULT 0,
 	latitude VARCHAR(32),
 	longitude VARCHAR(32),
-	`online` BOOLEAN DEFAULT FALSE
-	last_login DATETIME
+	`online` BOOLEAN DEFAULT FALSE,
+	last_login DATETIME,
 	creation_date DATETIME DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY (profile_id)
 );
@@ -97,6 +97,7 @@ CREATE TABLE IF NOT EXISTS notifications(
 	notification_text VARCHAR(255) NOT NULL,
 	notification_type VARCHAR(16) NOT NULL,
 	sender_id INT(10) UNSIGNED NOT NULL,
+	receiver_id INT(10) UNSIGNED NOT NULL,
 	notification_read BOOLEAN DEFAULT FALSE,
 	link VARCHAR(255) NOT NULL,
 	notification_time DATETIME DEFAULT CURRENT_TIMESTAMP,

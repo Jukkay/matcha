@@ -1,38 +1,43 @@
-import {API} from "../../utilities/api";
-import type { NextPage } from "next";
-import { useState, useEffect, useContext } from "react";
-import { useUserContext} from "../../components/UserContext";
+import { API } from '../../utilities/api';
+import type { NextPage } from 'next';
+import { useState, useEffect, useContext } from 'react';
+import { useUserContext } from '../../components/UserContext';
 
 const Logout: NextPage = (props) => {
-	const {updateAccessToken, updateRefreshToken, userData, updateUserData, refreshToken} = useUserContext()
+	const {
+		updateAccessToken,
+		updateRefreshToken,
+		userData,
+		updateUserData,
+		refreshToken,
+	} = useUserContext();
+
 	useEffect(() => {
 		API.post('/logout/', {
 			user_id: userData.user_id,
-			refreshToken: refreshToken }).then(res => {
-			if (res.status === 200) {
-				updateAccessToken('')
-				updateRefreshToken('')
-				updateUserData({})
-				sessionStorage?.removeItem('accessToken');
-				sessionStorage?.removeItem('refreshToken');
-				sessionStorage?.removeItem('userData');
-				sessionStorage?.removeItem('profile')
-			}
-		})
-	}, [])
+			refreshToken: refreshToken,
+		});
+		updateAccessToken('');
+		updateRefreshToken('');
+		updateUserData({});
+		sessionStorage?.removeItem('accessToken');
+		sessionStorage?.removeItem('refreshToken');
+		sessionStorage?.removeItem('userData');
+		sessionStorage?.removeItem('profile');
+	}, []);
 
 	return (
 		<div className="columns">
-		  <div className="column is-half is-offset-one-quarter">
-			<section className="section">
-			  <div className="box has-text-centered">
+			<div className="column is-half is-offset-one-quarter">
 				<section className="section">
-				  <h3 className="title is-3">Logout successful</h3>
+					<div className="box has-text-centered">
+						<section className="section">
+							<h3 className="title is-3">Logout successful</h3>
+						</section>
+					</div>
 				</section>
-			  </div>
-			</section>
-		  </div>
+			</div>
 		</div>
-	)
-}
-export default Logout
+	);
+};
+export default Logout;
