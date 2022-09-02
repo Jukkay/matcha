@@ -15,7 +15,11 @@ import {
 } from '../../types/types';
 import { authAPI } from '../../utilities/api';
 import { FcLike, FcDislike } from 'react-icons/fc';
-import { convertBirthdayToAge, reformatDate } from '../../utilities/helpers';
+import {
+	convertBirthdayToAge,
+	reformatDate,
+	reformatDateTime,
+} from '../../utilities/helpers';
 import { useNotificationContext } from '../../components/NotificationContext';
 import { useSocketContext } from '../../components/SocketContext';
 
@@ -50,7 +54,7 @@ const LoggedIn = () => {
 		likes_requester: 0,
 		match_id: 0,
 		online: false,
-		last_login: ''
+		last_login: '',
 	});
 	const { userData, updateUserData } = useUserContext();
 	const { setActivePage } = useNotificationContext();
@@ -115,7 +119,11 @@ const LoggedIn = () => {
 	);
 };
 
-const LikeButton = ({ profile, setProfile, setNotification }: LikeButtonProps) => {
+const LikeButton = ({
+	profile,
+	setProfile,
+	setNotification,
+}: LikeButtonProps) => {
 	const { userData } = useUserContext();
 	const socket = useSocketContext();
 
@@ -141,7 +149,7 @@ const LikeButton = ({ profile, setProfile, setNotification }: LikeButtonProps) =
 			// Send match notification
 			if (response.data.match) {
 				setProfile({ ...profile, like_id: 1, match_id: 1 });
-				setNotification(true)
+				setNotification(true);
 				const notification = {
 					sender_id: liker,
 					receiver_id: liked,
@@ -158,8 +166,7 @@ const LikeButton = ({ profile, setProfile, setNotification }: LikeButtonProps) =
 					link: `/profile/${liked}`,
 				};
 				socket.emit('send_notification', liker, notification2);
-			}
-			else setProfile({ ...profile, like_id: 1 });
+			} else setProfile({ ...profile, like_id: 1 });
 		}
 	};
 	const handleClick = () => {
@@ -217,55 +224,84 @@ const UnlikeButton = ({ profile, setProfile }: OtherUserViewProps) => {
 };
 
 const ViewMode = ({ profile, setProfile }: OtherUserViewProps) => {
-	const [notification, setNotification] = useState(false)
+	const [notification, setNotification] = useState(false);
 
 	const closeNotification = () => {
 		setNotification(false);
-	}
+	};
 	return (
-		<div>
-			<section className="section">
+		<div className="columns card my-6">
+			<div className="column card-image has-text-left is-two-thirds">
 				<Gallery user_id={profile.user_id} />
-				<OnlineIndicator onlineStatus={profile.online}/>
-				<div className="block">Famerating: {profile.famerating}</div>
-				<div className="block">Name: {profile.name}</div>
-				<div className="block">
-					Age:{' '}
+			</div>
+			<div className="column has-text-left">
+				<div className="">Name:</div>
+				<div className="block ml-6 has-text-weight-bold">
+					{profile.name}
+				</div>
+				<div className="">Age:</div>
+				<div className="block ml-6 has-text-weight-bold">
 					{profile.birthday && convertBirthdayToAge(profile.birthday)}
 				</div>
-				<div className="block">City: {profile.city}</div>
-				<div className="block">Country: {profile.country}</div>
-				<div className="block">
-					Introduction: {profile.introduction}
+				<div className="">City:</div>
+				<div className="block ml-6 has-text-weight-bold">
+					{profile.city}
 				</div>
+				<div className="">Country:</div>
+				<div className="block ml-6 has-text-weight-bold">
+					{profile.country}
+				</div>
+				<div className="">Famerating:</div>
+				<div className="block ml-6 has-text-weight-bold">
+					{profile.famerating}
+				</div>
+
+				<div className="">Introduction:</div>
+				<div className="block ml-6 has-text-weight-bold">
+					{profile.introduction}
+				</div>
+				<div className="">Interests:</div>
 				<div className="block">
-					Interests:{' '}
 					{profile.interests.length > 0
-						? profile.interests.map(
-								(interest, index) => (
-									<span
-										className="tag is-success is-medium is-rounded is-clickable mx-2 my-1"
-										key={index}
-									>
-										{interest}
-									</span>
-								)
-						  )
+						? profile.interests.map((interest, index) => (
+								<span
+									className="tag is-primary mx-2 my-1"
+									key={index}
+								>
+									{interest}
+								</span>
+						  ))
 						: null}
 				</div>
-				<div className="block">Gender: {profile.gender}</div>
-				<div className="block">Looking for: {profile.looking}</div>
-				<div className="block">Minimum age: {profile.min_age}</div>
-				<div className="block">Maximum age: {profile.max_age}</div>
-				<div className="block">User ID: {profile.user_id}</div>
-				<div className="block">Like ID: {profile.liked}</div>
-				<div className="block">Like ID: {profile.likes_requester}</div>
-				<div className="block">Match ID: {profile.match_id}</div>
-				<div className="block">Online: {profile.online}</div>
-				<div className="block">Last login: {reformatDate(profile.last_login)}</div>
+				<div className="">Gender:</div>
+				<div className="block ml-6 has-text-weight-bold">
+					{profile.gender}
+				</div>
+				<div className="">Looking for:</div>
+				<div className="block ml-6 has-text-weight-bold">
+					{profile.looking}
+				</div>
+				<div className="block">Minimum age:</div>
+				<div className="block ml-6 has-text-weight-bold">
+					{profile.min_age}
+				</div>
+				<div className="block">Maximum age:</div>
+				<div className="block ml-6 has-text-weight-bold">
+					{profile.max_age}
+				</div>
+				<div className="block">Last login:</div>
+				<div className="block ml-6 has-text-weight-bold">
+					{reformatDateTime(profile.last_login)}
+				</div>
+				<div className="block">
+					<OnlineIndicator onlineStatus={profile.online} />
+				</div>
 				{profile.match_id && notification ? (
 					<div className="notification is-primary">
-						<button className="delete" onClick={closeNotification}></button>
+						<button
+							className="delete"
+							onClick={closeNotification}
+						></button>
 						<h3 className="title is-3">It's a match!</h3>
 					</div>
 				) : null}
@@ -281,10 +317,14 @@ const ViewMode = ({ profile, setProfile }: OtherUserViewProps) => {
 							setProfile={setProfile}
 						/>
 					) : (
-						<LikeButton profile={profile} setProfile={setProfile} setNotification={setNotification}/>
+						<LikeButton
+							profile={profile}
+							setProfile={setProfile}
+							setNotification={setNotification}
+						/>
 					)}
 				</div>
-			</section>
+			</div>
 		</div>
 	);
 };
@@ -293,7 +333,7 @@ const ShowProfile: NextPage = () => {
 	const { accessToken } = useUserContext();
 	return (
 		<div className="columns is-centered">
-			<div className="column is-half">
+			<div className="column is-two-thirds">
 				{accessToken ? <LoggedIn /> : <NotLoggedIn />}
 			</div>
 		</div>

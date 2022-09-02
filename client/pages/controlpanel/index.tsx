@@ -383,7 +383,7 @@ const ControlPanel: NextPage = () => {
 	const { accessToken } = useUserContext();
 	return (
 		<div className="columns is-centered">
-			<div className="column is-half">
+			<div className="column is-three-quarters">
 				{accessToken ? <LoggedIn /> : <NotLoggedIn />}
 			</div>
 		</div>

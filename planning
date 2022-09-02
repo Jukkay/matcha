@@ -276,10 +276,9 @@ V Make separate errorHandler for catch blocks
 V Updated db reset scripts
 V Get higher resolution profile pictures from unsplash
 V Check why age range in profile creation doesn't default to own age
-
-Add carousel to profile views
-Show login time with login date
-Fix chat window ui
+V Add carousel to profile views
+V Show login time with login date
+V Fix chat window ui
 Fix the logic of how user defined coordinates are used so user coordinates override other methods
 Fine tune default search result sorting so it prioritises most people with best famerating and most common tags.
 Check why invalid email address error doesn't clear on signup form

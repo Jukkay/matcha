@@ -1,5 +1,5 @@
 import { execute } from '../utilities/SQLConnect';
-import e, { Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { decodeUserFromAccesstoken } from './token';
 
 export const saveNotificationToDatabase = async (data: {
@@ -20,15 +20,20 @@ export const saveNotificationToDatabase = async (data: {
                         )
                 VALUES (?, ?, ?, ?, ?)
                 `;
-	const response = await execute(sql, [
-		data.receiver_id,
-		data.notification_text,
-		data.notification_type,
-		data.sender_id,
-		data.link,
-	]);
-	return response;
-};
+	try {
+		
+		const response = await execute(sql, [
+			data.receiver_id,
+			data.notification_text,
+			data.notification_type,
+			data.sender_id,
+			data.link,
+		]);
+		return response;
+	} catch (err) {
+		console.error(err)
+	}
+	};
 
 export const getNotifications = async (req: Request, res: Response) => {
 	const user_id = req.params.id;

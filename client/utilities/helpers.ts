@@ -26,7 +26,10 @@ export const reformatDate = (date: string) => {
     const dateObject = new Date(date)
     return `${dateObject.getFullYear()}-${dateObject.getMonth() + 1}-${dateObject.getDate()}`
 }
-
+export const reformatDateTime = (datetime: string) => {
+    const dateObject = new Date(datetime)
+    return `${dateObject.getFullYear()}-${dateObject.getMonth() + 1}-${dateObject.getDate()} ${dateObject.toLocaleTimeString()}`
+}
 export const distanceBetweenPoints = (
 	latitude1: string,
 	longitude1: string,

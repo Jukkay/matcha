@@ -63,7 +63,7 @@ const LoggedIn = () => {
 		}
 	};
 	return (
-		<div className="column is-11 is-flex is-flex-direction-row is-justify-content-center is-align-content-center fullwidth">
+		<div className="is-flex is-flex-direction-row is-justify-content-center is-align-content-center">
 			<ChatWindow />
 			<MatchList />
 		</div>
@@ -216,7 +216,7 @@ const ReportMenu = ({ reporter, reported }: any) => {
 					</div>
 				</div>
 			</Modal>
-			<div className="dropdown is-hoverable is-pulled-right">
+			<div className="p-2 dropdown is-right is-hoverable">
 				<div className="dropdown-trigger">
 					<div className="navbar-item" id="controlpanel">
 						<div>
@@ -262,7 +262,7 @@ const MatchList = () => {
 	}, []);
 
 	return matches.length > 0 ? (
-		<div className="is-flex is-flex-direction-column match-list">
+		<div className="column is-narrow is-flex is-flex-direction-column match-list">
 			<h5 className="title is-5">Matches</h5>
 			{matches.map((match, index) => (
 				<MatchListItem
@@ -285,29 +285,9 @@ const MatchList = () => {
 
 const OnlineIndicator = ({ onlineStatus }: BooleanProp) => {
 	return onlineStatus ? (
-			<IconContext.Provider
-				value={{
-					color: 'green',
-					size: '0.75rem',
-					className: 'react-icons',
-				}}
-			>
-				<div>
-					<FaCircle />
-				</div>
-			</IconContext.Provider>
+		<div className="round-green"></div>
 	) : (
-		<IconContext.Provider
-			value={{
-				color: 'gray',
-				size: '0.75rem',
-				className: 'react-icons',
-			}}
-		>
-			<div>
-				<FaCircle />
-			</div>
-		</IconContext.Provider>
+		<div className="round-gray"></div>
 	);
 };
 const MatchListItem = ({ match, user_id }: any) => {
@@ -329,12 +309,13 @@ const MatchListItem = ({ match, user_id }: any) => {
 	};
 
 	return matchData.match_id === match.match_id ? (
-		<article
-			className="media has-background-grey-lighter is-clickable"
+		<div
+			className="has-background-grey-lighter p-2 is-clickable is-flex is-justify-content-center is-align-items-center"
 			onClick={handleClick}
 		>
-			<figure className="media-left">
-				<p className="image is-64x64">
+			<div className="p-2">
+				<OnlineIndicator onlineStatus={match.online} />
+				<figure className="image is-64x64">
 					<img
 						className="is-rounded"
 						src={`${authAPI.defaults.baseURL}/images/${profile_image}`}
@@ -345,26 +326,21 @@ const MatchListItem = ({ match, user_id }: any) => {
 						alt="Profile picture"
 						crossOrigin=""
 					/>
-				</p>
-			</figure>
-			<div className="media-content">
-				<div className="content">
-					<p>
-						<strong className="is-size-7">{name}</strong>
-						<OnlineIndicator onlineStatus={match.online} />
-						<ReportMenu reporter={user_id} reported={receiver_id} />
-						<br />
-						<span className="help">{`Matched on ${reformatDate(
-							match.match_date
-						)}`}</span>
-					</p>
-				</div>
+				</figure>
 			</div>
-		</article>
+			<div className="p-2">
+			<strong className="is-size-7">{name}</strong>
+			</div>
+			<ReportMenu reporter={user_id} reported={receiver_id} />
+		</div>
 	) : (
-		<article className="media is-clickable" onClick={handleClick}>
-			<figure className="media-left">
-				<p className="image is-64x64">
+		<div
+			className="is-clickable is-flex is-justify-content-center is-align-items-center"
+			onClick={handleClick}
+		>
+			<div className="p-2">
+				<OnlineIndicator onlineStatus={match.online} />
+				<figure className="image is-64x64">
 					<img
 						className="is-rounded"
 						src={`${authAPI.defaults.baseURL}/images/${profile_image}`}
@@ -375,22 +351,13 @@ const MatchListItem = ({ match, user_id }: any) => {
 						alt="Profile picture"
 						crossOrigin=""
 					/>
-				</p>
-			</figure>
-			<div className="media-content">
-				<div className="content">
-					<p>
-						<strong className="is-size-7">{name}</strong>
-						<OnlineIndicator onlineStatus={match.online} />
-						<ReportMenu reporter={user_id} reported={receiver_id} />
-						<br />
-						<span className="help">{`Matched on ${reformatDate(
-							match.match_date
-						)}`}</span>
-					</p>
-				</div>
+				</figure>
 			</div>
-		</article>
+			<div className="p-2">
+			<strong className="is-size-7">{name}</strong>
+			</div>
+			{/* <ReportMenu reporter={user_id} reported={receiver_id} /> */}
+		</div>
 	);
 };
 
@@ -481,8 +448,8 @@ const ChatWindow = () => {
 	}, [matchData.match_id]);
 
 	return matchData.match_id ? (
-		<div className="fullwidth">
-			<div className="section is-flex is-flex-direction-column is-justify-content-center is-align-content-center chat-window">
+		<div className="column">
+			<div className="is-flex is-flex-direction-column is-justify-content-center is-align-content-center chat-window">
 				{received.map((item, index) => (
 					<ChatMessage
 						key={index}
@@ -494,33 +461,31 @@ const ChatWindow = () => {
 					.
 				</div>
 			</div>
-
-			<form
-				onSubmit={handleSubmit}
-				className="m-6 chat-input has-background-white"
-			>
-				<div className="field has-addons">
-					<div className="control fullwidth">
-						<input
-							type="text"
-							className="input is-primary"
-							placeholder="Write something"
-							name="message"
-							onChange={onChange}
-							onFocus={scrollToBottom}
-							value={outgoing}
-						/>
+			<div className="chat-input has-background-white">
+				<form onSubmit={handleSubmit}>
+					<div className="field has-addons">
+						<div className="control fullwidth">
+							<input
+								type="text"
+								className="input is-primary"
+								placeholder="Write something"
+								name="message"
+								onChange={onChange}
+								onFocus={scrollToBottom}
+								value={outgoing}
+							/>
+						</div>
+						<div className="control">
+							<button className="button is-primary mr-6">
+								<span className="icon">
+									<IoMdSend />
+								</span>
+								<span>Send</span>
+							</button>
+						</div>
 					</div>
-					<div className="control">
-						<button className="button is-primary mr-3">
-							<span className="icon">
-								<IoMdSend />
-							</span>
-							<span>Send</span>
-						</button>
-					</div>
-				</div>
-			</form>
+				</form>
+			</div>
 		</div>
 	) : (
 		<div className="column">
@@ -559,8 +524,8 @@ const ChatMessage = ({ item, user_id }: any) => {
 const Messages: NextPage = () => {
 	const { accessToken } = useUserContext();
 	return (
-		<div className="">
-			<div className="columns is-centered">
+		<div className="columns is-centered">
+			<div className="column is-11">
 				{accessToken ? <LoggedIn /> : <NotLoggedIn />}
 			</div>
 		</div>

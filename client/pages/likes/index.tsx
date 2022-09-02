@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react';
 import { useNotificationContext } from '../../components/NotificationContext';
+import { OnlineIndicator } from '../../components/profile';
 import { useUserContext } from '../../components/UserContext';
 import { ActivePage, ILikeProfile, LogEntry, NotificationType } from '../../types/types';
 import { authAPI } from '../../utilities/api';
@@ -95,26 +96,45 @@ const LikeProfile = ({ profile }: any) => {
 	return (
 		<Link href={`/profile/${profile.user_id}`}>
 			<a>
-				<div className="card">
-					<div className="p-3 has-text-centered">
-						<figure className="image is-128x128">
+				<div className="columns card my-6">
+					<div className="column card-image has-text-left is-two-thirds">
+						<figure className="image">
 							<img
 								src={`${authAPI.defaults.baseURL}/images/${profile.profile_image}`}
 								alt="Placeholder image"
 								crossOrigin=""
 							/>
 						</figure>
+						<div className="is-overlay card-content">
+							<OnlineIndicator onlineStatus={profile.online} />
+						</div>
 					</div>
-					<div className="block">Name: {profile.name}</div>
-					<div className="block">
-						Age:{' '}
-						{profile.birthday &&
-							convertBirthdayToAge(profile.birthday)}
-					</div>
-					<div className="block">City: {profile.city}</div>
-					<div className="block">Country: {profile.country}</div>
-					<div className="block">
-						Like date: {reformatDate(profile.like_date)}
+					<div className="column mt-3 has-text-left">
+						<div className="block">Name: {profile.name}</div>
+						<div className="block">
+							Age: {profile.birthday && convertBirthdayToAge(profile.birthday)}
+						</div>
+						<div className="block">Famerating: {profile.famerating}</div>
+						<div className="block">
+							Distance: {`${profile.distance} km`}
+						</div>
+						<div className="block">City: {profile.city}</div>
+						<div className="block">Country: {profile.country}</div>
+						<div className="block">
+							Interests:{' '}
+							{profile.interests
+								? Object.entries(JSON.parse(profile.interests)).map(
+										(interest, index) => (
+											<span
+												className="tag is-primary mx-2 my-1"
+												key={index}
+											>
+												{interest[1] as string}
+											</span>
+										)
+								  )
+								: null}
+						</div>
 					</div>
 				</div>
 			</a>
@@ -126,7 +146,7 @@ const Likes: NextPage = () => {
 	const { accessToken } = useUserContext();
 	return (
 		<div className="columns is-centered">
-			<div className="column is-half">
+			<div className="column is-three-quarters">
 				{accessToken ? <LoggedIn /> : <NotLoggedIn />}
 			</div>
 		</div>

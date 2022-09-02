@@ -12,9 +12,11 @@ const Layout = ({ children }: { children: ReactNode }) => {
     <UserContextProvider>
       <SocketContextProvider>
       <NotificationContextProvider>
+        <div className="columns is-flex-direction-column is-fullheight-100vh">
         <NavbarComponent />
-          <main>{children}</main>
+          <main className="column">{children}</main>
         <Footer />
+        </div>
       </NotificationContextProvider>
       </SocketContextProvider>
     </UserContextProvider>

@@ -25,6 +25,11 @@ import { useUserContext } from './UserContext';
 import { dummyData } from '../pages/profile/data';
 import { convertBirthdayToAge } from '../utilities/helpers';
 import { SearchResultItem } from './discover';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, Scrollbar, A11y } from 'swiper';
+import "swiper/css";
+import "swiper/css/pagination";
+import "swiper/css/navigation";
 
 export const LikeButton = () => {
 	return (
@@ -145,7 +150,7 @@ export const CreateProfile = ({
 	const [query, setQuery] = useState('');
 	const [result, setResult] = useState<string[]>([]);
 	const { userData, updateUserData } = useUserContext();
-	const age = convertBirthdayToAge(userData.birthday)
+	const age = convertBirthdayToAge(userData.birthday);
 
 	// Update object values
 	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -153,7 +158,7 @@ export const CreateProfile = ({
 	};
 	useEffect(() => {
 		setInterests(profile.interests);
-		setProfile({...profile, min_age: age - 5, max_age: age + 5});
+		setProfile({ ...profile, min_age: age - 5, max_age: age + 5 });
 	}, []);
 
 	// Live query interest from interest list
@@ -461,16 +466,16 @@ export const UpdateProfile = ({
 	};
 	const deleteProfile = async () => {
 		const response = await authAPI.delete(`/profile/${profile.user_id}`);
-			if (response.status === 200) {
-				setDeleted(true);
-				setTimeout(() => {
-					updateUserData({...userData, profile_exists: false })
-					setDeleted(false);
-					setEditMode(false);
-					sessionStorage.removeItem('profile');
-				}, 2000);
-			}
-	}
+		if (response.status === 200) {
+			setDeleted(true);
+			setTimeout(() => {
+				updateUserData({ ...userData, profile_exists: false });
+				setDeleted(false);
+				setEditMode(false);
+				sessionStorage.removeItem('profile');
+			}, 2000);
+		}
+	};
 	const handleSubmit = (event: React.FormEvent) => {
 		event.preventDefault();
 		uploadProfile();
@@ -1169,21 +1174,25 @@ export const Gallery = ({ user_id }: UserImagesProps) => {
 	}, []);
 
 	return images && user_id ? (
-		<div className="block">
-			<div className="is-flex is-flex-direction-row is-flex-wrap-wrap">
+			<Swiper
+				pagination={{
+					type: "fraction",
+				}}
+				navigation={true}
+				modules={[Pagination, Navigation]}
+				className="swiper"
+			>
 				{images.map((image) => (
-					<div key={image} className="box mx-3 has-text-centered">
-						<figure className="image is-128x128">
-							<img
-								src={image}
-								alt="Placeholder image"
-								crossOrigin=""
-							/>
-						</figure>
-					</div>
+					<SwiperSlide
+					className="swiper-slide">
+						<img
+							src={image}
+							alt="Placeholder image"
+							crossOrigin=""
+						/>
+					</SwiperSlide>
 				))}
-			</div>
-		</div>
+			</Swiper>
 	) : null;
 };
 

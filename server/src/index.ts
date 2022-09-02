@@ -94,8 +94,7 @@ io.on('connection', (socket) => {
 		socket.on('send_notification', async(user_id, data) => {
 			if(!user_id) return;
 			// Save notification to database
-			const response = await saveNotificationToDatabase(data)
-			if (!response) throw new Error('Failed to save notification')
+			await saveNotificationToDatabase(data)
 
 			// Emit to user
 			socket.to(user_id).emit('receive_notification', data)

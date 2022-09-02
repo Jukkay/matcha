@@ -41,7 +41,7 @@ export const getVisitorLog = async (req: Request, res: Response) => {
 				message: 'ID mismatch. Are you doing something shady?',
 			});
 			const sql =
-			'SELECT name, birthday, city, country, profile_image, user_id FROM profiles INNER JOIN visitors ON profiles.user_id = visitors.visiting_user WHERE visited_user = ?';
+			'SELECT name, birthday, city, country, profile_image, user_id, interests FROM profiles INNER JOIN visitors ON profiles.user_id = visitors.visiting_user WHERE visited_user = ?';
 		const log = await execute(sql, [user_id]);
 		if (log.length > 0)
 			return res.status(200).json({
@@ -68,7 +68,7 @@ export const getRecentProfiles = async (req: Request, res: Response) => {
 				message: 'Unauthorized',
 			});
 		const sql =
-		'SELECT name, birthday, city, country, profile_image, user_id FROM profiles INNER JOIN visitors ON profiles.user_id = visitors.visited_user WHERE visiting_user = ?';
+		'SELECT name, birthday, city, country, profile_image, user_id, interests FROM profiles INNER JOIN visitors ON profiles.user_id = visitors.visited_user WHERE visiting_user = ?';
 		const log = await execute(sql, [user_id]);
 		console.log(log)
 		if (log.length > 0)

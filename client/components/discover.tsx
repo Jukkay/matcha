@@ -157,7 +157,9 @@ const AdvancedSearch = ({
 	const onClick = () => setVisible(!visible);
 	return visible ? (
 		<div className="block">
-			<button className="button is-primary is-light" onClick={onClick}>Hide Advanced Search</button>
+			<button className="button is-primary is-light" onClick={onClick}>
+				Hide Advanced Search
+			</button>
 			<div className="block">
 				<CountrySearchSelector
 					searchParams={searchParams}
@@ -178,9 +180,13 @@ const AdvancedSearch = ({
 				<Interests interests={interests} setInterests={setInterests} />
 			</div>
 		</div>
-	) : <div className="block">
-	<button className="button is-primary is-light" onClick={onClick}>Show Advanced Search</button>
-</div>
+	) : (
+		<div className="block">
+			<button className="button is-primary is-light" onClick={onClick}>
+				Show Advanced Search
+			</button>
+		</div>
+	);
 };
 const Interests = ({ interests, setInterests }: any) => {
 	const [tagError, setTagError] = useState(false);
@@ -381,39 +387,45 @@ export const SearchResultItem = ({
 	return (
 		<Link href={`/profile/${user_id}`}>
 			<a>
-				<div className="card">
-					<div className="p-3 has-text-centered">
-						<figure className="image is-128x128">
+				<div className="columns card my-6">
+					<div className="column card-image has-text-left is-two-thirds">
+						<figure className="image">
 							<img
 								src={`${authAPI.defaults.baseURL}/images/${profile_image}`}
 								alt="Placeholder image"
 								crossOrigin=""
 							/>
 						</figure>
+						<div className="is-overlay card-content">
+							<OnlineIndicator onlineStatus={online} />
+						</div>
 					</div>
-					<OnlineIndicator onlineStatus={online} />
-					<div className="block">Name: {name}</div>
-					<div className="block">
-						Age: {birthday && convertBirthdayToAge(birthday)}
-					</div>
-					<div className="block">Famerating: {famerating}</div>
-					<div className="block">Distance: {`${distance} km`}</div>
-					<div className="block">City: {city}</div>
-					<div className="block">Country: {country}</div>
-					<div className="block">
-						Interests:{' '}
-						{interests
-							? Object.entries(JSON.parse(interests)).map(
-									(interest, index) => (
-										<span
-											className="tag is-success is-medium is-rounded is-clickable mx-2 my-1"
-											key={index}
-										>
-											{interest[1] as string}
-										</span>
-									)
-							  )
-							: null}
+					<div className="column mt-3 has-text-left">
+						<div className="block">Name: {name}</div>
+						<div className="block">
+							Age: {birthday && convertBirthdayToAge(birthday)}
+						</div>
+						<div className="block">Famerating: {famerating}</div>
+						<div className="block">
+							Distance: {`${distance} km`}
+						</div>
+						<div className="block">City: {city}</div>
+						<div className="block">Country: {country}</div>
+						<div className="block">
+							Interests:{' '}
+							{interests
+								? Object.entries(JSON.parse(interests)).map(
+										(interest, index) => (
+											<span
+												className="tag is-primary mx-2 my-1"
+												key={index}
+											>
+												{interest[1] as string}
+											</span>
+										)
+								  )
+								: null}
+						</div>
 					</div>
 				</div>
 			</a>

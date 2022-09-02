@@ -13,20 +13,40 @@
 .bulma-loader-mixin
   @include loader
 
-.fix-to-bottom
-    position: absolute
-    bottom: 0px
-
 .chat-window
-
+    overflow: auto
+    height: 80vh
 
 .chat-input
     position: sticky
-    bottom: 10px
+    bottom: 0px
 
 .match-list
-    height: 90vh
+    height: 80vh
     position: sticky
-    top: 3.2rem
+    top: 100px
+    overflow: auto
+
 .bulma-arrow-mixin
-  @include arrow(black)
+    @include arrow(black)
+
+.round-green
+    background-color: green
+    width: 10px
+    height: 10px
+    border-radius: 50%
+
+.round-gray
+    background-color: gray
+    width: 10px
+    height: 10px
+    border-radius: 50%
+
+.image img
+    height: 100%
+    object-fit: cover
+
+footer
+    background-color: blue
+    position: sticky
+    bottom: 0px
