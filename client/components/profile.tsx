@@ -85,8 +85,8 @@ export const ProfileView = ({ profile, setEditMode }: ProfileViewProps) => {
 				<div className="block">Minimum age: {profile.min_age}</div>
 				<div className="block">Maximum age: {profile.max_age}</div>
 				<div className="block">User ID: {profile.user_id}</div>
-				<div className="block">Latitude: {profile.latitude}</div>
-				<div className="block">Logitude: {profile.longitude}</div>
+				<div className="block">Latitude: {profile.user_latitude}</div>
+				<div className="block">Logitude: {profile.user_longitude}</div>
 				<EditButton setEditMode={setEditMode} />
 			</section>
 			<VisitorLog user_id={userData.user_id} />
@@ -274,7 +274,7 @@ export const CreateProfile = ({
 							'Non-binary',
 							'Trans-man',
 							'Trans-woman',
-							'Other',
+							'Other'
 						]}
 					/>
 
@@ -346,10 +346,11 @@ export const CreateProfile = ({
 						options={[
 							'Male',
 							'Female',
+							'Male or Female',
 							'Non-binary',
 							'Trans-man',
 							'Trans-woman',
-							'Other',
+							'Anything goes',
 						]}
 					/>
 
@@ -524,10 +525,11 @@ export const UpdateProfile = ({
 						options={[
 							'Male',
 							'Female',
+							'Male or Female',
 							'Non-binary',
 							'Trans-man',
 							'Trans-woman',
-							'Other',
+							'Anything goes',
 						]}
 					/>
 
@@ -665,9 +667,9 @@ export const GPSCoordinateInput = ({ profile, setProfile }: any) => {
 				<input
 					type="text"
 					className="input is-primary"
-					name="latitude"
+					name="user_latitude"
 					onChange={onChange}
-					value={profile.latitude}
+					value={profile.user_latitude}
 				></input>
 				<label htmlFor="longitude" className="label my-3">
 					Longitude:
@@ -675,9 +677,9 @@ export const GPSCoordinateInput = ({ profile, setProfile }: any) => {
 				<input
 					type="text"
 					className="input is-primary"
-					name="longitude"
+					name="user_longitude"
 					onChange={onChange}
-					value={profile.longitude}
+					value={profile.user_longitude}
 				></input>
 			</div>
 		</div>
@@ -1182,9 +1184,10 @@ export const Gallery = ({ user_id }: UserImagesProps) => {
 				modules={[Pagination, Navigation]}
 				className="swiper"
 			>
-				{images.map((image) => (
+				{images.map((image, index) => (
 					<SwiperSlide
-					className="swiper-slide">
+					className="swiper-slide"
+					key={index}>
 						<img
 							src={image}
 							alt="Placeholder image"

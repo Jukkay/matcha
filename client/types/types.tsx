@@ -35,8 +35,8 @@ export interface ProfileViewProps {
 }
 
 export interface OtherUserViewProps {
-  profile: IOtherUserProfile;
-  setProfile: SetStateAction<any>
+  otherUserProfile: IOtherUserProfile;
+  setOtherUserProfile: SetStateAction<any>
 }
 export interface LikeButtonProps {
   profile: IOtherUserProfile;
@@ -105,6 +105,8 @@ export interface IProfile {
   city: string;
   latitude?: string;
   longitude?: string;
+  user_latitude?: string;
+  user_longitude?: string;
   famerating: number;
 }
 
@@ -121,8 +123,11 @@ export interface IOtherUserProfile {
   interests: string[];
   country: string;
   city: string;
-  latitude?: string;
-  longitude?: string;
+  latitude: string;
+  longitude: string;
+  user_latitude?: string;
+  user_longitude?: string;
+  distance?: number
   famerating: number;
   liked: number;
   likes_requester: number;
@@ -146,6 +151,8 @@ export interface IResultsProfile {
   city: string
   latitude: string
   longitude: string
+  user_latitude?: string
+  user_longitude?: string
   famerating: number
   distance: number
   common_tags: number
@@ -223,11 +230,11 @@ export interface AdvancedSearchProps {
   setSearchParams: SetStateAction<any>
   interests: string[]
   setInterests: SetStateAction<any>
+  results: IResultsProfile[]
+  setFilteredResults: SetStateAction<any>
 }
 export interface ResultsProps {
-  results: IResultsProfile[]
-  setResults: SetStateAction<any>
-  filteredResults: IResultsProfile[]
+  sortedResults: IResultsProfile[]
 }
 
 export interface ISearchParams {
@@ -239,8 +246,7 @@ export interface ISearchParams {
   max_age: number
   min_famerating: number,
   max_famerating: number,
-  max_distance: number,
-  interests: string[]
+  max_distance: number
 }
 
 export interface SearchParamsProps {

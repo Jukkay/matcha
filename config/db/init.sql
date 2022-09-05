@@ -37,6 +37,8 @@ CREATE TABLE IF NOT EXISTS profiles(
 	famerating INT UNSIGNED DEFAULT 0,
 	latitude VARCHAR(32),
 	longitude VARCHAR(32),
+	user_latitude VARCHAR(32),
+	user_longitude VARCHAR(32),
 	`online` BOOLEAN DEFAULT FALSE,
 	last_login DATETIME,
 	creation_date DATETIME DEFAULT CURRENT_TIMESTAMP,

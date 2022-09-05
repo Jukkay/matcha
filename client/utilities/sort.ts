@@ -1,12 +1,12 @@
 import { IProfile, IResultsProfile } from "../types/types";
 import { convertBirthdayToAge, distanceBetweenPoints } from "./helpers";
 
-export const nearFirst = (results: IResultsProfile[], latitude: string, longitude: string) => {
+export const nearFirst = (results: IResultsProfile[]) => {
     const sortedByDistance = [...results].sort((a, b) => a.distance - b.distance);
     return sortedByDistance
 };
 
-export const farFirst = (results: IResultsProfile[], latitude: string, longitude: string) => {
+export const farFirst = (results: IResultsProfile[]) => {
     const sortedByDistance = [...results].sort((a, b) => b.distance - a.distance);
     return sortedByDistance
 };

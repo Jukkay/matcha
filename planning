@@ -279,7 +279,33 @@ V Check why age range in profile creation doesn't default to own age
 V Add carousel to profile views
 V Show login time with login date
 V Fix chat window ui
-Fix the logic of how user defined coordinates are used so user coordinates override other methods
+V Fix the logic of how user defined coordinates are used so user coordinates override other methods
+V Add user_latitude and longitude to tables
+V Add user_ coordinates to profile object
+V Make profile update use user_ coordinates
+V Make distance functions use user_ coordinates if available
+V Show distance in profile too
+V Fix bug in distance calculation
+V Fix bug with removing user coordinates
+V Handle bisexuality. How can you show both sexes at the same time?
+V Add 'male & female' and 'Anything' as options to looking in profile create
+V Add to update
+V Handle these options in profile search
+V Fix filter by max distance
+V Keep original results intact
+V Always filter original results
+V Always sort filtered results
+V Always sort again after filtering
+V Remove result re ordering on advanced search open
+V Fix sorting by distance on first render
+V Add advanced search reset button
+V Move location search outside advanced search
+V Make famerating filtering happen on client side
+V Make filtering happen on button click
+V Change advanced search to 'filters'
+V Make it possible to combine filters
+Make search page layout clearer
+Add pagination to search results
 Fine tune default search result sorting so it prioritises most people with best famerating and most common tags.
 Check why invalid email address error doesn't clear on signup form
 

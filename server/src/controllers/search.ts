@@ -9,13 +9,11 @@ export const searchProfiles = async (req: Request, res: Response) => {
 		gender,
 		min_age,
 		max_age,
-		min_famerating,
-		max_famerating,
 		country,
 		city,
 	} = req.body.data;
 
-	if (!gender || !min_age || !max_age || !looking || !min_famerating || !max_famerating)
+	if (!gender || !min_age || !max_age || !looking)
 		return res.status(400).json({
 			message: 'Insufficient search parameters',
 		});
@@ -31,6 +29,26 @@ export const searchProfiles = async (req: Request, res: Response) => {
 		// Convert min_age and max_age to date strings
 		const minDate = convertMIN_AGE(min_age);
 		const maxDate = convertMAX_AGE(max_age);
+
+		// Create search parameters for gender
+		let lookingOptions = []
+		let genderOptions = []
+		if (looking == 'Male or Female')
+			lookingOptions = ['Male', 'Female']
+		else if (looking == 'Anything goes')
+			lookingOptions = ['Male',
+			'Female',
+			'Non-binary',
+			'Trans-man',
+			'Trans-woman',
+			'Other']
+		else
+			lookingOptions = [looking]
+		
+		if (gender == 'Male' || gender == 'Female')
+			genderOptions = [gender, 'Male or Female', 'Anything goes']
+		else
+			genderOptions = [gender, 'Anything goes']
 		// Search logic
 		let sql;
 		let results;
@@ -58,15 +76,12 @@ export const searchProfiles = async (req: Request, res: Response) => {
 			WHERE 
 				DATE(birthday) 
 					BETWEEN ? AND ? 
-				AND 
-				famerating 
-					BETWEEN ? AND ?
 				AND
-				gender = ? 
+				gender IN (?) 
 				AND 
 				profiles.user_id != ? 
 				AND 
-				looking = ?
+				looking IN (?)
 				AND
 				country = ?
 				AND
@@ -82,11 +97,9 @@ export const searchProfiles = async (req: Request, res: Response) => {
 				user_id,
 				maxDate,
 				minDate,
-				min_famerating,
-				max_famerating,
-				looking,
+				lookingOptions,
 				user_id,
-				gender,
+				genderOptions,
 				country,
 				city,
 			]);
@@ -114,14 +127,11 @@ export const searchProfiles = async (req: Request, res: Response) => {
 				DATE(birthday) 
 					BETWEEN ? AND ? 
 				AND 
-				famerating 
-					BETWEEN ? AND ?
-				AND
-				gender = ? 
+				gender IN (?) 
 				AND 
 				profiles.user_id != ? 
 				AND 
-				looking = ?
+				looking IN (?)
 				AND
 				country = ?
 				AND
@@ -135,11 +145,9 @@ export const searchProfiles = async (req: Request, res: Response) => {
 				user_id,
 				maxDate,
 				minDate,
-				min_famerating,
-				max_famerating,
-				looking,
+				lookingOptions,
 				user_id,
-				gender,
+				genderOptions,
 				country,
 			]);
 		} else {
@@ -165,15 +173,12 @@ export const searchProfiles = async (req: Request, res: Response) => {
 				WHERE 
 					DATE(birthday) 
 						BETWEEN ? AND ? 
-					AND 
-					famerating 
-						BETWEEN ? AND ?
 					AND
-					gender = ? 
+					gender IN (?) 
 					AND 
 					profiles.user_id != ? 
 					AND 
-					looking = ?
+					looking IN (?)
 					AND
 					blocks.block_id IS NULL
 				ORDER BY 
@@ -185,11 +190,9 @@ export const searchProfiles = async (req: Request, res: Response) => {
 				user_id,
 				maxDate,
 				minDate,
-				min_famerating,
-				max_famerating,
-				looking,
+				lookingOptions,
 				user_id,
-				gender,
+				genderOptions,
 			]);
 		} 
 		console.log('Results: ', results);

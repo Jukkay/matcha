@@ -17,6 +17,7 @@ import { authAPI } from '../../utilities/api';
 import { FcLike, FcDislike } from 'react-icons/fc';
 import {
 	convertBirthdayToAge,
+	distanceBetweenPoints,
 	reformatDate,
 	reformatDateTime,
 } from '../../utilities/helpers';
@@ -34,29 +35,33 @@ const NotLoggedIn = () => {
 };
 
 const LoggedIn = () => {
-	const [profile, setProfile] = useState<IOtherUserProfile>({
-		user_id: 0,
-		name: '',
-		birthday: '',
-		profile_image: '',
-		gender: '',
-		looking: '',
-		min_age: 0,
-		max_age: 0,
-		interests: [],
-		introduction: '',
-		country: '',
-		city: '',
-		latitude: '',
-		longitude: '',
-		famerating: 0,
-		liked: 0,
-		likes_requester: 0,
-		match_id: 0,
-		online: false,
-		last_login: '',
-	});
-	const { userData, updateUserData } = useUserContext();
+	const [otherUserProfile, setOtherUserProfile] = useState<IOtherUserProfile>(
+		{
+			user_id: 0,
+			name: '',
+			birthday: '',
+			profile_image: '',
+			gender: '',
+			looking: '',
+			min_age: 0,
+			max_age: 0,
+			interests: [],
+			introduction: '',
+			country: '',
+			city: '',
+			latitude: '',
+			longitude: '',
+			user_latitude: '',
+			user_longitude: '',
+			famerating: 0,
+			liked: 0,
+			likes_requester: 0,
+			match_id: 0,
+			online: false,
+			last_login: '',
+		}
+	);
+	const { userData } = useUserContext();
 	const { setActivePage } = useNotificationContext();
 	const [profileExists, setProfileExists] = useState(false);
 	const socket = useSocketContext();
@@ -94,7 +99,7 @@ const LoggedIn = () => {
 				response.data.profile.interests = JSON.parse(
 					response.data.profile.interests
 				);
-				setProfile(response.data.profile);
+				setOtherUserProfile(response.data.profile);
 			} else setProfileExists(false);
 		} catch (err) {
 			console.error(err);
@@ -111,7 +116,10 @@ const LoggedIn = () => {
 	}, [router.isReady]);
 
 	return profileExists ? (
-		<ViewMode profile={profile} setProfile={setProfile} />
+		<ViewMode
+			otherUserProfile={otherUserProfile}
+			setOtherUserProfile={setOtherUserProfile}
+		/>
 	) : (
 		<section className="section has-text-centered">
 			<h3 className="title is-3">No profile found.</h3>
@@ -183,12 +191,15 @@ const LikeButton = ({
 	);
 };
 
-const UnlikeButton = ({ profile, setProfile }: OtherUserViewProps) => {
+const UnlikeButton = ({
+	otherUserProfile,
+	setOtherUserProfile,
+}: OtherUserViewProps) => {
 	const { userData } = useUserContext();
 	const socket = useSocketContext();
 
 	const unlikeProfile = async () => {
-		const liked = profile.user_id;
+		const liked = otherUserProfile.user_id;
 		const liker: number = userData.user_id;
 
 		const response = await authAPI.delete(
@@ -197,7 +208,7 @@ const UnlikeButton = ({ profile, setProfile }: OtherUserViewProps) => {
 		);
 		console.log('Removing like');
 		if (response.status === 200) {
-			setProfile({ ...profile, like_id: 0 });
+			setOtherUserProfile({ ...otherUserProfile, like_id: 0 });
 		}
 
 		// Emit notification
@@ -223,8 +234,12 @@ const UnlikeButton = ({ profile, setProfile }: OtherUserViewProps) => {
 	);
 };
 
-const ViewMode = ({ profile, setProfile }: OtherUserViewProps) => {
+const ViewMode = ({
+	otherUserProfile,
+	setOtherUserProfile,
+}: OtherUserViewProps) => {
 	const [notification, setNotification] = useState(false);
+	const { profile } = useUserContext();
 
 	const closeNotification = () => {
 		setNotification(false);
@@ -232,38 +247,56 @@ const ViewMode = ({ profile, setProfile }: OtherUserViewProps) => {
 	return (
 		<div className="columns card my-6">
 			<div className="column card-image has-text-left is-two-thirds">
-				<Gallery user_id={profile.user_id} />
+				<Gallery user_id={otherUserProfile.user_id} />
 			</div>
 			<div className="column has-text-left">
 				<div className="">Name:</div>
 				<div className="block ml-6 has-text-weight-bold">
-					{profile.name}
+					{otherUserProfile.name}
 				</div>
 				<div className="">Age:</div>
 				<div className="block ml-6 has-text-weight-bold">
-					{profile.birthday && convertBirthdayToAge(profile.birthday)}
+					{otherUserProfile.birthday &&
+						convertBirthdayToAge(otherUserProfile.birthday)}
 				</div>
 				<div className="">City:</div>
 				<div className="block ml-6 has-text-weight-bold">
-					{profile.city}
+					{otherUserProfile.city}
 				</div>
 				<div className="">Country:</div>
 				<div className="block ml-6 has-text-weight-bold">
-					{profile.country}
+					{otherUserProfile.country}
+				</div>
+				<div className="">Distance:</div>
+				<div className="block ml-6 has-text-weight-bold">
+					{`${distanceBetweenPoints(
+						profile.user_latitude
+							? profile.user_latitude
+							: profile.latitude,
+						profile.user_longitude
+							? profile.user_longitude
+							: profile.longitude,
+						otherUserProfile.user_latitude
+							? otherUserProfile.user_latitude
+							: otherUserProfile.latitude,
+						otherUserProfile.user_longitude
+							? otherUserProfile.user_longitude
+							: otherUserProfile.longitude
+					)} km`}
 				</div>
 				<div className="">Famerating:</div>
 				<div className="block ml-6 has-text-weight-bold">
-					{profile.famerating}
+					{otherUserProfile.famerating}
 				</div>
 
 				<div className="">Introduction:</div>
 				<div className="block ml-6 has-text-weight-bold">
-					{profile.introduction}
+					{otherUserProfile.introduction}
 				</div>
 				<div className="">Interests:</div>
 				<div className="block">
-					{profile.interests.length > 0
-						? profile.interests.map((interest, index) => (
+					{otherUserProfile.interests.length > 0
+						? otherUserProfile.interests.map((interest, index) => (
 								<span
 									className="tag is-primary mx-2 my-1"
 									key={index}
@@ -275,28 +308,28 @@ const ViewMode = ({ profile, setProfile }: OtherUserViewProps) => {
 				</div>
 				<div className="">Gender:</div>
 				<div className="block ml-6 has-text-weight-bold">
-					{profile.gender}
+					{otherUserProfile.gender}
 				</div>
 				<div className="">Looking for:</div>
 				<div className="block ml-6 has-text-weight-bold">
-					{profile.looking}
+					{otherUserProfile.looking}
 				</div>
 				<div className="block">Minimum age:</div>
 				<div className="block ml-6 has-text-weight-bold">
-					{profile.min_age}
+					{otherUserProfile.min_age}
 				</div>
 				<div className="block">Maximum age:</div>
 				<div className="block ml-6 has-text-weight-bold">
-					{profile.max_age}
+					{otherUserProfile.max_age}
 				</div>
 				<div className="block">Last login:</div>
 				<div className="block ml-6 has-text-weight-bold">
-					{reformatDateTime(profile.last_login)}
+					{reformatDateTime(otherUserProfile.last_login)}
 				</div>
 				<div className="block">
-					<OnlineIndicator onlineStatus={profile.online} />
+					<OnlineIndicator onlineStatus={otherUserProfile.online} />
 				</div>
-				{profile.match_id && notification ? (
+				{otherUserProfile.match_id && notification ? (
 					<div className="notification is-primary">
 						<button
 							className="delete"
@@ -305,21 +338,22 @@ const ViewMode = ({ profile, setProfile }: OtherUserViewProps) => {
 						<h3 className="title is-3">It's a match!</h3>
 					</div>
 				) : null}
-				{profile.likes_requester && !profile.match_id ? (
+				{otherUserProfile.likes_requester &&
+				!otherUserProfile.match_id ? (
 					<div className="notification is-primary is-light">
-						<p className="is-3">{`${profile.name} likes you. Like them back to match them!`}</p>
+						<p className="is-3">{`${otherUserProfile.name} likes you. Like them back to match them!`}</p>
 					</div>
 				) : null}
 				<div className="block buttons">
-					{profile.liked ? (
+					{otherUserProfile.liked ? (
 						<UnlikeButton
-							profile={profile}
-							setProfile={setProfile}
+							otherUserProfile={otherUserProfile}
+							setOtherUserProfile={setOtherUserProfile}
 						/>
 					) : (
 						<LikeButton
-							profile={profile}
-							setProfile={setProfile}
+							profile={otherUserProfile}
+							setProfile={setOtherUserProfile}
 							setNotification={setNotification}
 						/>
 					)}

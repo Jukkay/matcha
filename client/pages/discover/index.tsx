@@ -37,7 +37,7 @@ const NotLoggedIn = () => {
 
 const LoggedIn = () => {
 	const { profile, setProfile, userData, updateUserData } = useUserContext();
-	const { setActivePage } = useNotificationContext()
+	const { setActivePage } = useNotificationContext();
 	const [sort, setSort] = useState<SortType>(SortType.DISTANCE);
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
 	const [searchParams, setSearchParams] = useState({
@@ -45,16 +45,20 @@ const LoggedIn = () => {
 		looking: profile.looking,
 		country: '',
 		city: '',
-		min_age: profile.min_age || (convertBirthdayToAge(profile.birthday) - 5),
-		max_age: profile.max_age || (convertBirthdayToAge(profile.birthday) + 5),
+		min_age: profile.min_age || convertBirthdayToAge(profile.birthday) - 5,
+		max_age: profile.max_age || convertBirthdayToAge(profile.birthday) + 5,
 		min_famerating: 1,
 		max_famerating: 1000,
-		max_distance: 1000,
-		interests: []
+		max_distance: 0,
 	});
 	const [results, setResults] = useState<IResultsProfile[]>([]);
-	const [filteredResults, setFilteredResults] = useState<IResultsProfile[]>([]);
-	
+	const [filteredResults, setFilteredResults] = useState<IResultsProfile[]>(
+		[]
+	);
+	const [sortedResults, setSortedResults] = useState<IResultsProfile[]>(
+		[]
+	);
+
 	const router = useRouter();
 	if (!userData.profile_exists) router.replace('/profile');
 
@@ -66,31 +70,35 @@ const LoggedIn = () => {
 					console.log('Geolocation not permitted by user.', error)
 			);
 		}
-		setActivePage(ActivePage.DISCOVER)
+		setActivePage(ActivePage.DISCOVER);
 	}, []);
 
 	useEffect(() => {
-		if (results.length < 1) return;
 		if (sort === SortType.DISTANCE)
-			setResults(nearFirst(results, profile.latitude, profile.longitude));
+			setSortedResults(nearFirst(filteredResults));
 		if (sort === SortType.REVERSE_DISTANCE)
-			setResults(farFirst(results, profile.latitude, profile.longitude));
-		if (sort === SortType.AGE) setResults(youngFirst(results));
-		if (sort === SortType.REVERSE_AGE) setResults(oldFirst(results));
-		if (sort === SortType.TAGS) setResults(moreCommonTagsFirst(results));
+			setSortedResults(farFirst(filteredResults));
+		if (sort === SortType.AGE)
+			setSortedResults(youngFirst(filteredResults));
+		if (sort === SortType.REVERSE_AGE)
+			setSortedResults(oldFirst(filteredResults));
+		if (sort === SortType.TAGS)
+			setSortedResults(moreCommonTagsFirst(filteredResults));
 		if (sort === SortType.REVERSE_TAGS)
-			setResults(lessCommonTagsFirst(results));
+			setSortedResults(lessCommonTagsFirst(filteredResults));
 		if (sort === SortType.FAMERATING)
-			setResults(highFameratingFirst(results));
+			setSortedResults(highFameratingFirst(filteredResults));
 		if (sort === SortType.REVERSE_FAMERATING)
-			setResults(lowFameratingFirst(results));
-	}, [sort]);
-
-	useEffect(() => {
-		if (searchParams.max_distance < 1) return;
-		const filteredByMaxDistance = [...results].filter((item) => item.distance <= searchParams.max_distance * 1000);
-		setResults(filteredByMaxDistance);
-	}, [searchParams.max_distance]);
+			setSortedResults(lowFameratingFirst(filteredResults));
+	}, [
+		sort,
+		searchParams.min_famerating,
+		searchParams.max_famerating,
+		searchParams.max_distance,
+		searchParams.country,
+		searchParams.city,
+		filteredResults
+	]);
 
 	return (
 		<>
@@ -103,11 +111,7 @@ const LoggedIn = () => {
 				setFilteredResults={setFilteredResults}
 			/>
 			<SortSelector sort={sort} setSort={setSort} />
-			<Results
-				results={results as IResultsProfile[]}
-				setResults={setResults}
-				filteredResults={filteredResults}
-			/>
+			<Results sortedResults={sortedResults} />
 		</>
 	);
 };

@@ -41,28 +41,12 @@ export const Search = ({
 	const { profile } = useUserContext();
 	const [interests, setInterests] = useState<string[]>([]);
 
-	// Filter results by interests
-	useEffect(() => {
-		if (interests.length < 1) {
-			setFilteredResults([]);
-			return;
-		}
-		const filtered = results.filter((item) => {
-			return JSON.parse(item.interests).some((data: string) =>
-				interests.includes(data)
-			);
-		});
-		setFilteredResults(filtered);
-	}, [interests, results]);
-
 	const searchDatabase = async () => {
 		const query = {
 			gender: searchParams.gender,
 			looking: searchParams.looking,
 			min_age: searchParams.min_age,
 			max_age: searchParams.max_age,
-			min_famerating: searchParams.min_famerating,
-			max_famerating: searchParams.max_famerating,
 			country: searchParams.country,
 			city: searchParams.city,
 		};
@@ -74,22 +58,24 @@ export const Search = ({
 				// Calculate distances
 				const resultsWithDistance = addDistanceToProfiles(
 					response.data.results,
-					profile.latitude,
-					profile.longitude
+					profile.user_latitude
+						? profile.user_latitude
+						: profile.latitude,
+					profile.user_longitude
+						? profile.user_longitude
+						: profile.longitude
 				);
 				// Count common interests
 				const resultsWithTags = addCommonTagsToProfiles(
 					resultsWithDistance,
 					profile.interests
 				);
-				// Default sort by distance
-				const sortedResults = nearFirst(
-					resultsWithTags,
-					profile.latitude,
-					profile.longitude
-				);
-				setResults(sortedResults);
-			} else setResults([]);
+				setResults(resultsWithTags);
+				setFilteredResults(resultsWithTags);
+			} else {
+				setResults([]);
+				setFilteredResults([]);
+			}
 		} catch (err) {
 			console.error(err);
 		}
@@ -103,7 +89,24 @@ export const Search = ({
 		event.preventDefault();
 		searchDatabase();
 	};
-
+	const resetSearch = (event: React.FormEvent) => {
+		event.preventDefault();
+		setSearchParams({
+			gender: profile.gender,
+			looking: profile.looking,
+			country: '',
+			city: '',
+			min_age:
+				profile.min_age || convertBirthdayToAge(profile.birthday) - 5,
+			max_age:
+				profile.max_age || convertBirthdayToAge(profile.birthday) + 5,
+			min_famerating: 1,
+			max_famerating: 1000,
+			max_distance: 0,
+		});
+		setInterests([]);
+		setFilteredResults(results);
+	};
 	return (
 		<div>
 			<form onSubmit={handleSubmit}>
@@ -125,22 +128,41 @@ export const Search = ({
 					options={[
 						'Male',
 						'Female',
+						'Male or Female',
 						'Non-binary',
 						'Trans-man',
 						'Trans-woman',
-						'Other',
+						'Anything goes',
 					]}
+				/>
+				<CountrySearchSelector
+					searchParams={searchParams}
+					setSearchParams={setSearchParams}
+				/>
+				<CitySearchSelector
+					searchParams={searchParams}
+					setSearchParams={setSearchParams}
 				/>
 				<AdvancedSearch
 					searchParams={searchParams}
 					setSearchParams={setSearchParams}
 					interests={interests}
 					setInterests={setInterests}
+					results={results}
+					setFilteredResults={setFilteredResults}
 				/>
-
-				<button type="submit" className="button is-primary">
-					Search
-				</button>
+				<div className="buttons">
+					<button type="submit" className="button is-primary">
+						Search
+					</button>
+					<button
+						type="submit"
+						onClick={resetSearch}
+						className="button"
+					>
+						Reset to default
+					</button>
+				</div>
 			</form>
 		</div>
 	);
@@ -151,24 +173,49 @@ const AdvancedSearch = ({
 	setSearchParams,
 	interests,
 	setInterests,
+	results,
+	setFilteredResults,
 }: AdvancedSearchProps) => {
 	const [visible, setVisible] = useState(false);
 
-	const onClick = () => setVisible(!visible);
+	const onClick = () => setVisible((visible) => !visible);
+
+	const handleFilters = (event: React.FormEvent) => {
+		event.preventDefault();
+		let filteredResults = results
+
+		// Filter by distance
+		if (searchParams.max_distance > 0) {
+			console.log('Filtering by distance', searchParams.max_distance);
+			filteredResults = [...filteredResults].filter(
+				(item) => item.distance <= searchParams.max_distance
+			);
+		}
+		// Filter by interests
+		if (interests.length > 0) {
+			filteredResults = filteredResults.filter((item) => {
+				return JSON.parse(item.interests).some((data: string) =>
+					interests.includes(data)
+				);
+			});
+		}
+		// Filter by famerating
+		if (searchParams.min_famerating > 0) {
+			filteredResults = [...filteredResults].filter(
+				(item) =>
+					item.famerating >= searchParams.min_famerating &&
+					item.famerating <= searchParams.max_famerating
+			);
+		}
+		setFilteredResults(filteredResults);
+	};
+
 	return visible ? (
 		<div className="block">
 			<button className="button is-primary is-light" onClick={onClick}>
-				Hide Advanced Search
+				Hide filters
 			</button>
 			<div className="block">
-				<CountrySearchSelector
-					searchParams={searchParams}
-					setSearchParams={setSearchParams}
-				/>
-				<CitySearchSelector
-					searchParams={searchParams}
-					setSearchParams={setSearchParams}
-				/>
 				<FameratingRange
 					searchParams={searchParams}
 					setSearchParams={setSearchParams}
@@ -178,12 +225,15 @@ const AdvancedSearch = ({
 					setSearchParams={setSearchParams}
 				/>
 				<Interests interests={interests} setInterests={setInterests} />
+				<button className="button is-primary" onClick={handleFilters}>
+					Apply filters
+				</button>
 			</div>
 		</div>
 	) : (
 		<div className="block">
 			<button className="button is-primary is-light" onClick={onClick}>
-				Show Advanced Search
+				Filter results
 			</button>
 		</div>
 	);
@@ -314,12 +364,11 @@ const DistanceRange = ({
 					type="number"
 					id="max_distance"
 					className="input is-primary"
-					min={1}
 					value={searchParams.max_distance}
 					onChange={(event) =>
 						setSearchParams({
 							...searchParams,
-							max_distance: parseInt(event.target.value),
+							max_distance: event.target.value,
 						})
 					}
 				/>
@@ -328,28 +377,10 @@ const DistanceRange = ({
 	);
 };
 
-export const Results = ({ results, filteredResults }: ResultsProps) => {
-	return filteredResults.length > 0 ? (
+export const Results = ({ sortedResults }: ResultsProps) => {
+	return sortedResults.length > 0 ? (
 		<section className="section has-text-centered">
-			{filteredResults.map((result, index) => (
-				<SearchResultItem
-					key={index}
-					user_id={result.user_id}
-					profile_image={result.profile_image}
-					name={result.name}
-					birthday={result.birthday}
-					city={result.city}
-					country={result.country}
-					distance={result.distance}
-					famerating={result.famerating}
-					interests={result.interests}
-					online={result.online}
-				/>
-			))}
-		</section>
-	) : results.length > 0 ? (
-		<section className="section has-text-centered">
-			{results?.map((result, index) => (
+			{sortedResults.map((result, index) => (
 				<SearchResultItem
 					key={index}
 					user_id={result.user_id}

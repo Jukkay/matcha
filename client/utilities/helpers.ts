@@ -36,6 +36,7 @@ export const distanceBetweenPoints = (
 	latitude2: string,
 	longitude2: string
 ) => {
+	if (!latitude1 || !longitude1 || !latitude2 || !longitude2) return 0;
 	const lat1 = parseFloat(latitude1);
 	const lat2 = parseFloat(latitude2);
 	const lon1 = parseFloat(longitude1);
@@ -53,7 +54,7 @@ export const distanceBetweenPoints = (
 			Math.cos(lat1Radians) *
 			Math.cos(lat2Radians);
 	const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-	const distance = Math.floor(c * earthRadius / 1000);
+	const distance = Math.floor(c * earthRadius);
 	return distance;
 };
 
@@ -67,8 +68,8 @@ export const addDistanceToProfiles = (
 		distance: distanceBetweenPoints(
 			latitude,
 			longitude,
-			profile.latitude as string,
-			profile.longitude as string
+			profile.user_latitude ? profile.user_latitude : profile.latitude,
+			profile.user_longitude ? profile.user_longitude : profile.longitude
 		),
 	}));
 	return resultsWithDistance;
