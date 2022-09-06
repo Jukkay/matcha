@@ -109,9 +109,10 @@ const LoggedIn = () => {
 				results={results}
 				filteredResults={filteredResults}
 				setFilteredResults={setFilteredResults}
+				setLoadStatus={setLoadStatus}
 			/>
 			<SortSelector sort={sort} setSort={setSort} />
-			<Results sortedResults={sortedResults} />
+			<Results sortedResults={sortedResults} loadStatus={loadStatus} />
 		</>
 	);
 };

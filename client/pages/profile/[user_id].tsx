@@ -9,6 +9,7 @@ import {
 	IOtherUserProfile,
 	IProfile,
 	LikeButtonProps,
+	LoadStatus,
 	NotificationType,
 	OtherUserViewProps,
 	ProfileViewProps,
@@ -35,6 +36,7 @@ const NotLoggedIn = () => {
 };
 
 const LoggedIn = () => {
+	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
 	const [otherUserProfile, setOtherUserProfile] = useState<IOtherUserProfile>(
 		{
 			user_id: 0,
@@ -92,6 +94,7 @@ const LoggedIn = () => {
 
 	const getUserProfile = async () => {
 		try {
+			setLoadStatus(LoadStatus.LOADING);
 			const { user_id } = router.query;
 			let response = await authAPI.get(`/profile/${user_id}`);
 			if (response?.data?.profile) {
@@ -102,9 +105,11 @@ const LoggedIn = () => {
 				setOtherUserProfile(response.data.profile);
 			} else setProfileExists(false);
 		} catch (err) {
+			setLoadStatus(LoadStatus.ERROR);
 			console.error(err);
 		} finally {
 			logVisit();
+			setLoadStatus(LoadStatus.IDLE);
 		}
 	};
 
@@ -115,6 +120,20 @@ const LoggedIn = () => {
 		setActivePage(ActivePage.OTHER_PROFILE);
 	}, [router.isReady]);
 
+	if (loadStatus == LoadStatus.LOADING)
+		return (
+			<section className="section has-element-centered">
+				<p>
+					<span className="loader"></span>;
+				</p>
+			</section>
+		);
+	if (loadStatus == LoadStatus.ERROR)
+		return (
+			<section className="section has-text-centered">
+				<h3 className="title is-3">Error loading profile</h3>
+			</section>
+		);
 	return profileExists ? (
 		<ViewMode
 			otherUserProfile={otherUserProfile}
@@ -143,7 +162,7 @@ const LikeButton = ({
 			liker: liker,
 			liked: liked,
 		});
-		console.log('Sending like');
+
 		if (response.status === 200) {
 			// Emit notification
 			const notification = {

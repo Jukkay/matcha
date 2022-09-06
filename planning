@@ -292,6 +292,7 @@ V Add 'male & female' and 'Anything' as options to looking in profile create
 V Add to update
 V Handle these options in profile search
 V Fix filter by max distance
+V Make sure profile image is changed to default on logout
 V Keep original results intact
 V Always filter original results
 V Always sort filtered results
@@ -304,21 +305,23 @@ V Make famerating filtering happen on client side
 V Make filtering happen on button click
 V Change advanced search to 'filters'
 V Make it possible to combine filters
-Make search page layout clearer
-Add pagination to search results
-Fine tune default search result sorting so it prioritises most people with best famerating and most common tags.
+V Add infinite scroll to search results
+V Make search page layout clearer
+V Show number of profiles found on search
+V Fine tune default search result sorting
+    V Sort by famerating on query.
+    V Sort by distance and common tags on first render.
+V Add real gps coordinates to dummy users
+Add loading state to all components that load
 Check why invalid email address error doesn't clear on signup form
+Lazy loading for images (Bonus)
+Double slider for age range
 
 # Later
-Make last message show on match list
 Refactor SQL queries using ``
-Make sure profile image is changed to default on logout
 Change language to very plain language for accessibility
-Change user_id into unique hash?
 Show image counter
-Move API url to docker secrets
 Remove error message passthrough in user controller
-Double slider for age range
 
 # Bonuses done
 JWT refresh automation

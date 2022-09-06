@@ -223,6 +223,7 @@ export interface SearchProps {
   results: IResultsProfile[]
   filteredResults: IResultsProfile[]
   setFilteredResults: SetStateAction<any>
+  setLoadStatus: SetStateAction<any>
 }
 
 export interface AdvancedSearchProps {
@@ -235,6 +236,7 @@ export interface AdvancedSearchProps {
 }
 export interface ResultsProps {
   sortedResults: IResultsProfile[]
+  loadStatus: LoadStatus
 }
 
 export interface ISearchParams {
@@ -270,6 +272,7 @@ export interface IProfileCard {
   distance: number
   interests: string
   online: boolean
+  ref?: any
 }
 
 export interface IMatch {

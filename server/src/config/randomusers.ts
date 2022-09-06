@@ -1,6 +1,7 @@
 const { RandomUser } = require('random-user-api');
 import * as SQLConnect from '../utilities/SQLConnect';
 import { dummyData } from './data';
+import { location } from './gpsdata'
 import fs from 'fs';
 
 const reformatDate = (date: string) => {
@@ -88,10 +89,11 @@ const createProfile = async (data: any) => {
 			filenames.push(temp);
 		}
 		profile_image = filenames[0][1]
+		const locationIndex = Math.floor(Math.random() * location.length)
 		await SQLConnect.execute(sql2, [
 			user_id,
 			data[key].nat,
-			data[key].location.city,
+			location[locationIndex].Name,
 			data[key].gender[0].toUpperCase() +
 				data[key].gender.slice(1).toLowerCase(),
 			reformatDate(data[key].dob.date),
@@ -102,8 +104,8 @@ const createProfile = async (data: any) => {
 			JSON.stringify(interests),
 			data[key].name.first,
 			profile_image,
-			data[key].location.coordinates.latitude,
-			data[key].location.coordinates.longitude,
+			location[locationIndex].Latitude,
+			location[locationIndex].Longitude,
 			Math.floor(Math.random() * (1000 - 1) + 1),
 		]);
 		await SQLConnect.execute(
@@ -130,8 +132,6 @@ const main = async () => {
 			.excludeAllFieldsBut('login')
 			.and()
 			.excludeAllFieldsBut('gender')
-			.and()
-			.excludeAllFieldsBut('location')
 			.and()
 			.excludeAllFieldsBut('nat')
 			.nationality('fi')

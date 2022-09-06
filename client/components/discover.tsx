@@ -1,6 +1,12 @@
 import type { NextPage } from 'next';
 import Link from 'next/link';
-import React, { useState, useEffect } from 'react';
+import React, {
+	useState,
+	useEffect,
+	useCallback,
+	MutableRefObject,
+	useRef,
+} from 'react';
 import {
 	GenderSelector,
 	OnlineIndicator,
@@ -12,6 +18,7 @@ import {
 	AdvancedSearchProps,
 	IProfileCard,
 	IResultsProfile,
+	LoadStatus,
 	ResultsProps,
 	SearchParamsProps,
 	SearchProps,
@@ -25,7 +32,7 @@ import {
 	convertAgeToBirthday,
 	convertBirthdayToAge,
 } from '../utilities/helpers';
-import { nearFirst } from '../utilities/sort';
+import { moreCommonTagsFirst } from '../utilities/sort';
 import { Country, City } from 'country-state-city';
 import { ErrorMessage } from './form';
 import { dummyData } from '../pages/profile/data';
@@ -37,6 +44,7 @@ export const Search = ({
 	results,
 	filteredResults,
 	setFilteredResults,
+	setLoadStatus,
 }: SearchProps) => {
 	const { profile } = useUserContext();
 	const [interests, setInterests] = useState<string[]>([]);
@@ -51,6 +59,7 @@ export const Search = ({
 			city: searchParams.city,
 		};
 		try {
+			setLoadStatus(LoadStatus.LOADING);
 			let response = await authAPI.post(`/search`, {
 				data: query,
 			});
@@ -70,14 +79,19 @@ export const Search = ({
 					resultsWithDistance,
 					profile.interests
 				);
-				setResults(resultsWithTags);
-				setFilteredResults(resultsWithTags);
+				const resultsSortedByInterests =
+					moreCommonTagsFirst(resultsWithTags);
+				setResults(resultsSortedByInterests);
+				setFilteredResults(resultsSortedByInterests);
 			} else {
 				setResults([]);
 				setFilteredResults([]);
 			}
 		} catch (err) {
+			setLoadStatus(LoadStatus.ERROR);
 			console.error(err);
+		} finally {
+			setLoadStatus(LoadStatus.IDLE);
 		}
 	};
 
@@ -109,6 +123,7 @@ export const Search = ({
 	};
 	return (
 		<div>
+			<h3 className="title is-3">Search</h3>
 			<form onSubmit={handleSubmit}>
 				<SearchAgeRange
 					searchParams={searchParams}
@@ -135,6 +150,8 @@ export const Search = ({
 						'Anything goes',
 					]}
 				/>
+				<hr />
+				<h5 className="title is-5 has-text-grey">Optional</h5>
 				<CountrySearchSelector
 					searchParams={searchParams}
 					setSearchParams={setSearchParams}
@@ -142,14 +159,6 @@ export const Search = ({
 				<CitySearchSelector
 					searchParams={searchParams}
 					setSearchParams={setSearchParams}
-				/>
-				<AdvancedSearch
-					searchParams={searchParams}
-					setSearchParams={setSearchParams}
-					interests={interests}
-					setInterests={setInterests}
-					results={results}
-					setFilteredResults={setFilteredResults}
 				/>
 				<div className="buttons">
 					<button type="submit" className="button is-primary">
@@ -163,6 +172,17 @@ export const Search = ({
 						Reset to default
 					</button>
 				</div>
+				<hr />
+				<h5 className="title is-5 has-text-grey">Filter results</h5>
+				<AdvancedSearch
+					searchParams={searchParams}
+					setSearchParams={setSearchParams}
+					interests={interests}
+					setInterests={setInterests}
+					results={results}
+					setFilteredResults={setFilteredResults}
+				/>
+				<hr />
 			</form>
 		</div>
 	);
@@ -182,7 +202,7 @@ const AdvancedSearch = ({
 
 	const handleFilters = (event: React.FormEvent) => {
 		event.preventDefault();
-		let filteredResults = results
+		let filteredResults = results;
 
 		// Filter by distance
 		if (searchParams.max_distance > 0) {
@@ -212,19 +232,25 @@ const AdvancedSearch = ({
 
 	return visible ? (
 		<div className="block">
-			<button className="button is-primary is-light" onClick={onClick}>
-				Hide filters
-			</button>
+			<div className="block">
+				<button className="button is-primary" onClick={onClick}>
+					Hide filters
+				</button>
+			</div>
 			<div className="block">
 				<FameratingRange
 					searchParams={searchParams}
 					setSearchParams={setSearchParams}
 				/>
+			</div>
+			<div className="block">
 				<DistanceRange
 					searchParams={searchParams}
 					setSearchParams={setSearchParams}
 				/>
 				<Interests interests={interests} setInterests={setInterests} />
+			</div>
+			<div className="block">
 				<button className="button is-primary" onClick={handleFilters}>
 					Apply filters
 				</button>
@@ -232,8 +258,8 @@ const AdvancedSearch = ({
 		</div>
 	) : (
 		<div className="block">
-			<button className="button is-primary is-light" onClick={onClick}>
-				Filter results
+			<button className="button is-primary" onClick={onClick}>
+				Show filters
 			</button>
 		</div>
 	);
@@ -377,10 +403,50 @@ const DistanceRange = ({
 	);
 };
 
-export const Results = ({ sortedResults }: ResultsProps) => {
+export const Results = ({ sortedResults, loadStatus }: ResultsProps) => {
+	const [endIndex, setEndIndex] = useState(9);
+	const [searchResultText, setSearchResultText] = useState('');
+	const scrollTarget: MutableRefObject<any> = useRef(null);
+
+	// Infinite scroll for results
+	const handleScroll = useCallback((entries: any) => {
+		if (entries[0].isIntersecting) {
+			setEndIndex((endIndex) => endIndex + 10);
+		}
+	}, []);
+
+	useEffect(() => {
+		const options = {
+			root: null,
+			threshold: 1.0,
+		};
+		const observer = new IntersectionObserver(handleScroll, options);
+		if (scrollTarget.current) observer.observe(scrollTarget.current);
+	}, [handleScroll]);
+
+	useEffect(() => {
+		const count = sortedResults.length;
+		if (count < 1) setSearchResultText('No results found');
+		else if (count == 1) setSearchResultText('1 profile found');
+		else setSearchResultText(`${sortedResults.length} profiles found`);
+	}, [sortedResults]);
+
+	if (loadStatus == LoadStatus.LOADING)
+		return (
+			<section className="section has-element-centered">
+				<div className="loader"></div>
+			</section>
+		);
+	if (loadStatus == LoadStatus.ERROR)
+		return (
+			<section className="section has-text-centered">
+				<h3 className="title is-3">Error loading profiles</h3>
+			</section>
+		);
 	return sortedResults.length > 0 ? (
 		<section className="section has-text-centered">
-			{sortedResults.map((result, index) => (
+			<h5 className="title is-5">{searchResultText}</h5>
+			{sortedResults.slice(0, endIndex).map((result, index) => (
 				<SearchResultItem
 					key={index}
 					user_id={result.user_id}
@@ -395,6 +461,13 @@ export const Results = ({ sortedResults }: ResultsProps) => {
 					online={result.online}
 				/>
 			))}
+			{endIndex < sortedResults.length ? (
+				<div ref={scrollTarget}>Loading</div>
+			) : (
+				<section className="section has-text-centered">
+					<h3 className="title is-3">No more matching profiles</h3>
+				</section>
+			)}
 		</section>
 	) : (
 		<section className="section has-text-centered">
