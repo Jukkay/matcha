@@ -36,6 +36,7 @@ import { moreCommonTagsFirst } from '../utilities/sort';
 import { Country, City } from 'country-state-city';
 import { ErrorMessage } from './form';
 import { dummyData } from '../pages/profile/data';
+import { LoadError, Spinner } from './utilities';
 
 export const Search = ({
 	searchParams,
@@ -424,6 +425,7 @@ export const Results = ({ sortedResults, loadStatus }: ResultsProps) => {
 		if (scrollTarget.current) observer.observe(scrollTarget.current);
 	}, [handleScroll]);
 
+	// Show how many profiles found
 	useEffect(() => {
 		const count = sortedResults.length;
 		if (count < 1) setSearchResultText('No results found');
@@ -432,17 +434,10 @@ export const Results = ({ sortedResults, loadStatus }: ResultsProps) => {
 	}, [sortedResults]);
 
 	if (loadStatus == LoadStatus.LOADING)
-		return (
-			<section className="section has-element-centered">
-				<div className="loader"></div>
-			</section>
-		);
+		return <Spinner />
 	if (loadStatus == LoadStatus.ERROR)
-		return (
-			<section className="section has-text-centered">
-				<h3 className="title is-3">Error loading profiles</h3>
-			</section>
-		);
+		return <LoadError text="Error loading profiles" />
+
 	return sortedResults.length > 0 ? (
 		<section className="section has-text-centered">
 			<h5 className="title is-5">{searchResultText}</h5>

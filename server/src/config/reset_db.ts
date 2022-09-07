@@ -30,8 +30,10 @@ const reset_db = async () => {
 			db.query(sql)
 		)
 		db.end()
+		process.exit(0)
 	} catch (err) {
 		console.error(err)
+		process.exit(1)
 	}
 }
 

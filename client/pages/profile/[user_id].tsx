@@ -24,6 +24,7 @@ import {
 } from '../../utilities/helpers';
 import { useNotificationContext } from '../../components/NotificationContext';
 import { useSocketContext } from '../../components/SocketContext';
+import { LoadError, Spinner } from '../../components/utilities';
 
 const NotLoggedIn = () => {
 	return (
@@ -67,9 +68,16 @@ const LoggedIn = () => {
 	const { setActivePage } = useNotificationContext();
 	const [profileExists, setProfileExists] = useState(false);
 	const socket = useSocketContext();
+	const [wasRedirected, setWasRedirected] = useState(false);
 	const router = useRouter();
-	if (!userData.profile_exists) router.replace('/profile');
 
+	// Redirect if user has no profile
+	useEffect(() => {
+		if (wasRedirected || userData.profile_exists) return;
+		setWasRedirected(true);
+		router.replace('/profile');
+	}, [userData.profile_exists]);
+	
 	const logVisit = async () => {
 		try {
 			const { user_id } = router.query;
@@ -121,19 +129,10 @@ const LoggedIn = () => {
 	}, [router.isReady]);
 
 	if (loadStatus == LoadStatus.LOADING)
-		return (
-			<section className="section has-element-centered">
-				<p>
-					<span className="loader"></span>;
-				</p>
-			</section>
-		);
+		return <Spinner />
 	if (loadStatus == LoadStatus.ERROR)
-		return (
-			<section className="section has-text-centered">
-				<h3 className="title is-3">Error loading profile</h3>
-			</section>
-		);
+		return <LoadError text="Error loading profile" />
+		
 	return profileExists ? (
 		<ViewMode
 			otherUserProfile={otherUserProfile}

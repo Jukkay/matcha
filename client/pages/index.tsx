@@ -1,6 +1,6 @@
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useUserContext } from '../components/UserContext';
 
 const NotLoggedIn = () => {
@@ -13,20 +13,34 @@ const NotLoggedIn = () => {
 
 const LoggedIn = () => {
 	const { userData, profile, setProfile } = useUserContext();
-	// Router for redirect after login
+	const [wasRedirected, setWasRedirected] = useState(false);
 	const router = useRouter();
 
-	if (!userData.profile_exists) router.replace('/profile');
+	// Redirect if user has no profile
+	useEffect(() => {
+		if (wasRedirected || userData.profile_exists) return;
+		let latestState
+		setWasRedirected(latest => {latestState = latest; return true});
+		if (latestState) return
+		console.log('Redirect from front page')
+		router.replace('/profile');
+	}, [userData.profile_exists]);
 
 	useEffect(() => {
 		if ('geolocation' in navigator) {
 			navigator.geolocation.getCurrentPosition(
-				(position) => setProfile({...profile, geolocation: position}), 
-				(error) => console.log('Geolocation not permitted by user.', error))
+				(position) => setProfile({ ...profile, geolocation: position }),
+				(error) =>
+					console.log('Geolocation not permitted by user.', error)
+			);
 		}
 	}, []);
-	
-	return <div>Profile is complete. Front page here.</div>;
+
+	return (
+		<section className="section">
+			<div>Profile is complete. Front page here.</div>
+		</section>
+	);
 };
 
 const Home: NextPage = () => {

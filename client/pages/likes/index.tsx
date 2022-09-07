@@ -5,7 +5,8 @@ import React, { useState, useEffect } from 'react';
 import { useNotificationContext } from '../../components/NotificationContext';
 import { OnlineIndicator } from '../../components/profile';
 import { useUserContext } from '../../components/UserContext';
-import { ActivePage, ILikeProfile, LogEntry, NotificationType } from '../../types/types';
+import { LoadError, Spinner } from '../../components/utilities';
+import { ActivePage, ILikeProfile, LoadStatus, LogEntry, NotificationType } from '../../types/types';
 import { authAPI } from '../../utilities/api';
 import { convertBirthdayToAge, reformatDate } from '../../utilities/helpers';
 
@@ -24,9 +25,16 @@ const LoggedIn = () => {
 	const { setActivePage, setNotificationCount, setMessageCount, setLikeCount } = useNotificationContext();
 	const [likedProfiles, setLikedProfiles] = useState<ILikeProfile[]>([]);
 	const [likerProfiles, setLikerProfiles] = useState<ILikeProfile[]>([]);
+	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
+	const [wasRedirected, setWasRedirected] = useState(false);
 	const router = useRouter();
 
-	if (!userData.profile_exists) router.replace('/profile');
+	// Redirect if user has no profile
+	useEffect(() => {
+		if (wasRedirected || userData.profile_exists) return;
+		setWasRedirected(true);
+		router.replace('/profile');
+	}, [userData.profile_exists]);
 
 	const getLikerProfiles = async () => {
 		let response = await authAPI.get(`/like/${userData.user_id}`);
@@ -54,9 +62,19 @@ const LoggedIn = () => {
 	}
 
 	useEffect(() => {
-		getLikedProfiles();
-		getLikerProfiles();
-		markLikeNotificationsRead()
+		const fetchData = async () => {
+			try {
+				setLoadStatus(LoadStatus.LOADING)
+				await getLikedProfiles();
+				await getLikerProfiles();
+				await markLikeNotificationsRead()
+			} catch (err) {
+				setLoadStatus(LoadStatus.ERROR);
+			} finally {
+				setLoadStatus(LoadStatus.IDLE)
+			}
+		}
+		fetchData();
 		setActivePage(ActivePage.LIKES);
 	}, []);
 
@@ -69,6 +87,12 @@ const LoggedIn = () => {
 			);
 		}
 	}, []);
+
+	if (loadStatus == LoadStatus.LOADING)
+		return <Spinner />
+	if (loadStatus == LoadStatus.ERROR)
+		return <LoadError text="Error loading likes" />
+
 
 	return likerProfiles.length > 0 || likedProfiles.length > 0 ? (
 		<section className="section has-text-centered">

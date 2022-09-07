@@ -362,3 +362,7 @@ export interface ILikeProfile extends IProfileCard {
 export interface BooleanProp {
   onlineStatus: boolean
 }
+
+export interface TextInput {
+  text: string
+}

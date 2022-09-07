@@ -20,6 +20,7 @@ import { FiMenu } from 'react-icons/fi';
 import { IconContext } from 'react-icons';
 import { BsThreeDots, BsThreeDotsVertical } from 'react-icons/bs';
 import { FaCircle } from 'react-icons/fa';
+import { LoadError, Spinner } from '../../components/utilities';
 
 const NotLoggedIn = () => {
 	return (
@@ -36,10 +37,16 @@ const LoggedIn = () => {
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
 	const { setNotificationCount, setMessageCount, setLikeCount } =
 		useNotificationContext();
+	const [wasRedirected, setWasRedirected] = useState(false);
 	const router = useRouter();
 
-	if (!userData.profile_exists) router.replace('/profile');
-
+	// Redirect if user has no profile
+	useEffect(() => {
+		if (wasRedirected || userData.profile_exists) return;
+		setWasRedirected(true);
+		router.replace('/profile');
+	}, [userData.profile_exists]);
+		
 	useEffect(() => {
 		if ('geolocation' in navigator) {
 			navigator.geolocation.getCurrentPosition(
@@ -252,14 +259,27 @@ const MatchList = () => {
 
 	useEffect(() => {
 		const getUsersMatches = async () => {
-			let response = await authAPI.get(`/match/${profile.user_id}`);
-			if (response.status === 200) {
-				setMatches(response.data.matches);
+			try {
+				setLoadStatus(LoadStatus.LOADING);
+				let response = await authAPI.get(`/match/${profile.user_id}`);
+				if (response.status === 200) {
+					setMatches(response.data.matches);
+				}
+			} catch (err) {
+				console.error(err)
+				setLoadStatus(LoadStatus.ERROR)
+			} finally {
+				setLoadStatus(LoadStatus.IDLE)
 			}
 		};
 		getUsersMatches();
 		setActivePage(ActivePage.MESSAGES);
 	}, []);
+
+	if (loadStatus == LoadStatus.LOADING)
+		return <Spinner />
+	if (loadStatus == LoadStatus.ERROR)
+		return <LoadError text="Error loading matches" />
 
 	return matches.length > 0 ? (
 		<div className="column is-narrow is-flex is-flex-direction-column match-list">
@@ -422,11 +442,15 @@ const ChatWindow = () => {
 			if (!matchData.match_id) return;
 			setReceived([]);
 			socket.emit('active_chat', matchData.match_id);
+			setLoadStatus(LoadStatus.LOADING);
 			const response = await authAPI(`/messages/${matchData.match_id}`);
 			if (response?.data?.messages?.length > 0)
 				setReceived([...response.data.messages]);
 		} catch (err) {
 			console.error(err);
+			setLoadStatus(LoadStatus.ERROR);
+		} finally {
+			setLoadStatus(LoadStatus.IDLE)
 		}
 	};
 
@@ -446,6 +470,11 @@ const ChatWindow = () => {
 	useEffect(() => {
 		selectChat();
 	}, [matchData.match_id]);
+
+	if (loadStatus == LoadStatus.LOADING)
+		return <Spinner />
+	if (loadStatus == LoadStatus.ERROR)
+		return <LoadError text="Error loading messages" />
 
 	return matchData.match_id ? (
 		<div className="column">

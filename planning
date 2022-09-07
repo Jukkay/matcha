@@ -312,16 +312,27 @@ V Fine tune default search result sorting
     V Sort by famerating on query.
     V Sort by distance and common tags on first render.
 V Add real gps coordinates to dummy users
-Add loading state to all components that load
-Check why invalid email address error doesn't clear on signup form
-Lazy loading for images (Bonus)
-Double slider for age range
+V Set up loading state
+V Check why invalid email address error doesn't clear on signup form
+V Create spinner component
+V Check why front page redirect to profile page even if profile exists
+V Add loading state to all components that load
+V Add and check redirect state before redirecting to avoid abort errors
 
-# Later
+Fix login not redirecting to front page for users with profile
+Fix login redirect abort error if still bothering
+Double slider for age range
+Make online status work with socket.io
 Refactor SQL queries using ``
 Change language to very plain language for accessibility
 Show image counter
 Remove error message passthrough in user controller
+
+# Possible bonuses
+Lazy loading
+Instagram picture import
+Facebook login
+Image optimization
 
 # Bonuses done
 JWT refresh automation

@@ -58,10 +58,16 @@ const LoggedIn = () => {
 	const [sortedResults, setSortedResults] = useState<IResultsProfile[]>(
 		[]
 	);
-
+	const [wasRedirected, setWasRedirected] = useState(false);
 	const router = useRouter();
-	if (!userData.profile_exists) router.replace('/profile');
 
+	// Redirect if user has no profile
+	useEffect(() => {
+		if (wasRedirected || userData.profile_exists) return;
+		setWasRedirected(true);
+		router.replace('/profile');
+	}, [userData.profile_exists]);
+	
 	useEffect(() => {
 		if ('geolocation' in navigator) {
 			navigator.geolocation.getCurrentPosition(

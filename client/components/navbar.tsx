@@ -125,7 +125,6 @@ const NotificationDropdownMenu = () => {
 	const { userData } = useUserContext();
 
 	const markNotificationsRead = async () => {
-		console.log('markNotificationsRead running');
 		if (!userData.user_id) return;
 		const response = await authAPI(`/notifications/${userData.user_id}`);
 		if (response?.data?.notifications?.length > 0) {
@@ -360,20 +359,22 @@ const NavbarComponent = () => {
 				aria-label="main navigation"
 			>
 				<div className="navbar-brand">
-					<a className="navbar-item pt-3" href="/">
-						<span className="icon is-medium">
-							<IconContext.Provider
-								value={{
-									size: '1.2rem',
-									className: 'react-icons',
-								}}
-							>
-								<div>
-									<FaHeart />
-								</div>
-							</IconContext.Provider>
-						</span>
-					</a>
+					<Link href="/">
+						<a className="navbar-item pt-3" href="/">
+							<span className="icon is-medium">
+								<IconContext.Provider
+									value={{
+										size: '1.2rem',
+										className: 'react-icons',
+									}}
+								>
+									<div>
+										<FaHeart />
+									</div>
+								</IconContext.Provider>
+							</span>
+						</a>
+					</Link>
 					<a
 						role="button"
 						className="navbar-burger"

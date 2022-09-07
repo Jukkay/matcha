@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import multer from 'multer';
 import path from 'path';
 import { decodeUserFromAccesstoken } from '../controllers/token';
+import { encode } from "blurhash";
 
 const checkFileValidity = (req: any, file: any, callback: any) => {
 	const validExtensions = /png|jpg|jpeg|gif|/;

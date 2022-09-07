@@ -144,8 +144,10 @@ const main = async () => {
 		await createUsers(filtered);
 		await getUserIDs(filtered);
 		await createProfile(filtered);
+		process.exit(0)
 	} catch (err) {
 		console.error(err);
+		process.exit(1)
 	}
 };
 main();
