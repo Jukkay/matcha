@@ -366,3 +366,10 @@ export interface BooleanProp {
 export interface TextInput {
   text: string
 }
+export interface UserIdInput {
+  user_id: number
+}
+
+export interface ResultProfiles {
+  profiles: IResultsProfile[]
+}

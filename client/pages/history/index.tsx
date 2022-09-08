@@ -99,18 +99,19 @@ const SearchResultItem = ({ profile }: any) => {
 	return (
 <Link href={`/profile/${profile.user_id}`}>
 			<a>
-				<div className="columns card my-6">
-					<div className="column card-image has-text-left is-two-thirds">
-						<figure className="image">
+				<div className="columns card my-6 rounded-corners">
+					<div className="column has-text-left is-two-thirds">
+						<figure className="image is-square">
 							<img
 								src={`${authAPI.defaults.baseURL}/images/${profile.profile_image}`}
 								alt="Placeholder image"
 								crossOrigin=""
+								className="rounded-corners"
 							/>
-						</figure>
-						<div className="is-overlay card-content">
+						<div className="is-overlay mt-3 ml-3">
 							<OnlineIndicator onlineStatus={profile.online} />
 						</div>
+						</figure>
 					</div>
 					<div className="column mt-3 has-text-left">
 						<div className="block">Name: {profile.name}</div>

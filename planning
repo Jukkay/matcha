@@ -321,11 +321,14 @@ V Add and check redirect state before redirecting to avoid abort errors
 V Fix login not redirecting to front page for users with profile
 V Fix login redirect abort error if still bothering
 
-Build front page
-Show profiles closest in one row
-Show profiles with most common interests in one row
-Show profiles with highest famerating in one row
-Show random profiles
+V Build front page
+V Show profiles closest in one row
+V Show profiles with most common interests in one row
+V Show profiles with highest famerating in one row
+V Show random profiles
+V Make all carousel pictures crop to same aspect ratio
+V Give images and cards uniformly rounded corners
+
 Double slider for age range
 Make online status work with socket.io
 Refactor SQL queries using ``
