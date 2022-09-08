@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import type { NextPage } from 'next';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Gallery, OnlineIndicator } from '../../components/profile';
 import { useUserContext } from '../../components/UserContext';
 import {
@@ -69,13 +69,18 @@ const LoggedIn = () => {
 	const [profileExists, setProfileExists] = useState(false);
 	const socket = useSocketContext();
 	const [wasRedirected, setWasRedirected] = useState(false);
+	const isFirstRender = useRef(true)
 	const router = useRouter();
 
 	// Redirect if user has no profile
 	useEffect(() => {
+		if (isFirstRender.current) {
+			isFirstRender.current = false;
+			return
+		}
 		if (wasRedirected || userData.profile_exists) return;
 		setWasRedirected(true);
-		router.replace('/profile');
+    	router.replace('/profile')
 	}, [userData.profile_exists]);
 	
 	const logVisit = async () => {

@@ -1,7 +1,7 @@
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Results, Search, SortSelector } from '../../components/discover';
 import { useNotificationContext } from '../../components/NotificationContext';
 
@@ -59,13 +59,18 @@ const LoggedIn = () => {
 		[]
 	);
 	const [wasRedirected, setWasRedirected] = useState(false);
+	const isFirstRender = useRef(true)
 	const router = useRouter();
 
 	// Redirect if user has no profile
 	useEffect(() => {
+		if (isFirstRender.current) {
+			isFirstRender.current = false;
+			return
+		}
 		if (wasRedirected || userData.profile_exists) return;
 		setWasRedirected(true);
-		router.replace('/profile');
+    	router.replace('/profile')
 	}, [userData.profile_exists]);
 	
 	useEffect(() => {

@@ -19,9 +19,8 @@ const LoginSuccess = () => {
 			isFirstRender.current = false;
 			return
 		}
-		if (wasRedirected || userData.profile_exists) return;
+		if (wasRedirected) return;
 		setWasRedirected(true);
-		console.log('Redirect from login')
 		const path = userData.profile_exists ? '/' : '/profile'
     	setTimeout(() => router.replace(path), 2000);
 	}, [userData.profile_exists]);

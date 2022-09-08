@@ -41,7 +41,7 @@ const LoggedIn = () => {
 		}
 		if (wasRedirected || userData.profile_exists) return;
 		setWasRedirected(true);
-		router.replace('/profile');
+    	router.replace('/profile')
 	}, [userData.profile_exists]);
 	
 	useEffect(() => {

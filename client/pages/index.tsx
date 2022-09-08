@@ -1,6 +1,6 @@
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useUserContext } from '../components/UserContext';
 
 const NotLoggedIn = () => {
@@ -14,16 +14,18 @@ const NotLoggedIn = () => {
 const LoggedIn = () => {
 	const { userData, profile, setProfile } = useUserContext();
 	const [wasRedirected, setWasRedirected] = useState(false);
+	const isFirstRender = useRef(true)
 	const router = useRouter();
 
 	// Redirect if user has no profile
 	useEffect(() => {
+		if (isFirstRender.current) {
+			isFirstRender.current = false;
+			return
+		}
 		if (wasRedirected || userData.profile_exists) return;
-		let latestState
-		setWasRedirected(latest => {latestState = latest; return true});
-		if (latestState) return
-		console.log('Redirect from front page')
-		router.replace('/profile');
+		setWasRedirected(true);
+    	router.replace('/profile')
 	}, [userData.profile_exists]);
 
 	useEffect(() => {

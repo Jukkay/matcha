@@ -1,7 +1,7 @@
 import type { NextPage } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNotificationContext } from '../../components/NotificationContext';
 import { OnlineIndicator } from '../../components/profile';
 import { useUserContext } from '../../components/UserContext';
@@ -27,13 +27,18 @@ const LoggedIn = () => {
 	const [likerProfiles, setLikerProfiles] = useState<ILikeProfile[]>([]);
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
 	const [wasRedirected, setWasRedirected] = useState(false);
+	const isFirstRender = useRef(true)
 	const router = useRouter();
 
 	// Redirect if user has no profile
 	useEffect(() => {
+		if (isFirstRender.current) {
+			isFirstRender.current = false;
+			return
+		}
 		if (wasRedirected || userData.profile_exists) return;
 		setWasRedirected(true);
-		router.replace('/profile');
+    	router.replace('/profile')
 	}, [userData.profile_exists]);
 
 	const getLikerProfiles = async () => {

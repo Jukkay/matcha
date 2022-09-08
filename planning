@@ -318,9 +318,14 @@ V Create spinner component
 V Check why front page redirect to profile page even if profile exists
 V Add loading state to all components that load
 V Add and check redirect state before redirecting to avoid abort errors
+V Fix login not redirecting to front page for users with profile
+V Fix login redirect abort error if still bothering
 
-Fix login not redirecting to front page for users with profile
-Fix login redirect abort error if still bothering
+Build front page
+Show profiles closest in one row
+Show profiles with most common interests in one row
+Show profiles with highest famerating in one row
+Show random profiles
 Double slider for age range
 Make online status work with socket.io
 Refactor SQL queries using ``

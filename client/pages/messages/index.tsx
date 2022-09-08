@@ -38,13 +38,18 @@ const LoggedIn = () => {
 	const { setNotificationCount, setMessageCount, setLikeCount } =
 		useNotificationContext();
 	const [wasRedirected, setWasRedirected] = useState(false);
+	const isFirstRender = useRef(true)
 	const router = useRouter();
 
 	// Redirect if user has no profile
 	useEffect(() => {
+		if (isFirstRender.current) {
+			isFirstRender.current = false;
+			return
+		}
 		if (wasRedirected || userData.profile_exists) return;
 		setWasRedirected(true);
-		router.replace('/profile');
+    	router.replace('/profile')
 	}, [userData.profile_exists]);
 		
 	useEffect(() => {
