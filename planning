@@ -328,8 +328,18 @@ V Show profiles with highest famerating in one row
 V Show random profiles
 V Make all carousel pictures crop to same aspect ratio
 V Give images and cards uniformly rounded corners
+V Move basic search stuff on one line
+V Add min values to number selectors
+V Optional search stuff on another line
+V Filters and sort on third line
+V toggle optional and filter lines visibility on click
 
 Double slider for age range
+Add links to footer
+create terms and agreements
+create privacy policy
+create about
+
 Make online status work with socket.io
 Refactor SQL queries using ``
 Change language to very plain language for accessibility

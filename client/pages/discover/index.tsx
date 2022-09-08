@@ -121,8 +121,9 @@ const LoggedIn = () => {
 				filteredResults={filteredResults}
 				setFilteredResults={setFilteredResults}
 				setLoadStatus={setLoadStatus}
+				sort={sort} 
+				setSort={setSort}
 			/>
-			<SortSelector sort={sort} setSort={setSort} />
 			<Results sortedResults={sortedResults} loadStatus={loadStatus} />
 		</>
 	);

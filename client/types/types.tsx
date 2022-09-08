@@ -224,6 +224,8 @@ export interface SearchProps {
   filteredResults: IResultsProfile[]
   setFilteredResults: SetStateAction<any>
   setLoadStatus: SetStateAction<any>
+  sort: SortType
+  setSort: SetStateAction<any>
 }
 
 export interface AdvancedSearchProps {
@@ -233,6 +235,8 @@ export interface AdvancedSearchProps {
   setInterests: SetStateAction<any>
   results: IResultsProfile[]
   setFilteredResults: SetStateAction<any>
+  sort: SortType
+  setSort: SetStateAction<any>
 }
 export interface ResultsProps {
   sortedResults: IResultsProfile[]
@@ -254,6 +258,16 @@ export interface ISearchParams {
 export interface SearchParamsProps {
   searchParams: ISearchParams
   setSearchParams: SetStateAction<any>
+}
+
+export interface BasicSearchProps {
+  searchParams: ISearchParams
+  setSearchParams: SetStateAction<any>
+  resetSearch: (event: React.FormEvent) => void
+}
+
+export interface ButtonsProps {
+  resetSearch: (event: React.FormEvent) => void
 }
 
 export interface LogEntry {

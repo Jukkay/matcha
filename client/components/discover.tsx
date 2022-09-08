@@ -8,6 +8,7 @@ import React, {
 	useRef,
 } from 'react';
 import {
+	BasicSearchLine,
 	GenderSelector,
 	OnlineIndicator,
 	SearchAgeRange,
@@ -37,6 +38,9 @@ import { Country, City } from 'country-state-city';
 import { ErrorMessage } from './form';
 import { dummyData } from '../pages/profile/data';
 import { LoadError, Spinner } from './utilities';
+import { FaFilter } from 'react-icons/fa';
+import { BiSortAlt2 } from 'react-icons/bi';
+import { IconContext } from 'react-icons';
 
 export const Search = ({
 	searchParams,
@@ -46,6 +50,8 @@ export const Search = ({
 	filteredResults,
 	setFilteredResults,
 	setLoadStatus,
+	sort,
+	setSort,
 }: SearchProps) => {
 	const { profile } = useUserContext();
 	const [interests, setInterests] = useState<string[]>([]);
@@ -126,76 +132,37 @@ export const Search = ({
 		<div>
 			<h3 className="title is-3">Search</h3>
 			<form onSubmit={handleSubmit}>
-				<SearchAgeRange
+				<BasicSearchLine
 					searchParams={searchParams}
 					setSearchParams={setSearchParams}
+					resetSearch={resetSearch}
 				/>
-				<GenderSelector
-					label="Gender *"
-					id="looking"
-					value={searchParams.looking}
-					placeholder="Choose a gender"
-					onChange={(event) =>
-						setSearchParams({
-							...searchParams,
-							looking: event.target.value,
-						})
-					}
-					options={[
-						'Male',
-						'Female',
-						'Male or Female',
-						'Non-binary',
-						'Trans-man',
-						'Trans-woman',
-						'Anything goes',
-					]}
-				/>
-				<hr />
-				<h5 className="title is-5 has-text-grey">Optional</h5>
-				<CountrySearchSelector
-					searchParams={searchParams}
-					setSearchParams={setSearchParams}
-				/>
-				<CitySearchSelector
-					searchParams={searchParams}
-					setSearchParams={setSearchParams}
-				/>
-				<div className="buttons">
-					<button type="submit" className="button is-primary">
-						Search
-					</button>
-					<button
-						type="submit"
-						onClick={resetSearch}
-						className="button"
-					>
-						Reset to default
-					</button>
-				</div>
-				<hr />
-				<h5 className="title is-5 has-text-grey">Filter results</h5>
-				<AdvancedSearch
-					searchParams={searchParams}
-					setSearchParams={setSearchParams}
-					interests={interests}
-					setInterests={setInterests}
-					results={results}
-					setFilteredResults={setFilteredResults}
-				/>
-				<hr />
 			</form>
+			<hr />
+
+			<Filters
+				searchParams={searchParams}
+				setSearchParams={setSearchParams}
+				interests={interests}
+				setInterests={setInterests}
+				results={results}
+				setFilteredResults={setFilteredResults}
+				sort={sort}
+				setSort={setSort}
+			/>
 		</div>
 	);
 };
 
-const AdvancedSearch = ({
+const Filters = ({
 	searchParams,
 	setSearchParams,
 	interests,
 	setInterests,
 	results,
 	setFilteredResults,
+	sort,
+	setSort,
 }: AdvancedSearchProps) => {
 	const [visible, setVisible] = useState(false);
 
@@ -233,10 +200,18 @@ const AdvancedSearch = ({
 
 	return visible ? (
 		<div className="block">
-			<div className="block">
-				<button className="button is-primary" onClick={onClick}>
-					Hide filters
-				</button>
+			<div className="is-flex is-justify-content-space-between is-align-items-start">
+				<div className="block">
+					<label htmlFor="filter" className="label">
+						Filter
+					</label>
+					<div className="block">
+						<button className="button" onClick={onClick}>
+							Hide filters
+						</button>
+					</div>
+				</div>
+				<SortSelector sort={sort} setSort={setSort} />
 			</div>
 			<div className="block">
 				<FameratingRange
@@ -259,9 +234,31 @@ const AdvancedSearch = ({
 		</div>
 	) : (
 		<div className="block">
-			<button className="button is-primary" onClick={onClick}>
-				Show filters
-			</button>
+			<div className="block is-flex is-justify-content-space-between is-align-items-start">
+				<div className="block">
+					<div className="is-flex is-align-items-baseline">
+						<label htmlFor="filter" className="label mr-1">
+							Filter
+						</label>
+						<span className="icon is-medium">
+							<IconContext.Provider
+								value={{
+									size: '0.9rem',
+									className: 'react-icons',
+								}}
+							>
+								<div>
+									<FaFilter />
+								</div>
+							</IconContext.Provider>
+						</span>
+					</div>
+					<button className="button" onClick={onClick}>
+						Show filters
+					</button>
+				</div>
+				<SortSelector sort={sort} setSort={setSort} />
+			</div>
 		</div>
 	);
 };
@@ -390,6 +387,7 @@ const DistanceRange = ({
 				<input
 					type="number"
 					id="max_distance"
+					min={0}
 					className="input is-primary"
 					value={searchParams.max_distance}
 					onChange={(event) =>
@@ -433,10 +431,9 @@ export const Results = ({ sortedResults, loadStatus }: ResultsProps) => {
 		else setSearchResultText(`${sortedResults.length} profiles found`);
 	}, [sortedResults]);
 
-	if (loadStatus == LoadStatus.LOADING)
-		return <Spinner />
+	if (loadStatus == LoadStatus.LOADING) return <Spinner />;
 	if (loadStatus == LoadStatus.ERROR)
-		return <LoadError text="Error loading profiles" />
+		return <LoadError text="Error loading profiles" />;
 
 	return sortedResults.length > 0 ? (
 		<section className="section has-text-centered">
@@ -495,9 +492,9 @@ export const SearchResultItem = ({
 								crossOrigin=""
 								className="rounded-corners"
 							/>
-						<div className="is-overlay mt-3 ml-3">
-							<OnlineIndicator onlineStatus={online} />
-						</div>
+							<div className="is-overlay mt-3 ml-3">
+								<OnlineIndicator onlineStatus={online} />
+							</div>
 						</figure>
 					</div>
 					<div className="column mt-3 has-text-left">
@@ -536,13 +533,27 @@ export const SearchResultItem = ({
 export const SortSelector = ({ sort, setSort }: SortProps) => {
 	return (
 		<div className="block">
-			<label htmlFor="county" className="label my-3">
-				Sort by
-			</label>
+			<div className="is-flex is-align-items-start">
+				<label htmlFor="sort" className="label">
+					Sort by
+				</label>
+				<span className="icon is-medium">
+					<IconContext.Provider
+						value={{
+							size: '1.3rem',
+							className: 'react-icons',
+						}}
+					>
+						<div>
+							<BiSortAlt2 />
+						</div>
+					</IconContext.Provider>
+				</span>
+			</div>
 			<div className="select">
 				<select
-					id="city"
-					name="city"
+					id="sort"
+					name="sort"
 					value={sort}
 					onChange={(event) => setSort(event.target.value)}
 				>
@@ -580,7 +591,7 @@ export const CountrySearchSelector = ({
 }: SearchParamsProps) => {
 	return (
 		<div className="block">
-			<label htmlFor="country" className="label my-3">
+			<label htmlFor="country" className="label">
 				Country
 			</label>
 			<div className="select is-primary">
@@ -616,7 +627,7 @@ export const CitySearchSelector = ({
 }: SearchParamsProps) => {
 	return searchParams.country ? (
 		<div className="block">
-			<label htmlFor="city" className="label my-3">
+			<label htmlFor="city" className="label">
 				City
 			</label>
 			<div className="select is-primary">
@@ -647,7 +658,7 @@ export const CitySearchSelector = ({
 		</div>
 	) : (
 		<div className="block">
-			<label htmlFor="county" className="label my-3">
+			<label htmlFor="county" className="label">
 				City
 			</label>
 			<div className="select is-primary disabled">

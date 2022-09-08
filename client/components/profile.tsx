@@ -17,6 +17,8 @@ import {
 	IProfileCard,
 	BooleanProp,
 	SearchParamsProps,
+	BasicSearchProps,
+	ButtonsProps,
 } from '../types/types';
 import { Country, City } from 'country-state-city';
 import { ErrorMessage } from './form';
@@ -24,12 +26,17 @@ import { authAPI } from '../utilities/api';
 import { useUserContext } from './UserContext';
 import { dummyData } from '../pages/profile/data';
 import { convertBirthdayToAge } from '../utilities/helpers';
-import { SearchResultItem } from './discover';
+import {
+	CitySearchSelector,
+	CountrySearchSelector,
+	SearchResultItem,
+} from './discover';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Scrollbar, A11y } from 'swiper';
-import "swiper/css";
-import "swiper/css/pagination";
-import "swiper/css/navigation";
+import 'swiper/css';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
+import { Slider, Handles, Tracks } from 'react-compound-slider';
 
 export const LikeButton = () => {
 	return (
@@ -274,7 +281,7 @@ export const CreateProfile = ({
 							'Non-binary',
 							'Trans-man',
 							'Trans-woman',
-							'Other'
+							'Other',
 						]}
 					/>
 
@@ -941,38 +948,162 @@ export const AgeRange = ({ profile, setProfile }: ISelectorProfile) => {
 	);
 };
 
+export const SubmitAndResetButtons = ({ resetSearch }: ButtonsProps) => {
+	return (
+		<div className="block">
+			<div className="label is-invisible">Submit</div>
+			<div className="buttons">
+				<button type="submit" className="button is-primary">
+					Search
+				</button>
+				<button type="submit" onClick={resetSearch} className="button">
+					Reset to default
+				</button>
+			</div>
+		</div>
+	);
+};
+
+export const BasicSearchLine = ({
+	searchParams,
+	setSearchParams,
+	resetSearch,
+}: BasicSearchProps) => {
+	const [optionalsVisible, setOptionalsVisible] = useState(false);
+	const handleClick = (event: React.MouseEvent) => {
+		event.preventDefault();
+		setOptionalsVisible((current) => !current);
+	};
+
+	return optionalsVisible ? (
+		<div>
+			<div className="is-flex is-justify-content-space-between is-align-items-start">
+				<SearchAgeRange
+					searchParams={searchParams}
+					setSearchParams={setSearchParams}
+				/>
+				<SearchGenderSelector
+					label="Gender *"
+					id="looking"
+					value={searchParams.looking}
+					placeholder="Choose a gender"
+					onChange={(event) =>
+						setSearchParams({
+							...searchParams,
+							looking: event.target.value,
+						})
+					}
+					options={[
+						'Male',
+						'Female',
+						'Male or Female',
+						'Non-binary',
+						'Trans-man',
+						'Trans-woman',
+						'Anything goes',
+					]}
+				/>
+				<SubmitAndResetButtons resetSearch={resetSearch} />
+			</div>
+			<div className="buttons">
+				<button
+					className="button is-ghost has-text-black"
+					onClick={handleClick}
+				>
+					Hide optional parameters
+				</button>
+				<button className="button is-ghost" onClick={handleClick}>
+					<span className="bulma-arrow-mixin"></span>
+				</button>
+			</div>
+			<div className="block is-flex is-justify-content-space-between is-align-items-start">
+				<CountrySearchSelector
+					searchParams={searchParams}
+					setSearchParams={setSearchParams}
+				/>
+				<CitySearchSelector
+					searchParams={searchParams}
+					setSearchParams={setSearchParams}
+				/>
+			</div>
+		</div>
+	) : (
+		<div>
+			<div className="is-flex is-justify-content-space-between is-align-items-start">
+				<SearchAgeRange
+					searchParams={searchParams}
+					setSearchParams={setSearchParams}
+				/>
+				<SearchGenderSelector
+					label="Gender *"
+					id="looking"
+					value={searchParams.looking}
+					placeholder="Choose a gender"
+					onChange={(event) =>
+						setSearchParams({
+							...searchParams,
+							looking: event.target.value,
+						})
+					}
+					options={[
+						'Male',
+						'Female',
+						'Male or Female',
+						'Non-binary',
+						'Trans-man',
+						'Trans-woman',
+						'Anything goes',
+					]}
+				/>
+				<SubmitAndResetButtons resetSearch={resetSearch} />
+			</div>
+			<div className="buttons">
+				<button
+					className="button is-ghost has-text-black"
+					onClick={handleClick}
+				>
+					Search by location
+				</button>
+				<button className="button is-ghost" onClick={handleClick}>
+					<span className="bulma-arrow-mixin"></span>
+				</button>
+			</div>
+		</div>
+	);
+};
 export const SearchAgeRange = ({
 	searchParams,
 	setSearchParams,
 }: SearchParamsProps) => {
 	return (
 		<div className="block">
-			<label htmlFor="min_age" className="label">
-				Age range *
-			</label>
-
-			<div className="field is-horizontal">
-				<div className="field-label is-normal">
-					<label htmlFor="min_age" className="label">
-						Min
-					</label>
-				</div>
-				<div className="field-body">
-					<div className="field">
-						<input
-							type="number"
-							id="min_age"
-							className="input is-primary"
-							min="18"
-							max={searchParams.max_age}
-							value={searchParams.min_age}
-							onChange={(event) =>
-								setSearchParams({
-									...searchParams,
-									min_age: parseInt(event.target.value),
-								})
-							}
-						/>
+			<div className="field">
+				<label htmlFor="min_age" className="label">
+					Age range *
+				</label>
+				<div className="is-flex is-justify-content-start">
+					<div className="field-label is-normal">
+						<label htmlFor="min_age" className="label">
+							Min
+						</label>
+					</div>
+					<div className="field mr-6">
+						<div className="control">
+							<input
+								type="number"
+								id="min_age"
+								className="input is-primary"
+								min="18"
+								max={searchParams.max_age}
+								value={searchParams.min_age}
+								onChange={(event) =>
+									setSearchParams({
+										...searchParams,
+										min_age: parseInt(event.target.value),
+									})
+								}
+							/>
+						</div>
 					</div>
 					<div className="field-label is-normal">
 						<label htmlFor="max_age" className="label">
@@ -980,20 +1111,59 @@ export const SearchAgeRange = ({
 						</label>
 					</div>
 					<div className="field">
-						<input
-							type="number"
-							id="max_age"
-							className="input is-primary"
-							min={searchParams.min_age}
-							max="122"
-							value={searchParams.max_age}
-							onChange={(event) =>
-								setSearchParams({
-									...searchParams,
-									max_age: parseInt(event.target.value),
-								})
-							}
-						/>
+						<div className="control">
+							<input
+								type="number"
+								id="max_age"
+								className="input is-primary"
+								min={searchParams.min_age}
+								max="122"
+								value={searchParams.max_age}
+								onChange={(event) =>
+									setSearchParams({
+										...searchParams,
+										max_age: parseInt(event.target.value),
+									})
+								}
+							/>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+};
+export const SearchGenderSelector = ({
+	label,
+	id,
+	value,
+	placeholder,
+	onChange,
+	options,
+}: ISelector) => {
+	return (
+		<div className="block">
+			<div className="field">
+				<label htmlFor={id} className="label">
+					{label}
+				</label>
+				<div className="control">
+					<div className="select is-primary">
+						<select
+							id={id}
+							value={value}
+							onChange={onChange}
+							required
+						>
+							<option value={''} disabled>
+								{placeholder}
+							</option>
+							{options?.map((item) => (
+								<option key={item} value={item}>
+									{item}
+								</option>
+							))}
+						</select>
 					</div>
 				</div>
 			</div>
@@ -1176,26 +1346,20 @@ export const Gallery = ({ user_id }: UserImagesProps) => {
 	}, []);
 
 	return images && user_id ? (
-			<Swiper
-				pagination={{
-					type: "fraction",
-				}}
-				navigation={true}
-				modules={[Pagination, Navigation]}
-				className="swiper"
-			>
-				{images.map((image, index) => (
-					<SwiperSlide
-					className="swiper-slide"
-					key={index}>
-						<img
-							src={image}
-							alt="Placeholder image"
-							crossOrigin=""
-						/>
-					</SwiperSlide>
-				))}
-			</Swiper>
+		<Swiper
+			pagination={{
+				type: 'fraction',
+			}}
+			navigation={true}
+			modules={[Pagination, Navigation]}
+			className="swiper"
+		>
+			{images.map((image, index) => (
+				<SwiperSlide className="swiper-slide" key={index}>
+					<img src={image} alt="Placeholder image" crossOrigin="" />
+				</SwiperSlide>
+			))}
+		</Swiper>
 	) : null;
 };
 
