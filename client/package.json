@@ -13,7 +13,7 @@
     "axios": "^0.27.2",
     "bulma": "^0.9.4",
     "country-state-city": "^3.0.1",
-    "next": "12.2.2",
+    "next": "12.2.3",
     "next-transpile-modules": "^9.0.0",
     "react": "^18.2.0",
     "react-compound-slider": "^3.4.0",
