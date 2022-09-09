@@ -195,7 +195,6 @@ export const searchProfiles = async (req: Request, res: Response) => {
 				genderOptions,
 			]);
 		} 
-		console.log('Results: ', results);
 		console.log('Searched with:', req.body.data);
 		if (results.length > 0) {
 			return res.status(200).json({

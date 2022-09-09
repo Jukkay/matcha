@@ -50,7 +50,6 @@ const LoggedIn = () => {
 				setLoadStatus(LoadStatus.LOADING)
 				let response = await authAPI.get(`/log`);
 				if (response.status === 200) {
-					console.log(response.data.log)
 					setLog(response.data.log)
 				}
 			} catch (err) {

@@ -1,4 +1,3 @@
-import type { NextPage } from 'next';
 import Link from 'next/link';
 import React, {
 	useState,
@@ -8,17 +7,17 @@ import React, {
 	useRef,
 } from 'react';
 import {
-	BasicSearchLine,
-	GenderSelector,
 	OnlineIndicator,
-	SearchAgeRange,
 	SearchResult,
 } from './profile';
 import { useUserContext } from './UserContext';
 import {
 	AdvancedSearchProps,
+	BasicSearchProps,
+	ButtonsProps,
 	IProfileCard,
 	IResultsProfile,
+	ISelector,
 	LoadStatus,
 	ResultsProps,
 	SearchParamsProps,
@@ -41,8 +40,11 @@ import { LoadError, Spinner } from './utilities';
 import { FaFilter } from 'react-icons/fa';
 import { BiSortAlt2 } from 'react-icons/bi';
 import { IconContext } from 'react-icons';
+import Box from '@mui/material/Box';
+import Slider from '@mui/material/Slider';
 
-export const Search = ({
+
+export const ProfileSearch = ({
 	searchParams,
 	setSearchParams,
 	setResults,
@@ -56,7 +58,7 @@ export const Search = ({
 	const { profile } = useUserContext();
 	const [interests, setInterests] = useState<string[]>([]);
 
-	const searchDatabase = async () => {
+	const searchDatabase = async (controller: AbortController) => {
 		const query = {
 			gender: searchParams.gender,
 			looking: searchParams.looking,
@@ -69,6 +71,7 @@ export const Search = ({
 			setLoadStatus(LoadStatus.LOADING);
 			let response = await authAPI.post(`/search`, {
 				data: query,
+				signal: controller.signal,
 			});
 			if (response?.data?.results) {
 				// Calculate distances
@@ -103,12 +106,16 @@ export const Search = ({
 	};
 
 	useEffect(() => {
-		searchDatabase();
+		const controller = new AbortController();
+		searchDatabase(controller);
+		return () => controller.abort();
 	}, []);
 
-	const handleSubmit = (event: React.FormEvent) => {
+	const handleSubmit = async (event: React.FormEvent) => {
 		event.preventDefault();
-		searchDatabase();
+		const controller = new AbortController();
+		await searchDatabase(controller);
+		controller.abort();
 	};
 	const resetSearch = (event: React.FormEvent) => {
 		event.preventDefault();
@@ -498,18 +505,44 @@ export const SearchResultItem = ({
 						</figure>
 					</div>
 					<div className="column mt-3 has-text-left">
-						<div className="block">Name: {name}</div>
 						<div className="block">
-							Age: {birthday && convertBirthdayToAge(birthday)}
+							<span className="has-text-weight-semibold mr-3">
+								Name:
+							</span>
+							{name}
 						</div>
-						<div className="block">Famerating: {famerating}</div>
 						<div className="block">
-							Distance: {`${distance} km`}
+							<span className="has-text-weight-semibold mr-3">
+								Age:
+							</span>
+							{birthday && convertBirthdayToAge(birthday)}
 						</div>
-						<div className="block">City: {city}</div>
-						<div className="block">Country: {country}</div>
 						<div className="block">
-							Interests:{' '}
+							<span className="has-text-weight-semibold mr-3">
+								Famerating:
+							</span>
+							{famerating}
+						</div>
+						<div className="block">
+						<span className="has-text-weight-semibold mr-3">
+							Distance: 
+						</span>
+							{`${distance} km`}
+						</div>
+						<div className="block">
+						<span className="has-text-weight-semibold mr-3">
+							City: 
+						</span>
+							{city}</div>
+						<div className="block">
+						<span className="has-text-weight-semibold mr-3">
+							Country: 
+						</span>
+							{country}</div>
+						<div className="block">
+						<span className="has-text-weight-semibold mr-3">
+							Interests:
+						</span>
 							{interests
 								? Object.entries(JSON.parse(interests)).map(
 										(interest, index) => (
@@ -676,6 +709,224 @@ export const CitySearchSelector = ({
 						Choose a country first
 					</option>
 				</select>
+			</div>
+		</div>
+	);
+};
+
+export const BasicSearchLine = ({
+	searchParams,
+	setSearchParams,
+	resetSearch,
+}: BasicSearchProps) => {
+	const [optionalsVisible, setOptionalsVisible] = useState(false);
+	const handleClick = (event: React.MouseEvent) => {
+		event.preventDefault();
+		setOptionalsVisible((current) => !current);
+	};
+
+	return optionalsVisible ? (
+		<div>
+			<div className="is-flex is-justify-content-space-between is-align-items-start">
+				<SearchAgeRange
+					searchParams={searchParams}
+					setSearchParams={setSearchParams}
+				/>
+				<SearchGenderSelector
+					label="Gender *"
+					id="looking"
+					value={searchParams.looking}
+					placeholder="Choose a gender"
+					onChange={(event) =>
+						setSearchParams({
+							...searchParams,
+							looking: event.target.value,
+						})
+					}
+					options={[
+						'Male',
+						'Female',
+						'Male or Female',
+						'Non-binary',
+						'Trans-man',
+						'Trans-woman',
+						'Anything goes',
+					]}
+				/>
+				<SubmitAndResetButtons resetSearch={resetSearch} />
+			</div>
+			<div className="buttons">
+				<button
+					className="button is-ghost has-text-black"
+					onClick={handleClick}
+				>
+					Hide optional parameters
+				</button>
+				<button className="button is-ghost" onClick={handleClick}>
+					<span className="bulma-arrow-mixin"></span>
+				</button>
+			</div>
+			<div className="block is-flex is-justify-content-space-between is-align-items-start">
+				<CountrySearchSelector
+					searchParams={searchParams}
+					setSearchParams={setSearchParams}
+				/>
+				<CitySearchSelector
+					searchParams={searchParams}
+					setSearchParams={setSearchParams}
+				/>
+			</div>
+		</div>
+	) : (
+		<div>
+			<div className="is-flex is-justify-content-space-between is-align-items-start">
+				<SearchAgeRange
+					searchParams={searchParams}
+					setSearchParams={setSearchParams}
+				/>
+				<SearchGenderSelector
+					label="Gender *"
+					id="looking"
+					value={searchParams.looking}
+					placeholder="Choose a gender"
+					onChange={(event) =>
+						setSearchParams({
+							...searchParams,
+							looking: event.target.value,
+						})
+					}
+					options={[
+						'Male',
+						'Female',
+						'Male or Female',
+						'Non-binary',
+						'Trans-man',
+						'Trans-woman',
+						'Anything goes',
+					]}
+				/>
+				<SubmitAndResetButtons resetSearch={resetSearch} />
+			</div>
+			<div className="buttons">
+				<button
+					className="button is-ghost has-text-black"
+					onClick={handleClick}
+				>
+					Search by location
+				</button>
+				<button className="button is-ghost" onClick={handleClick}>
+					<span className="bulma-arrow-mixin"></span>
+				</button>
+			</div>
+		</div>
+	);
+};
+
+export const AgeRangeSlider = ({
+	searchParams,
+	setSearchParams,
+}: SearchParamsProps) => {
+	const [value, setValue] = React.useState<number[]>([
+		searchParams.min_age,
+		searchParams.max_age,
+	]);
+
+	useEffect(() => {
+		setSearchParams({
+			...setSearchParams,
+			min_age: value[0],
+			max_age: value[1],
+		});
+	}, [value]);
+	const handleChange = (event: Event, newValue: number | number[]) => {
+		setValue(newValue as number[]);
+	};
+
+	return (
+		<Box sx={{ width: 300 }}>
+			<Slider
+				getAriaLabel={() => 'Age range'}
+				value={value}
+				onChange={handleChange}
+				min={18}
+				max={100}
+				valueLabelDisplay="on"
+				disableSwap
+			/>
+		</Box>
+	);
+};
+
+export const SearchAgeRange = ({
+	searchParams,
+	setSearchParams,
+}: SearchParamsProps) => {
+	return (
+		<div className="block">
+			<div className="field">
+				<label htmlFor="ageRange" className="label mb-6">
+					Age range *
+				</label>
+				<div className="control" id="ageRange">
+					<AgeRangeSlider
+						searchParams={searchParams}
+						setSearchParams={setSearchParams}
+					/>
+				</div>
+			</div>
+		</div>
+	);
+};
+
+export const SearchGenderSelector = ({
+	label,
+	id,
+	value,
+	placeholder,
+	onChange,
+	options,
+}: ISelector) => {
+	return (
+		<div className="block">
+			<div className="field">
+				<label htmlFor={id} className="label">
+					{label}
+				</label>
+				<div className="control">
+					<div className="select is-primary">
+						<select
+							id={id}
+							value={value}
+							onChange={onChange}
+							required
+						>
+							<option value={''} disabled>
+								{placeholder}
+							</option>
+							{options?.map((item) => (
+								<option key={item} value={item}>
+									{item}
+								</option>
+							))}
+						</select>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+};
+
+export const SubmitAndResetButtons = ({ resetSearch }: ButtonsProps) => {
+	return (
+		<div className="block">
+			<div className="label is-invisible">Submit</div>
+			<div className="buttons">
+				<button type="submit" className="button is-primary">
+					Search
+				</button>
+				<button type="submit" onClick={resetSearch} className="button">
+					Reset to default
+				</button>
 			</div>
 		</div>
 	);

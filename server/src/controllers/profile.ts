@@ -146,7 +146,6 @@ const getProfile = async (req: Request, res: Response) => {
 			requester,
 			user_id,
 		]);
-		console.log(profile_data);
 		if (profile_data.length > 0) {
 			// TODO Create notification of profile visit
 			return res.status(200).json({

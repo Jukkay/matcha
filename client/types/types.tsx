@@ -387,3 +387,7 @@ export interface UserIdInput {
 export interface ResultProfiles {
   profiles: IResultsProfile[]
 }
+
+export interface LikeProp {
+  likeCount: number
+}

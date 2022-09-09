@@ -345,8 +345,10 @@ Refactor SQL queries using ``
 Change language to very plain language for accessibility
 Show image counter
 Remove error message passthrough in user controller
+Move components to files that make most sense
 
 # Possible bonuses
+AWS deployment
 Lazy loading
 Instagram picture import
 Facebook login

@@ -1,14 +1,31 @@
 @import "bulma/bulma"
 @import '@creativebulma/bulma-badge'
 
+$mobile: 960px
+
+.text-links
+    display: flex
+
+.username
+    display: block
+
+@media (max-width: $mobile)
+    .text-links
+        display: none
+    .username
+        display: none
+
 .react-icons
-    verticalAlign: middle
+    vertical-align: middle
 
 .is-fullheight-100vh
     height: 100vh
 
 .fullwidth
     width: 100%
+    
+.fullheight
+    height: 100%
 
 .chat-window
     overflow: auto

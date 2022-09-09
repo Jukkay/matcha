@@ -8,11 +8,14 @@ import { authAPI } from '../utilities/api';
 import { useUserContext } from './UserContext';
 import { useSocketContext } from './SocketContext';
 import { useNotificationContext } from './NotificationContext';
-import { INotification, NotificationType } from '../types/types';
+import { INotification, LikeProp, NotificationType } from '../types/types';
 
 const LoggedOutControls = () => {
 	return (
 		<>
+			<div className="navbar-brand">
+				<Logo />
+			</div>
 			<Link href="/signup">
 				<a className="button is-primary">Sign up</a>
 			</Link>
@@ -23,232 +26,27 @@ const LoggedOutControls = () => {
 	);
 };
 
+const Logo = () => {
+	return (
+		<Link href="/">
+			<a className="navbar-item pt-3" href="/">
+				<span className="icon is-medium">
+					<IconContext.Provider
+						value={{
+							size: '1.2rem',
+							className: 'react-icons',
+						}}
+					>
+						<div>
+							<FaHeart />
+						</div>
+					</IconContext.Provider>
+				</span>
+			</a>
+		</Link>
+	);
+};
 const LoggedInControls = () => {
-	return (
-		<>
-			<NotificationDropdownMenu />
-			<MessageIcon />
-			<ProfilePicture />
-			<MainDropdownMenu />
-		</>
-	);
-};
-
-const MainDropdownMenu = () => {
-	return (
-		<div className="dropdown is-hoverable">
-			<div className="dropdown-trigger">
-				<div className="navbar-item" id="controlpanel">
-					<a className="navbar-item">
-						<span className="icon is-medium">
-							<IconContext.Provider
-								value={{
-									size: '1.5rem',
-									className: 'react-icons',
-								}}
-							>
-								<div>
-									<FiMenu />
-								</div>
-							</IconContext.Provider>
-						</span>
-					</a>
-				</div>
-			</div>
-			<div className="dropdown-menu" id="dropdown-menu" role="menu">
-				<div className="dropdown-content">
-					<Link href="/controlpanel">
-						<a className="dropdown-item">User settings</a>
-					</Link>
-					<Link href="/logout">
-						<a className="dropdown-item">Log out</a>
-					</Link>
-				</div>
-			</div>
-		</div>
-	);
-};
-const MessageIcon = () => {
-	const {
-		messageCount,
-		setNotificationCount,
-		setMessageCount,
-		setLikeCount,
-	} = useNotificationContext();
-	return messageCount ? (
-		<Link href="/messages">
-			<a className="navbar-item">
-				<span title="Badge top right" className="badge is-danger">
-					{messageCount}
-				</span>
-				<span className="icon is-medium">
-					<IconContext.Provider
-						value={{
-							size: '1.2rem',
-							className: 'react-icons',
-						}}
-					>
-						<div>
-							<BsFillChatFill />
-						</div>
-					</IconContext.Provider>
-				</span>
-			</a>
-		</Link>
-	) : (
-		<Link href="/messages">
-			<a className="navbar-item">
-				<span className="icon is-medium">
-					<IconContext.Provider
-						value={{
-							size: '1.2rem',
-							className: 'react-icons',
-						}}
-					>
-						<div>
-							<BsFillChatFill />
-						</div>
-					</IconContext.Provider>
-				</span>
-			</a>
-		</Link>
-	);
-};
-const NotificationDropdownMenu = () => {
-	const {
-		notificationCount,
-		setNotificationCount,
-		setMessageCount,
-		setLikeCount,
-		setNotifications,
-	} = useNotificationContext();
-	const { userData } = useUserContext();
-
-	const markNotificationsRead = async () => {
-		if (!userData.user_id) return;
-		const response = await authAPI(`/notifications/${userData.user_id}`);
-		if (response?.data?.notifications?.length > 0) {
-			setNotifications([...response.data.notifications]);
-		}
-		const response2 = await authAPI.patch('/notifications', {
-			type: 'all',
-			user_id: userData.user_id,
-		});
-		if (response2.status === 200) {
-			setNotificationCount(0);
-			setMessageCount(0);
-			setLikeCount(0);
-		}
-	};
-	return (
-		<div className="dropdown is-hoverable">
-			<div
-				className="dropdown-trigger"
-				onMouseEnter={markNotificationsRead}
-			>
-				<div className="navbar-item" id="notifications">
-					{notificationCount ? (
-						<a className="navbar-item">
-							<span
-								title="Badge top right"
-								className="badge is-danger"
-							>
-								{notificationCount}
-							</span>
-							<span className="icon is-medium">
-								<IconContext.Provider
-									value={{
-										size: '1.2rem',
-										className: 'react-icons',
-									}}
-								>
-									<div>
-										<FaBell />
-									</div>
-								</IconContext.Provider>
-							</span>
-						</a>
-					) : (
-						<a className="navbar-item">
-							<span className="icon is-medium">
-								<IconContext.Provider
-									value={{
-										size: '1.2rem',
-										className: 'react-icons',
-									}}
-								>
-									<div>
-										<FaBell />
-									</div>
-								</IconContext.Provider>
-							</span>
-						</a>
-					)}
-				</div>
-				<div className="dropdown-menu" id="dropdown-menu" role="menu">
-					<div className="dropdown-content">
-						<NotificationsList />
-					</div>
-				</div>
-			</div>
-		</div>
-	);
-};
-
-const NotificationsList = () => {
-	const { notifications } = useNotificationContext();
-
-	return notifications.length ? (
-		notifications.map((notification: INotification, index: number) => (
-			<Link key={index} href={notification.link}>
-				<a className="dropdown-item">
-					<span className="">{notification.notification_text}</span>
-					<span className="help">
-						{notification.notification_time}
-					</span>
-				</a>
-			</Link>
-		))
-	) : (
-		<a className="dropdown-item">
-			<span className="">No notifications</span>
-		</a>
-	);
-};
-const ProfilePicture = () => {
-	const { userData, profile } = useUserContext();
-	return (
-		<div className="navbar-item" id="profile">
-			<Link href="/profile">
-				<a className="navbar-item">
-					<p className="mr-3">
-						<strong>{userData.username}</strong>
-					</p>
-
-					<figure className="image">
-						<img
-							className="is-rounded"
-							src={
-								profile.profile_image === 'default.png' ||
-								!profile.profile_image
-									? '/default.png'
-									: `${authAPI.defaults.baseURL}/images/${profile.profile_image}`
-							}
-							onError={({ currentTarget }) => {
-								currentTarget.onerror = null;
-								currentTarget.src = '/default.png';
-							}}
-							alt="Profile picture"
-							crossOrigin=""
-						/>
-					</figure>
-				</a>
-			</Link>
-		</div>
-	);
-};
-
-const NavbarComponent = () => {
 	const { userData } = useUserContext();
 	const {
 		activeChatUser,
@@ -265,7 +63,6 @@ const NavbarComponent = () => {
 	const socket = useSocketContext();
 
 	const getNotifications = async () => {
-		console.log('getNotifications running');
 		try {
 			if (!userData.user_id) return;
 			socket.emit('set_user', userData.user_id);
@@ -350,6 +147,284 @@ const NavbarComponent = () => {
 	}, [notifications, activeChatUser, activePage]);
 
 	// Token state
+	return (
+		<div className="is-flex is-justify-content-space-between is-flex-wrap-nowrap fullwidth">
+			<div className="navbar-brand">
+				<Logo />
+			</div>
+			<div className="is-flex is-justify-content-space-between fullwidth is-flex-wrap-nowrap">
+				<TextLinks likeCount={likeCount} />
+
+				<div className="is-flex is-justify-content-end is-flex-wrap-nowrap is-align-items-center fullwidth">
+					<NotificationDropdownMenu />
+					<MessageIcon />
+					<Username />
+					<ProfilePicture />
+					<MainDropdownMenu />
+				</div>
+			</div>
+		</div>
+	);
+};
+
+const TextLinks = ({ likeCount }: LikeProp) => {
+	return (
+		<div className="is-flex-wrap-nowrap text-links">
+			<Link href="/search">
+				<a className="navbar-item">Search</a>
+			</Link>
+			<Link href="/history">
+				<a className="navbar-item">Recent profiles</a>
+			</Link>
+			{likeCount ? (
+				<Link href="/likes">
+					<a className="navbar-item">
+						<span
+							title="Badge top right"
+							className="badge is-danger"
+						>
+							{likeCount}
+						</span>
+						Likes
+					</a>
+				</Link>
+			) : (
+				<Link href="/likes">
+					<a className="navbar-item">Likes</a>
+				</Link>
+			)}
+		</div>
+	);
+};
+const MainDropdownMenu = () => {
+	return (
+		<div className="dropdown is-hoverable is-right">
+			<div className="dropdown-trigger">
+				<a className="navbar-item">
+					<span className="icon is-medium">
+						<IconContext.Provider
+							value={{
+								size: '1.5rem',
+								className: 'react-icons',
+							}}
+						>
+							<div>
+								<FiMenu />
+							</div>
+						</IconContext.Provider>
+					</span>
+				</a>
+			</div>
+			<div className="dropdown-menu" id="dropdown-menu" role="menu">
+				<div className="dropdown-content">
+					<Link href="/search">
+						<a className="dropdown-item">Search</a>
+					</Link>
+					<Link href="/history">
+						<a className="dropdown-item">Recent profiles</a>
+					</Link>
+
+					<Link href="/likes">
+						<a className="dropdown-item">Likes</a>
+					</Link>
+					<Link href="/controlpanel">
+						<a className="dropdown-item">User settings</a>
+					</Link>
+					<Link href="/logout">
+						<a className="dropdown-item">Log out</a>
+					</Link>
+				</div>
+			</div>
+		</div>
+	);
+};
+const MessageIcon = () => {
+	const {
+		messageCount,
+		setNotificationCount,
+		setMessageCount,
+		setLikeCount,
+	} = useNotificationContext();
+	return messageCount ? (
+		<Link href="/messages">
+			<a className="navbar-item">
+				<span title="Badge top right" className="badge is-danger">
+					{messageCount}
+				</span>
+				<span className="icon is-medium ">
+					<IconContext.Provider
+						value={{
+							size: '1.2rem',
+							className: 'react-icons',
+						}}
+					>
+						<div>
+							<BsFillChatFill />
+						</div>
+					</IconContext.Provider>
+				</span>
+			</a>
+		</Link>
+	) : (
+		<Link href="/messages">
+			<a className="navbar-item">
+				<span className="icon is-medium">
+					<IconContext.Provider
+						value={{
+							size: '1.2rem',
+							className: 'react-icons',
+						}}
+					>
+						<div>
+							<BsFillChatFill />
+						</div>
+					</IconContext.Provider>
+				</span>
+			</a>
+		</Link>
+	);
+};
+const NotificationDropdownMenu = () => {
+	const {
+		notificationCount,
+		setNotificationCount,
+		setMessageCount,
+		setLikeCount,
+		setNotifications,
+	} = useNotificationContext();
+	const { userData } = useUserContext();
+
+	const markNotificationsRead = async () => {
+		if (!userData.user_id) return;
+		const response = await authAPI(`/notifications/${userData.user_id}`);
+		if (response?.data?.notifications?.length > 0) {
+			setNotifications([...response.data.notifications]);
+		}
+		const response2 = await authAPI.patch('/notifications', {
+			type: 'all',
+			user_id: userData.user_id,
+		});
+		if (response2.status === 200) {
+			setNotificationCount(0);
+			setMessageCount(0);
+			setLikeCount(0);
+		}
+	};
+	return (
+		<div className="dropdown is-hoverable">
+			<div
+				className="dropdown-trigger"
+				onMouseEnter={markNotificationsRead}
+			>
+				{notificationCount ? (
+					<a className="navbar-item">
+						<span
+							title="Badge top right"
+							className="badge is-danger"
+						>
+							{notificationCount}
+						</span>
+						<span className="icon is-medium">
+							<IconContext.Provider
+								value={{
+									size: '1.2rem',
+									className: 'react-icons',
+								}}
+							>
+								<div>
+									<FaBell />
+								</div>
+							</IconContext.Provider>
+						</span>
+					</a>
+				) : (
+					<a className="navbar-item">
+						<span className="icon is-medium">
+							<IconContext.Provider
+								value={{
+									size: '1.2rem',
+									className: 'react-icons',
+								}}
+							>
+								<div>
+									<FaBell />
+								</div>
+							</IconContext.Provider>
+						</span>
+					</a>
+				)}
+			</div>
+			<div className="dropdown-menu" id="dropdown-menu" role="menu">
+				<div className="dropdown-content">
+					<NotificationsList />
+				</div>
+			</div>
+		</div>
+	);
+};
+
+const NotificationsList = () => {
+	const { notifications } = useNotificationContext();
+
+	return notifications.length ? (
+		notifications.map((notification: INotification, index: number) => (
+			<Link key={index} href={notification.link}>
+				<a className="dropdown-item">
+					<span className="">{notification.notification_text}</span>
+					<span className="help">
+						{notification.notification_time}
+					</span>
+				</a>
+			</Link>
+		))
+	) : (
+		<a className="dropdown-item">
+			<span className="">No notifications</span>
+		</a>
+	);
+};
+
+const Username = () => {
+	const { userData } = useUserContext();
+	return (
+		<Link href="/profile" className="username">
+			<a className="navbar-item">
+				<p className="">
+					<strong>{userData.username}</strong>
+				</p>
+			</a>
+		</Link>
+	);
+};
+const ProfilePicture = () => {
+	const { profile } = useUserContext();
+	return (
+		<Link href="/profile">
+			<a className="navbar-item">
+				<figure className="image">
+					<img
+						className="is-rounded"
+						src={
+							profile.profile_image === 'default.png' ||
+							!profile.profile_image
+								? '/default.png'
+								: `${authAPI.defaults.baseURL}/images/${profile.profile_image}`
+						}
+						onError={({ currentTarget }) => {
+							currentTarget.onerror = null;
+							currentTarget.src = '/default.png';
+						}}
+						alt="Profile picture"
+						crossOrigin=""
+					/>
+				</figure>
+			</a>
+		</Link>
+	);
+};
+
+const NavbarComponent = () => {
+	// Token state
 	const { accessToken } = useUserContext();
 	return (
 		<div className="column is-narrow">
@@ -358,101 +433,7 @@ const NavbarComponent = () => {
 				role="navigation"
 				aria-label="main navigation"
 			>
-				<div className="navbar-brand">
-					<Link href="/">
-						<a className="navbar-item pt-3" href="/">
-							<span className="icon is-medium">
-								<IconContext.Provider
-									value={{
-										size: '1.2rem',
-										className: 'react-icons',
-									}}
-								>
-									<div>
-										<FaHeart />
-									</div>
-								</IconContext.Provider>
-							</span>
-						</a>
-					</Link>
-					<a
-						role="button"
-						className="navbar-burger"
-						aria-label="menu"
-						aria-expanded="false"
-						data-target="navbar-burger-button"
-					>
-						<span aria-hidden="true"></span>
-						<span aria-hidden="true"></span>
-						<span aria-hidden="true"></span>
-					</a>
-				</div>
-				<div
-					className="navbar-menu is-hidden mobile-menu"
-					id="navbar-mobile"
-				>
-					<div className="navbar-end">
-						<Link href="/discover">
-							<a className="navbar-item">Discover</a>
-						</Link>
-						<Link href="/history">
-							<a className="navbar-item">Recent profiles</a>
-						</Link>
-						{likeCount ? (
-							<Link href="/likes">
-								<a className="navbar-item">
-									<span
-										title="Badge top right"
-										className="badge is-danger"
-									>
-										{likeCount}
-									</span>
-									Likes
-								</a>
-							</Link>
-						) : (
-							<Link href="/likes">
-								<a className="navbar-item">Likes</a>
-							</Link>
-						)}
-					</div>
-				</div>
-				<div className="navbar-menu">
-					<div className="navbar-start">
-						<Link href="/discover">
-							<a className="navbar-item">Discover</a>
-						</Link>
-						<Link href="/history">
-							<a className="navbar-item">Recent profiles</a>
-						</Link>
-						{likeCount ? (
-							<Link href="/likes">
-								<a className="navbar-item">
-									<span
-										title="Badge top right"
-										className="badge is-danger"
-									>
-										{likeCount}
-									</span>
-									Likes
-								</a>
-							</Link>
-						) : (
-							<Link href="/likes">
-								<a className="navbar-item">Likes</a>
-							</Link>
-						)}
-					</div>
-					<div className="navbar-end">
-						<div className="navbar-item">
-							<div className="buttons" id="buttons">
-								{accessToken
-									? LoggedInControls()
-									: LoggedOutControls()}
-							</div>
-						</div>
-					</div>
-				</div>
+				{accessToken ? LoggedInControls() : LoggedOutControls()}
 			</nav>
 		</div>
 	);
