@@ -29,7 +29,7 @@ const LoggedOutControls = () => {
 const Logo = () => {
 	return (
 		<Link href="/">
-			<a className="navbar-item pt-3" href="/">
+			<a className="navbar-item pt-3">
 				<span className="icon is-medium">
 					<IconContext.Provider
 						value={{
@@ -389,9 +389,7 @@ const Username = () => {
 	return (
 		<Link href="/profile" className="username">
 			<a className="navbar-item">
-				<p className="">
 					<strong>{userData.username}</strong>
-				</p>
 			</a>
 		</Link>
 	);

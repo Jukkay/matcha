@@ -6,7 +6,12 @@ import { useNotificationContext } from '../../components/NotificationContext';
 import { OnlineIndicator } from '../../components/profile';
 import { useUserContext } from '../../components/UserContext';
 import { LoadError, Spinner } from '../../components/utilities';
-import { ActivePage, ILikeProfile, LoadStatus, LogEntry, NotificationType } from '../../types/types';
+import {
+	ActivePage,
+	ILikeProfile,
+	LoadStatus,
+	NotificationType,
+} from '../../types/types';
 import { authAPI } from '../../utilities/api';
 import { convertBirthdayToAge, reformatDate } from '../../utilities/helpers';
 
@@ -22,23 +27,28 @@ const NotLoggedIn = () => {
 
 const LoggedIn = () => {
 	const { userData, updateUserData, profile, setProfile } = useUserContext();
-	const { setActivePage, setNotificationCount, setMessageCount, setLikeCount } = useNotificationContext();
+	const {
+		setActivePage,
+		setNotificationCount,
+		setMessageCount,
+		setLikeCount,
+	} = useNotificationContext();
 	const [likedProfiles, setLikedProfiles] = useState<ILikeProfile[]>([]);
 	const [likerProfiles, setLikerProfiles] = useState<ILikeProfile[]>([]);
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
 	const [wasRedirected, setWasRedirected] = useState(false);
-	const isFirstRender = useRef(true)
+	const isFirstRender = useRef(true);
 	const router = useRouter();
 
 	// Redirect if user has no profile
 	useEffect(() => {
 		if (isFirstRender.current) {
 			isFirstRender.current = false;
-			return
+			return;
 		}
 		if (wasRedirected || userData.profile_exists) return;
 		setWasRedirected(true);
-    	router.replace('/profile')
+		router.replace('/profile');
 	}, [userData.profile_exists]);
 
 	const getLikerProfiles = async () => {
@@ -57,28 +67,31 @@ const LoggedIn = () => {
 		}
 	};
 
-	const markLikeNotificationsRead = async() => {
-		const response = await authAPI.patch('/notifications', {type: NotificationType.LIKE, user_id: userData.user_id})
+	const markLikeNotificationsRead = async () => {
+		const response = await authAPI.patch('/notifications', {
+			type: NotificationType.LIKE,
+			user_id: userData.user_id,
+		});
 		if (response.status === 200) {
-			setNotificationCount(0)
-			setMessageCount(0)
-			setLikeCount(0)
+			setNotificationCount(0);
+			setMessageCount(0);
+			setLikeCount(0);
 		}
-	}
+	};
 
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
-				setLoadStatus(LoadStatus.LOADING)
+				setLoadStatus(LoadStatus.LOADING);
 				await getLikedProfiles();
 				await getLikerProfiles();
-				await markLikeNotificationsRead()
+				await markLikeNotificationsRead();
 			} catch (err) {
 				setLoadStatus(LoadStatus.ERROR);
 			} finally {
-				setLoadStatus(LoadStatus.IDLE)
+				setLoadStatus(LoadStatus.IDLE);
 			}
-		}
+		};
 		fetchData();
 		setActivePage(ActivePage.LIKES);
 	}, []);
@@ -93,11 +106,9 @@ const LoggedIn = () => {
 		}
 	}, []);
 
-	if (loadStatus == LoadStatus.LOADING)
-		return <Spinner />
+	if (loadStatus == LoadStatus.LOADING) return <Spinner />;
 	if (loadStatus == LoadStatus.ERROR)
-		return <LoadError text="Error loading likes" />
-
+		return <LoadError text="Error loading likes" />;
 
 	return likerProfiles.length > 0 || likedProfiles.length > 0 ? (
 		<section className="section has-text-centered">
@@ -134,32 +145,58 @@ const LikeProfile = ({ profile }: any) => {
 								crossOrigin=""
 								className="rounded-corners"
 							/>
-						<div className="is-overlay mt-3 ml-3">
-							<OnlineIndicator onlineStatus={profile.online} />
-						</div>
+							<div className="is-overlay mt-3 ml-3">
+								<OnlineIndicator
+									onlineStatus={profile.online}
+								/>
+							</div>
 						</figure>
 					</div>
 					<div className="column mt-3 has-text-left">
-						<div className="block">Name: {profile.name}</div>
 						<div className="block">
-							Age: {profile.birthday && convertBirthdayToAge(profile.birthday)}
+							<span className="has-text-weight-semibold mr-3">
+								Name:
+							</span>
+							{profile.name}
 						</div>
-						<div className="block">Famerating: {profile.famerating}</div>
 						<div className="block">
-							Distance: {`${profile.distance} km`}
+							<span className="has-text-weight-semibold mr-3">
+								Age:
+							</span>
+							{profile.birthday &&
+								convertBirthdayToAge(profile.birthday)}
 						</div>
-						<div className="block">City: {profile.city}</div>
-						<div className="block">Country: {profile.country}</div>
 						<div className="block">
-							Interests:{' '}
+							<span className="has-text-weight-semibold mr-3">
+								Famerating:
+							</span>
+							{profile.famerating}
+						</div>
+
+						<div className="block">
+							<span className="has-text-weight-semibold mr-3">
+								City:
+							</span>
+							{profile.city}
+						</div>
+						<div className="block">
+							<span className="has-text-weight-semibold mr-3">
+								Country:
+							</span>
+							{profile.country}
+						</div>
+						<div className="block">
+							<span className="has-text-weight-semibold mr-3">
+								Interests:
+							</span>
 							{profile.interests
-								? Object.entries(JSON.parse(profile.interests)).map(
-										(interest, index) => (
+								? JSON.parse(profile.interests).map(
+										(interest: string, index: number) => (
 											<span
 												className="tag is-primary mx-2 my-1"
 												key={index}
 											>
-												{interest[1] as string}
+												{interest}
 											</span>
 										)
 								  )

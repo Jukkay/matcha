@@ -94,7 +94,7 @@ const LoggedIn = () => {
 	</section>)
 };
 
-const SearchResultItem = ({ profile }: any) => {
+export const SearchResultItem = ({ profile }: any) => {
 	return (
 <Link href={`/profile/${profile.user_id}`}>
 			<a>
@@ -107,32 +107,55 @@ const SearchResultItem = ({ profile }: any) => {
 								crossOrigin=""
 								className="rounded-corners"
 							/>
-						<div className="is-overlay mt-3 ml-3">
-							<OnlineIndicator onlineStatus={profile.online} />
-						</div>
+							<div className="is-overlay mt-3 ml-3">
+								<OnlineIndicator onlineStatus={profile.online} />
+							</div>
 						</figure>
 					</div>
 					<div className="column mt-3 has-text-left">
-						<div className="block">Name: {profile.name}</div>
 						<div className="block">
-							Age: {profile.birthday && convertBirthdayToAge(profile.birthday)}
+							<span className="has-text-weight-semibold mr-3">
+								Name:
+							</span>
+							{profile.name}
 						</div>
-						<div className="block">Famerating: {profile.famerating}</div>
 						<div className="block">
-							Distance: {`${profile.distance} km`}
+							<span className="has-text-weight-semibold mr-3">
+								Age:
+							</span>
+							{profile.birthday && convertBirthdayToAge(profile.birthday)}
 						</div>
-						<div className="block">City: {profile.city}</div>
-						<div className="block">Country: {profile.country}</div>
 						<div className="block">
-							Interests:{' '}
+							<span className="has-text-weight-semibold mr-3">
+								Famerating:
+							</span>
+							{profile.famerating}
+						</div>
+		
+						<div className="block">
+							<span className="has-text-weight-semibold mr-3">
+								City:
+							</span>
+							{profile.city}
+						</div>
+						<div className="block">
+							<span className="has-text-weight-semibold mr-3">
+								Country:
+							</span>
+							{profile.country}
+						</div>
+						<div className="block">
+							<span className="has-text-weight-semibold mr-3">
+								Interests:
+							</span>
 							{profile.interests
-								? Object.entries(JSON.parse(profile.interests)).map(
-										(interest, index) => (
+								? JSON.parse(profile.interests).map(
+										(interest: string, index: number) => (
 											<span
 												className="tag is-primary mx-2 my-1"
 												key={index}
 											>
-												{interest[1] as string}
+												{interest}
 											</span>
 										)
 								  )

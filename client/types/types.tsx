@@ -22,6 +22,7 @@ export interface ViewProps {
 
 export interface UserImagesProps {
   user_id: number | undefined;
+  online: boolean;
 }
 
 export interface FileInputProps {
@@ -36,12 +37,16 @@ export interface ProfileViewProps {
 
 export interface OtherUserViewProps {
   otherUserProfile: IOtherUserProfile;
-  setOtherUserProfile: SetStateAction<any>
+}
+export interface UnlikeButtonProps {
+  otherUserProfile: IOtherUserProfile;
+  setLiked: SetStateAction<any>
+  setMatch: SetStateAction<any>
 }
 export interface LikeButtonProps {
   profile: IOtherUserProfile;
-  setProfile: SetStateAction<any>
-  setNotification: SetStateAction<any>
+  setLiked: SetStateAction<any>
+  setMatch: SetStateAction<any>
 }
 
 export interface SaveButtonProps {
@@ -108,6 +113,7 @@ export interface IProfile {
   user_latitude?: string;
   user_longitude?: string;
   famerating: number;
+  online: boolean;
 }
 
 export interface IOtherUserProfile {
@@ -177,15 +183,21 @@ export interface ISearchResult {
 	query: string;
   }
 export interface ISelector {
-  label?: string, 
-  id?: string, 
-  value?: string, 
-  placeholder?: string, 
-  onChange?: (e: any) => void;
-  options?: any[]
+    label?: string, 
+    id?: string, 
+    value?: string, 
+    placeholder?: string, 
+    onChange?: (e: any) => void;
+    options?: any[]
 }
 
 export interface ISelectorProfile {
+  profile: IProfile ;
+  setProfile: SetStateAction<any>
+  isRequired: boolean
+  
+}
+export interface IAgeRange {
   profile: IProfile ;
   setProfile: SetStateAction<any>
   

@@ -2,7 +2,7 @@ import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Results, ProfileSearch } from '../../components/discover';
+import { Results, ProfileSearch } from '../../components/search';
 import { useNotificationContext } from '../../components/NotificationContext';
 
 import { useUserContext } from '../../components/UserContext';

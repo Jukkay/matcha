@@ -1,12 +1,12 @@
 import type { NextPage } from 'next';
 import React, { useState, useEffect } from 'react';
+import { CreateProfile } from '../../components/createProfile';
 import { useNotificationContext } from '../../components/NotificationContext';
 import {
-	CreateProfile,
 	NewProfileButton,
 	ProfileView,
-	UpdateProfile,
 } from '../../components/profile';
+import { UpdateProfile } from '../../components/updateProfile';
 import { useUserContext } from '../../components/UserContext';
 import { ActivePage, EditProps, IProfile, ViewProps } from '../../types/types';
 import { authAPI } from '../../utilities/api';
@@ -26,6 +26,7 @@ const LoggedIn = () => {
 	const { setActivePage } = useNotificationContext()
 	const [editMode, setEditMode] = useState(false);
 	
+	// Fetch profile data
 	useEffect(() => {
 		const getUserProfile = async () => {
 			try {
@@ -51,6 +52,7 @@ const LoggedIn = () => {
 		setActivePage(ActivePage.PROFILE)
 	}, []);
 
+	// Ask for location permission and locate user
 	useEffect(() => {
 		if ('geolocation' in navigator) {
 			navigator.geolocation.getCurrentPosition(
@@ -78,6 +80,7 @@ const LoggedIn = () => {
 	);
 };
 
+// Edit profile
 const EditMode = ({
 	setEditMode,
 	profile,
@@ -98,6 +101,8 @@ const EditMode = ({
 		/>
 	);
 };
+
+// View profile
 const ViewMode = ({ setEditMode, profile }: ViewProps) => {
 	const { userData } = useUserContext();
 	return userData.profile_exists ? (
@@ -111,7 +116,7 @@ const Profile: NextPage = () => {
 	const { accessToken } = useUserContext();
 	return (
 		<div className="columns is-centered">
-			<div className="column is-half">
+			<div className="column is-three-quarters">
 				{accessToken ? <LoggedIn /> : <NotLoggedIn />}
 			</div>
 		</div>

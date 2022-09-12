@@ -333,14 +333,27 @@ V Add min values to number selectors
 V Optional search stuff on another line
 V Filters and sort on third line
 V toggle optional and filter lines visibility on click
-
-Double slider for age range
-Add links to footer
-create terms and agreements
-create privacy policy
-create about
+V Double slider for age range
+V Make navbar responsivity manually
+V Add links to footer
+V create about
+V create terms and agreements
+V create privacy policy
+V Re-structure components in correct files
+V Comment files
+V Update likes and history profile cards
+V Update own profile and profile view cards
+V Check why like button doesn't update when liking user.
+V Check what's going on with famerating not updating
 
 Make online status work with socket.io
+Test all required functionality
+Make production docker-compose
+Configure AWS account
+Deploy to AWS
+Remove extra clogs
+Customize CSS styling for the app
+
 Refactor SQL queries using ``
 Change language to very plain language for accessibility
 Show image counter

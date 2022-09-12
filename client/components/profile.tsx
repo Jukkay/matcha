@@ -2,94 +2,133 @@ import React, { useState, PointerEvent, useEffect } from 'react';
 import { FaUpload } from 'react-icons/fa';
 
 import {
-	EditProps,
 	ITag,
 	ISearchResult,
-	ISelector,
-	ISelectorProfile,
-	ITextArea,
 	IThumbnails,
 	EditButtonProps,
 	ProfileViewProps,
 	FileInputProps,
-	GalleryProps,
 	UserImagesProps,
 	IProfileCard,
 	BooleanProp,
 } from '../types/types';
-import { Country, City } from 'country-state-city';
-import { ErrorMessage } from './form';
+import { EditButton } from './form';
 import { authAPI } from '../utilities/api';
 import { useUserContext } from './UserContext';
-import { dummyData } from '../pages/profile/data';
 import { convertBirthdayToAge } from '../utilities/helpers';
-import {
-	SearchResultItem,
-} from './discover';
+import { SearchResultItem } from './search';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination } from 'swiper';
+import { Lazy, Navigation, Pagination } from 'swiper';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 
-export const LikeButton = () => {
-	return (
-		<button className="button">
-			<span className="icon is-small">
-				<i className="fas fa-bold"></i>
-			</span>
-		</button>
-	);
-};
-
-export const EditButton = ({ setEditMode }: EditButtonProps) => {
-	return (
-		<button className="button is-primary" onClick={() => setEditMode(true)}>
-			Edit profile
-		</button>
-	);
-};
-
 export const ProfileView = ({ profile, setEditMode }: ProfileViewProps) => {
 	const { userData } = useUserContext();
 	return (
-		<div>
-			<section className="section">
-				<h3 className="title is-3">Your profile</h3>
-				<Gallery user_id={userData.user_id} />
-				<div className="block">Famerating: {profile.famerating}</div>
-				<div className="block">Name: {profile.name}</div>
-				<div className="block">
-					Age:{' '}
-					{profile.birthday && convertBirthdayToAge(profile.birthday)}
+		<div className="my-6">
+			<h1 className="title is-1">Your profile</h1>
+			<div className="columns card my-6 rounded-corners">
+				<div className="column has-text-left is-two-thirds">
+					<Gallery user_id={userData.user_id} online={profile.online}/>
 				</div>
-				<div className="block">City: {profile.city}</div>
-				<div className="block">Country: {profile.country}</div>
-				<div className="block">
-					Introduction: {profile.introduction}
+				<div className="column mt-3 has-text-left m-3">
+					<div className="block">
+						<span className="has-text-weight-semibold mr-3">
+							Name:
+						</span>
+						{profile.name}
+					</div>
+					<div className="block">
+						<span className="has-text-weight-semibold mr-3">
+							Age:
+						</span>
+						{profile.birthday &&
+							convertBirthdayToAge(profile.birthday)}
+					</div>
+					<div className="block">
+						<span className="has-text-weight-semibold mr-3">
+							Famerating:
+						</span>
+						{profile.famerating}
+					</div>
+
+					<div className="block">
+						<span className="has-text-weight-semibold mr-3">
+							City:
+						</span>
+						{profile.city}
+					</div>
+					<div className="block">
+						<span className="has-text-weight-semibold mr-3">
+							Country:
+						</span>
+						{profile.country}
+					</div>
+					<div className="block">
+						<span className="has-text-weight-semibold mr-3">
+							Interests:
+						</span>
+						{profile.interests
+							? profile.interests.map(
+									(interest: string, index: number) => (
+										<span
+											className="tag is-primary mx-2 my-1"
+											key={index}
+										>
+											{interest}
+										</span>
+									)
+							  )
+							: null}
+					</div>
+					<div className="block">
+						<span className="has-text-weight-semibold mr-3">
+							Introduction:
+						</span>
+						<p className="notification has-background-primary-light">
+							{profile.introduction}
+						</p>
+					</div>
+					<div className="block">
+						<span className="has-text-weight-semibold mr-3">
+							Gender:
+						</span>
+						{profile.gender}
+					</div>
+					<div className="block">
+						<span className="has-text-weight-semibold mr-3">
+							Looking for:
+						</span>
+						{profile.looking}
+					</div>
+					<div className="block">
+						<span className="has-text-weight-semibold mr-3">
+							Minimum age:
+						</span>
+						{profile.min_age}
+					</div>
+					<div className="block">
+						<span className="has-text-weight-semibold mr-3">
+							Maximum age:
+						</span>
+						{profile.max_age}
+					</div>
+					<div className="block">
+						<span className="has-text-weight-semibold mr-3">
+							Latitude:
+						</span>
+						{profile.latitude}
+					</div>
+					<div className="block">
+						<span className="has-text-weight-semibold mr-3">
+							Longitude:
+						</span>
+						{profile.longitude}
+					</div>
+					<EditButton setEditMode={setEditMode} />
 				</div>
-				<div className="block">
-					Interests:{' '}
-					{profile.interests.length > 0
-						? profile.interests.map((interest, index) => (
-								<span
-									className="tag is-success is-medium is-rounded is-clickable mx-2 my-1"
-									key={index}
-								>
-									{interest}
-								</span>
-						  ))
-						: null}
-				</div>
-				<div className="block">Gender: {profile.gender}</div>
-				<div className="block">Looking for: {profile.looking}</div>
-				<div className="block">Minimum age: {profile.min_age}</div>
-				<div className="block">Maximum age: {profile.max_age}</div>
-				<div className="block">User ID: {profile.user_id}</div>
-				<div className="block">Latitude: {profile.user_latitude}</div>
-				<div className="block">Logitude: {profile.user_longitude}</div>
-				<EditButton setEditMode={setEditMode} />
-			</section>
+			</div>
 			<VisitorLog user_id={userData.user_id} />
 		</div>
 	);
@@ -137,555 +176,7 @@ export const VisitorLog = ({ user_id }: any) => {
 		</section>
 	);
 };
-export const CreateProfile = ({
-	setEditMode,
-	profile,
-	setProfile,
-}: EditProps) => {
-	const [tagError, setTagError] = useState(false);
-	const [success, setSuccess] = useState(false);
-	const [interestsError, setInterestsError] = useState(false);
-	const [fileError, setFileError] = useState(false);
-	const [files, setFiles] = useState<FileList>();
-	const [interests, setInterests] = useState<string[]>([]);
-	const [query, setQuery] = useState('');
-	const [result, setResult] = useState<string[]>([]);
-	const { userData, updateUserData } = useUserContext();
-	const age = convertBirthdayToAge(userData.birthday);
 
-	// Update object values
-	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setQuery(event.target.value);
-	};
-	useEffect(() => {
-		setInterests(profile.interests);
-		setProfile({ ...profile, min_age: age - 5, max_age: age + 5 });
-	}, []);
-
-	// Live query interest from interest list
-	useEffect(() => {
-		if (!query) {
-			setResult([]);
-			return;
-		}
-		const results = dummyData.filter((interest) =>
-			interest.toLowerCase().includes(query.toLowerCase())
-		);
-		setResult(results as string[]);
-	}, [query]);
-
-	const uploadPhotos = async () => {
-		if (!files || files.length < 1) {
-			setFileError(true);
-			return;
-		}
-		// Add files to formData
-		const imageData = new FormData();
-		for (let i = 0; i < files.length; i++) {
-			imageData.append('files', files[i], files[i].name);
-		}
-		// Upload to server
-		const response = await authAPI.post('/image', imageData);
-		return response;
-	};
-
-	const uploadProfile = async () => {
-		try {
-			// Check photos
-			if (!files || files.length < 1) {
-				setFileError(true);
-				return;
-			}
-			// Check interests amount
-			if (interests?.length < 1) {
-				setInterestsError(true);
-				return;
-			}
-			// Add interests object to profile
-			let payload = profile;
-			payload.interests = interests;
-			// upload photos
-			const photoUpload = await uploadPhotos();
-			if (!photoUpload) {
-				setFileError(true);
-				return;
-			}
-			// Get profile picture filename
-			const imageNumber = profile.profile_image || '0';
-			payload.profile_image = photoUpload.data.filenames[imageNumber];
-			// Add other information user can't change
-			payload.birthday = userData.birthday;
-			payload.name = userData.name;
-			// Upload profile
-			const response = await authAPI.post(`/profile`, payload);
-			if (response.status === 200) {
-				setSuccess(true);
-				setTimeout(() => {
-					setSuccess(false);
-					setEditMode(false);
-					updateUserData({ ...userData, profile_exists: true });
-					sessionStorage.setItem('profile', JSON.stringify(payload));
-				}, 2000);
-			}
-		} catch (err) {
-			console.error(err);
-		}
-	};
-
-	const handleSubmit = (event: React.FormEvent) => {
-		event.preventDefault();
-		uploadProfile();
-	};
-	return success ? (
-		<section className="section">
-			<div className="box has-text-centered">
-				<section className="section">
-					<h3 className="title is-3">Profile created successfully</h3>
-				</section>
-			</div>
-		</section>
-	) : (
-		<div>
-			<form onSubmit={handleSubmit}>
-				<section className="section">
-					<h3 className="title is-3">Create new profile</h3>
-
-					{/* Location */}
-					<CountrySelector
-						profile={profile}
-						setProfile={setProfile}
-					/>
-					<CitySelector profile={profile} setProfile={setProfile} />
-
-					{/* Gender */}
-					<GenderSelector
-						label="Gender *"
-						id="gender"
-						value={profile.gender}
-						placeholder="Choose your gender"
-						onChange={(event) =>
-							setProfile({
-								...profile,
-								gender: event.target.value,
-							})
-						}
-						options={[
-							'Male',
-							'Female',
-							'Non-binary',
-							'Trans-man',
-							'Trans-woman',
-							'Other',
-						]}
-					/>
-
-					{/* Introduction */}
-					<TextArea
-						label="Introduction *"
-						id="introduction"
-						value={profile.introduction}
-						placeholder="Introduction"
-						size={10}
-						onChange={(event) =>
-							setProfile({
-								...profile,
-								introduction: event.target.value,
-							})
-						}
-					/>
-
-					{/* Interests */}
-					<div className="block">
-						<label htmlFor="interests" className="label my-3">
-							Interests (choose 1 to 5) *
-						</label>
-						<input
-							className="input my-3"
-							type="text"
-							id="interests"
-							placeholder="Search for interests"
-							onChange={onChange}
-						></input>
-						<ErrorMessage
-							errorMessage="Maximum 5 interests. Please unselect something to select something new."
-							error={tagError}
-						/>
-						<ErrorMessage
-							errorMessage="You must choose at least one interest."
-							error={interestsError}
-						/>
-						<SearchResult
-							result={result}
-							setResult={setResult}
-							setTagError={setTagError}
-							interests={interests}
-							setInterests={setInterests}
-							query={query}
-						/>
-					</div>
-					<FileInput files={files} setFiles={setFiles} />
-					<ErrorMessage
-						errorMessage="You must upload at least one picture."
-						error={fileError}
-					/>
-
-					<h3 className="title is-3 mt-6">
-						What kind of partner are you looking for?
-					</h3>
-					{/* Looking For */}
-					<GenderSelector
-						label="Gender *"
-						id="looking"
-						value={profile.looking}
-						placeholder="Choose a gender"
-						onChange={(event) =>
-							setProfile({
-								...profile,
-								looking: event.target.value,
-							})
-						}
-						options={[
-							'Male',
-							'Female',
-							'Male or Female',
-							'Non-binary',
-							'Trans-man',
-							'Trans-woman',
-							'Anything goes',
-						]}
-					/>
-
-					{/* Age range */}
-					<AgeRange profile={profile} setProfile={setProfile} />
-					<button type="submit" className="button is-primary">
-						Save profile
-					</button>
-				</section>
-			</form>
-		</div>
-	);
-};
-
-export const UpdateProfile = ({
-	setEditMode,
-	profile,
-	setProfile,
-}: EditProps) => {
-	const [tagError, setTagError] = useState(false);
-	const [success, setSuccess] = useState(false);
-	const [deleted, setDeleted] = useState(false);
-	const [interestsError, setInterestsError] = useState(false);
-	const [coordinateError, setCoordinateError] = useState(false);
-	const [imageError, setImageError] = useState(false);
-	const [files, setFiles] = useState<FileList>();
-	const [interests, setInterests] = useState<string[]>([]);
-	const [query, setQuery] = useState('');
-	const [result, setResult] = useState<string[]>([]);
-	const { userData, updateUserData } = useUserContext();
-
-	// Update object values
-	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setQuery(event.target.value);
-	};
-
-	useEffect(() => {
-		setInterests(profile.interests);
-		setSuccess(false);
-	}, []);
-
-	// Live query interest from interest list
-	useEffect(() => {
-		if (!query) {
-			setResult([]);
-			return;
-		}
-		const results = dummyData.filter((interest) =>
-			interest.toLowerCase().includes(query.toLowerCase())
-		);
-		setResult(results as string[]);
-	}, [query]);
-
-	const uploadPhotos = async () => {
-		if (!files || files.length < 1) {
-			return;
-		}
-		// Add files to formData
-		const imageData = new FormData();
-		for (let i = 0; i < files.length; i++) {
-			imageData.append('files', files[i], files[i].name);
-		}
-
-		// Upload to server
-		const response = await authAPI.post('/image', imageData);
-		return response;
-	};
-
-	const uploadProfile = async () => {
-		try {
-			if (profile.latitude && profile.longitude) {
-				const latitudeTest =
-					/^(-?[1-8]?\d(?:\.\d{1,18})?|90(?:\.0{1,18})?)$/.test(
-						profile.latitude
-					);
-				const longitudeTest =
-					/^(-?(?:1[0-7]|[1-9])?\d(?:\.\d{1,18})?|180(?:\.0{1,18})?)$/.test(
-						profile.longitude
-					);
-				if (!latitudeTest || !longitudeTest) {
-					setCoordinateError(true);
-					return;
-				}
-			}
-			// Check interests amount
-			if (interests?.length < 1) {
-				setInterestsError(true);
-				return;
-			}
-			// Check photos
-			if (files && files.length > 0) {
-				// upload photos
-				await uploadPhotos();
-			}
-			// Add interests object to profile
-			let payload = profile;
-			payload.interests = interests;
-			// Add other information user can't change
-			payload.birthday = userData.birthday;
-			payload.name = userData.name;
-			// Upload profile
-			const response = await authAPI.patch(`/profile`, payload);
-			if (response.status === 200) {
-				setSuccess(true);
-				setTimeout(() => {
-					setSuccess(false);
-					setEditMode(false);
-					sessionStorage.setItem('profile', JSON.stringify(payload));
-				}, 2000);
-			}
-		} catch (err) {
-			console.error(err);
-		}
-	};
-	const deleteProfile = async () => {
-		const response = await authAPI.delete(`/profile/${profile.user_id}`);
-		if (response.status === 200) {
-			setDeleted(true);
-			setTimeout(() => {
-				updateUserData({ ...userData, profile_exists: false });
-				setDeleted(false);
-				setEditMode(false);
-				sessionStorage.removeItem('profile');
-			}, 2000);
-		}
-	};
-	const handleSubmit = (event: React.FormEvent) => {
-		event.preventDefault();
-		uploadProfile();
-	};
-	return deleted ? (
-		<section className="section">
-			<div className="box has-text-centered">
-				<section className="section">
-					<h3 className="title is-3">Profile deleted successfully</h3>
-				</section>
-			</div>
-		</section>
-	) : success ? (
-		<section className="section">
-			<div className="box has-text-centered">
-				<section className="section">
-					<h3 className="title is-3">Profile updated successfully</h3>
-				</section>
-			</div>
-		</section>
-	) : (
-		<div>
-			<form onSubmit={handleSubmit}>
-				<section className="section">
-					<h3 className="title is-3">Edit profile</h3>
-
-					{/* Location */}
-					<CountrySelector
-						profile={profile}
-						setProfile={setProfile}
-					/>
-					<CitySelector profile={profile} setProfile={setProfile} />
-
-					{/* Gender */}
-					<GenderSelector
-						label="Gender *"
-						id="gender"
-						value={profile.gender}
-						placeholder="Choose your gender"
-						onChange={(event) =>
-							setProfile({
-								...profile,
-								gender: event.target.value,
-							})
-						}
-						options={[
-							'Male',
-							'Female',
-							'Male or Female',
-							'Non-binary',
-							'Trans-man',
-							'Trans-woman',
-							'Anything goes',
-						]}
-					/>
-
-					{/* Introduction */}
-					<TextArea
-						label="Introduction *"
-						id="introduction"
-						value={profile.introduction}
-						placeholder="Introduction"
-						size={10}
-						onChange={(event) =>
-							setProfile({
-								...profile,
-								introduction: event.target.value,
-							})
-						}
-					/>
-
-					{/* Interests */}
-					<div className="block">
-						<label htmlFor="interests" className="label my-3">
-							Interests (choose 1 to 5) *
-						</label>
-						<input
-							className="input my-3"
-							type="text"
-							id="interests"
-							placeholder="Search for interests"
-							onChange={onChange}
-						></input>
-						<ErrorMessage
-							errorMessage="Maximum 5 interests. Please unselect something to select something new."
-							error={tagError}
-						/>
-						<ErrorMessage
-							errorMessage="You must choose at least one interest."
-							error={interestsError}
-						/>
-						<SearchResult
-							result={result}
-							setResult={setResult}
-							setTagError={setTagError}
-							interests={interests}
-							setInterests={setInterests}
-							query={query}
-						/>
-					</div>
-					{/* Pictures */}
-					<EditGallery files={files} setImageError={setImageError} />
-					<ErrorMessage
-						errorMessage="You must have at least one picture."
-						error={imageError}
-					/>
-					<FileInput files={files} setFiles={setFiles} />
-
-					<h3 className="title is-3 mt-6">
-						What kind of partner are you looking for?
-					</h3>
-					{/* Looking For */}
-					<GenderSelector
-						label="Gender *"
-						id="looking"
-						value={profile.looking}
-						placeholder="Choose a gender"
-						onChange={(event) =>
-							setProfile({
-								...profile,
-								looking: event.target.value,
-							})
-						}
-						options={[
-							'Male',
-							'Female',
-							'Non-binary',
-							'Trans-man',
-							'Trans-woman',
-							'Other',
-						]}
-					/>
-
-					{/* Age range */}
-					<AgeRange profile={profile} setProfile={setProfile} />
-					{/* User coordinate input */}
-					<GPSCoordinateInput
-						profile={profile}
-						setProfile={setProfile}
-					/>
-					<ErrorMessage
-						errorMessage="Invalid coordinates."
-						error={coordinateError}
-					/>
-					<div className="block buttons">
-						<button type="submit" className="button is-primary">
-							Update profile
-						</button>
-						<button
-							className="button is-primary"
-							onClick={() => setEditMode(false)}
-						>
-							Cancel
-						</button>
-					</div>
-				</section>
-			</form>
-
-			<section className="section">
-				<p className="block">
-					Caution: Removing profile is irreversible. If you remove
-					your profile, you won't be able to use the site normally
-					anymore unless you create a new profile. This action will
-					not remove your whole account. If you wish to remove your
-					account too, you can do that in User settings.
-				</p>
-				<button className="button is-danger" onClick={deleteProfile}>
-					Remove profile
-				</button>
-			</section>
-		</div>
-	);
-};
-
-export const GPSCoordinateInput = ({ profile, setProfile }: any) => {
-	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setProfile({ ...profile, [event.target.name]: event.target.value });
-	};
-	return (
-		<div className="block">
-			<label htmlFor="GPS" className="label my-3">
-				Manually set GPS location
-			</label>
-			<div className="block">
-				<label htmlFor="latitude" className="label my-3">
-					Latitude:
-				</label>
-				<input
-					type="text"
-					className="input is-primary"
-					name="user_latitude"
-					onChange={onChange}
-					value={profile.user_latitude}
-				></input>
-				<label htmlFor="longitude" className="label my-3">
-					Longitude:
-				</label>
-				<input
-					type="text"
-					className="input is-primary"
-					name="user_longitude"
-					onChange={onChange}
-					value={profile.user_longitude}
-				></input>
-			</div>
-		</div>
-	);
-};
 export const NewProfileButton = ({ setEditMode }: EditButtonProps) => {
 	return (
 		<div className="section has-text-centered">
@@ -720,7 +211,7 @@ export const Tag = ({ text, interests, setInterests, setTagError }: ITag) => {
 
 	return (
 		<span
-			className="tag is-success is-light is-medium is-rounded is-clickable"
+			className="tag is-primary is-light is-clickable"
 			onClick={handleTagClick}
 		>
 			{text}
@@ -744,10 +235,7 @@ export const SelectedTag = ({
 	};
 
 	return (
-		<span
-			className="tag is-primary is-medium is-rounded is-clickable"
-			onClick={handleTagClick}
-		>
+		<span className="tag is-primary is-clickable" onClick={handleTagClick}>
 			{text}
 		</span>
 	);
@@ -788,318 +276,7 @@ export const SearchResult = ({
 	) : null;
 };
 
-export const CountrySelector = ({ profile, setProfile }: ISelectorProfile) => {
-	return (
-		<div className="block">
-			<label htmlFor="country" className="label my-3">
-				Country *
-			</label>
-			<div className="select is-primary">
-				<select
-					id="country"
-					name="country"
-					value={profile.country}
-					onChange={(event) =>
-						setProfile({
-							...profile,
-							country: event.target.value,
-						})
-					}
-					required
-				>
-					<option value={''} disabled>
-						Choose your country
-					</option>
-					{Country.getAllCountries().map((country, index) => (
-						<option
-							key={`${country.name}${index}`}
-							value={country.isoCode}
-						>
-							{country.name}
-						</option>
-					))}
-				</select>
-			</div>
-		</div>
-	);
-};
-
-export const CitySelector = ({ profile, setProfile }: ISelectorProfile) => {
-	return profile.country ? (
-		<div className="block">
-			<label htmlFor="city" className="label my-3">
-				City *
-			</label>
-			<div className="select is-primary">
-				<select
-					id="city"
-					name="city"
-					value={profile.city}
-					onChange={(event) =>
-						setProfile({
-							...profile,
-							city: event.target.value,
-						})
-					}
-					required
-				>
-					<option value={''} disabled>
-						Choose your city
-					</option>
-					{City.getCitiesOfCountry(profile.country)?.map(
-						(city, index) => (
-							<option
-								key={`${city.name}${index}`}
-								value={city.name}
-							>
-								{city.name}
-							</option>
-						)
-					)}
-				</select>
-			</div>
-		</div>
-	) : (
-		<div className="block">
-			<label htmlFor="county" className="label my-3">
-				City *
-			</label>
-			<div className="select is-primary disabled">
-				<select
-					id="city"
-					value={profile?.city}
-					onChange={(event) =>
-						setProfile({
-							...profile,
-							city: event.target.value,
-						})
-					}
-					required
-				>
-					<option value={''} disabled>
-						Choose your city
-					</option>
-				</select>
-			</div>
-		</div>
-	);
-};
-
-export const AgeRange = ({ profile, setProfile }: ISelectorProfile) => {
-	return (
-		<div className="block">
-			<label htmlFor="min_age" className="label">
-				Age range *
-			</label>
-
-			<div className="field is-horizontal">
-				<div className="field-label is-normal">
-					<label htmlFor="min_age" className="label">
-						Min
-					</label>
-				</div>
-				<div className="field-body">
-					<div className="field">
-						<input
-							type="number"
-							id="min_age"
-							className="input is-primary"
-							min="18"
-							max={profile?.max_age}
-							value={profile?.min_age}
-							onChange={(event) =>
-								setProfile({
-									...profile,
-									min_age: parseInt(event.target.value),
-								})
-							}
-						/>
-					</div>
-					<div className="field-label is-normal">
-						<label htmlFor="max_age" className="label">
-							Max
-						</label>
-					</div>
-					<div className="field">
-						<input
-							type="number"
-							id="max_age"
-							className="input is-primary"
-							min={profile?.min_age}
-							max="122"
-							value={profile?.max_age}
-							onChange={(event) =>
-								setProfile({
-									...profile,
-									max_age: parseInt(event.target.value),
-								})
-							}
-						/>
-					</div>
-				</div>
-			</div>
-		</div>
-	);
-};
-
-export const GenderSelector = ({
-	label,
-	id,
-	value,
-	placeholder,
-	onChange,
-	options,
-}: ISelector) => {
-	return (
-		<div className="block">
-			<label htmlFor={id} className="label my-3">
-				{label}
-			</label>
-			<div className="select is-primary">
-				<select id={id} value={value} onChange={onChange} required>
-					<option value={''} disabled>
-						{placeholder}
-					</option>
-					{options?.map((item) => (
-						<option key={item} value={item}>
-							{item}
-						</option>
-					))}
-				</select>
-			</div>
-		</div>
-	);
-};
-
-export const TextArea = ({
-	label,
-	id,
-	value,
-	placeholder,
-	onChange,
-	size,
-}: ITextArea) => {
-	return (
-		<div className="block">
-			<label htmlFor={id} className="label my-3">
-				{label}
-			</label>
-			<textarea
-				id={id}
-				className="textarea is-primary"
-				rows={size}
-				placeholder={placeholder}
-				value={value}
-				onChange={onChange}
-				required
-			></textarea>
-		</div>
-	);
-};
-export const EditGallery = ({ files, setImageError }: GalleryProps) => {
-	const [images, setImages] = useState<string[]>([]);
-	const { userData, updateUserData, profile, setProfile } = useUserContext();
-
-	// Remove uploaded image
-	const handleClick = async (event: PointerEvent<HTMLButtonElement>) => {
-		event.preventDefault();
-		if (images.length < 2) {
-			setImageError(true);
-			return;
-		}
-		const url = event.currentTarget.id;
-		const removedImage = url.substring(url.lastIndexOf('/') + 1);
-		if (!removedImage) return;
-		if (removedImage == profile.profile_image) {
-			setProfile({
-				...profile,
-				profile_image: images[0].substring(url.lastIndexOf('/') + 1),
-			});
-			updateUserData({
-				...userData,
-				profile_image: images[0].substring(url.lastIndexOf('/') + 1),
-			});
-		}
-		let response = await authAPI.delete(`/image/${removedImage}`);
-		if (response.status === 200) {
-			const newImages = images.filter((item) => item != url);
-			setImages([...newImages]);
-		}
-	};
-
-	// Set as profile picture
-	const handleProfilePicture = (event: PointerEvent<HTMLButtonElement>) => {
-		event.preventDefault();
-		const url = event.currentTarget.id;
-		const chosenImage = url.substring(url.lastIndexOf('/') + 1);
-		setProfile({ ...profile, profile_image: chosenImage });
-		updateUserData({ ...userData, profile_image: chosenImage });
-	};
-
-	useEffect(() => {
-		const getUserImages = async () => {
-			let response = await authAPI.get(`/image/user/${userData.user_id}`);
-			if (response?.data?.photos) {
-				const filenames = response.data.photos.map(
-					(item: any) =>
-						`${authAPI.defaults.baseURL}/images/${item['filename']}`
-				);
-				setImages(filenames);
-			}
-		};
-		getUserImages();
-	}, []);
-
-	return images ? (
-		<div className="block">
-			<label htmlFor="gallery" className="label my-3">
-				Uploaded images:
-			</label>
-			<div className="is-flex is-flex-direction-row is-flex-wrap-wrap">
-				{images.map((image) => (
-					<div key={image} className="box mx-3 has-text-centered">
-						<figure className="image is-128x128">
-							<img
-								src={image}
-								alt="Placeholder image"
-								crossOrigin=""
-							/>
-						</figure>
-						<div className="buttons">
-							<button
-								className="button is-small is-danger is-centered mt-3"
-								id={image}
-								onClick={handleClick}
-							>
-								Remove
-							</button>
-							{profile.profile_image ==
-							image.substring(image.lastIndexOf('/') + 1) ? (
-								<button
-									className="button is-small is-centered mt-3"
-									id={image}
-									onClick={handleProfilePicture}
-								>
-									Current profile picture
-								</button>
-							) : (
-								<button
-									className="button is-small is-primary is-centered mt-3"
-									id={image}
-									onClick={handleProfilePicture}
-								>
-									Set as profile picture
-								</button>
-							)}
-						</div>
-					</div>
-				))}
-			</div>
-		</div>
-	) : null;
-};
-
-export const Gallery = ({ user_id }: UserImagesProps) => {
+export const Gallery = ({ user_id, online }: UserImagesProps) => {
 	const [images, setImages] = useState([]);
 
 	useEffect(() => {
@@ -1118,16 +295,28 @@ export const Gallery = ({ user_id }: UserImagesProps) => {
 
 	return images && user_id ? (
 		<Swiper
+			slidesPerView={1}
+			spaceBetween={30}
+			lazy={true}
 			pagination={{
-				type: 'fraction',
+				dynamicBullets: true,
 			}}
 			navigation={true}
-			modules={[Pagination, Navigation]}
-			className="swiper"
+			modules={[Pagination, Navigation, Lazy]}
 		>
 			{images.map((image, index) => (
 				<SwiperSlide className="swiper-slide" key={index}>
-					<img src={image} alt="Placeholder image" crossOrigin="" />
+					<div className="is-relative image is-square rounded-corners">
+						<img
+							src={image}
+							alt="Placeholder image"
+							className="rounded-corners fullwidth"
+							crossOrigin=""
+						/>
+						<div className="is-overlay mt-3 ml-3">
+							<OnlineIndicator onlineStatus={online} />
+						</div>
+					</div>
 				</SwiperSlide>
 			))}
 		</Swiper>

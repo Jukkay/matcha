@@ -56,8 +56,15 @@ const calculateFamerating = async(user_id: string) => {
 	const messages = await execute(sql, [user_id]);
 
 	// Calculate famerating
-	if (!likesReceived[0].like_count || !matches[0].match_count || !messages[0].message_count) return 0
-	else return likesReceived[0].like_count as number + (messages[0].message_count as number / matches[0].match_count as number)
+	let messagesPerMatch
+	if (messages[0].message_count && matches[0].match_count)
+		messagesPerMatch =  messages[0].message_count as number / matches[0].match_count as number
+	else
+		messagesPerMatch = 0
+	const famerating = likesReceived[0].like_count as number + messagesPerMatch
+	if (famerating > 1000)
+		return 1000
+	return famerating
 
 
 }
@@ -245,7 +252,6 @@ const removeLike = async (req: Request, res: Response) => {
 			return res.status(401).json({
 				message: 'Unauthorized',
 			});
-		console.log('liker is', liker, 'user_id is', user_id);
 		if (user_id != liker)
 			return res.status(400).json({
 				message: 'ID mismatch. Are you doing something shady?',
@@ -273,6 +279,8 @@ const removeLike = async (req: Request, res: Response) => {
 				AND 
 				target_id = ?`;
 		const response = await execute(sql, [user_id, liked]);
+		// Update famerating
+		await updateFamerating(liker, liked as string)
 		if (response)
 			return res.status(200).json({
 				message: 'Like removed successfully',

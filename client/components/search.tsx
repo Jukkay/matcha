@@ -6,10 +6,7 @@ import React, {
 	MutableRefObject,
 	useRef,
 } from 'react';
-import {
-	OnlineIndicator,
-	SearchResult,
-} from './profile';
+import { OnlineIndicator, SearchResult } from './profile';
 import { useUserContext } from './UserContext';
 import {
 	AdvancedSearchProps,
@@ -34,7 +31,7 @@ import {
 } from '../utilities/helpers';
 import { moreCommonTagsFirst } from '../utilities/sort';
 import { Country, City } from 'country-state-city';
-import { ErrorMessage } from './form';
+import { DistanceRange, ErrorMessage, FameratingRange } from './form';
 import { dummyData } from '../pages/profile/data';
 import { LoadError, Spinner } from './utilities';
 import { FaFilter } from 'react-icons/fa';
@@ -43,13 +40,11 @@ import { IconContext } from 'react-icons';
 import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
 
-
 export const ProfileSearch = ({
 	searchParams,
 	setSearchParams,
 	setResults,
 	results,
-	filteredResults,
 	setFilteredResults,
 	setLoadStatus,
 	sort,
@@ -317,97 +312,6 @@ const Interests = ({ interests, setInterests }: any) => {
 		</div>
 	);
 };
-const FameratingRange = ({
-	searchParams,
-	setSearchParams,
-}: SearchParamsProps) => {
-	return (
-		<div className="block">
-			<label htmlFor="min_age" className="label">
-				Famerating range
-			</label>
-
-			<div className="field is-horizontal">
-				<div className="field-label is-normal">
-					<label htmlFor="min_famerating" className="label">
-						Min
-					</label>
-				</div>
-				<div className="field-body">
-					<div className="field">
-						<input
-							type="number"
-							id="min_famerating"
-							className="input is-primary"
-							min="1"
-							max={searchParams.max_famerating}
-							value={searchParams.min_famerating}
-							onChange={(event) =>
-								setSearchParams({
-									...searchParams,
-									min_famerating: parseInt(
-										event.target.value
-									),
-								})
-							}
-						/>
-					</div>
-					<div className="field-label is-normal">
-						<label htmlFor="max_famerating" className="label">
-							Max
-						</label>
-					</div>
-					<div className="field">
-						<input
-							type="number"
-							id="max_famerating"
-							className="input is-primary"
-							min={searchParams.min_famerating}
-							max="1000"
-							value={searchParams.max_famerating}
-							onChange={(event) =>
-								setSearchParams({
-									...searchParams,
-									max_famerating: parseInt(
-										event.target.value
-									),
-								})
-							}
-						/>
-					</div>
-				</div>
-			</div>
-		</div>
-	);
-};
-
-const DistanceRange = ({
-	searchParams,
-	setSearchParams,
-}: SearchParamsProps) => {
-	return (
-		<div className="block">
-			<label htmlFor="max_distance" className="label my-3">
-				Maximum distance (km)
-			</label>
-			<div className="field">
-				<input
-					type="number"
-					id="max_distance"
-					min={0}
-					className="input is-primary"
-					value={searchParams.max_distance}
-					onChange={(event) =>
-						setSearchParams({
-							...searchParams,
-							max_distance: event.target.value,
-						})
-					}
-				/>
-			</div>
-		</div>
-	);
-};
 
 export const Results = ({ sortedResults, loadStatus }: ResultsProps) => {
 	const [endIndex, setEndIndex] = useState(9);
@@ -524,33 +428,35 @@ export const SearchResultItem = ({
 							{famerating}
 						</div>
 						<div className="block">
-						<span className="has-text-weight-semibold mr-3">
-							Distance: 
-						</span>
+							<span className="has-text-weight-semibold mr-3">
+								Distance:
+							</span>
 							{`${distance} km`}
 						</div>
 						<div className="block">
-						<span className="has-text-weight-semibold mr-3">
-							City: 
-						</span>
-							{city}</div>
+							<span className="has-text-weight-semibold mr-3">
+								City:
+							</span>
+							{city}
+						</div>
 						<div className="block">
-						<span className="has-text-weight-semibold mr-3">
-							Country: 
-						</span>
-							{country}</div>
+							<span className="has-text-weight-semibold mr-3">
+								Country:
+							</span>
+							{country}
+						</div>
 						<div className="block">
-						<span className="has-text-weight-semibold mr-3">
-							Interests:
-						</span>
+							<span className="has-text-weight-semibold mr-3">
+								Interests:
+							</span>
 							{interests
-								? Object.entries(JSON.parse(interests)).map(
-										(interest, index) => (
+								? JSON.parse(interests).map(
+										(interest: string, index: number) => (
 											<span
 												className="tag is-primary mx-2 my-1"
 												key={index}
 											>
-												{interest[1] as string}
+												{interest}
 											</span>
 										)
 								  )
@@ -733,25 +639,7 @@ export const BasicSearchLine = ({
 					setSearchParams={setSearchParams}
 				/>
 				<SearchGenderSelector
-					label="Gender *"
-					id="looking"
-					value={searchParams.looking}
-					placeholder="Choose a gender"
-					onChange={(event) =>
-						setSearchParams({
-							...searchParams,
-							looking: event.target.value,
-						})
-					}
-					options={[
-						'Male',
-						'Female',
-						'Male or Female',
-						'Non-binary',
-						'Trans-man',
-						'Trans-woman',
-						'Anything goes',
-					]}
+					searchParams={searchParams} setSearchParams={setSearchParams}
 				/>
 				<SubmitAndResetButtons resetSearch={resetSearch} />
 			</div>
@@ -785,25 +673,7 @@ export const BasicSearchLine = ({
 					setSearchParams={setSearchParams}
 				/>
 				<SearchGenderSelector
-					label="Gender *"
-					id="looking"
-					value={searchParams.looking}
-					placeholder="Choose a gender"
-					onChange={(event) =>
-						setSearchParams({
-							...searchParams,
-							looking: event.target.value,
-						})
-					}
-					options={[
-						'Male',
-						'Female',
-						'Male or Female',
-						'Non-binary',
-						'Trans-man',
-						'Trans-woman',
-						'Anything goes',
-					]}
+					searchParams={searchParams} setSearchParams={setSearchParams}
 				/>
 				<SubmitAndResetButtons resetSearch={resetSearch} />
 			</div>
@@ -879,38 +749,35 @@ export const SearchAgeRange = ({
 };
 
 export const SearchGenderSelector = ({
-	label,
-	id,
-	value,
-	placeholder,
-	onChange,
-	options,
-}: ISelector) => {
+	searchParams,
+	setSearchParams,
+}: SearchParamsProps) => {
 	return (
 		<div className="block">
-			<div className="field">
-				<label htmlFor={id} className="label">
-					{label}
-				</label>
-				<div className="control">
-					<div className="select is-primary">
-						<select
-							id={id}
-							value={value}
-							onChange={onChange}
-							required
-						>
-							<option value={''} disabled>
-								{placeholder}
-							</option>
-							{options?.map((item) => (
-								<option key={item} value={item}>
-									{item}
-								</option>
-							))}
-						</select>
-					</div>
-				</div>
+			<label htmlFor="looking" className="label my-3">
+				Gender *
+			</label>
+			<div className="select is-primary">
+				<select
+					id="looking"
+					value={searchParams.looking}
+					onChange={(event) =>
+						setSearchParams({
+							...searchParams,
+							looking: event.target.value,
+						})
+					}
+				>
+					<option value={''} disabled>
+						Choose a gender
+					</option>
+					<option value="Male">Male</option>
+					<option value="Female">Female</option>
+					<option value="Non-binary">Non-binary</option>
+					<option value="Trans-man">Trans-man</option>
+					<option value="Trans-woman">Trans-woman</option>
+					<option value="Anything goes">Anything goes</option>
+				</select>
 			</div>
 		</div>
 	);

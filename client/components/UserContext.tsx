@@ -57,7 +57,8 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
 		longitude: '',
 		user_latitude: '', 
 		user_longitude: '',
-		famerating: 0
+		famerating: 0,
+		online: true
 	});
 
 	useEffect(() => {

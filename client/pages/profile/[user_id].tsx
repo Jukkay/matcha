@@ -5,21 +5,18 @@ import { Gallery, OnlineIndicator } from '../../components/profile';
 import { useUserContext } from '../../components/UserContext';
 import {
 	ActivePage,
-	BooleanProp,
 	IOtherUserProfile,
-	IProfile,
 	LikeButtonProps,
 	LoadStatus,
 	NotificationType,
 	OtherUserViewProps,
-	ProfileViewProps,
+	UnlikeButtonProps,
 } from '../../types/types';
 import { authAPI } from '../../utilities/api';
 import { FcLike, FcDislike } from 'react-icons/fc';
 import {
 	convertBirthdayToAge,
 	distanceBetweenPoints,
-	reformatDate,
 	reformatDateTime,
 } from '../../utilities/helpers';
 import { useNotificationContext } from '../../components/NotificationContext';
@@ -141,7 +138,6 @@ const LoggedIn = () => {
 	return profileExists ? (
 		<ViewMode
 			otherUserProfile={otherUserProfile}
-			setOtherUserProfile={setOtherUserProfile}
 		/>
 	) : (
 		<section className="section has-text-centered">
@@ -152,8 +148,8 @@ const LoggedIn = () => {
 
 const LikeButton = ({
 	profile,
-	setProfile,
-	setNotification,
+	setLiked,
+	setMatch
 }: LikeButtonProps) => {
 	const { userData } = useUserContext();
 	const socket = useSocketContext();
@@ -179,8 +175,7 @@ const LikeButton = ({
 			socket.emit('send_notification', liked, notification);
 			// Send match notification
 			if (response.data.match) {
-				setProfile({ ...profile, like_id: 1, match_id: 1 });
-				setNotification(true);
+				setMatch(true)
 				const notification = {
 					sender_id: liker,
 					receiver_id: liked,
@@ -197,10 +192,11 @@ const LikeButton = ({
 					link: `/profile/${liked}`,
 				};
 				socket.emit('send_notification', liker, notification2);
-			} else setProfile({ ...profile, like_id: 1 });
+			}
 		}
 	};
 	const handleClick = () => {
+		setLiked(true)
 		likeProfile();
 	};
 
@@ -216,8 +212,9 @@ const LikeButton = ({
 
 const UnlikeButton = ({
 	otherUserProfile,
-	setOtherUserProfile,
-}: OtherUserViewProps) => {
+	setLiked,
+	setMatch
+}: UnlikeButtonProps) => {
 	const { userData } = useUserContext();
 	const socket = useSocketContext();
 
@@ -225,14 +222,11 @@ const UnlikeButton = ({
 		const liked = otherUserProfile.user_id;
 		const liker: number = userData.user_id;
 
-		const response = await authAPI.delete(
+		await authAPI.delete(
 			`/like?liker=${liker}&liked=${liked}`,
 			{}
 		);
 		console.log('Removing like');
-		if (response.status === 200) {
-			setOtherUserProfile({ ...otherUserProfile, like_id: 0 });
-		}
 
 		// Emit notification
 		const notification = {
@@ -245,10 +239,12 @@ const UnlikeButton = ({
 		socket.emit('send_notification', liked, notification);
 	};
 	const handleClick = () => {
+		setLiked(false)
+		setMatch(false);
 		unlikeProfile();
 	};
 	return (
-		<button className="button is-medium" onClick={handleClick}>
+		<button className="button is-medium has-background-primary-light" onClick={handleClick}>
 			<span className="icon is-medium">
 				<FcDislike />
 			</span>
@@ -259,100 +255,100 @@ const UnlikeButton = ({
 
 const ViewMode = ({
 	otherUserProfile,
-	setOtherUserProfile,
 }: OtherUserViewProps) => {
-	const [notification, setNotification] = useState(false);
-	const { profile } = useUserContext();
+	const [liked, setLiked] = useState(otherUserProfile.liked);
+	const [match, setMatch] = useState(false);
 
 	const closeNotification = () => {
-		setNotification(false);
+		setMatch(false);
 	};
 	return (
 		<div className="columns card my-6">
 			<div className="column card-image has-text-left is-two-thirds">
-				<Gallery user_id={otherUserProfile.user_id} />
+				<Gallery user_id={otherUserProfile.user_id} online={otherUserProfile.online}/>
 			</div>
-			<div className="column has-text-left">
-				<div className="">Name:</div>
-				<div className="block ml-6 has-text-weight-bold">
+			<div className="column mt-3 has-text-left m-3">
+				<div className="block">
+					<span className="has-text-weight-semibold mr-3">Name:</span>
 					{otherUserProfile.name}
 				</div>
-				<div className="">Age:</div>
-				<div className="block ml-6 has-text-weight-bold">
-					{otherUserProfile.birthday &&
-						convertBirthdayToAge(otherUserProfile.birthday)}
+				<div className="block">
+					<span className="has-text-weight-semibold mr-3">Age:</span>
+					{otherUserProfile.birthday && convertBirthdayToAge(otherUserProfile.birthday)}
 				</div>
-				<div className="">City:</div>
-				<div className="block ml-6 has-text-weight-bold">
-					{otherUserProfile.city}
-				</div>
-				<div className="">Country:</div>
-				<div className="block ml-6 has-text-weight-bold">
-					{otherUserProfile.country}
-				</div>
-				<div className="">Distance:</div>
-				<div className="block ml-6 has-text-weight-bold">
-					{`${distanceBetweenPoints(
-						profile.user_latitude
-							? profile.user_latitude
-							: profile.latitude,
-						profile.user_longitude
-							? profile.user_longitude
-							: profile.longitude,
-						otherUserProfile.user_latitude
-							? otherUserProfile.user_latitude
-							: otherUserProfile.latitude,
-						otherUserProfile.user_longitude
-							? otherUserProfile.user_longitude
-							: otherUserProfile.longitude
-					)} km`}
-				</div>
-				<div className="">Famerating:</div>
-				<div className="block ml-6 has-text-weight-bold">
+				<div className="block">
+					<span className="has-text-weight-semibold mr-3">
+						Famerating:
+					</span>
 					{otherUserProfile.famerating}
 				</div>
 
-				<div className="">Introduction:</div>
-				<div className="block ml-6 has-text-weight-bold">
-					{otherUserProfile.introduction}
-				</div>
-				<div className="">Interests:</div>
 				<div className="block">
-					{otherUserProfile.interests.length > 0
-						? otherUserProfile.interests.map((interest, index) => (
-								<span
-									className="tag is-primary mx-2 my-1"
-									key={index}
-								>
-									{interest}
-								</span>
-						  ))
+					<span className="has-text-weight-semibold mr-3">City:</span>
+					{otherUserProfile.city}
+				</div>
+				<div className="block">
+					<span className="has-text-weight-semibold mr-3">
+						Country:
+					</span>
+					{otherUserProfile.country}
+				</div>
+				<div className="block">
+					<span className="has-text-weight-semibold mr-3">
+						Interests:
+					</span>
+					{otherUserProfile.interests
+						? otherUserProfile.interests.map(
+								(interest: string, index: number) => (
+									<span
+										className="tag is-primary mx-2 my-1"
+										key={index}
+									>
+										{interest}
+									</span>
+								)
+						  )
 						: null}
 				</div>
-				<div className="">Gender:</div>
-				<div className="block ml-6 has-text-weight-bold">
-					{otherUserProfile.gender}
-				</div>
-				<div className="">Looking for:</div>
-				<div className="block ml-6 has-text-weight-bold">
-					{otherUserProfile.looking}
-				</div>
-				<div className="block">Minimum age:</div>
-				<div className="block ml-6 has-text-weight-bold">
-					{otherUserProfile.min_age}
-				</div>
-				<div className="block">Maximum age:</div>
-				<div className="block ml-6 has-text-weight-bold">
-					{otherUserProfile.max_age}
-				</div>
-				<div className="block">Last login:</div>
-				<div className="block ml-6 has-text-weight-bold">
-					{reformatDateTime(otherUserProfile.last_login)}
+				<div className="block">
+					<span className="has-text-weight-semibold mr-3">
+						Introduction:
+					</span>
+					<p className="notification has-background-primary-light">
+						{otherUserProfile.introduction}
+					</p>
 				</div>
 				<div className="block">
-					<OnlineIndicator onlineStatus={otherUserProfile.online} />
+					<span className="has-text-weight-semibold mr-3">
+						Gender:
+					</span>
+					{otherUserProfile.gender}
 				</div>
-				{otherUserProfile.match_id && notification ? (
+				<div className="block">
+					<span className="has-text-weight-semibold mr-3">
+						Looking for:
+					</span>
+					{otherUserProfile.looking}
+				</div>
+				<div className="block">
+					<span className="has-text-weight-semibold mr-3">
+						Minimum age:
+					</span>
+					{otherUserProfile.min_age}
+				</div>
+				<div className="block">
+					<span className="has-text-weight-semibold mr-3">
+						Maximum age:
+					</span>
+					{otherUserProfile.max_age}
+				</div>
+				<div className="block">
+					<span className="has-text-weight-semibold mr-3">
+						Last login:
+					</span>
+					{reformatDateTime(otherUserProfile.last_login)}
+				</div>
+				{match ? (
 					<div className="notification is-primary">
 						<button
 							className="delete"
@@ -368,16 +364,17 @@ const ViewMode = ({
 					</div>
 				) : null}
 				<div className="block buttons">
-					{otherUserProfile.liked ? (
+					{liked ? (
 						<UnlikeButton
 							otherUserProfile={otherUserProfile}
-							setOtherUserProfile={setOtherUserProfile}
+							setLiked={setLiked}
+							setMatch={setMatch}
 						/>
 					) : (
 						<LikeButton
 							profile={otherUserProfile}
-							setProfile={setOtherUserProfile}
-							setNotification={setNotification}
+							setLiked={setLiked}
+							setMatch={setMatch}
 						/>
 					)}
 				</div>
