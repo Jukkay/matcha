@@ -57,28 +57,38 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
 		longitude: '',
 		user_latitude: '', 
 		user_longitude: '',
-		famerating: 0,
-		online: true
+		famerating: 0
 	});
 
 	useEffect(() => {
-		// Look for user information in session storage
-		const storedInfo = sessionStorage.getItem('userData');
-		if (storedInfo) {
-			const userInfo = JSON.parse(storedInfo);
-			updateUserData(userInfo);
-		}
-		const storedProfile = sessionStorage.getItem('profile');
-		if (storedProfile) {
-			const userInfo = JSON.parse(storedProfile);
-			setProfile(userInfo);
-		}
-		const accessTokenStored = sessionStorage.getItem('accessToken');
-		const refreshTokenStored = sessionStorage.getItem('refreshToken');
-		if (accessTokenStored && refreshTokenStored) {
-			updateAccessToken(accessTokenStored);
-			updateRefreshToken(refreshTokenStored);
-		}
+		updateUserData((current) => {
+			// Look for user information in session storage
+			const storedInfo = sessionStorage.getItem('userData');
+			if (storedInfo) {
+				return JSON.parse(storedInfo)
+			}
+			else return current
+		})
+		setProfile((current) => {
+			// Look for user information in session storage
+			const storedProfile = sessionStorage.getItem('profile');
+			if (storedProfile) {
+				return JSON.parse(storedProfile);
+			}
+			else return current
+		})		
+		updateAccessToken((current) => {
+			const accessTokenStored = sessionStorage.getItem('accessToken');
+			if (accessTokenStored) {
+				return accessTokenStored}
+			else return current
+		});
+		updateRefreshToken((current) => {
+			const refreshTokenStored = sessionStorage.getItem('refreshToken');
+			if (refreshTokenStored) {
+				return refreshTokenStored}
+			else return current
+		});
 	}, []);
 
 	return (

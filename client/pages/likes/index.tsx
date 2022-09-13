@@ -145,9 +145,9 @@ const LikeProfile = ({ profile }: any) => {
 								crossOrigin=""
 								className="rounded-corners"
 							/>
-							<div className="is-overlay mt-3 ml-3">
+							<div className="is-overlay">
 								<OnlineIndicator
-									onlineStatus={profile.online}
+									user_id={profile.user_id}
 								/>
 							</div>
 						</figure>

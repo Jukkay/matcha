@@ -57,6 +57,25 @@ const io = new Server(httpServer, {
 // Socket.io listeners
 let previousChat: any;
 let previousUser: any;
+let onlineUsers: [{user_id: number, socket_id: string, active: number}]
+
+const updateOnlineUsers = (user_id: number, socket_id: string) => {
+	const i = onlineUsers.findIndex(item => item.user_id === user_id)
+	if (i > -1) {
+		onlineUsers[i].active = Date.now()
+		onlineUsers[i].socket_id = socket_id
+	}
+	else {
+		onlineUsers.push({user_id: user_id, socket_id: socket_id, active: Date.now()})
+	}
+}
+
+const queryOnlineUsers = (user_id: number) => {
+	if (onlineUsers?.findIndex(item => item.user_id === user_id) > -1) {
+		return true
+	}
+	return false
+}
 io.on('connection', (socket) => {
 	try {
 		console.log(socket.id, 'connected');
@@ -67,6 +86,7 @@ io.on('connection', (socket) => {
 			previousChat = data;
 			console.log('active chat is ', data)
 		});
+
 		socket.on('send_message', async(matchID, data) => {
 			if (!matchID) return;
 
@@ -100,6 +120,14 @@ io.on('connection', (socket) => {
 			socket.to(user_id).emit('receive_notification', data)
 			console.log('Notification sent to user_id', user_id)
 		})
+
+		// Online query
+		socket.on('online_query', (user_id) => {
+			const onlineStatus = queryOnlineUsers(user_id)
+			console.log('user', user_id, 'online status', onlineStatus)
+			socket.emit('online_response', {queried_id: user_id, online: onlineStatus});
+
+		});
 
 		socket.on('disconnection', () => console.log(socket.rooms, 'disconnected'));
 	} catch (err) {

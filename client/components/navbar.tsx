@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { IconContext } from 'react-icons';
-import { FaCog, FaHeart, FaBars, FaRegBell, FaBell } from 'react-icons/fa';
+import { FaHeart, FaBell } from 'react-icons/fa';
 import { FiMenu } from 'react-icons/fi';
 import { BsFillChatFill } from 'react-icons/bs';
 import { authAPI } from '../utilities/api';
@@ -12,7 +12,7 @@ import { INotification, LikeProp, NotificationType } from '../types/types';
 
 const LoggedOutControls = () => {
 	return (
-		<>
+		<div className="is-flex is-justify-content-space-between is-flex-wrap-nowrap fullwidth">
 			<div className="navbar-brand">
 				<Logo />
 			</div>
@@ -22,7 +22,7 @@ const LoggedOutControls = () => {
 			<Link href="/login">
 				<a className="button">Log in</a>
 			</Link>
-		</>
+		</div>
 	);
 };
 
@@ -31,16 +31,9 @@ const Logo = () => {
 		<Link href="/">
 			<a className="navbar-item pt-3">
 				<span className="icon is-medium">
-					<IconContext.Provider
-						value={{
-							size: '1.2rem',
-							className: 'react-icons',
-						}}
-					>
-						<div>
+		
 							<FaHeart />
-						</div>
-					</IconContext.Provider>
+				
 				</span>
 			</a>
 		</Link>

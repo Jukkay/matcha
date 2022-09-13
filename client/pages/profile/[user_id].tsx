@@ -57,7 +57,6 @@ const LoggedIn = () => {
 			liked: 0,
 			likes_requester: 0,
 			match_id: 0,
-			online: false,
 			last_login: '',
 		}
 	);
@@ -258,14 +257,14 @@ const ViewMode = ({
 }: OtherUserViewProps) => {
 	const [liked, setLiked] = useState(otherUserProfile.liked);
 	const [match, setMatch] = useState(false);
-
+	const { userData } = useUserContext();
 	const closeNotification = () => {
 		setMatch(false);
 	};
 	return (
 		<div className="columns card my-6">
 			<div className="column card-image has-text-left is-two-thirds">
-				<Gallery user_id={otherUserProfile.user_id} online={otherUserProfile.online}/>
+				<Gallery user_id={otherUserProfile.user_id} />
 			</div>
 			<div className="column mt-3 has-text-left m-3">
 				<div className="block">

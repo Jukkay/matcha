@@ -107,8 +107,8 @@ export const SearchResultItem = ({ profile }: any) => {
 								crossOrigin=""
 								className="rounded-corners"
 							/>
-							<div className="is-overlay mt-3 ml-3">
-								<OnlineIndicator onlineStatus={profile.online} />
+							<div className="is-overlay">
+								<OnlineIndicator user_id={profile.user_id}/>
 							</div>
 						</figure>
 					</div>

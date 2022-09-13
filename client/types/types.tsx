@@ -113,7 +113,6 @@ export interface IProfile {
   user_latitude?: string;
   user_longitude?: string;
   famerating: number;
-  online: boolean;
 }
 
 export interface IOtherUserProfile {
@@ -138,7 +137,6 @@ export interface IOtherUserProfile {
   liked: number;
   likes_requester: number;
   match_id: number
-  online: boolean;
   last_login: string;
 }
 
@@ -297,7 +295,6 @@ export interface IProfileCard {
   famerating: number
   distance: number
   interests: string
-  online: boolean
   ref?: any
 }
 
@@ -385,8 +382,8 @@ export interface ILikeProfile extends IProfileCard {
   target_id: number
 }
 
-export interface BooleanProp {
-  onlineStatus: boolean
+export interface OnlineStatusProps {
+  user_id: number
 }
 
 export interface TextInput {

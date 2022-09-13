@@ -1,6 +1,6 @@
 import React, { useState, PointerEvent, useEffect } from 'react';
 import { FaUpload } from 'react-icons/fa';
-
+import { useSocketContext } from './SocketContext';
 import {
 	ITag,
 	ISearchResult,
@@ -10,7 +10,7 @@ import {
 	FileInputProps,
 	UserImagesProps,
 	IProfileCard,
-	BooleanProp,
+	OnlineStatusProps,
 } from '../types/types';
 import { EditButton } from './form';
 import { authAPI } from '../utilities/api';
@@ -30,7 +30,9 @@ export const ProfileView = ({ profile, setEditMode }: ProfileViewProps) => {
 			<h1 className="title is-1">Your profile</h1>
 			<div className="columns card my-6 rounded-corners">
 				<div className="column has-text-left is-two-thirds">
-					<Gallery user_id={userData.user_id} online={profile.online}/>
+					<Gallery
+						user_id={userData.user_id}
+					/>
 				</div>
 				<div className="column mt-3 has-text-left m-3">
 					<div className="block">
@@ -164,7 +166,6 @@ export const VisitorLog = ({ user_id }: any) => {
 						famerating={result.famerating}
 						distance={result.distance}
 						interests={result.interests}
-						online={result.online}
 					/>
 				))}
 			</div>
@@ -276,7 +277,7 @@ export const SearchResult = ({
 	) : null;
 };
 
-export const Gallery = ({ user_id, online }: UserImagesProps) => {
+export const Gallery = ({ user_id }: OnlineStatusProps) => {
 	const [images, setImages] = useState([]);
 
 	useEffect(() => {
@@ -294,32 +295,34 @@ export const Gallery = ({ user_id, online }: UserImagesProps) => {
 	}, []);
 
 	return images && user_id ? (
-		<Swiper
-			slidesPerView={1}
-			spaceBetween={30}
-			lazy={true}
-			pagination={{
-				dynamicBullets: true,
-			}}
-			navigation={true}
-			modules={[Pagination, Navigation, Lazy]}
-		>
-			{images.map((image, index) => (
-				<SwiperSlide className="swiper-slide" key={index}>
-					<div className="is-relative image is-square rounded-corners">
-						<img
-							src={image}
-							alt="Placeholder image"
-							className="rounded-corners fullwidth"
-							crossOrigin=""
-						/>
-						<div className="is-overlay mt-3 ml-3">
-							<OnlineIndicator onlineStatus={online} />
+		<div>
+			<Swiper
+				slidesPerView={1}
+				spaceBetween={30}
+				lazy={true}
+				pagination={{
+					dynamicBullets: true,
+				}}
+				navigation={true}
+				modules={[Pagination, Navigation, Lazy]}
+			>
+				{images.map((image, index) => (
+					<SwiperSlide className="swiper-slide" key={index}>
+						<div className="image is-square rounded-corners">
+							<img
+								src={image}
+								alt="Placeholder image"
+								className="rounded-corners fullwidth"
+								crossOrigin=""
+							/>
 						</div>
-					</div>
-				</SwiperSlide>
-			))}
-		</Swiper>
+					</SwiperSlide>
+				))}
+			</Swiper>
+				<div className="is-overlay">
+					<OnlineIndicator user_id={user_id} />
+				</div>
+		</div>
 	) : null;
 };
 
@@ -420,10 +423,28 @@ export const Thumbnails = ({ preview, setPreview }: IThumbnails) => {
 	) : null;
 };
 
-export const OnlineIndicator = ({ onlineStatus }: BooleanProp) => {
-	return onlineStatus ? (
-		<span className="tag is-primary">Online</span>
+export const OnlineIndicator = ({ user_id }: OnlineStatusProps) => {
+	const [online, setOnline] = useState(false);
+	const socket = useSocketContext();
+	
+	// Listen for notifications
+	useEffect(() => {
+		try {
+			socket.on('online_response', (data) => {
+				if (data.queried_id === user_id) setOnline(data.online);
+			});
+			socket.emit('online_query', user_id);
+			return () => {
+				socket.removeAllListeners('online_response');
+			};
+		} catch (err) {
+			console.error(err);
+		} 
+	}, []);
+
+	return online ? (
+		<span className="tag is-primary online-indicator mt-5 ml-5">Online</span>
 	) : (
-		<span className="tag is-danger">Offline</span>
+		<span className="tag is-danger online-indicator mt-5 ml-5">Offline</span>
 	);
 };

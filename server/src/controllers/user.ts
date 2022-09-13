@@ -95,9 +95,9 @@ export const login = async (req: Request, res: Response) => {
 		const accessToken = await signAccessToken(user[0].user_id);
 		const refreshToken = await signRefreshToken(user[0].user_id);
 
-		// Update login information
+		// Update last login
 		const sql2 =
-			'UPDATE profiles SET online=TRUE, last_login=now() WHERE user_id = ?;';
+			'UPDATE profiles SET last_login=now() WHERE user_id = ?;';
 		const response = await execute(sql2, user[0].user_id);
 		// Return user data to frontend
 		if (accessToken && refreshToken) {
@@ -132,9 +132,7 @@ export const logout = async (req: Request, res: Response) => {
 		if (!refreshToken)
 			return res.status(400).json({ message: 'Missing token' });
 		await deleteRefreshToken(refreshToken);
-		// Update login information
-		const sql2 = 'UPDATE profiles SET online=FALSE WHERE user_id = ?;';
-		await execute(sql2, user_id);
+
 		return res.status(200).json({
 			message: 'Logout successful',
 		});

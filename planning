@@ -347,6 +347,34 @@ V Check why like button doesn't update when liking user.
 V Check what's going on with famerating not updating
 
 Make online status work with socket.io
+    Handling online status
+        Create an array
+        Add user and timestamp to array when they
+            emit an event to backend
+        If user is in array
+            update timestamp
+    Querying online status
+        Create listener to backend
+            When receives user_id
+                if it exists in array
+                    if timestamp is less than 5min old
+                        online
+                    else
+                        remove user from array
+                        offline
+                else
+                    offline
+V Create backend logic for online status
+V Make onlinestatus component query online status
+V Change gallery so it has only one online status component overlaid over pictures
+V Remove old online status logic from backend
+V Remove old online status logic from frontend
+V Remove online status from db tables
+Why doesn't infinite scroll work in search?
+Remove duplicates from history
+Add infinite scroll to history
+Limit history to reasonable amount
+What happens if user is unmatched or blocked during chat?
 Test all required functionality
 Make production docker-compose
 Configure AWS account

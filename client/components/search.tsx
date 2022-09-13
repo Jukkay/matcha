@@ -349,7 +349,7 @@ export const Results = ({ sortedResults, loadStatus }: ResultsProps) => {
 	return sortedResults.length > 0 ? (
 		<section className="section has-text-centered">
 			<h5 className="title is-5">{searchResultText}</h5>
-			{sortedResults.slice(0, endIndex).map((result, index) => (
+			{endIndex < sortedResults.length && sortedResults.slice(0, endIndex).map((result, index) => (
 				<SearchResultItem
 					key={index}
 					user_id={result.user_id}
@@ -361,11 +361,10 @@ export const Results = ({ sortedResults, loadStatus }: ResultsProps) => {
 					distance={result.distance}
 					famerating={result.famerating}
 					interests={result.interests}
-					online={result.online}
 				/>
 			))}
 			{endIndex < sortedResults.length ? (
-				<div ref={scrollTarget}>Loading</div>
+				<div ref={scrollTarget}><Spinner /></div>
 			) : (
 				<section className="section has-text-centered">
 					<h3 className="title is-3">No more matching profiles</h3>
@@ -389,7 +388,6 @@ export const SearchResultItem = ({
 	famerating,
 	distance,
 	interests,
-	online,
 }: IProfileCard) => {
 	return (
 		<Link href={`/profile/${user_id}`}>
@@ -403,8 +401,8 @@ export const SearchResultItem = ({
 								crossOrigin=""
 								className="rounded-corners"
 							/>
-							<div className="is-overlay mt-3 ml-3">
-								<OnlineIndicator onlineStatus={online} />
+							<div className="is-overlay">
+								<OnlineIndicator user_id={user_id} />
 							</div>
 						</figure>
 					</div>
