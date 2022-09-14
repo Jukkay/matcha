@@ -189,8 +189,8 @@ export const GPSCoordinateInput = ({ profile, setProfile }: any) => {
 					type="text"
 					className="input is-primary"
 					name="user_latitude"
+					value={profile.user_latitude || ''}
 					onChange={onChange}
-					value={profile.user_latitude}
 				></input>
 				<label htmlFor="longitude" className="label my-3">
 					Longitude:
@@ -199,8 +199,8 @@ export const GPSCoordinateInput = ({ profile, setProfile }: any) => {
 					type="text"
 					className="input is-primary"
 					name="user_longitude"
+					value={profile.user_longitude || ''}
 					onChange={onChange}
-					value={profile.user_longitude}
 				></input>
 			</div>
 		</div>

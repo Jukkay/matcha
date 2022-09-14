@@ -22,9 +22,20 @@ const getTokenFromSessionStorage = () => {
 	return window.sessionStorage.getItem('accessToken')
 }
 
+const getUserIDFromSessionStorage = () => {
+	if (typeof window === "undefined")
+		return null
+	const storedInfo = window.sessionStorage.getItem('userData');
+	if (storedInfo) {
+		return JSON.parse(storedInfo).user_id;
+	}
+	return null
+}
+
 const API = authAPI.defaults.baseURL || 'http://localhost:4000';
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(API, {
-	auth: { token: getTokenFromSessionStorage() },
+	auth: { token: getTokenFromSessionStorage(),
+			user_id: getUserIDFromSessionStorage()},
 });
 
 export const SocketContext = createContext(socket);
@@ -40,3 +51,5 @@ export const SocketContextProvider = ({children}: {children: ReactNode}) => {
 		</SocketContext.Provider>
 	);
 };
+
+export { socket }

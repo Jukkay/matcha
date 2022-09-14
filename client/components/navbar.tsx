@@ -10,6 +10,7 @@ import { useSocketContext } from './SocketContext';
 import { useNotificationContext } from './NotificationContext';
 import { INotification, LikeProp, NotificationType } from '../types/types';
 import axios from 'axios';
+import { socket } from './SocketContext'
 
 const LoggedOutControls = () => {
 	return (
@@ -17,12 +18,16 @@ const LoggedOutControls = () => {
 			<div className="navbar-brand">
 				<Logo />
 			</div>
-			<Link href="/signup">
-				<a className="button is-primary">Sign up</a>
-			</Link>
-			<Link href="/login">
-				<a className="button">Log in</a>
-			</Link>
+			<div className="is-flex is-justify-content-space-between fullwidth is-flex-wrap-nowrap">
+				<div className="is-flex is-justify-content-end is-flex-wrap-nowrap is-align-items-center fullwidth buttons mr-6">
+					<Link href="/signup">
+						<a className="button is-primary">Sign up</a>
+					</Link>
+					<Link href="/login">
+						<a className="button">Log in</a>
+					</Link>
+				</div>
+			</div>
 		</div>
 	);
 };
@@ -32,9 +37,7 @@ const Logo = () => {
 		<Link href="/">
 			<a className="navbar-item pt-3">
 				<span className="icon is-medium">
-		
-							<FaHeart />
-				
+					<FaHeart />
 				</span>
 			</a>
 		</Link>
@@ -54,7 +57,7 @@ const LoggedInControls = () => {
 		messageCount,
 		likeCount,
 	} = useNotificationContext();
-	const socket = useSocketContext();
+	// const socket = useSocketContext();
 
 	const getNotifications = async () => {
 		try {
@@ -78,7 +81,7 @@ const LoggedInControls = () => {
 	// Subscribe for and fetch notifications
 	useEffect(() => {
 		getNotifications();
-	}, [userData.user_id]);
+	}, [socket, userData.user_id]);
 
 	// Listen for notifications
 	useEffect(() => {
@@ -90,10 +93,13 @@ const LoggedInControls = () => {
 						user_id: userData.user_id,
 					});
 					const newToken = refreshResponse.data.accessToken;
-					socket.auth = {token: newToken}
+					socket.auth = {
+						token: newToken,
+						user_id: userData.user_id,
+					};
 					updateAccessToken(newToken);
-					sessionStorage.setItem("accessToken", newToken);
-					console.log('AccessToken refreshed by socket handler')
+					sessionStorage.setItem('accessToken', newToken);
+					console.log('AccessToken refreshed by socket handler');
 					socket.connect();
 				}
 			});
@@ -398,7 +404,7 @@ const Username = () => {
 	return (
 		<Link href="/profile" className="username">
 			<a className="navbar-item">
-					<strong>{userData.username}</strong>
+				<strong>{userData.username}</strong>
 			</a>
 		</Link>
 	);

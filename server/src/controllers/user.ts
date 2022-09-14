@@ -172,7 +172,6 @@ const getUserInformation = async (req: Request, res: Response) => {
 				`;
 	try {
 		const userData = await execute(sql, [user_id]);
-		console.log(userData);
 		if (userData.length > 0) {
 			return res.status(200).json({
 				message: 'User data retrieved successfully',
@@ -209,8 +208,6 @@ const deleteUser = async (req: Request, res: Response) => {
 		// Remove profile
 		let sql = 'DELETE FROM profiles WHERE user_id = ?';
 		let response = await execute(sql, [user_id]);
-
-		// Remove user data
 
 		// Delete matches
 		sql = `
@@ -354,7 +351,6 @@ const updateUser = async (req: Request, res: Response) => {
 			reformatDate(birthday),
 			user_id,
 		]);
-		console.log(response);
 		if (response)
 			return res.status(200).json({
 				message: 'User information updated successfully',

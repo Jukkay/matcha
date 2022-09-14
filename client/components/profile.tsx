@@ -23,6 +23,7 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import axios from 'axios';
+import { socket } from './SocketContext'
 
 export const ProfileView = ({ profile, setEditMode }: ProfileViewProps) => {
 	const { userData } = useUserContext();
@@ -426,7 +427,7 @@ export const Thumbnails = ({ preview, setPreview }: IThumbnails) => {
 
 export const OnlineIndicator = ({ user_id }: OnlineStatusProps) => {
 	const [online, setOnline] = useState(false);
-	const socket = useSocketContext();
+	// const socket = useSocketContext();
 	
 	// Query online status and listen for response
 	useEffect(() => {

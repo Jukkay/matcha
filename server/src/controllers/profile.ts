@@ -44,7 +44,7 @@ const newProfile = async (req: Request, res: Response) => {
 			});
 		// Get and locate IP
 		if (!latitude || !longitude) {
-			const location = await locateIP(req);
+			const location = await locateIP(user_id, req);
 			latitude = location?.ll[0] || '60.16952';
 			longitude = location?.ll[1] || '24.93545';
 		}
@@ -190,7 +190,7 @@ const updateProfile = async (req: Request, res: Response) => {
 			});
 		// Get and locate IP
 		if (!latitude || !longitude) {
-			const location = await locateIP(req);
+			const location = await locateIP(user_id, req);
 			latitude = location?.ll[0] || '60.16952';
 			longitude = location?.ll[1] || '24.93545';
 		}

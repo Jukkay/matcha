@@ -42,6 +42,7 @@ export const refreshToken = async (req: Request, res: Response) => {
 				message: 'No token given',
 			});
 		}
+		console.log('Token received')
 		// Check if token is valid
 		const decoded = await verifyJWT(token, refresh_token);
 		if (!decoded) {
@@ -49,6 +50,7 @@ export const refreshToken = async (req: Request, res: Response) => {
 				message: 'Invalid token',
 			});
 		}
+		console.log('Token verified')
 		//Check if refreshToken is on valid token list
 		const findToken = `SELECT * FROM tokens WHERE token = ?;`;
 		const foundToken = await execute(findToken, [token]);

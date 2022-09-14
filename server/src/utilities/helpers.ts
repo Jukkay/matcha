@@ -1,6 +1,7 @@
 import geoip from 'fast-geoip';
 import requestIP from 'request-ip';
 import { Request } from 'express';
+import { execute } from './SQLConnect';
 
 export const convertBirthdayToAge = (birthday: string) => {
 	const now = new Date().getTime();
@@ -37,17 +38,13 @@ export const convertMAX_AGE = (age: number) => {
 	return `${bd.getFullYear()}-${bd.getMonth() + 1}-${bd.getDate()}`;
 };
 
-export const locateIP = async (req: Request) => {
+export const locateIP = async (user_id: string, req: Request) => {
 	// Get and locate IP
 	const ip = requestIP.getClientIp(req) || '127.0.0.1';
 	console.log(ip);
 	const ip_location = await geoip.lookup(ip);
 	console.log(ip_location);
+	const sql = 'UPDATE profiles SET ip_location = ? WHERE user_id = ?;';
+	await execute(sql, [JSON.stringify(ip_location), user_id]);
 	return ip_location;
-	// const sql = 'UPDATE profiles SET ip_location = ? WHERE user_id = ?;';
-	// await execute(sql, [JSON.stringify(ip_location), user_id]);
 };
-
-// Socket.io middleware wrapper
-export const wrap = (middleware: any) => (socket: any, next: any) =>
-	middleware(socket.request, {}, next);

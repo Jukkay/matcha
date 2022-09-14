@@ -54,7 +54,6 @@ const LoggedIn = () => {
 	const getLikerProfiles = async () => {
 		let response = await authAPI.get(`/like/${userData.user_id}`);
 		if (response.data.profiles.length > 0) {
-			console.log(response.data.profiles);
 			setLikerProfiles(response.data.profiles);
 		}
 	};
@@ -62,7 +61,6 @@ const LoggedIn = () => {
 	const getLikedProfiles = async () => {
 		let response = await authAPI.get(`/likedprofiles/${userData.user_id}`);
 		if (response.data.profiles.length > 0) {
-			console.log(response.data.profiles);
 			setLikedProfiles(response.data.profiles);
 		}
 	};

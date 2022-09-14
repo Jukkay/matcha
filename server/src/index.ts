@@ -56,13 +56,12 @@ const io = new Server(httpServer, {
 // Socket.io listeners
 let previousChat: any;
 let previousUser: any;
-let onlineUsers: [{ user_id: number; socket_id: string; active: number }];
+let onlineUsers: any[] = [];
 
 const updateOnlineUsers = (user_id: number, socket_id: string) => {
-	const i = onlineUsers.findIndex((item) => item.user_id === user_id);
-	if (i > -1) {
-		onlineUsers[i].active = Date.now();
-		onlineUsers[i].socket_id = socket_id;
+	const i = onlineUsers?.findIndex((item) => item.user_id === user_id);
+	if (i && i > -1) {
+		onlineUsers[i] = {user_id: user_id, socket_id: socket_id, active: Date.now()}
 	} else {
 		onlineUsers.push({
 			user_id: user_id,
@@ -73,15 +72,24 @@ const updateOnlineUsers = (user_id: number, socket_id: string) => {
 };
 
 const queryOnlineUsers = (user_id: number) => {
-	if (onlineUsers?.findIndex((item) => item.user_id === user_id) > -1) {
-		return true;
+	const maxTimeInactive = 1000 * 60 * 5
+	const i = onlineUsers?.findIndex((item) => item.user_id === user_id)
+	if (i > -1) {
+		if ((Date.now() - onlineUsers[i].active) < maxTimeInactive)
+			return true;
+		onlineUsers.splice(i, 1);
 	}
 	return false;
 };
+
 // Check socket token
 io.use((socket, next) => {
 	const token = socket.handshake.auth.token;
-	if (!token) return next(new Error('Unauthorized'));
+	const user_id = socket.handshake.auth.user_id
+	if (!token || !user_id) {
+		next(new Error('Unauthorized'));
+	}
+	updateOnlineUsers(user_id, socket.id)
 	if (checkSocketJWT(token)) {
 		next();
 	} else {

@@ -10,7 +10,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
 
   return (
     <UserContextProvider>
-      <SocketContextProvider>
+      {/* <SocketContextProvider> */}
       <NotificationContextProvider>
         <div className="columns is-flex-direction-column is-fullheight-100vh">
         <NavbarComponent />
@@ -18,7 +18,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
         <Footer />
         </div>
       </NotificationContextProvider>
-      </SocketContextProvider>
+      {/* </SocketContextProvider> */}
     </UserContextProvider>
   );
 };

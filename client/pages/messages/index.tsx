@@ -17,6 +17,7 @@ import { useSocketContext } from '../../components/SocketContext';
 import { useNotificationContext } from '../../components/NotificationContext';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import { LoadError, Spinner } from '../../components/utilities';
+import { socket } from '../../components/SocketContext'
 
 const NotLoggedIn = () => {
 	return (
@@ -306,7 +307,7 @@ const MatchList = () => {
 
 const OnlineIndicator = ({ user_id }: OnlineStatusProps) => {
 	const [online, setOnline] = useState(false);
-	const socket = useSocketContext();
+	// const socket = useSocketContext();
 	
 	// Query online status and listen for response
 	useEffect(() => {
@@ -403,7 +404,7 @@ const ChatWindow = () => {
 	const [received, setReceived] = useState<{}[]>([]);
 	const [outgoing, setOutgoing] = useState('');
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
-	const socket = useSocketContext();
+	// const socket = useSocketContext();
 	const { matchData } = useNotificationContext();
 	const windowBottom: MutableRefObject<any> = useRef(null);
 	const { profile, refreshToken, userData, updateAccessToken } = useUserContext();
