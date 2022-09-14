@@ -400,3 +400,18 @@ export interface ResultProfiles {
 export interface LikeProp {
   likeCount: number
 }
+
+export type UserInfo = {
+	username: string | undefined;
+	user_id: number | undefined;
+	name: string | undefined;
+	email: string | undefined;
+	birthday: string | undefined;
+	profile_image: string | undefined;
+	profile_exists: boolean | undefined;
+}
+
+export interface IUser {
+	user?: UserInfo;
+	updateUser?: (user: UserInfo) => void;
+}

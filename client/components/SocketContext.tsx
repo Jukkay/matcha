@@ -7,7 +7,7 @@ interface ServerToClientEvents {
 	receive_notification: (message: any) => void;
 	online_response: (data: any) => void;
 }
-  
+
 interface ClientToServerEvents {
 	send_message: (match_id: number, payload: {}) => void;
 	send_notification: (receiver_id: number, notification: {}) => void;
@@ -16,20 +16,26 @@ interface ClientToServerEvents {
 	online_query: (user_id: number) => void;
 }
 
-const API = authAPI.defaults.baseURL || 'http://localhost:4000'
-
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(API);
-export const SocketContext = createContext(socket)
-
-export const useSocketContext = () => {
-    return useContext(SocketContext)
+const getTokenFromSessionStorage = () => {
+	if (typeof window === "undefined")
+		return null
+	return window.sessionStorage.getItem('accessToken')
 }
 
-export const SocketContextProvider = ({ children }: { children: ReactNode }) => {
+const API = authAPI.defaults.baseURL || 'http://localhost:4000';
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(API, {
+	auth: { token: getTokenFromSessionStorage() },
+});
+
+export const SocketContext = createContext(socket);
+
+export const useSocketContext = () => {
+	return useContext(SocketContext);
+};
+
+export const SocketContextProvider = ({children}: {children: ReactNode}) => {
 	return (
-		<SocketContext.Provider
-			value={socket}
-		>
+		<SocketContext.Provider value={socket}>
 			{children}
 		</SocketContext.Provider>
 	);

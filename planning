@@ -370,6 +370,13 @@ V Change gallery so it has only one online status component overlaid over pictur
 V Remove old online status logic from backend
 V Remove old online status logic from frontend
 V Remove online status from db tables
+V Change messaging online statuses to new type
+V Make auth system for sockets
+V Add token to sockets
+V Make tokens refresh on unauthorized
+
+Test online status
+Test websockets with multiple users
 Why doesn't infinite scroll work in search?
 Remove duplicates from history
 Add infinite scroll to history

@@ -9,6 +9,7 @@ import { useUserContext } from './UserContext';
 import { useSocketContext } from './SocketContext';
 import { useNotificationContext } from './NotificationContext';
 import { INotification, LikeProp, NotificationType } from '../types/types';
+import axios from 'axios';
 
 const LoggedOutControls = () => {
 	return (
@@ -40,7 +41,7 @@ const Logo = () => {
 	);
 };
 const LoggedInControls = () => {
-	const { userData } = useUserContext();
+	const { refreshToken, userData, updateAccessToken } = useUserContext();
 	const {
 		activeChatUser,
 		activePage,
@@ -82,6 +83,20 @@ const LoggedInControls = () => {
 	// Listen for notifications
 	useEffect(() => {
 		try {
+			socket.on('connect_error', async (err) => {
+				if (err.message === 'Unauthorized') {
+					const refreshResponse = await axios.post(`/token/`, {
+						token: refreshToken,
+						user_id: userData.user_id,
+					});
+					const newToken = refreshResponse.data.accessToken;
+					socket.auth = {token: newToken}
+					updateAccessToken(newToken);
+					sessionStorage.setItem("accessToken", newToken);
+					console.log('AccessToken refreshed by socket handler')
+					socket.connect();
+				}
+			});
 			socket.on('receive_notification', (data) => {
 				console.log('Received notification', data);
 				if (
@@ -97,6 +112,7 @@ const LoggedInControls = () => {
 			});
 			return () => {
 				socket.removeAllListeners('receive_notification');
+				socket.removeAllListeners('connect_error');
 			};
 		} catch (err) {
 			console.error(err);
@@ -424,7 +440,7 @@ const NavbarComponent = () => {
 				role="navigation"
 				aria-label="main navigation"
 			>
-				{accessToken ? LoggedInControls() : LoggedOutControls()}
+				{accessToken ? <LoggedInControls /> : <LoggedOutControls />}
 			</nav>
 		</div>
 	);

@@ -1,4 +1,4 @@
-import react, {
+import {
 	createContext,
 	ReactNode,
 	useContext,
@@ -6,22 +6,7 @@ import react, {
 	useState,
 } from 'react';
 import { IProfile } from '../types/types';
-import { authAPI } from '../utilities/api';
-import { convertBirthdayToAge } from '../utilities/helpers';
 
-export type UserInfo = {
-	username: string | undefined;
-	user_id: number | undefined;
-	name: string | undefined;
-	email: string | undefined;
-	birthday: string | undefined;
-	profile_image: string | undefined;
-	profile_exists: boolean | undefined;
-}
-export interface IUser {
-	user?: UserInfo;
-	updateUser?: (user: UserInfo) => void;
-}
 export const UserContext = createContext<any>(null);
 
 export const useUserContext = () => {
@@ -67,7 +52,7 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
 			if (storedInfo) {
 				return JSON.parse(storedInfo)
 			}
-			else return current
+			return current
 		})
 		setProfile((current) => {
 			// Look for user information in session storage
@@ -75,19 +60,19 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
 			if (storedProfile) {
 				return JSON.parse(storedProfile);
 			}
-			else return current
+			return current
 		})		
 		updateAccessToken((current) => {
 			const accessTokenStored = sessionStorage.getItem('accessToken');
 			if (accessTokenStored) {
 				return accessTokenStored}
-			else return current
+			return current
 		});
 		updateRefreshToken((current) => {
 			const refreshTokenStored = sessionStorage.getItem('refreshToken');
 			if (refreshTokenStored) {
 				return refreshTokenStored}
-			else return current
+			return current
 		});
 	}, []);
 

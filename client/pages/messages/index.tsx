@@ -7,7 +7,7 @@ import {
 	ChatProps,
 	ActivePage,
 	NotificationType,
-	BooleanProp,
+	OnlineStatusProps,
 } from '../../types/types';
 import { authAPI } from '../../utilities/api';
 import { createSQLDatetimeString, reformatDate } from '../../utilities/helpers';
@@ -15,11 +15,7 @@ import { IoMdSend } from 'react-icons/io';
 import { useRouter } from 'next/router';
 import { useSocketContext } from '../../components/SocketContext';
 import { useNotificationContext } from '../../components/NotificationContext';
-import Link from 'next/link';
-import { FiMenu } from 'react-icons/fi';
-import { IconContext } from 'react-icons';
-import { BsThreeDots, BsThreeDotsVertical } from 'react-icons/bs';
-import { FaCircle } from 'react-icons/fa';
+import { BsThreeDotsVertical } from 'react-icons/bs';
 import { LoadError, Spinner } from '../../components/utilities';
 
 const NotLoggedIn = () => {
@@ -308,8 +304,26 @@ const MatchList = () => {
 	);
 };
 
-const OnlineIndicator = ({ onlineStatus }: BooleanProp) => {
-	return onlineStatus ? (
+const OnlineIndicator = ({ user_id }: OnlineStatusProps) => {
+	const [online, setOnline] = useState(false);
+	const socket = useSocketContext();
+	
+	// Query online status and listen for response
+	useEffect(() => {
+		try {
+			socket.on('online_response', (data) => {
+				if (data.queried_id === user_id) setOnline(data.online);
+			});
+			socket.emit('online_query', user_id);
+			return () => {
+				socket.removeAllListeners('online_response');
+			};
+		} catch (err) {
+			console.error(err);
+		} 
+	}, []);
+
+	return online ? (
 		<div className="round-green"></div>
 	) : (
 		<div className="round-gray"></div>
@@ -339,7 +353,7 @@ const MatchListItem = ({ match, user_id }: any) => {
 			onClick={handleClick}
 		>
 			<div className="p-2">
-				<OnlineIndicator onlineStatus={match.online} />
+				<OnlineIndicator user_id={receiver_id} />
 				<figure className="image is-64x64">
 					<img
 						className="is-rounded"
@@ -364,7 +378,7 @@ const MatchListItem = ({ match, user_id }: any) => {
 			onClick={handleClick}
 		>
 			<div className="p-2">
-				<OnlineIndicator onlineStatus={match.online} />
+				<OnlineIndicator user_id={receiver_id} />
 				<figure className="image is-64x64">
 					<img
 						className="is-rounded"
@@ -381,7 +395,6 @@ const MatchListItem = ({ match, user_id }: any) => {
 			<div className="p-2">
 			<strong className="is-size-7">{name}</strong>
 			</div>
-			{/* <ReportMenu reporter={user_id} reported={receiver_id} /> */}
 		</div>
 	);
 };
@@ -390,11 +403,10 @@ const ChatWindow = () => {
 	const [received, setReceived] = useState<{}[]>([]);
 	const [outgoing, setOutgoing] = useState('');
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
-	const { profile } = useUserContext();
 	const socket = useSocketContext();
 	const { matchData } = useNotificationContext();
 	const windowBottom: MutableRefObject<any> = useRef(null);
-
+	const { profile, refreshToken, userData, updateAccessToken } = useUserContext();
 	const onChange = (event: React.ChangeEvent<HTMLInputElement>) =>
 		setOutgoing(event.target.value);
 
