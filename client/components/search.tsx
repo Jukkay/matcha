@@ -1,11 +1,5 @@
 import Link from 'next/link';
-import React, {
-	useState,
-	useEffect,
-	useCallback,
-	MutableRefObject,
-	useRef,
-} from 'react';
+import React, { useState, useEffect } from 'react';
 import { OnlineIndicator, SearchResult } from './profile';
 import { useUserContext } from './UserContext';
 import {
@@ -13,8 +7,6 @@ import {
 	BasicSearchProps,
 	ButtonsProps,
 	IProfileCard,
-	IResultsProfile,
-	ISelector,
 	LoadStatus,
 	ResultsProps,
 	SearchParamsProps,
@@ -39,6 +31,7 @@ import { BiSortAlt2 } from 'react-icons/bi';
 import { IconContext } from 'react-icons';
 import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
+import { useInView } from 'react-intersection-observer';
 
 export const ProfileSearch = ({
 	searchParams,
@@ -62,6 +55,8 @@ export const ProfileSearch = ({
 			country: searchParams.country,
 			city: searchParams.city,
 		};
+		if (!query.gender || !query.looking || !query.min_age || !query.max_age)
+			return;
 		try {
 			setLoadStatus(LoadStatus.LOADING);
 			let response = await authAPI.post(`/search`, {
@@ -314,25 +309,18 @@ const Interests = ({ interests, setInterests }: any) => {
 };
 
 export const Results = ({ sortedResults, loadStatus }: ResultsProps) => {
-	const [endIndex, setEndIndex] = useState(9);
 	const [searchResultText, setSearchResultText] = useState('');
-	const scrollTarget: MutableRefObject<any> = useRef(null);
+	const [endIndex, setEndIndex] = useState(9);
 
-	// Infinite scroll for results
-	const handleScroll = useCallback((entries: any) => {
-		if (entries[0].isIntersecting) {
+	// Infinite scroll hooks
+	const { ref, inView } = useInView({
+		threshold: 0,
+	});
+	useEffect(() => {
+		if (inView) {
 			setEndIndex((endIndex) => endIndex + 10);
 		}
-	}, []);
-
-	useEffect(() => {
-		const options = {
-			root: null,
-			threshold: 1.0,
-		};
-		const observer = new IntersectionObserver(handleScroll, options);
-		if (scrollTarget.current) observer.observe(scrollTarget.current);
-	}, [handleScroll]);
+	}, [inView]);
 
 	// Show how many profiles found
 	useEffect(() => {
@@ -349,27 +337,36 @@ export const Results = ({ sortedResults, loadStatus }: ResultsProps) => {
 	return sortedResults.length > 0 ? (
 		<section className="section has-text-centered">
 			<h5 className="title is-5">{searchResultText}</h5>
-			{endIndex < sortedResults.length && sortedResults.slice(0, endIndex).map((result, index) => (
-				<SearchResultItem
-					key={index}
-					user_id={result.user_id}
-					profile_image={result.profile_image}
-					name={result.name}
-					birthday={result.birthday}
-					city={result.city}
-					country={result.country}
-					distance={result.distance}
-					famerating={result.famerating}
-					interests={result.interests}
-				/>
-			))}
-			{endIndex < sortedResults.length ? (
-				<div ref={scrollTarget}><Spinner /></div>
-			) : (
-				<section className="section has-text-centered">
-					<h3 className="title is-3">No more matching profiles</h3>
-				</section>
-			)}
+			<div>
+				{endIndex < sortedResults.length &&
+					sortedResults
+						.slice(0, endIndex)
+						.map((result, index) => (
+							<SearchResultItem
+								key={index}
+								user_id={result.user_id}
+								profile_image={result.profile_image}
+								name={result.name}
+								birthday={result.birthday}
+								city={result.city}
+								country={result.country}
+								distance={result.distance}
+								famerating={result.famerating}
+								interests={result.interests}
+							/>
+						))}
+				{endIndex < sortedResults.length ? (
+					<div ref={ref}>
+						<Spinner />
+					</div>
+				) : (
+					<section className="section has-text-centered">
+						<h3 className="title is-3">
+							No more matching profiles
+						</h3>
+					</section>
+				)}
+			</div>
 		</section>
 	) : (
 		<section className="section has-text-centered">
@@ -637,7 +634,8 @@ export const BasicSearchLine = ({
 					setSearchParams={setSearchParams}
 				/>
 				<SearchGenderSelector
-					searchParams={searchParams} setSearchParams={setSearchParams}
+					searchParams={searchParams}
+					setSearchParams={setSearchParams}
 				/>
 				<SubmitAndResetButtons resetSearch={resetSearch} />
 			</div>
@@ -671,7 +669,8 @@ export const BasicSearchLine = ({
 					setSearchParams={setSearchParams}
 				/>
 				<SearchGenderSelector
-					searchParams={searchParams} setSearchParams={setSearchParams}
+					searchParams={searchParams}
+					setSearchParams={setSearchParams}
 				/>
 				<SubmitAndResetButtons resetSearch={resetSearch} />
 			</div>

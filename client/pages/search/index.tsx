@@ -23,6 +23,7 @@ import {
 	oldFirst,
 	youngFirst,
 } from '../../utilities/sort';
+import { ErrorBoundary } from '../../components/utilities';
 
 const NotLoggedIn = () => {
 	return (
@@ -35,7 +36,7 @@ const NotLoggedIn = () => {
 };
 
 const LoggedIn = () => {
-	const { profile, setProfile, userData, updateUserData } = useUserContext();
+	const { profile, setProfile, userData } = useUserContext();
 	const { setActivePage } = useNotificationContext();
 	const [sort, setSort] = useState<SortType>(SortType.DISTANCE);
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
@@ -131,11 +132,13 @@ const LoggedIn = () => {
 const Search: NextPage = () => {
 	const { accessToken } = useUserContext();
 	return (
+		<ErrorBoundary>
 		<div className="columns is-centered">
 			<div className="column is-three-quarters mt-6 pt-6">
 				{accessToken ? <LoggedIn /> : <NotLoggedIn />}
 			</div>
 		</div>
+		</ErrorBoundary>
 	);
 };
 

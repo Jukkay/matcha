@@ -5,7 +5,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNotificationContext } from '../../components/NotificationContext';
 import { OnlineIndicator } from '../../components/profile';
 import { useUserContext } from '../../components/UserContext';
-import { LoadError, Spinner } from '../../components/utilities';
+import { ErrorBoundary, LoadError, Spinner } from '../../components/utilities';
 import {
 	ActivePage,
 	ILikeProfile,
@@ -108,7 +108,8 @@ const LoggedIn = () => {
 	if (loadStatus == LoadStatus.ERROR)
 		return <LoadError text="Error loading likes" />;
 
-	return likerProfiles.length > 0 || likedProfiles.length > 0 ? (
+	return (likerProfiles && likerProfiles.length > 0) ||
+		(likedProfiles && likedProfiles.length > 0) ? (
 		<section className="section has-text-centered">
 			<h3 className="title is-3">They liked your profile:</h3>
 			<div className="block">
@@ -144,9 +145,7 @@ const LikeProfile = ({ profile }: any) => {
 								className="rounded-corners"
 							/>
 							<div className="is-overlay">
-								<OnlineIndicator
-									user_id={profile.user_id}
-								/>
+								<OnlineIndicator user_id={profile.user_id} />
 							</div>
 						</figure>
 					</div>
@@ -210,11 +209,13 @@ const LikeProfile = ({ profile }: any) => {
 const Likes: NextPage = () => {
 	const { accessToken } = useUserContext();
 	return (
-		<div className="columns is-centered">
-			<div className="column is-three-quarters">
-				{accessToken ? <LoggedIn /> : <NotLoggedIn />}
+		<ErrorBoundary>
+			<div className="columns is-centered">
+				<div className="column is-three-quarters">
+					{accessToken ? <LoggedIn /> : <NotLoggedIn />}
+				</div>
 			</div>
-		</div>
+		</ErrorBoundary>
 	);
 };
 

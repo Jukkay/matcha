@@ -59,12 +59,12 @@ V GPS location
         https://openbase.com/js/geoip-lite
    V Allow user to change GPS position in profile
 V Browsing
-    Show suggestions that match preferences
-    Match
-        Sexual preference
-        Location
-        Maximum common tags
-        With maximum fame rating
+    V Show suggestions that match preferences
+    V Match
+        V Sexual preference
+        V Location
+        V Maximum common tags
+        V With maximum fame rating
    V Prioritise people from same area
    V Sort by
        V Age
@@ -79,14 +79,14 @@ V Advanced search
    V     One or more
    V Sort and filter by same as previously
    V Filtering (can be same as the search?)
-Profile of other users
+V Profile of other users
    V Visits to profile must be stored to user's visit history
    V Notification of visit to profile owner
    V Show
        V all profile information
        V Fame rating
        V Online/Offline
-         Last login date and time
+       V Last login date and time
        V If likes you
     V Like
        V Must have at least one picture to like someone
@@ -111,7 +111,6 @@ V Notifications
 V Database
    V relational or graph
    V Can't be noSQL
-    Build your own ORM
 Bonuses
     Facebook/google login/signup
     Facebook picture import
@@ -360,12 +359,18 @@ V Fix token refresh
 V Make logged user timestamp update and list clean in right situations
 V Limit history to reasonable amount
 V Make IP location write location to db
+V Why doesn't infinite scroll work in search? 
 
-Why doesn't infinite scroll work in search?
+
+Add infinite scroll to history
+Add infinite scroll to likes
+Add infinite scroll to own profile page
+Add infinite scroll to chat window
+Fix Error: Abort fetching component for route when quickly pressing navbar Links
+Check if it happens in production build also
 Test online status
 Test websockets with multiple users
 Remove duplicates from history
-Add infinite scroll to history
 What happens if user is unmatched or blocked during chat?
 Test all required functionality
 Make production docker-compose
@@ -390,3 +395,8 @@ Image optimization
 # Bonuses done
 JWT refresh automation
 Live search with interests
+Infinite scroll
+Socket based online status
+Socket based messaging
+Socket based notifications
+Random user script

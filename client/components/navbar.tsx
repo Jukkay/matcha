@@ -10,7 +10,8 @@ import { useSocketContext } from './SocketContext';
 import { useNotificationContext } from './NotificationContext';
 import { INotification, LikeProp, NotificationType } from '../types/types';
 import axios from 'axios';
-import { socket } from './SocketContext'
+import { socket } from './SocketContext';
+import { ErrorBoundary } from './utilities';
 
 const LoggedOutControls = () => {
 	return (
@@ -185,29 +186,35 @@ const LoggedInControls = () => {
 const TextLinks = ({ likeCount }: LikeProp) => {
 	return (
 		<div className="is-flex-wrap-nowrap text-links">
-			<Link href="/search">
-				<a className="navbar-item">Search</a>
-			</Link>
-			<Link href="/history">
-				<a className="navbar-item">Recent profiles</a>
-			</Link>
-			{likeCount ? (
-				<Link href="/likes">
-					<a className="navbar-item">
-						<span
-							title="Badge top right"
-							className="badge is-danger"
-						>
-							{likeCount}
-						</span>
-						Likes
-					</a>
+			<ErrorBoundary>
+				<Link href="/search">
+					<a className="navbar-item">Search</a>
 				</Link>
-			) : (
-				<Link href="/likes">
-					<a className="navbar-item">Likes</a>
+			</ErrorBoundary>
+			<ErrorBoundary>
+				<Link href="/history">
+					<a className="navbar-item">Recent profiles</a>
 				</Link>
-			)}
+			</ErrorBoundary>
+			<ErrorBoundary>
+				{likeCount ? (
+					<Link href="/likes">
+						<a className="navbar-item">
+							<span
+								title="Badge top right"
+								className="badge is-danger"
+							>
+								{likeCount}
+							</span>
+							Likes
+						</a>
+					</Link>
+				) : (
+					<Link href="/likes">
+						<a className="navbar-item">Likes</a>
+					</Link>
+				)}
+			</ErrorBoundary>
 		</div>
 	);
 };
