@@ -108,30 +108,47 @@ const LoggedIn = () => {
 	if (loadStatus == LoadStatus.ERROR)
 		return <LoadError text="Error loading likes" />;
 
-	return (likerProfiles && likerProfiles.length > 0) ||
-		(likedProfiles && likedProfiles.length > 0) ? (
+	return (
 		<section className="section has-text-centered">
 			<h3 className="title is-3">They liked your profile:</h3>
 			<div className="block">
-				{likerProfiles?.map((liker, index) => (
-					<LikeProfile key={index} profile={liker} />
-				))}
+				{likerProfiles.length > 0 ? (
+					likerProfiles
+						.slice(0, 5)
+						.map((liker, index) => (
+							<LikeProfile key={index} profile={liker} />
+						))
+				) : (
+					<p>Nothing to show yet</p>
+				)}
+				{likerProfiles.length > 5 ? (
+					<Link href="/likesreceived">
+						<a className="button is-primary">Show more</a>
+					</Link>
+				) : null}
 			</div>
 			<h3 className="title is-3">You liked their profiles:</h3>
 			<div className="block">
-				{likedProfiles?.map((liker, index) => (
-					<LikeProfile key={index} profile={liker} />
-				))}
+				{likedProfiles.length > 0 ? (
+					likedProfiles
+						.slice(0, 5)
+						.map((liker, index) => (
+							<LikeProfile key={index} profile={liker} />
+						))
+				) : (
+					<p>Nothing to show yet</p>
+				)}
+				{likedProfiles.length > 5 ? (
+					<Link href="/likedprofiles">
+						<a className="button is-primary">Show more</a>
+					</Link>
+				) : null}
 			</div>
-		</section>
-	) : (
-		<section className="section">
-			<h3 className="title is-3">No likes to show yet</h3>
 		</section>
 	);
 };
 
-const LikeProfile = ({ profile }: any) => {
+export const LikeProfile = ({ profile }: any) => {
 	return (
 		<Link href={`/profile/${profile.user_id}`}>
 			<a>

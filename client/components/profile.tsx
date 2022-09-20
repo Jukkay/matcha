@@ -23,7 +23,9 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import axios from 'axios';
-import { socket } from './SocketContext'
+import { socket } from './SocketContext';
+import { useInView } from 'react-intersection-observer';
+import { Spinner } from './utilities';
 
 export const ProfileView = ({ profile, setEditMode }: ProfileViewProps) => {
 	const { userData } = useUserContext();
@@ -32,9 +34,7 @@ export const ProfileView = ({ profile, setEditMode }: ProfileViewProps) => {
 			<h1 className="title is-1">Your profile</h1>
 			<div className="columns card my-6 rounded-corners">
 				<div className="column has-text-left is-two-thirds">
-					<Gallery
-						user_id={userData.user_id}
-					/>
+					<Gallery user_id={userData.user_id} />
 				</div>
 				<div className="column mt-3 has-text-left m-3">
 					<div className="block">
@@ -141,6 +141,18 @@ export const ProfileView = ({ profile, setEditMode }: ProfileViewProps) => {
 export const VisitorLog = ({ user_id }: any) => {
 	const [pageVisited, setPageVisited] = useState(false);
 	const [log, setLog] = useState([]);
+	const [endIndex, setEndIndex] = useState(9);
+
+	// Infinite scroll hooks
+	const { ref, inView } = useInView({
+		threshold: 0,
+	});
+	useEffect(() => {
+		if (inView) {
+			setEndIndex((endIndex) => endIndex + 10);
+		}
+	}, [inView]);
+
 	useEffect(() => {
 		const getVisitorLog = async () => {
 			let response = await authAPI.get(`/log/${user_id}`);
@@ -156,20 +168,33 @@ export const VisitorLog = ({ user_id }: any) => {
 		<section className="section">
 			<h3 className="title is-3">Visitor log</h3>
 			<div className="block">
-				{log.map((result: IProfileCard, index) => (
-					<SearchResultItem
-						key={index}
-						user_id={result.user_id}
-						profile_image={result.profile_image}
-						name={result.name}
-						birthday={result.birthday}
-						city={result.city}
-						country={result.country}
-						famerating={result.famerating}
-						distance={result.distance}
-						interests={result.interests}
-					/>
-				))}
+				{log
+						.slice(0, endIndex)
+						.map((result: IProfileCard, index) => (
+							<SearchResultItem
+								key={index}
+								user_id={result.user_id}
+								profile_image={result.profile_image}
+								name={result.name}
+								birthday={result.birthday}
+								city={result.city}
+								country={result.country}
+								famerating={result.famerating}
+								distance={result.distance}
+								interests={result.interests}
+							/>
+						))}
+				{endIndex < log.length ? (
+					<div ref={ref}>
+						<Spinner />
+					</div>
+				) : (
+					<section className="section has-text-centered">
+						<h3 className="title is-3">
+							No more matching profiles
+						</h3>
+					</section>
+				)}
 			</div>
 		</section>
 	) : (
@@ -321,9 +346,9 @@ export const Gallery = ({ user_id }: OnlineStatusProps) => {
 					</SwiperSlide>
 				))}
 			</Swiper>
-				<div className="is-overlay">
-					<OnlineIndicator user_id={user_id} />
-				</div>
+			<div className="is-overlay">
+				<OnlineIndicator user_id={user_id} />
+			</div>
 		</div>
 	) : null;
 };
@@ -428,7 +453,7 @@ export const Thumbnails = ({ preview, setPreview }: IThumbnails) => {
 export const OnlineIndicator = ({ user_id }: OnlineStatusProps) => {
 	const [online, setOnline] = useState(false);
 	// const socket = useSocketContext();
-	
+
 	// Query online status and listen for response
 	useEffect(() => {
 		try {
@@ -441,12 +466,16 @@ export const OnlineIndicator = ({ user_id }: OnlineStatusProps) => {
 			};
 		} catch (err) {
 			console.error(err);
-		} 
+		}
 	}, []);
 
 	return online ? (
-		<span className="tag is-primary online-indicator mt-5 ml-5">Online</span>
+		<span className="tag is-primary online-indicator mt-5 ml-5">
+			Online
+		</span>
 	) : (
-		<span className="tag is-danger online-indicator mt-5 ml-5">Offline</span>
+		<span className="tag is-danger online-indicator mt-5 ml-5">
+			Offline
+		</span>
 	);
 };

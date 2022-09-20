@@ -360,12 +360,18 @@ V Make logged user timestamp update and list clean in right situations
 V Limit history to reasonable amount
 V Make IP location write location to db
 V Why doesn't infinite scroll work in search? 
+V Add infinite scroll to history
+V Add infinite scroll to likes
+V Create likes received page
+V Create liked profiles page
+V Add infinite scroll to own profile page
+V Check why search button doesn't work sometimes (or at all?)
+V Focus to text input on start
 
-
-Add infinite scroll to history
-Add infinite scroll to likes
-Add infinite scroll to own profile page
+Remove page refresh on message send
 Add infinite scroll to chat window
+
+Figure out why socket middleware stops listeners
 Fix Error: Abort fetching component for route when quickly pressing navbar Links
 Check if it happens in production build also
 Test online status
@@ -400,3 +406,4 @@ Socket based online status
 Socket based messaging
 Socket based notifications
 Random user script
+Delete profile and/or userdata

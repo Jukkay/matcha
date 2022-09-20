@@ -18,7 +18,6 @@ import { authAPI } from '../utilities/api';
 import {
 	addCommonTagsToProfiles,
 	addDistanceToProfiles,
-	convertAgeToBirthday,
 	convertBirthdayToAge,
 } from '../utilities/helpers';
 import { moreCommonTagsFirst } from '../utilities/sort';
@@ -48,7 +47,7 @@ export const ProfileSearch = ({
 
 	const searchDatabase = async (controller: AbortController) => {
 		const query = {
-			gender: searchParams.gender,
+			gender: profile.gender,
 			looking: searchParams.looking,
 			min_age: searchParams.min_age,
 			max_age: searchParams.max_age,
@@ -107,6 +106,7 @@ export const ProfileSearch = ({
 		await searchDatabase(controller);
 		controller.abort();
 	};
+
 	const resetSearch = (event: React.FormEvent) => {
 		event.preventDefault();
 		setSearchParams({
@@ -125,6 +125,7 @@ export const ProfileSearch = ({
 		setInterests([]);
 		setFilteredResults(results);
 	};
+
 	return (
 		<div>
 			<h3 className="title is-3">Search</h3>
@@ -133,6 +134,7 @@ export const ProfileSearch = ({
 					searchParams={searchParams}
 					setSearchParams={setSearchParams}
 					resetSearch={resetSearch}
+					handleSubmit={handleSubmit}
 				/>
 			</form>
 			<hr />
@@ -171,7 +173,6 @@ const Filters = ({
 
 		// Filter by distance
 		if (searchParams.max_distance > 0) {
-			console.log('Filtering by distance', searchParams.max_distance);
 			filteredResults = [...filteredResults].filter(
 				(item) => item.distance <= searchParams.max_distance
 			);
@@ -338,8 +339,7 @@ export const Results = ({ sortedResults, loadStatus }: ResultsProps) => {
 		<section className="section has-text-centered">
 			<h5 className="title is-5">{searchResultText}</h5>
 			<div>
-				{endIndex < sortedResults.length &&
-					sortedResults
+				{sortedResults
 						.slice(0, endIndex)
 						.map((result, index) => (
 							<SearchResultItem
@@ -619,6 +619,7 @@ export const BasicSearchLine = ({
 	searchParams,
 	setSearchParams,
 	resetSearch,
+	handleSubmit
 }: BasicSearchProps) => {
 	const [optionalsVisible, setOptionalsVisible] = useState(false);
 	const handleClick = (event: React.MouseEvent) => {
@@ -637,7 +638,7 @@ export const BasicSearchLine = ({
 					searchParams={searchParams}
 					setSearchParams={setSearchParams}
 				/>
-				<SubmitAndResetButtons resetSearch={resetSearch} />
+				<SubmitAndResetButtons resetSearch={resetSearch} handleSubmit={handleSubmit} />
 			</div>
 			<div className="buttons">
 				<button
@@ -672,7 +673,7 @@ export const BasicSearchLine = ({
 					searchParams={searchParams}
 					setSearchParams={setSearchParams}
 				/>
-				<SubmitAndResetButtons resetSearch={resetSearch} />
+				<SubmitAndResetButtons resetSearch={resetSearch} handleSubmit={handleSubmit}/>
 			</div>
 			<div className="buttons">
 				<button
@@ -780,15 +781,15 @@ export const SearchGenderSelector = ({
 	);
 };
 
-export const SubmitAndResetButtons = ({ resetSearch }: ButtonsProps) => {
+export const SubmitAndResetButtons = ({ resetSearch, handleSubmit }: ButtonsProps) => {
 	return (
 		<div className="block">
 			<div className="label is-invisible">Submit</div>
 			<div className="buttons">
-				<button type="submit" className="button is-primary">
+				<button type="submit" onClick={handleSubmit} className="button is-primary">
 					Search
 				</button>
-				<button type="submit" onClick={resetSearch} className="button">
+				<button type="reset" onClick={resetSearch} className="button">
 					Reset to default
 				</button>
 			</div>

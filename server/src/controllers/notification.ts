@@ -37,7 +37,7 @@ export const saveNotificationToDatabase = async (data: {
 
 export const getNotifications = async (req: Request, res: Response) => {
 	const user_id = req.params.id;
-	console.log('Getting notifications for user_id: ', user_id);
+	console.log('getNotifications for user_id: ', user_id);
 	try {
 		if (!user_id)
 			return res.status(400).json({

@@ -62,12 +62,14 @@ const updateOnlineUsers = (user_id: number, socket_id: string) => {
 	const i = onlineUsers?.findIndex((item) => item.user_id === user_id);
 	if (i && i > -1) {
 		onlineUsers[i] = {user_id: user_id, socket_id: socket_id, active: Date.now()}
+		console.log(onlineUsers[i], 'updated')
 	} else {
 		onlineUsers.push({
 			user_id: user_id,
 			socket_id: socket_id,
 			active: Date.now(),
 		});
+		console.log(onlineUsers[onlineUsers.length - 1], 'added')
 	}
 };
 
@@ -82,20 +84,23 @@ const queryOnlineUsers = (user_id: number) => {
 	return false;
 };
 
-// Check socket token
-io.use((socket, next) => {
-	const token = socket.handshake.auth.token;
-	const user_id = socket.handshake.auth.user_id
-	if (!token || !user_id) {
-		next(new Error('Unauthorized'));
-	}
-	updateOnlineUsers(user_id, socket.id)
-	if (checkSocketJWT(token)) {
-		next();
-	} else {
-		next(new Error('Unauthorized'));
-	}
-});
+// // Check socket token
+// io.use((socket, next) => {
+// 	const token = socket.handshake.auth.token;
+// 	const user_id = socket.handshake.auth.user_id
+// 	if (!token || !user_id) {
+// 		console.log('Missing token or user_id')
+// 		return next(new Error('Unauthorized'));
+// 	}
+// 	updateOnlineUsers(user_id, socket.id)
+// 	if (checkSocketJWT(token)) {
+// 		console.log('Token validated')
+// 		next();
+// 	} else {
+// 		console.log('Invalid token')
+// 		next(new Error('Unauthorized'));
+// 	}
+// });
 
 io.on('connection', (socket) => {
 	try {

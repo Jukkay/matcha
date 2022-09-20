@@ -72,6 +72,15 @@ const LoggedIn = () => {
 		setWasRedirected(true);
     	router.replace('/profile')
 	}, [userData.profile_exists]);
+
+	// Needs to exist to make sure these searchParams don't end up undefined on reload.
+	useEffect(() => {
+		setSearchParams({
+			...searchParams,
+			gender: profile.gender,
+			looking: profile.looking,
+		})
+	}, [profile.gender, profile.looking])
 	
 	useEffect(() => {
 		if ('geolocation' in navigator) {

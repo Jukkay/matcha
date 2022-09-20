@@ -274,10 +274,12 @@ export interface BasicSearchProps {
   searchParams: ISearchParams
   setSearchParams: SetStateAction<any>
   resetSearch: (event: React.FormEvent) => void
+  handleSubmit: (event: React.FormEvent) => void
 }
 
 export interface ButtonsProps {
   resetSearch: (event: React.FormEvent) => void
+  handleSubmit: (event: React.FormEvent) => void
 }
 
 export interface LogEntry {

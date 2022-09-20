@@ -4,20 +4,19 @@ import { useUserContext } from '../../components/UserContext';
 import {
 	LoadStatus,
 	IMatch,
-	ChatProps,
 	ActivePage,
 	NotificationType,
 	OnlineStatusProps,
 } from '../../types/types';
 import { authAPI } from '../../utilities/api';
-import { createSQLDatetimeString, reformatDate } from '../../utilities/helpers';
+import { createSQLDatetimeString } from '../../utilities/helpers';
 import { IoMdSend } from 'react-icons/io';
 import { useRouter } from 'next/router';
-import { useSocketContext } from '../../components/SocketContext';
 import { useNotificationContext } from '../../components/NotificationContext';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import { LoadError, Spinner } from '../../components/utilities';
-import { socket } from '../../components/SocketContext'
+import { socket } from '../../components/SocketContext';
+import { useInView } from 'react-intersection-observer';
 
 const NotLoggedIn = () => {
 	return (
@@ -35,20 +34,20 @@ const LoggedIn = () => {
 	const { setNotificationCount, setMessageCount, setLikeCount } =
 		useNotificationContext();
 	const [wasRedirected, setWasRedirected] = useState(false);
-	const isFirstRender = useRef(true)
+	const isFirstRender = useRef(true);
 	const router = useRouter();
 
 	// Redirect if user has no profile
 	useEffect(() => {
 		if (isFirstRender.current) {
 			isFirstRender.current = false;
-			return
+			return;
 		}
 		if (wasRedirected || userData.profile_exists) return;
 		setWasRedirected(true);
-    	router.replace('/profile')
+		router.replace('/profile');
 	}, [userData.profile_exists]);
-		
+
 	useEffect(() => {
 		if ('geolocation' in navigator) {
 			navigator.geolocation.getCurrentPosition(
@@ -254,7 +253,7 @@ const ReportMenu = ({ reporter, reported }: any) => {
 	);
 };
 const MatchList = () => {
-	const { profile, setProfile } = useUserContext();
+	const { profile } = useUserContext();
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
 	const [matches, setMatches] = useState<IMatch[]>([]);
 	const { matchData, setMatchData, setActivePage } = useNotificationContext();
@@ -268,23 +267,22 @@ const MatchList = () => {
 					setMatches(response.data.matches);
 				}
 			} catch (err) {
-				console.error(err)
-				setLoadStatus(LoadStatus.ERROR)
+				console.error(err);
+				setLoadStatus(LoadStatus.ERROR);
 			} finally {
-				setLoadStatus(LoadStatus.IDLE)
+				setLoadStatus(LoadStatus.IDLE);
 			}
 		};
 		getUsersMatches();
 		setActivePage(ActivePage.MESSAGES);
 	}, []);
 
-	if (loadStatus == LoadStatus.LOADING)
-		return <Spinner />
+	if (loadStatus == LoadStatus.LOADING) return <Spinner />;
 	if (loadStatus == LoadStatus.ERROR)
-		return <LoadError text="Error loading matches" />
+		return <LoadError text="Error loading matches" />;
 
 	return matches.length > 0 ? (
-		<div className="column is-narrow is-flex is-flex-direction-column match-list">
+		<div className="column is-narrow is-flex is-flex-direction-column mt-6 match-list">
 			<h5 className="title is-5">Matches</h5>
 			{matches.map((match, index) => (
 				<MatchListItem
@@ -308,7 +306,7 @@ const MatchList = () => {
 const OnlineIndicator = ({ user_id }: OnlineStatusProps) => {
 	const [online, setOnline] = useState(false);
 	// const socket = useSocketContext();
-	
+
 	// Query online status and listen for response
 	useEffect(() => {
 		try {
@@ -321,7 +319,7 @@ const OnlineIndicator = ({ user_id }: OnlineStatusProps) => {
 			};
 		} catch (err) {
 			console.error(err);
-		} 
+		}
 	}, []);
 
 	return online ? (
@@ -350,7 +348,7 @@ const MatchListItem = ({ match, user_id }: any) => {
 
 	return matchData.match_id === match.match_id ? (
 		<div
-			className="has-background-grey-lighter p-2 is-clickable is-flex is-justify-content-center is-align-items-center"
+			className="has-background-grey-lighter is-clickable is-flex is-justify-content-center is-align-items-center"
 			onClick={handleClick}
 		>
 			<div className="p-2">
@@ -369,13 +367,13 @@ const MatchListItem = ({ match, user_id }: any) => {
 				</figure>
 			</div>
 			<div className="p-2">
-			<strong className="is-size-7">{name}</strong>
+				<strong className="is-size-7">{name}</strong>
 			</div>
 			<ReportMenu reporter={user_id} reported={receiver_id} />
 		</div>
 	) : (
 		<div
-			className="is-clickable is-flex is-justify-content-center is-align-items-center"
+			className="is-clickable is-flex is-justify-content-center is-align-items-center mr-6"
 			onClick={handleClick}
 		>
 			<div className="p-2">
@@ -394,7 +392,7 @@ const MatchListItem = ({ match, user_id }: any) => {
 				</figure>
 			</div>
 			<div className="p-2">
-			<strong className="is-size-7">{name}</strong>
+				<strong className="is-size-7">{name}</strong>
 			</div>
 		</div>
 	);
@@ -404,10 +402,22 @@ const ChatWindow = () => {
 	const [received, setReceived] = useState<{}[]>([]);
 	const [outgoing, setOutgoing] = useState('');
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
-	// const socket = useSocketContext();
 	const { matchData } = useNotificationContext();
 	const windowBottom: MutableRefObject<any> = useRef(null);
-	const { profile, refreshToken, userData, updateAccessToken } = useUserContext();
+	const { profile } = useUserContext();
+	const [startIndex, setStartIndex] = useState(received.length - 25);
+
+	// Infinite scroll hooks
+	const { ref, inView } = useInView({
+		threshold: 0,
+	});
+	useEffect(() => {
+		if (inView) {
+			setStartIndex((startIndex) => startIndex - 25);
+			console.log('useEffect ran. StartIndex changed.')
+		}
+	}, [inView]);
+
 	const onChange = (event: React.ChangeEvent<HTMLInputElement>) =>
 		setOutgoing(event.target.value);
 
@@ -426,9 +436,7 @@ const ChatWindow = () => {
 		socket.emit('send_message', matchData.match_id, payload);
 		socket.emit('send_notification', matchData.receiver_id, notification);
 	};
-
-	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
+	const sendMessage = async() => {
 		if (outgoing.length < 1) return;
 		try {
 			setLoadStatus(LoadStatus.LOADING);
@@ -454,6 +462,11 @@ const ChatWindow = () => {
 		} catch (err) {
 			console.error(err);
 		}
+	}
+	const handleSubmit = (event: React.FormEvent) => {
+		event.preventDefault();
+		sendMessage();
+		
 	};
 	const selectChat = async () => {
 		try {
@@ -468,7 +481,7 @@ const ChatWindow = () => {
 			console.error(err);
 			setLoadStatus(LoadStatus.ERROR);
 		} finally {
-			setLoadStatus(LoadStatus.IDLE)
+			setLoadStatus(LoadStatus.IDLE);
 		}
 	};
 
@@ -489,21 +502,30 @@ const ChatWindow = () => {
 		selectChat();
 	}, [matchData.match_id]);
 
-	if (loadStatus == LoadStatus.LOADING)
-		return <Spinner />
 	if (loadStatus == LoadStatus.ERROR)
-		return <LoadError text="Error loading messages" />
+		return <LoadError text="Error loading messages" />;
 
 	return matchData.match_id ? (
 		<div className="column">
-			<div className="is-flex is-flex-direction-column is-justify-content-center is-align-content-center chat-window">
-				{received.map((item, index) => (
-					<ChatMessage
-						key={index}
-						item={item}
-						user_id={profile.user_id}
-					/>
-				))}
+			<div className="is-flex is-flex-direction-column mt-6 chat-window">
+				{startIndex > 0 ? (
+					<div ref={ref}>
+						<Spinner />
+					</div>
+				) : received.length > 0 ? null : (
+					<section className="section has-text-centered">
+						<h3 className="title is-3">No messages to show</h3>
+					</section>
+				)}
+				{received
+					.slice(startIndex > 0 ? startIndex : 0, received.length)
+					.map((item, index) => (
+						<ChatMessage
+							key={index}
+							item={item}
+							user_id={profile.user_id}
+						/>
+					))}
 				<div ref={windowBottom} className="is-invisible">
 					.
 				</div>
@@ -520,10 +542,11 @@ const ChatWindow = () => {
 								onChange={onChange}
 								onFocus={scrollToBottom}
 								value={outgoing}
+								autoFocus
 							/>
 						</div>
 						<div className="control">
-							<button className="button is-primary mr-6">
+							<button className="button is-primary mr-6" type="submit">
 								<span className="icon">
 									<IoMdSend />
 								</span>

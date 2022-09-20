@@ -9,6 +9,7 @@ import { ErrorBoundary, LoadError, Spinner } from '../../components/utilities';
 import { ActivePage, LoadStatus, LogEntry } from '../../types/types';
 import { authAPI } from '../../utilities/api';
 import { convertBirthdayToAge } from '../../utilities/helpers';
+import { useInView } from 'react-intersection-observer';
 
 const NotLoggedIn = () => {
 	return (
@@ -28,7 +29,18 @@ const LoggedIn = () => {
 	const [wasRedirected, setWasRedirected] = useState(false);
 	const isFirstRender = useRef(true);
 	const router = useRouter();
+	const [endIndex, setEndIndex] = useState(9);
 
+	// Infinite scroll hooks
+	const { ref, inView } = useInView({
+		threshold: 0,
+	});
+	useEffect(() => {
+		if (inView) {
+			setEndIndex((endIndex) => endIndex + 10);
+		}
+	}, [inView]);
+	
 	// Redirect if user has no profile
 	useEffect(() => {
 		if (isFirstRender.current) {
@@ -77,9 +89,22 @@ const LoggedIn = () => {
 		<section className="section has-text-centered">
 			<h3 className="title is-3">Recently visited profiles</h3>
 			<div className="block">
-				{log.map((visitor: LogEntry, index) => (
-					<SearchResultItem key={index} profile={visitor} />
-				))}
+				{log
+						.slice(0, endIndex)
+						.map((visitor: LogEntry, index) => (
+							<SearchResultItem key={index} profile={visitor} />
+						))}
+				{endIndex < log.length ? (
+					<div ref={ref}>
+						<Spinner />
+					</div>
+				) : (
+					<section className="section has-text-centered">
+						<h3 className="title is-3">
+							No more matching profiles
+						</h3>
+					</section>
+				)}
 			</div>
 		</section>
 	) : (
