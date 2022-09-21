@@ -30,7 +30,16 @@ import { IconContext } from 'react-icons';
 import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
 import { useInView } from 'react-intersection-observer';
-import { CitySearchSelector, CountrySearchSelector } from './location';
+import dynamic from 'next/dynamic';
+import { Suspense } from 'react';
+
+// Dynamically imported components
+const CitySearchSelector = dynamic(() => import('./searchLocationSelectors'), {
+	suspense: true,
+});
+const CountrySearchSelector = dynamic(() => import('./searchLocationSelectors'), {
+	suspense: true,
+});
 
 export const ProfileSearch = ({
 	searchParams,
@@ -86,10 +95,7 @@ export const ProfileSearch = ({
 				setResults([]);
 				setFilteredResults([]);
 			}
-		} catch (err) {
-			setLoadStatus(LoadStatus.ERROR);
-			console.error(err);
-		} finally {
+		} catch (err) {} finally {
 			setLoadStatus(LoadStatus.IDLE);
 		}
 	};
@@ -339,22 +345,20 @@ export const Results = ({ sortedResults, loadStatus }: ResultsProps) => {
 		<section className="section has-text-centered">
 			<h5 className="title is-5">{searchResultText}</h5>
 			<div>
-				{sortedResults
-						.slice(0, endIndex)
-						.map((result, index) => (
-							<SearchResultItem
-								key={index}
-								user_id={result.user_id}
-								profile_image={result.profile_image}
-								name={result.name}
-								birthday={result.birthday}
-								city={result.city}
-								country={result.country}
-								distance={result.distance}
-								famerating={result.famerating}
-								interests={result.interests}
-							/>
-						))}
+				{sortedResults.slice(0, endIndex).map((result, index) => (
+					<SearchResultItem
+						key={index}
+						user_id={result.user_id}
+						profile_image={result.profile_image}
+						name={result.name}
+						birthday={result.birthday}
+						city={result.city}
+						country={result.country}
+						distance={result.distance}
+						famerating={result.famerating}
+						interests={result.interests}
+					/>
+				))}
 				{endIndex < sortedResults.length ? (
 					<div ref={ref}>
 						<Spinner />
@@ -523,7 +527,7 @@ export const BasicSearchLine = ({
 	searchParams,
 	setSearchParams,
 	resetSearch,
-	handleSubmit
+	handleSubmit,
 }: BasicSearchProps) => {
 	const [optionalsVisible, setOptionalsVisible] = useState(false);
 	const handleClick = (event: React.MouseEvent) => {
@@ -542,7 +546,10 @@ export const BasicSearchLine = ({
 					searchParams={searchParams}
 					setSearchParams={setSearchParams}
 				/>
-				<SubmitAndResetButtons resetSearch={resetSearch} handleSubmit={handleSubmit} />
+				<SubmitAndResetButtons
+					resetSearch={resetSearch}
+					handleSubmit={handleSubmit}
+				/>
 			</div>
 			<div className="buttons">
 				<button
@@ -556,14 +563,16 @@ export const BasicSearchLine = ({
 				</button>
 			</div>
 			<div className="block is-flex is-justify-content-space-between is-align-items-start">
-				<CountrySearchSelector
-					searchParams={searchParams}
-					setSearchParams={setSearchParams}
-				/>
-				<CitySearchSelector
-					searchParams={searchParams}
-					setSearchParams={setSearchParams}
-				/>
+				<Suspense fallback={`Loading...`}>
+					<CountrySearchSelector
+						searchParams={searchParams}
+						setSearchParams={setSearchParams}
+					/>
+					<CitySearchSelector
+						searchParams={searchParams}
+						setSearchParams={setSearchParams}
+					/>
+				</Suspense>
 			</div>
 		</div>
 	) : (
@@ -577,7 +586,10 @@ export const BasicSearchLine = ({
 					searchParams={searchParams}
 					setSearchParams={setSearchParams}
 				/>
-				<SubmitAndResetButtons resetSearch={resetSearch} handleSubmit={handleSubmit}/>
+				<SubmitAndResetButtons
+					resetSearch={resetSearch}
+					handleSubmit={handleSubmit}
+				/>
 			</div>
 			<div className="buttons">
 				<button
@@ -685,12 +697,19 @@ export const SearchGenderSelector = ({
 	);
 };
 
-export const SubmitAndResetButtons = ({ resetSearch, handleSubmit }: ButtonsProps) => {
+export const SubmitAndResetButtons = ({
+	resetSearch,
+	handleSubmit,
+}: ButtonsProps) => {
 	return (
 		<div className="block">
 			<div className="label is-invisible">Submit</div>
 			<div className="buttons">
-				<button type="submit" onClick={handleSubmit} className="button is-primary">
+				<button
+					type="submit"
+					onClick={handleSubmit}
+					className="button is-primary"
+				>
 					Search
 				</button>
 				<button type="reset" onClick={resetSearch} className="button">

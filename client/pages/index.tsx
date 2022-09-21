@@ -27,7 +27,6 @@ const LoggedIn = () => {
 		[]
 	);
 	const [wasRedirected, setWasRedirected] = useState(false);
-	const isFirstRender = useRef(true);
 	const router = useRouter();
 
 	// Redirect if user has no profile
@@ -83,7 +82,6 @@ const LoggedIn = () => {
 			}
 		} catch (err) {
 			setLoadStatus(LoadStatus.ERROR);
-			console.error(err);
 		} finally {
 			setLoadStatus(LoadStatus.IDLE);
 		}

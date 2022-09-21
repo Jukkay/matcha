@@ -36,7 +36,6 @@ const LoggedIn = () => {
 	const [likedProfiles, setLikedProfiles] = useState<ILikeProfile[]>([]);
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
 	const [wasRedirected, setWasRedirected] = useState(false);
-	const isFirstRender = useRef(true);
 	const router = useRouter();
 	const [endIndex, setEndIndex] = useState(5);
 

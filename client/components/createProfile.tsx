@@ -6,7 +6,16 @@ import { convertBirthdayToAge } from "../utilities/helpers";
 import { AgeRange, ErrorMessage, GenderSelector, LookingSelector, TextArea } from "./form";
 import { FileInput, SearchResult } from "./profile";
 import { useUserContext } from "./UserContext";
-import { CitySelector, CountrySelector } from "./location";
+import dynamic from 'next/dynamic';
+import { Suspense } from 'react';
+
+// Dynamically imported components
+const CitySelector = dynamic(() => import('./profileLocationSelectors'), {
+	suspense: true,
+});
+const CountrySelector = dynamic(() => import('./profileLocationSelectors'), {
+	suspense: true,
+});
 
 // Profile creation page component
 export const CreateProfile = ({
@@ -125,13 +134,19 @@ export const CreateProfile = ({
 				<section className="section">
 					<h3 className="title is-3">Create new profile</h3>
 
-					{/* Location */}
-					<CountrySelector
-						profile={profile}
-						setProfile={setProfile}
-						isRequired={true}
-					/>
-					<CitySelector profile={profile} setProfile={setProfile} isRequired={true}/>
+					{/* Location. Components imported lazyly*/}
+					<Suspense fallback={`Loading...`}>
+						<CountrySelector
+							profile={profile}
+							setProfile={setProfile}
+							isRequired={true}
+						/>
+						<CitySelector
+							profile={profile}
+							setProfile={setProfile}
+							isRequired={true}
+						/>
+					</Suspense>
 
 					{/* Gender */}
 					<GenderSelector

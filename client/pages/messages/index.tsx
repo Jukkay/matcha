@@ -34,7 +34,6 @@ const LoggedIn = () => {
 	const { setNotificationCount, setMessageCount, setLikeCount } =
 		useNotificationContext();
 	const [wasRedirected, setWasRedirected] = useState(false);
-	const isFirstRender = useRef(true);
 	const router = useRouter();
 
 	// Redirect if user has no profile
@@ -56,15 +55,17 @@ const LoggedIn = () => {
 	}, []);
 
 	const markMessageNotificationsRead = async () => {
-		const response = await authAPI.patch('/notifications', {
-			type: NotificationType.MESSAGE,
-			user_id: userData.user_id,
-		});
-		if (response.status === 200) {
-			setNotificationCount(0);
-			setMessageCount(0);
-			setLikeCount(0);
-		}
+		try {
+			const response = await authAPI.patch('/notifications', {
+				type: NotificationType.MESSAGE,
+				user_id: userData.user_id,
+			});
+			if (response.status === 200) {
+				setNotificationCount(0);
+				setMessageCount(0);
+				setLikeCount(0);
+			}
+		} catch (err) {}
 	};
 	return (
 		<div className="is-flex is-flex-direction-row is-justify-content-center is-align-content-center">
@@ -115,24 +116,28 @@ const ReportMenu = ({ reporter, reported }: any) => {
 	const [reason, setReason] = useState('');
 
 	const handleBlockSubmit = async () => {
-		const response = await authAPI.post('/blockuser', {
-			blocked: reported,
-			blocker: reporter,
-			reason: reason,
-		});
-		if (response.status === 200) {
-			setShowBlockModal(false);
-		}
+		try {
+			const response = await authAPI.post('/blockuser', {
+				blocked: reported,
+				blocker: reporter,
+				reason: reason,
+			});
+			if (response.status === 200) {
+				setShowBlockModal(false);
+			}
+		} catch (err) {}
 	};
 	const handleReportSubmit = async () => {
-		const response = await authAPI.post('/reportuser', {
-			reported: reported,
-			reporter: reporter,
-			reason: reason,
-		});
-		if (response.status === 200) {
-			setShowBlockModal(false);
-		}
+		try {
+			const response = await authAPI.post('/reportuser', {
+				reported: reported,
+				reporter: reporter,
+				reason: reason,
+			});
+			if (response.status === 200) {
+				setShowBlockModal(false);
+			}
+		} catch (err) {}
 	};
 	return (
 		<div>
@@ -263,7 +268,6 @@ const MatchList = () => {
 					setMatches(response.data.matches);
 				}
 			} catch (err) {
-				console.error(err);
 				setLoadStatus(LoadStatus.ERROR);
 			} finally {
 				setLoadStatus(LoadStatus.IDLE);
@@ -301,7 +305,6 @@ const MatchList = () => {
 
 const OnlineIndicator = ({ user_id }: OnlineStatusProps) => {
 	const [online, setOnline] = useState(false);
-	// const socket = useSocketContext();
 
 	// Query online status and listen for response
 	useEffect(() => {
@@ -313,9 +316,7 @@ const OnlineIndicator = ({ user_id }: OnlineStatusProps) => {
 			return () => {
 				socket.removeAllListeners('online_response');
 			};
-		} catch (err) {
-			console.error(err);
-		}
+		} catch (err) {}
 	}, []);
 
 	return online ? (
@@ -455,9 +456,7 @@ const ChatWindow = () => {
 			emitMessageAndNotification(matchData, payload, notification);
 			selectChat();
 			setOutgoing('');
-		} catch (err) {
-			console.error(err);
-		}
+		} catch (err) {}
 	};
 	const handleSubmit = (event: React.FormEvent) => {
 		event.preventDefault();
@@ -473,7 +472,6 @@ const ChatWindow = () => {
 			if (response?.data?.messages?.length > 0)
 				setReceived([...response.data.messages]);
 		} catch (err) {
-			console.error(err);
 			setLoadStatus(LoadStatus.ERROR);
 		} finally {
 			setLoadStatus(LoadStatus.IDLE);

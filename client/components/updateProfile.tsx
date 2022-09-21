@@ -1,11 +1,27 @@
-import { useEffect, useState, PointerEvent } from "react";
-import { dummyData } from "./data";
-import { EditProps, GalleryProps } from "../types/types";
-import { authAPI } from "../utilities/api";
-import { AgeRange, ErrorMessage, GenderSelector, GPSCoordinateInput, LookingSelector, TextArea } from "./form";
-import { FileInput, SearchResult } from "./profile";
-import { useUserContext } from "./UserContext";
-import { CitySelector, CountrySelector } from "./location";
+import { useEffect, useState, PointerEvent } from 'react';
+import { dummyData } from './data';
+import { EditProps, GalleryProps } from '../types/types';
+import { authAPI } from '../utilities/api';
+import {
+	AgeRange,
+	ErrorMessage,
+	GenderSelector,
+	GPSCoordinateInput,
+	LookingSelector,
+	TextArea,
+} from './form';
+import { FileInput, SearchResult } from './profile';
+import { useUserContext } from './UserContext';
+import dynamic from 'next/dynamic';
+import { Suspense } from 'react';
+
+// Dynamically imported components
+const CitySelector = dynamic(() => import('./profileLocationSelectors'), {
+	suspense: true,
+});
+const CountrySelector = dynamic(() => import('./profileLocationSelectors'), {
+	suspense: true,
+});
 
 // Profile update page component
 export const UpdateProfile = ({
@@ -146,17 +162,25 @@ export const UpdateProfile = ({
 				<section className="section">
 					<h3 className="title is-3">Edit profile</h3>
 
-					{/* Location */}
-					<CountrySelector
-						profile={profile}
-						setProfile={setProfile}
-						isRequired={true}
-					/>
-					<CitySelector profile={profile} setProfile={setProfile} isRequired={true}/>
+					{/* Location. Components imported lazyly*/}
+					<Suspense fallback={`Loading...`}>
+						<CountrySelector
+							profile={profile}
+							setProfile={setProfile}
+							isRequired={true}
+						/>
+						<CitySelector
+							profile={profile}
+							setProfile={setProfile}
+							isRequired={true}
+						/>
+					</Suspense>
 
 					{/* Gender */}
 					<GenderSelector
-						profile={profile} setProfile={setProfile} isRequired={true}
+						profile={profile}
+						setProfile={setProfile}
+						isRequired={true}
 					/>
 
 					{/* Introduction */}
@@ -218,12 +242,14 @@ export const UpdateProfile = ({
 
 					{/* Looking For */}
 					<LookingSelector
-						profile={profile} setProfile={setProfile} isRequired={true}
+						profile={profile}
+						setProfile={setProfile}
+						isRequired={true}
 					/>
 
 					{/* Age range */}
 					<AgeRange profile={profile} setProfile={setProfile} />
-					
+
 					{/* User coordinate input */}
 					<GPSCoordinateInput
 						profile={profile}

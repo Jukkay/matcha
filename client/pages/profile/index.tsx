@@ -44,9 +44,7 @@ const LoggedIn = () => {
 						JSON.stringify(response.data.profile)
 					);
 				} else updateUserData({ ...userData, profile_exists: false });
-			} catch (err) {
-				console.error(err);
-			} 
+			} catch (err) {} 
 		};
 		getUserProfile();
 		setActivePage(ActivePage.PROFILE)

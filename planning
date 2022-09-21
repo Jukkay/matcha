@@ -367,12 +367,17 @@ V Create liked profiles page
 V Add infinite scroll to own profile page
 V Check why search button doesn't work sometimes (or at all?)
 V Focus to text input on start
+V Fix Error: Abort fetching component for route when quickly pressing navbar Links (doesn't happen on production build)
+V Add missing try catches
+V Remove console.logs from catches
+V Move components using heavy libraries in their own files
+V Import heavy elements dynamically
 
+Fix profile creation not working
 Remove page refresh on message send
 Add infinite scroll to chat window
 
 Figure out why socket middleware stops listeners
-Fix Error: Abort fetching component for route when quickly pressing navbar Links
 Check if it happens in production build also
 Test online status
 Test websockets with multiple users

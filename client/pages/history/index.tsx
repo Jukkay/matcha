@@ -57,7 +57,6 @@ const LoggedIn = () => {
 					setLog(response.data.log);
 				}
 			} catch (err) {
-				console.error(err);
 				setLoadStatus(LoadStatus.ERROR);
 			} finally {
 				setLoadStatus(LoadStatus.IDLE);

@@ -10,7 +10,7 @@ import {
 import { FormInput, Notification, SubmitButton } from '../../components/form';
 import { useNotificationContext } from '../../components/NotificationContext';
 import { useUserContext } from '../../components/UserContext';
-import { ActivePage, EditProps, IProfile, ViewProps } from '../../types/types';
+import { ActivePage } from '../../types/types';
 import { authAPI } from '../../utilities/api';
 
 const NotLoggedIn = () => {
@@ -85,7 +85,7 @@ const LoggedIn = () => {
 			leftIcon: <FaBirthdayCake />,
 			rightIcon: <FaCheck color="green" />,
 			validator: validBirthday,
-            value: values.birthday,
+			value: values.birthday,
 			required: true,
 		},
 		{
@@ -99,7 +99,7 @@ const LoggedIn = () => {
 			leftIcon: <FaUser />,
 			rightIcon: <FaCheck color="green" />,
 			validator: validUsername,
-            value: values.username,
+			value: values.username,
 			required: true,
 		},
 		{
@@ -136,7 +136,7 @@ const LoggedIn = () => {
 			autoComplete: 'email',
 			leftIcon: <FaEnvelope />,
 			rightIcon: <FaCheck color="green" />,
-            value: values.email,
+			value: values.email,
 			validator: validEmail,
 			required: true,
 		},
@@ -150,7 +150,7 @@ const LoggedIn = () => {
 			helper: 'This is the name visible for other users. The name must be between 3 and 32 characters and only letters and numbers and spaces are allowed.',
 			leftIcon: <FaUser />,
 			rightIcon: <FaCheck color="green" />,
-            value: values.name,
+			value: values.name,
 			validator: validName,
 			required: false,
 		},
@@ -165,15 +165,15 @@ const LoggedIn = () => {
 				if (response?.data?.userData) {
 					setValues({
 						...values,
-						birthday: new Date(response.data.userData.birthday).toISOString().substring(0,10),
+						birthday: new Date(response.data.userData.birthday)
+							.toISOString()
+							.substring(0, 10),
 						username: response.data.userData.username,
 						email: response.data.userData.email,
 						name: response.data.userData.name,
 					});
 				}
-			} catch (err) {
-				console.error(err);
-			}
+			} catch (err) {}
 		};
 		getUserData();
 		setActivePage(ActivePage.CONTROL_PANEL);
@@ -264,13 +264,19 @@ const LoggedIn = () => {
 		setValidName(result);
 	}, [values.name]);
 
-    // Form validation
-    useEffect(() => {
-        if (validBirthday && validUsername && validPassword && validEmail && validMatch) {
-        if (values.name && !validName) setValidForm(false);
-        else setValidForm(true);
-        } else setValidForm(false);
-    }, [validBirthday, validUsername, validPassword, validEmail, validMatch]);
+	// Form validation
+	useEffect(() => {
+		if (
+			validBirthday &&
+			validUsername &&
+			validPassword &&
+			validEmail &&
+			validMatch
+		) {
+			if (values.name && !validName) setValidForm(false);
+			else setValidForm(true);
+		} else setValidForm(false);
+	}, [validBirthday, validUsername, validPassword, validEmail, validMatch]);
 
 	// Handle submit
 	const handleSubmit = async (event: React.SyntheticEvent) => {
@@ -299,22 +305,26 @@ const LoggedIn = () => {
 	};
 
 	const deleteUser = async () => {
-		const response = await authAPI.delete(`/user/${profile.user_id}`);
+		try {
+			const response = await authAPI.delete(`/user/${profile.user_id}`);
 			if (response.status === 200) {
 				setDeleted(true);
 				setTimeout(() => {
-					updateUserData({})
+					updateUserData({});
 					setDeleted(false);
 					sessionStorage.removeItem('userData');
 				}, 2000);
 			}
-	}
+		} catch (err) {}
+	};
 	// Component
 	return deleted ? (
 		<section className="section">
 			<div className="box has-text-centered">
 				<section className="section">
-					<h3 className="title is-3">User account and data removed successfully</h3>
+					<h3 className="title is-3">
+						User account and data removed successfully
+					</h3>
 				</section>
 			</div>
 		</section>
@@ -369,10 +379,15 @@ const LoggedIn = () => {
 					/>
 				</section>
 				<section className="section">
-				<p className="block">
-					Caution: Removing account is irreversible and all data related to your account will be removed. If you want to come back you'll have to create a new account and profile.
-				</p>
-					<button className="button is-danger" onClick={deleteUser}>Delete account and user data</button>
+					<p className="block">
+						Caution: Removing account is irreversible and all data
+						related to your account will be removed. If you want to
+						come back you'll have to create a new account and
+						profile.
+					</p>
+					<button className="button is-danger" onClick={deleteUser}>
+						Delete account and user data
+					</button>
 				</section>
 			</div>
 		</section>

@@ -3,7 +3,7 @@ import type { NextPage } from 'next';
 import { useEffect } from 'react';
 import { useUserContext } from '../../components/UserContext';
 
-const Logout: NextPage = (props) => {
+const Logout: NextPage = () => {
 	const {
 		updateAccessToken,
 		updateRefreshToken,
@@ -13,17 +13,19 @@ const Logout: NextPage = (props) => {
 	} = useUserContext();
 
 	useEffect(() => {
-		API.post('/logout/', {
-			user_id: userData.user_id,
-			refreshToken: refreshToken,
-		});
-		updateAccessToken('');
-		updateRefreshToken('');
-		updateUserData({});
-		sessionStorage?.removeItem('accessToken');
-		sessionStorage?.removeItem('refreshToken');
-		sessionStorage?.removeItem('userData');
-		sessionStorage?.removeItem('profile');
+		try {
+			API.post('/logout/', {
+				user_id: userData.user_id,
+				refreshToken: refreshToken,
+			});
+			updateAccessToken('');
+			updateRefreshToken('');
+			updateUserData({});
+			sessionStorage?.removeItem('accessToken');
+			sessionStorage?.removeItem('refreshToken');
+			sessionStorage?.removeItem('userData');
+			sessionStorage?.removeItem('profile');
+		} catch (err) {}
 	}, []);
 
 	return (

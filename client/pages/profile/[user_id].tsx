@@ -90,9 +90,7 @@ const LoggedIn = () => {
 				link: `/profile/${userData.user_id}`,
 			};
 			socket.emit('send_notification', Number(user_id), notification);
-		} catch (err) {
-			console.error(err);
-		}
+		} catch (err) {}
 	};
 
 	const getUserProfile = async () => {
@@ -143,43 +141,44 @@ const LikeButton = ({ profile, setLiked, setMatch }: LikeButtonProps) => {
 	const likeProfile = async () => {
 		const liked = profile.user_id;
 		const liker = userData.user_id;
+		try {
+			const response = await authAPI.post('/like', {
+				liker: liker,
+				liked: liked,
+			});
 
-		const response = await authAPI.post('/like', {
-			liker: liker,
-			liked: liked,
-		});
-
-		if (response.status === 200) {
-			// Emit notification
-			const notification = {
-				sender_id: liker,
-				receiver_id: liked,
-				notification_type: NotificationType.LIKE,
-				notification_text: `Somebody liked you!`,
-				link: `/profile/${liker}`,
-			};
-			socket.emit('send_notification', liked, notification);
-			// Send match notification
-			if (response.data.match) {
-				setMatch(true);
+			if (response.status === 200) {
+				// Emit notification
 				const notification = {
 					sender_id: liker,
 					receiver_id: liked,
-					notification_type: NotificationType.MATCH,
-					notification_text: `You have a new match! Start a conversation`,
+					notification_type: NotificationType.LIKE,
+					notification_text: `Somebody liked you!`,
 					link: `/profile/${liker}`,
 				};
 				socket.emit('send_notification', liked, notification);
-				const notification2 = {
-					sender_id: liker,
-					receiver_id: liker,
-					notification_type: NotificationType.MATCH,
-					notification_text: `You have a new match! Start a conversation`,
-					link: `/profile/${liked}`,
-				};
-				socket.emit('send_notification', liker, notification2);
+				// Send match notification
+				if (response.data.match) {
+					setMatch(true);
+					const notification = {
+						sender_id: liker,
+						receiver_id: liked,
+						notification_type: NotificationType.MATCH,
+						notification_text: `You have a new match! Start a conversation`,
+						link: `/profile/${liker}`,
+					};
+					socket.emit('send_notification', liked, notification);
+					const notification2 = {
+						sender_id: liker,
+						receiver_id: liker,
+						notification_type: NotificationType.MATCH,
+						notification_text: `You have a new match! Start a conversation`,
+						link: `/profile/${liked}`,
+					};
+					socket.emit('send_notification', liker, notification2);
+				}
 			}
-		}
+		} catch (err) {}
 	};
 	const handleClick = () => {
 		setLiked(true);
@@ -207,20 +206,21 @@ const UnlikeButton = ({
 	const unlikeProfile = async () => {
 		const liked = otherUserProfile.user_id;
 		const liker: number = userData.user_id;
+		try {
+			await authAPI.delete(`/like?liker=${liker}&liked=${liked}`, {});
 
-		await authAPI.delete(`/like?liker=${liker}&liked=${liked}`, {});
-		console.log('Removing like');
-
-		// Emit notification
-		const notification = {
-			sender_id: liker,
-			receiver_id: liked,
-			notification_type: NotificationType.UNLIKE,
-			notification_text: `Somebody unliked you!`,
-			link: `/profile/${liker}`,
-		};
-		socket.emit('send_notification', liked, notification);
+			// Emit notification
+			const notification = {
+				sender_id: liker,
+				receiver_id: liked,
+				notification_type: NotificationType.UNLIKE,
+				notification_text: `Somebody unliked you!`,
+				link: `/profile/${liker}`,
+			};
+			socket.emit('send_notification', liked, notification);
+		} catch (err) {}
 	};
+
 	const handleClick = () => {
 		setLiked(false);
 		setMatch(false);
@@ -242,7 +242,7 @@ const UnlikeButton = ({
 const ViewMode = ({ otherUserProfile }: OtherUserViewProps) => {
 	const [liked, setLiked] = useState(otherUserProfile.liked);
 	const [match, setMatch] = useState(false);
-	const { userData } = useUserContext();
+	
 	const closeNotification = () => {
 		setMatch(false);
 	};
