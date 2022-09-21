@@ -1,6 +1,5 @@
 import React, { useState, PointerEvent, useEffect } from 'react';
 import { FaUpload } from 'react-icons/fa';
-import { useSocketContext } from './SocketContext';
 import {
 	ITag,
 	ISearchResult,
@@ -8,7 +7,6 @@ import {
 	EditButtonProps,
 	ProfileViewProps,
 	FileInputProps,
-	UserImagesProps,
 	IProfileCard,
 	OnlineStatusProps,
 } from '../types/types';
@@ -22,7 +20,6 @@ import { Lazy, Navigation, Pagination } from 'swiper';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
-import axios from 'axios';
 import { socket } from './SocketContext';
 import { useInView } from 'react-intersection-observer';
 import { Spinner } from './utilities';

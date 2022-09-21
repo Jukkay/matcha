@@ -1,15 +1,16 @@
 import type { NextPage } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNotificationContext } from '../../components/NotificationContext';
 import { OnlineIndicator } from '../../components/profile';
 import { useUserContext } from '../../components/UserContext';
-import { ErrorBoundary, LoadError, Spinner } from '../../components/utilities';
+import { ErrorFallback, LoadError, Spinner } from '../../components/utilities';
 import { ActivePage, LoadStatus, LogEntry } from '../../types/types';
 import { authAPI } from '../../utilities/api';
 import { convertBirthdayToAge } from '../../utilities/helpers';
 import { useInView } from 'react-intersection-observer';
+import {ErrorBoundary} from 'react-error-boundary'
 
 const NotLoggedIn = () => {
 	return (
@@ -22,12 +23,11 @@ const NotLoggedIn = () => {
 };
 
 const LoggedIn = () => {
-	const { userData, updateUserData, profile, setProfile } = useUserContext();
+	const { userData, profile, setProfile } = useUserContext();
 	const { setActivePage } = useNotificationContext();
 	const [log, setLog] = useState([]);
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
 	const [wasRedirected, setWasRedirected] = useState(false);
-	const isFirstRender = useRef(true);
 	const router = useRouter();
 	const [endIndex, setEndIndex] = useState(9);
 
@@ -189,7 +189,7 @@ export const SearchResultItem = ({ profile }: any) => {
 const History: NextPage = () => {
 	const { accessToken } = useUserContext();
 	return (
-		<ErrorBoundary>
+		<ErrorBoundary FallbackComponent={ErrorFallback} >
 			<div className="columns is-centered">
 				<div className="column is-three-quarters">
 					{accessToken ? <LoggedIn /> : <NotLoggedIn />}

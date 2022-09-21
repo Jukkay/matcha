@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { dummyData } from "../pages/profile/data";
+import { dummyData } from "./data";
 import { EditProps } from "../types/types";
 import { authAPI } from "../utilities/api";
 import { convertBirthdayToAge } from "../utilities/helpers";
-import { AgeRange, CitySelector, CountrySelector, ErrorMessage, GenderSelector, LookingSelector, TextArea } from "./form";
+import { AgeRange, ErrorMessage, GenderSelector, LookingSelector, TextArea } from "./form";
 import { FileInput, SearchResult } from "./profile";
 import { useUserContext } from "./UserContext";
+import { CitySelector, CountrySelector } from "./location";
 
 // Profile creation page component
 export const CreateProfile = ({

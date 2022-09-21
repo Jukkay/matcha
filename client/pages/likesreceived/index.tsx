@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import React, { useState, useEffect, useRef } from 'react';
 import { useNotificationContext } from '../../components/NotificationContext';
 import { useUserContext } from '../../components/UserContext';
-import { ErrorBoundary, LoadError, Spinner } from '../../components/utilities';
+import { ErrorFallback, LoadError, Spinner } from '../../components/utilities';
 import {
 	ActivePage,
 	ILikeProfile,
@@ -13,6 +13,7 @@ import {
 import { authAPI } from '../../utilities/api';
 import { useInView } from 'react-intersection-observer';
 import { LikeProfile } from '../likes';
+import {ErrorBoundary} from 'react-error-boundary'
 
 const NotLoggedIn = () => {
 	return (
@@ -135,7 +136,7 @@ const LoggedIn = () => {
 const LikesReceived: NextPage = () => {
 	const { accessToken } = useUserContext();
 	return (
-		<ErrorBoundary>
+		<ErrorBoundary FallbackComponent={ErrorFallback} >
 			<div className="columns is-centered">
 				<div className="column is-three-quarters">
 					{accessToken ? <LoggedIn /> : <NotLoggedIn />}

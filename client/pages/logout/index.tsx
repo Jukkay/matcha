@@ -1,6 +1,6 @@
 import { API } from '../../utilities/api';
 import type { NextPage } from 'next';
-import { useState, useEffect, useContext } from 'react';
+import { useEffect } from 'react';
 import { useUserContext } from '../../components/UserContext';
 
 const Logout: NextPage = (props) => {

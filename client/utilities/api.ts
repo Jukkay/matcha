@@ -39,7 +39,6 @@ const handleResponse = (response: AxiosResponse): AxiosResponse => {
 
 // Intercept reponse errors and update access token if 401
 const handleResponseError = async (error: AxiosError) => {
-	try {
 		const config = error.config as RetryRequest;
 		const refreshToken = sessionStorage.getItem('refreshToken');
 		// Refresh access token
@@ -64,9 +63,6 @@ const handleResponseError = async (error: AxiosError) => {
 			return API(config);
 		}
 		return Promise.reject(error);
-	} catch (err) {
-		return Promise.reject(err);
-	}
 };
 
 // Add interceptors to axios instance

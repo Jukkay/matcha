@@ -21,9 +21,8 @@ import {
 	convertBirthdayToAge,
 } from '../utilities/helpers';
 import { moreCommonTagsFirst } from '../utilities/sort';
-import { Country, City } from 'country-state-city';
 import { DistanceRange, ErrorMessage, FameratingRange } from './form';
-import { dummyData } from '../pages/profile/data';
+import { dummyData } from './data';
 import { LoadError, Spinner } from './utilities';
 import { FaFilter } from 'react-icons/fa';
 import { BiSortAlt2 } from 'react-icons/bi';
@@ -31,6 +30,7 @@ import { IconContext } from 'react-icons';
 import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
 import { useInView } from 'react-intersection-observer';
+import { CitySearchSelector, CountrySearchSelector } from './location';
 
 export const ProfileSearch = ({
 	searchParams,
@@ -512,102 +512,6 @@ export const SortSelector = ({ sort, setSort }: SortProps) => {
 					</option>
 					<option value={SortType.REVERSE_FAMERATING}>
 						Famerating low to high
-					</option>
-				</select>
-			</div>
-		</div>
-	);
-};
-
-export const CountrySearchSelector = ({
-	searchParams,
-	setSearchParams,
-}: SearchParamsProps) => {
-	return (
-		<div className="block">
-			<label htmlFor="country" className="label">
-				Country
-			</label>
-			<div className="select is-primary">
-				<select
-					id="country"
-					name="country"
-					value={searchParams.country}
-					onChange={(event) =>
-						setSearchParams({
-							...searchParams,
-							country: event.target.value,
-						})
-					}
-				>
-					<option value={''}>Choose a country</option>
-					{Country.getAllCountries().map((country, index) => (
-						<option
-							key={`${country.name}${index}`}
-							value={country.isoCode}
-						>
-							{country.name}
-						</option>
-					))}
-				</select>
-			</div>
-		</div>
-	);
-};
-
-export const CitySearchSelector = ({
-	searchParams,
-	setSearchParams,
-}: SearchParamsProps) => {
-	return searchParams.country ? (
-		<div className="block">
-			<label htmlFor="city" className="label">
-				City
-			</label>
-			<div className="select is-primary">
-				<select
-					id="city"
-					name="city"
-					value={searchParams.city}
-					onChange={(event) =>
-						setSearchParams({
-							...searchParams,
-							city: event.target.value,
-						})
-					}
-				>
-					<option value={''}>Choose a city</option>
-					{City.getCitiesOfCountry(searchParams.country)?.map(
-						(city, index) => (
-							<option
-								key={`${city.name}${index}`}
-								value={city.name}
-							>
-								{city.name}
-							</option>
-						)
-					)}
-				</select>
-			</div>
-		</div>
-	) : (
-		<div className="block">
-			<label htmlFor="county" className="label">
-				City
-			</label>
-			<div className="select is-primary disabled">
-				<select
-					id="city"
-					value={searchParams?.city}
-					onChange={(event) =>
-						setSearchParams({
-							...searchParams,
-							city: event.target.value,
-						})
-					}
-				>
-					<option value={''} disabled>
-						Choose a country first
 					</option>
 				</select>
 			</div>

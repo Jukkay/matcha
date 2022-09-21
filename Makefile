@@ -21,6 +21,9 @@ down:
 clean:
 	docker-compose down --remove-orphans
 
+build:
+	docker-compose run --rm client "pnpm build"
+
 install-client:
 	docker-compose run --rm client "pnpm install"
 

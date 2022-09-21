@@ -12,7 +12,7 @@ import {
 	IResultsProfile,
 	ActivePage,
 } from '../../types/types';
-import { convertBirthdayToAge } from '../../utilities/helpers';
+import { convertBirthdayToAge, handleRouteError } from '../../utilities/helpers';
 import {
 	farFirst,
 	highFameratingFirst,
@@ -23,7 +23,8 @@ import {
 	oldFirst,
 	youngFirst,
 } from '../../utilities/sort';
-import { ErrorBoundary } from '../../components/utilities';
+import {ErrorBoundary} from 'react-error-boundary'
+import { ErrorFallback } from '../../components/utilities';
 
 const NotLoggedIn = () => {
 	return (
@@ -60,6 +61,17 @@ const LoggedIn = () => {
 	);
 	const [wasRedirected, setWasRedirected] = useState(false);
 	const router = useRouter();
+
+	// Router error event listener and handler
+	useEffect(() => {
+		router.events.on('routeChangeError', handleRouteError)
+	
+		// If the component is unmounted, unsubscribe
+		// from the event with the `off` method:
+		return () => {
+		  router.events.off('routeChangeError', handleRouteError)
+		}
+	  }, [])
 
 	// Redirect if user has no profile
 	useEffect(() => {
@@ -136,7 +148,7 @@ const LoggedIn = () => {
 const Search: NextPage = () => {
 	const { accessToken } = useUserContext();
 	return (
-		<ErrorBoundary>
+		<ErrorBoundary FallbackComponent={ErrorFallback}>
 		<div className="columns is-centered">
 			<div className="column is-three-quarters mt-6 pt-6">
 				{accessToken ? <LoggedIn /> : <NotLoggedIn />}

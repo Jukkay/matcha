@@ -1,5 +1,5 @@
 import type { NextPage } from "next";
-import react, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Notification } from "../../components/form";
 import { API } from "../../utilities/api";
 import { useRouter } from "next/router";

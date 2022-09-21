@@ -94,3 +94,9 @@ export const countCommonTags = (profileTags: {}, ownTags: {}) => {
 export const createSQLDatetimeString = () => {
 	return new Date().toISOString().slice(0, 19).replace('T', ' ')
 }
+
+export const handleRouteError = (err: any, url: any) => {
+	if (err.cancelled) {
+        console.log(`Route to ${url} was cancelled!`)
+    }
+}

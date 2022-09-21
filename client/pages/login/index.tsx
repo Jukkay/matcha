@@ -136,8 +136,11 @@ const Login: NextPage = () => {
 	
 	const handleLogin = async() => {
 
+		const controller = new AbortController();
 		try {
-			const response = await API.post(`login/`, values);
+			const response = await API.post(`login/`, values, {
+				signal: controller.signal
+			});
 			if (response?.status === 200) {
 				if (response.data?.auth !== true) {
 					throw new Error('Invalid server response');
@@ -180,6 +183,7 @@ const Login: NextPage = () => {
 			}
 		} finally {
 			setLoading(false);
+			controller.abort();
 		}
 	}
 

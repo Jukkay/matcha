@@ -5,7 +5,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNotificationContext } from '../../components/NotificationContext';
 import { OnlineIndicator } from '../../components/profile';
 import { useUserContext } from '../../components/UserContext';
-import { ErrorBoundary, LoadError, Spinner } from '../../components/utilities';
+import { ErrorFallback, LoadError, Spinner } from '../../components/utilities';
 import {
 	ActivePage,
 	ILikeProfile,
@@ -13,7 +13,8 @@ import {
 	NotificationType,
 } from '../../types/types';
 import { authAPI } from '../../utilities/api';
-import { convertBirthdayToAge, reformatDate } from '../../utilities/helpers';
+import { convertBirthdayToAge} from '../../utilities/helpers';
+import {ErrorBoundary} from 'react-error-boundary'
 
 const NotLoggedIn = () => {
 	return (
@@ -222,7 +223,7 @@ export const LikeProfile = ({ profile }: any) => {
 const Likes: NextPage = () => {
 	const { accessToken } = useUserContext();
 	return (
-		<ErrorBoundary>
+		<ErrorBoundary FallbackComponent={ErrorFallback} >
 			<div className="columns is-centered">
 				<div className="column is-three-quarters">
 					{accessToken ? <LoggedIn /> : <NotLoggedIn />}
