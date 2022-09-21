@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import type { NextPage } from 'next';
 import React, { useState, useEffect, useRef } from 'react';
-import { Gallery, OnlineIndicator } from '../../components/profile';
+import { Gallery } from '../../components/profile';
 import { useUserContext } from '../../components/UserContext';
 import {
 	ActivePage,
@@ -16,7 +16,6 @@ import { authAPI } from '../../utilities/api';
 import { FcLike, FcDislike } from 'react-icons/fc';
 import {
 	convertBirthdayToAge,
-	distanceBetweenPoints,
 	reformatDateTime,
 } from '../../utilities/helpers';
 import { useNotificationContext } from '../../components/NotificationContext';
@@ -65,20 +64,15 @@ const LoggedIn = () => {
 	const [profileExists, setProfileExists] = useState(false);
 	const socket = useSocketContext();
 	const [wasRedirected, setWasRedirected] = useState(false);
-	const isFirstRender = useRef(true)
 	const router = useRouter();
 
 	// Redirect if user has no profile
 	useEffect(() => {
-		if (isFirstRender.current) {
-			isFirstRender.current = false;
-			return
-		}
 		if (wasRedirected || userData.profile_exists) return;
 		setWasRedirected(true);
-    	router.replace('/profile')
+		router.replace('/profile');
 	}, [userData.profile_exists]);
-	
+
 	const logVisit = async () => {
 		try {
 			const { user_id } = router.query;
@@ -129,15 +123,12 @@ const LoggedIn = () => {
 		setActivePage(ActivePage.OTHER_PROFILE);
 	}, [router.isReady]);
 
-	if (loadStatus == LoadStatus.LOADING)
-		return <Spinner />
+	if (loadStatus == LoadStatus.LOADING) return <Spinner />;
 	if (loadStatus == LoadStatus.ERROR)
-		return <LoadError text="Error loading profile" />
-		
+		return <LoadError text="Error loading profile" />;
+
 	return profileExists ? (
-		<ViewMode
-			otherUserProfile={otherUserProfile}
-		/>
+		<ViewMode otherUserProfile={otherUserProfile} />
 	) : (
 		<section className="section has-text-centered">
 			<h3 className="title is-3">No profile found.</h3>
@@ -145,11 +136,7 @@ const LoggedIn = () => {
 	);
 };
 
-const LikeButton = ({
-	profile,
-	setLiked,
-	setMatch
-}: LikeButtonProps) => {
+const LikeButton = ({ profile, setLiked, setMatch }: LikeButtonProps) => {
 	const { userData } = useUserContext();
 	const socket = useSocketContext();
 
@@ -174,7 +161,7 @@ const LikeButton = ({
 			socket.emit('send_notification', liked, notification);
 			// Send match notification
 			if (response.data.match) {
-				setMatch(true)
+				setMatch(true);
 				const notification = {
 					sender_id: liker,
 					receiver_id: liked,
@@ -195,7 +182,7 @@ const LikeButton = ({
 		}
 	};
 	const handleClick = () => {
-		setLiked(true)
+		setLiked(true);
 		likeProfile();
 	};
 
@@ -212,7 +199,7 @@ const LikeButton = ({
 const UnlikeButton = ({
 	otherUserProfile,
 	setLiked,
-	setMatch
+	setMatch,
 }: UnlikeButtonProps) => {
 	const { userData } = useUserContext();
 	const socket = useSocketContext();
@@ -221,10 +208,7 @@ const UnlikeButton = ({
 		const liked = otherUserProfile.user_id;
 		const liker: number = userData.user_id;
 
-		await authAPI.delete(
-			`/like?liker=${liker}&liked=${liked}`,
-			{}
-		);
+		await authAPI.delete(`/like?liker=${liker}&liked=${liked}`, {});
 		console.log('Removing like');
 
 		// Emit notification
@@ -238,12 +222,15 @@ const UnlikeButton = ({
 		socket.emit('send_notification', liked, notification);
 	};
 	const handleClick = () => {
-		setLiked(false)
+		setLiked(false);
 		setMatch(false);
 		unlikeProfile();
 	};
 	return (
-		<button className="button is-medium has-background-primary-light" onClick={handleClick}>
+		<button
+			className="button is-medium has-background-primary-light"
+			onClick={handleClick}
+		>
 			<span className="icon is-medium">
 				<FcDislike />
 			</span>
@@ -252,9 +239,7 @@ const UnlikeButton = ({
 	);
 };
 
-const ViewMode = ({
-	otherUserProfile,
-}: OtherUserViewProps) => {
+const ViewMode = ({ otherUserProfile }: OtherUserViewProps) => {
 	const [liked, setLiked] = useState(otherUserProfile.liked);
 	const [match, setMatch] = useState(false);
 	const { userData } = useUserContext();
@@ -273,7 +258,8 @@ const ViewMode = ({
 				</div>
 				<div className="block">
 					<span className="has-text-weight-semibold mr-3">Age:</span>
-					{otherUserProfile.birthday && convertBirthdayToAge(otherUserProfile.birthday)}
+					{otherUserProfile.birthday &&
+						convertBirthdayToAge(otherUserProfile.birthday)}
 				</div>
 				<div className="block">
 					<span className="has-text-weight-semibold mr-3">

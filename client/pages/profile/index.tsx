@@ -8,7 +8,7 @@ import {
 } from '../../components/profile';
 import { UpdateProfile } from '../../components/updateProfile';
 import { useUserContext } from '../../components/UserContext';
-import { ActivePage, EditProps, IProfile, ViewProps } from '../../types/types';
+import { ActivePage, EditProps, ViewProps } from '../../types/types';
 import { authAPI } from '../../utilities/api';
 
 const NotLoggedIn = () => {

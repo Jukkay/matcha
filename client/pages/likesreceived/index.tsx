@@ -51,23 +51,17 @@ const LoggedIn = () => {
 
 	// Redirect if user has no profile
 	useEffect(() => {
-		if (isFirstRender.current) {
-			isFirstRender.current = false;
-			return;
-		}
 		if (wasRedirected || userData.profile_exists) return;
 		setWasRedirected(true);
 		router.replace('/profile');
 	}, [userData.profile_exists]);
 
-
-    const getLikerProfiles = async () => {
+	const getLikerProfiles = async () => {
 		let response = await authAPI.get(`/like/${userData.user_id}`);
 		if (response.data.profiles.length > 0) {
 			setLikerProfiles(response.data.profiles);
 		}
 	};
-
 
 	const markLikeNotificationsRead = async () => {
 		const response = await authAPI.patch('/notifications', {
@@ -111,17 +105,14 @@ const LoggedIn = () => {
 	if (loadStatus == LoadStatus.ERROR)
 		return <LoadError text="Error loading likes" />;
 
-	return (
-		likerProfiles.length > 0 ? (
+	return likerProfiles.length > 0 ? (
 		<section className="section has-text-centered">
 			<h3 className="title is-3">They liked your profile:</h3>
 			<div className="block">
-				{likerProfiles
-						.slice(0, endIndex)
-						.map((liker, index) => (
-							<LikeProfile key={index} profile={liker} />
-						))}
-                {endIndex < likerProfiles.length ? (
+				{likerProfiles.slice(0, endIndex).map((liker, index) => (
+					<LikeProfile key={index} profile={liker} />
+				))}
+				{endIndex < likerProfiles.length ? (
 					<div ref={ref}>
 						<Spinner />
 					</div>
@@ -133,13 +124,12 @@ const LoggedIn = () => {
 					</section>
 				)}
 			</div>
-			
 		</section>
 	) : (
 		<section className="section has-text-centered">
 			<h3 className="title is-3">No likes to show yet</h3>
 		</section>
-	))
+	);
 };
 
 const LikesReceived: NextPage = () => {

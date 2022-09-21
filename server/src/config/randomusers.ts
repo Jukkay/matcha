@@ -113,8 +113,8 @@ const createProfile = async (data: any) => {
 			[filenames]
 		);
 		await SQLConnect.execute(
-			'UPDATE profiles SET online=?, last_login=now() WHERE user_id = ?',
-			[(Math.random() < 0.5), user_id]
+			'UPDATE profiles SET last_login=now() WHERE user_id = ?',
+			[user_id]
 		);
 	}
 	console.log('Profiles created');

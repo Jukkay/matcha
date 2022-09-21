@@ -10,19 +10,15 @@ import Link from 'next/link';
 const LoginSuccess = () => {
 	const { setProfile, userData, updateUserData } = useUserContext();
 	const [wasRedirected, setWasRedirected] = useState(false);
-	const isFirstRender = useRef(true)
 	const router = useRouter();
 
 	// Redirect if user has no profile
 	useEffect(() => {
-		if (isFirstRender.current) {
-			isFirstRender.current = false;
-			return
-		}
-		if (wasRedirected) return;
+		if (wasRedirected || userData.profile_exists) return;
 		setWasRedirected(true);
 		const path = userData.profile_exists ? '/' : '/profile'
-    	setTimeout(() => router.replace(path), 2000);
+    	const timer = setTimeout(() => router.replace(path), 2000);
+		return () => clearTimeout(timer)
 	}, [userData.profile_exists]);
 
 	useEffect(() => {
@@ -72,14 +68,9 @@ const Login: NextPage = () => {
 	const [notification, setNotification] = useState(false);
 	const [notificationText, setNotificationText] = useState('');
 
-	// Router for redirect after login
-	const router = useRouter();
 	// Get user data from context
 	const {
 		updateUserData,
-		userData,
-		accessToken,
-		refreshToken,
 		updateAccessToken,
 		updateRefreshToken,
 	} = useUserContext();
@@ -142,17 +133,8 @@ const Login: NextPage = () => {
 			setValidForm(true);
 		} else setValidForm(false);
 	}, [values.username, values.password]);
-
-	// Handle submit
-	const handleSubmit = async (event: React.SyntheticEvent) => {
-		event.preventDefault();
-		setLoading(true);
-		setErrors({
-			username: false,
-			password: false,
-			generic: false,
-			server: false,
-		});
+	
+	const handleLogin = async() => {
 
 		try {
 			const response = await API.post(`login/`, values);
@@ -199,6 +181,18 @@ const Login: NextPage = () => {
 		} finally {
 			setLoading(false);
 		}
+	}
+
+	const handleSubmit = (event: React.SyntheticEvent) => {
+		event.preventDefault();
+		setLoading(true);
+		setErrors({
+			username: false,
+			password: false,
+			generic: false,
+			server: false,
+		});
+		handleLogin()
 	};
 
 	return success ? (

@@ -6,7 +6,6 @@ import { FiMenu } from 'react-icons/fi';
 import { BsFillChatFill } from 'react-icons/bs';
 import { authAPI } from '../utilities/api';
 import { useUserContext } from './UserContext';
-import { useSocketContext } from './SocketContext';
 import { useNotificationContext } from './NotificationContext';
 import { INotification, LikeProp, NotificationType } from '../types/types';
 import axios from 'axios';
@@ -21,12 +20,16 @@ const LoggedOutControls = () => {
 			</div>
 			<div className="is-flex is-justify-content-space-between fullwidth is-flex-wrap-nowrap">
 				<div className="is-flex is-justify-content-end is-flex-wrap-nowrap is-align-items-center fullwidth buttons mr-6">
-					<Link href="/signup">
-						<a className="button is-primary">Sign up</a>
-					</Link>
-					<Link href="/login">
-						<a className="button">Log in</a>
-					</Link>
+					<ErrorBoundary>
+						<Link href="/signup">
+							<a className="button is-primary">Sign up</a>
+						</Link>
+					</ErrorBoundary>
+					<ErrorBoundary>
+						<Link href="/login">
+							<a className="button">Log in</a>
+						</Link>
+					</ErrorBoundary>
 				</div>
 			</div>
 		</div>
@@ -35,13 +38,15 @@ const LoggedOutControls = () => {
 
 const Logo = () => {
 	return (
-		<Link href="/">
-			<a className="navbar-item pt-3">
-				<span className="icon is-medium">
-					<FaHeart />
-				</span>
-			</a>
-		</Link>
+		<ErrorBoundary>
+			<Link href="/">
+				<a className="navbar-item pt-3">
+					<span className="icon is-medium">
+						<FaHeart />
+					</span>
+				</a>
+			</Link>
+		</ErrorBoundary>
 	);
 };
 const LoggedInControls = () => {

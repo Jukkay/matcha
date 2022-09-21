@@ -39,10 +39,6 @@ const LoggedIn = () => {
 
 	// Redirect if user has no profile
 	useEffect(() => {
-		if (isFirstRender.current) {
-			isFirstRender.current = false;
-			return;
-		}
 		if (wasRedirected || userData.profile_exists) return;
 		setWasRedirected(true);
 		router.replace('/profile');
@@ -414,7 +410,7 @@ const ChatWindow = () => {
 	useEffect(() => {
 		if (inView) {
 			setStartIndex((startIndex) => startIndex - 25);
-			console.log('useEffect ran. StartIndex changed.')
+			console.log('useEffect ran. StartIndex changed.');
 		}
 	}, [inView]);
 
@@ -436,7 +432,7 @@ const ChatWindow = () => {
 		socket.emit('send_message', matchData.match_id, payload);
 		socket.emit('send_notification', matchData.receiver_id, notification);
 	};
-	const sendMessage = async() => {
+	const sendMessage = async () => {
 		if (outgoing.length < 1) return;
 		try {
 			setLoadStatus(LoadStatus.LOADING);
@@ -462,11 +458,10 @@ const ChatWindow = () => {
 		} catch (err) {
 			console.error(err);
 		}
-	}
+	};
 	const handleSubmit = (event: React.FormEvent) => {
 		event.preventDefault();
 		sendMessage();
-		
 	};
 	const selectChat = async () => {
 		try {
@@ -546,7 +541,10 @@ const ChatWindow = () => {
 							/>
 						</div>
 						<div className="control">
-							<button className="button is-primary mr-6" type="submit">
+							<button
+								className="button is-primary mr-6"
+								type="submit"
+							>
 								<span className="icon">
 									<IoMdSend />
 								</span>

@@ -43,10 +43,6 @@ const LoggedIn = () => {
 	
 	// Redirect if user has no profile
 	useEffect(() => {
-		if (isFirstRender.current) {
-			isFirstRender.current = false;
-			return;
-		}
 		if (wasRedirected || userData.profile_exists) return;
 		setWasRedirected(true);
 		router.replace('/profile');
