@@ -3,7 +3,6 @@ import { getSecret } from 'docker-secret';
 import { IAccesstoken, IEmailToken } from '../interfaces/token';
 import { execute } from '../utilities/SQLConnect';
 import { signAccessToken, verifyJWT } from '../utilities/promisifyJWT';
-const tokenList = require('../index').tokenList;
 
 export const verifyEmailToken = async (req: Request, res: Response) => {
 	try {
@@ -112,7 +111,7 @@ export const decodeUserFromAccesstoken = async (req: Request) => {
     const accessToken = req.headers.authorization?.split(' ')[1]
     const server_token = getSecret('server_token');
     if (!accessToken || !server_token) return
-		const decoded = await verifyJWT(accessToken, server_token);
+	const decoded = await verifyJWT(accessToken, server_token);
     if (!decoded) return 
     const { user_id } = decoded as IAccesstoken;
     return user_id

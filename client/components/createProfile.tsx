@@ -8,12 +8,13 @@ import { FileInput, SearchResult } from "./profile";
 import { useUserContext } from "./UserContext";
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
+import { Spinner } from "./utilities";
 
 // Dynamically imported components
-const CitySelector = dynamic(() => import('./profileLocationSelectors'), {
+const CitySelector = dynamic(() => import('./profileCitySelector'), {
 	suspense: true,
 });
-const CountrySelector = dynamic(() => import('./profileLocationSelectors'), {
+const CountrySelector = dynamic(() => import('./profileCountrySelector'), {
 	suspense: true,
 });
 
@@ -94,8 +95,7 @@ export const CreateProfile = ({
 				return;
 			}
 			// Get profile picture filename
-			const imageNumber = profile.profile_image || '0';
-			payload.profile_image = photoUpload.data.filenames[imageNumber];
+			payload.profile_image = profile.profile_image === 'default.png' ? photoUpload.data.filenames[0] : profile.profile_image
 			// Add other information user can't change
 			payload.birthday = userData.birthday;
 			payload.name = userData.name;
@@ -134,8 +134,8 @@ export const CreateProfile = ({
 				<section className="section">
 					<h3 className="title is-3">Create new profile</h3>
 
-					{/* Location. Components imported lazyly*/}
-					<Suspense fallback={`Loading...`}>
+					{/* Location. Components imported dynamically*/}
+					<Suspense fallback={<Spinner />}>
 						<CountrySelector
 							profile={profile}
 							setProfile={setProfile}

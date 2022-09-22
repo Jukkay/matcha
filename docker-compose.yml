@@ -1,22 +1,22 @@
 version: "3.8"
 services:
   client:
-    build: ./client/
     container_name: 'matcha_client'
+    build: ./client/
     volumes:
       - "./client:/client"
     working_dir: "/client"
     entrypoint: "/bin/bash -c"
     command:
-      - "pnpm start"
+      - "pnpm dev"
     ports:
       - 3000:3000
     environment:
         API_URL: http://localhost:4000
 
   server:
-    build: ./server/
     container_name: 'matcha_server'
+    build: ./server/
     depends_on:
       - mariadb
     volumes:

@@ -36,16 +36,6 @@ const LoggedIn = () => {
 		router.replace('/profile');
 	}, [userData.profile_exists]);
 
-	useEffect(() => {
-		if ('geolocation' in navigator) {
-			navigator.geolocation.getCurrentPosition(
-				(position) => setProfile({ ...profile, geolocation: position }),
-				(error) =>
-					console.log('Geolocation not permitted by user.', error)
-			);
-		}
-	}, []);
-
 	const searchDatabase = async () => {
 		const query = {
 			gender: profile.gender,

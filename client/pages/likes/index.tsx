@@ -90,16 +90,6 @@ const LoggedIn = () => {
 		setActivePage(ActivePage.LIKES);
 	}, []);
 
-	useEffect(() => {
-		if ('geolocation' in navigator) {
-			navigator.geolocation.getCurrentPosition(
-				(position) => setProfile({ ...profile, geolocation: position }),
-				(error) =>
-					console.log('Geolocation not permitted by user.', error)
-			);
-		}
-	}, []);
-
 	if (loadStatus == LoadStatus.LOADING) return <Spinner />;
 	if (loadStatus == LoadStatus.ERROR)
 		return <LoadError text="Error loading likes" />;

@@ -372,11 +372,16 @@ V Add missing try catches
 V Remove console.logs from catches
 V Move components using heavy libraries in their own files
 V Import heavy elements dynamically
+V Remove extra fields from user table
+V Refactor dynamically imported elements to their own files
+V Fix profile creation not working
+V Fix profile image default selection
+V Why doesn't search button work again?
+V Remove page refresh on message send
+V Add infinite scroll to chat window
 
-Fix profile creation not working
-Remove page refresh on message send
-Add infinite scroll to chat window
-
+Fix online status
+Make sure gps and ip location works
 Figure out why socket middleware stops listeners
 Check if it happens in production build also
 Test online status

@@ -44,7 +44,5 @@ export const locateIP = async (user_id: string, req: Request) => {
 	console.log(ip);
 	const ip_location = await geoip.lookup(ip);
 	console.log(ip_location);
-	const sql = 'UPDATE profiles SET ip_location = ? WHERE user_id = ?;';
-	await execute(sql, [JSON.stringify(ip_location), user_id]);
 	return ip_location;
 };

@@ -1,5 +1,6 @@
 CREATE DATABASE IF NOT EXISTS matcha;
 USE matcha;
+
 CREATE TABLE IF NOT EXISTS users(
 	`user_id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 	birthday DATE NOT NULL,
@@ -7,11 +8,6 @@ CREATE TABLE IF NOT EXISTS users(
 	`password` VARCHAR(255) NOT NULL,
 	`name` VARCHAR(255) DEFAULT username,
 	email VARCHAR(320) NOT NULL UNIQUE,
-	biography VARCHAR(4096),
-	gender VARCHAR(255),
-	gender_preference VARCHAR(255),
-	city VARCHAR(255),
-	country VARCHAR(255),
 	validated BOOLEAN DEFAULT FALSE,
 	profile_exists BOOLEAN DEFAULT FALSE,
 	password_reset_key VARCHAR(255),
@@ -19,6 +15,7 @@ CREATE TABLE IF NOT EXISTS users(
 	email_notification BOOLEAN DEFAULT TRUE,
 	PRIMARY KEY (`user_id`)
 );
+
 CREATE TABLE IF NOT EXISTS profiles(
 	profile_id BIGINT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 	`user_id` INT(10) UNSIGNED NOT NULL UNIQUE,

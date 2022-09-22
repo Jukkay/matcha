@@ -400,7 +400,7 @@ export const FileInput = ({ files, setFiles }: FileInputProps) => {
 };
 
 export const Thumbnails = ({ preview, setPreview }: IThumbnails) => {
-	const { userData, updateUserData, profile, setProfile } = useUserContext();
+	const { profile, setProfile } = useUserContext();
 	// Remove uploaded image
 	const handleRemove = (event: PointerEvent<HTMLButtonElement>) => {
 		event.preventDefault();

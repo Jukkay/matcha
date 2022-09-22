@@ -88,17 +88,6 @@ const LoggedIn = () => {
 			looking: profile.looking,
 		})
 	}, [profile.gender, profile.looking])
-	
-	useEffect(() => {
-		if ('geolocation' in navigator) {
-			navigator.geolocation.getCurrentPosition(
-				(position) => setProfile({ ...profile, geolocation: position }),
-				(error) =>
-					console.log('Geolocation not permitted by user.', error)
-			);
-		}
-		setActivePage(ActivePage.DISCOVER);
-	}, []);
 
 	useEffect(() => {
 		if (sort === SortType.DISTANCE)

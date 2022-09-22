@@ -13,7 +13,7 @@ const checkJWT = (req: Request, res: Response, next: NextFunction) => {
 				message: 'No token provided'
 			})
 		}
-		jwt.verify(token, server_token, (err, decoded) => {
+		jwt.verify(token, server_token, (err) => {
 			if (err) {
 				return res.status(401).json({
 					message: 'Unauthorized'
@@ -23,8 +23,8 @@ const checkJWT = (req: Request, res: Response, next: NextFunction) => {
 		})
 	} catch (err) {
 		console.error(err)
-		return res.status(401).json({
-			message: 'Unauthorized'
+		return res.status(500).json({
+			message: 'Cannot verify token'
 		})
 	}
 

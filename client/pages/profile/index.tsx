@@ -50,20 +50,6 @@ const LoggedIn = () => {
 		setActivePage(ActivePage.PROFILE)
 	}, []);
 
-	// Ask for location permission and locate user
-	useEffect(() => {
-		if ('geolocation' in navigator) {
-			navigator.geolocation.getCurrentPosition(
-				(position) => {
-					if (position) {
-						setProfile({...profile, latitude: position.coords.latitude, longitude: position.coords.longitude})
-						console.log('geolocation', position)
-					}
-					}, 
-				(error) => console.log('Geolocation not permitted by user.', error))
-		}
-	}, []);
-
 	return editMode ? (
 		<EditMode
 			setEditMode={setEditMode}

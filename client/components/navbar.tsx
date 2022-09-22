@@ -49,7 +49,7 @@ const Logo = () => {
 	);
 };
 const LoggedInControls = () => {
-	const { refreshToken, userData, updateAccessToken } = useUserContext();
+	const { refreshToken, userData, updateAccessToken, profile, setProfile } = useUserContext();
 	const {
 		activeChatUser,
 		activePage,
@@ -62,7 +62,20 @@ const LoggedInControls = () => {
 		messageCount,
 		likeCount,
 	} = useNotificationContext();
-	// const socket = useSocketContext();
+	
+	// Ask for location permission and locate user
+	useEffect(() => {
+		if ('geolocation' in navigator) {
+			navigator.geolocation.getCurrentPosition(
+				(position) => {
+					if (position) {
+						setProfile({...profile, latitude: position.coords.latitude, longitude: position.coords.longitude})
+						console.log('geolocation', position)
+					}
+					}, 
+				(error) => console.log('Geolocation not permitted by user.', error))
+		}
+	}, []);
 
 	const getNotifications = async () => {
 		try {

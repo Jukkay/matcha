@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { OkPacket, RowDataPacket } from 'mysql';
 import { execute } from '../utilities/SQLConnect';
 import { decodeUserFromAccesstoken } from './token';
 
@@ -34,10 +33,8 @@ const getAllMatches = async (req: Request, res: Response) => {
 				SELECT
 					matches.*,
 					p1.profile_image AS image1,
-					p1.online,
 					p1.name AS name1,
 					p2.profile_image AS image2,
-					p2.online,
 					p2.name AS name2
 				FROM
 					matches

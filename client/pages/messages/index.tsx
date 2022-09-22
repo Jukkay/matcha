@@ -44,13 +44,6 @@ const LoggedIn = () => {
 	}, [userData.profile_exists]);
 
 	useEffect(() => {
-		if ('geolocation' in navigator) {
-			navigator.geolocation.getCurrentPosition(
-				(position) => setProfile({ ...profile, geolocation: position }),
-				(error) =>
-					console.log('Geolocation not permitted by user.', error)
-			);
-		}
 		markMessageNotificationsRead();
 	}, []);
 
@@ -310,6 +303,7 @@ const OnlineIndicator = ({ user_id }: OnlineStatusProps) => {
 	useEffect(() => {
 		try {
 			socket.on('online_response', (data) => {
+				console.log('online response', data)
 				if (data.queried_id === user_id) setOnline(data.online);
 			});
 			socket.emit('online_query', user_id);
@@ -402,7 +396,7 @@ const ChatWindow = () => {
 	const { matchData } = useNotificationContext();
 	const windowBottom: MutableRefObject<any> = useRef(null);
 	const { profile } = useUserContext();
-	const [startIndex, setStartIndex] = useState(received.length - 25);
+	const [startIndex, setStartIndex] = useState(received.length);
 
 	// Infinite scroll hooks
 	const { ref, inView } = useInView({
@@ -410,10 +404,14 @@ const ChatWindow = () => {
 	});
 	useEffect(() => {
 		if (inView) {
-			setStartIndex((startIndex) => startIndex - 25);
-			console.log('useEffect ran. StartIndex changed.');
+			setStartIndex((startIndex) => startIndex - 10 > 0 ? startIndex - 10 : 0);
 		}
 	}, [inView]);
+
+
+	useEffect(() => {
+			console.log('StartIndex set.', startIndex);
+	}, [startIndex]);
 
 	const onChange = (event: React.ChangeEvent<HTMLInputElement>) =>
 		setOutgoing(event.target.value);
@@ -423,6 +421,7 @@ const ChatWindow = () => {
 	};
 	useEffect(() => {
 		scrollToBottom();
+		setStartIndex(received.length - 10 > 0 ? received.length - 10 : 0)
 	}, [received]);
 
 	const emitMessageAndNotification = (
@@ -458,6 +457,7 @@ const ChatWindow = () => {
 			setOutgoing('');
 		} catch (err) {}
 	};
+
 	const handleSubmit = (event: React.FormEvent) => {
 		event.preventDefault();
 		sendMessage();
@@ -503,9 +503,10 @@ const ChatWindow = () => {
 			<div className="is-flex is-flex-direction-column mt-6 chat-window">
 				{startIndex > 0 ? (
 					<div ref={ref}>
-						<Spinner />
 					</div>
-				) : received.length > 0 ? null : (
+				) : received.length > 0 ? <section className="section has-text-centered">
+				<h5 className="title is-5">No more messages</h5>
+			</section> : (
 					<section className="section has-text-centered">
 						<h3 className="title is-3">No messages to show</h3>
 					</section>

@@ -4,8 +4,6 @@ import bcryptjs from 'bcryptjs';
 import { signAccessToken, signRefreshToken } from '../utilities/promisifyJWT';
 import { sendEmailVerification } from '../utilities/sendEmailVerification';
 import {
-	convertBirthdayToAge,
-	locateIP,
 	reformatDate,
 } from '../utilities/helpers';
 import { validateRegistrationInput } from '../utilities/validators';
@@ -25,7 +23,7 @@ const register = async (req: Request, res: Response) => {
 	const hash = await bcryptjs.hash(password, 10);
 	const sql = `INSERT INTO users (username, password, email, name, birthday) VALUES (?, ?, ?, ?, ?);`;
 	try {
-		const result = await execute(sql, [
+		await execute(sql, [
 			username,
 			hash,
 			email,

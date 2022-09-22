@@ -34,10 +34,10 @@ import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 
 // Dynamically imported components
-const CitySearchSelector = dynamic(() => import('./searchLocationSelectors'), {
+const CitySearchSelector = dynamic(() => import('./searchCitySelector'), {
 	suspense: true,
 });
-const CountrySearchSelector = dynamic(() => import('./searchLocationSelectors'), {
+const CountrySearchSelector = dynamic(() => import('./searchCountrySelector'), {
 	suspense: true,
 });
 
@@ -54,7 +54,8 @@ export const ProfileSearch = ({
 	const { profile } = useUserContext();
 	const [interests, setInterests] = useState<string[]>([]);
 
-	const searchDatabase = async (controller: AbortController) => {
+	const searchDatabase = async () => {
+		const controller = new AbortController();
 		const query = {
 			gender: profile.gender,
 			looking: searchParams.looking,
@@ -95,22 +96,20 @@ export const ProfileSearch = ({
 				setResults([]);
 				setFilteredResults([]);
 			}
-		} catch (err) {} finally {
+		} catch (err) {
+		} finally {
 			setLoadStatus(LoadStatus.IDLE);
+			controller.abort();
 		}
 	};
 
 	useEffect(() => {
-		const controller = new AbortController();
-		searchDatabase(controller);
-		return () => controller.abort();
+		searchDatabase();
 	}, []);
 
-	const handleSubmit = async (event: React.FormEvent) => {
+	const handleSubmit = (event: React.FormEvent) => {
 		event.preventDefault();
-		const controller = new AbortController();
-		await searchDatabase(controller);
-		controller.abort();
+		searchDatabase();
 	};
 
 	const resetSearch = (event: React.FormEvent) => {
@@ -563,7 +562,8 @@ export const BasicSearchLine = ({
 				</button>
 			</div>
 			<div className="block is-flex is-justify-content-space-between is-align-items-start">
-				<Suspense fallback={`Loading...`}>
+				{/* Location. Components imported dynamically */}
+				<Suspense fallback={<Spinner />}>
 					<CountrySearchSelector
 						searchParams={searchParams}
 						setSearchParams={setSearchParams}
@@ -617,7 +617,7 @@ export const AgeRangeSlider = ({
 
 	useEffect(() => {
 		setSearchParams({
-			...setSearchParams,
+			...searchParams,
 			min_age: value[0],
 			max_age: value[1],
 		});

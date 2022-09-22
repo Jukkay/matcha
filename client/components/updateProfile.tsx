@@ -14,12 +14,13 @@ import { FileInput, SearchResult } from './profile';
 import { useUserContext } from './UserContext';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
+import { Spinner } from './utilities';
 
 // Dynamically imported components
-const CitySelector = dynamic(() => import('./profileLocationSelectors'), {
+const CitySelector = dynamic(() => import('./profileCitySelector'), {
 	suspense: true,
 });
-const CountrySelector = dynamic(() => import('./profileLocationSelectors'), {
+const CountrySelector = dynamic(() => import('./profileCountrySelector'), {
 	suspense: true,
 });
 
@@ -162,8 +163,8 @@ export const UpdateProfile = ({
 				<section className="section">
 					<h3 className="title is-3">Edit profile</h3>
 
-					{/* Location. Components imported lazyly*/}
-					<Suspense fallback={`Loading...`}>
+					{/* Location. Components imported dynamically */}
+					<Suspense fallback={<Spinner />}>
 						<CountrySelector
 							profile={profile}
 							setProfile={setProfile}

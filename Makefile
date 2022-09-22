@@ -20,6 +20,7 @@ down:
 
 clean:
 	docker-compose down --remove-orphans
+	docker volume rm matcha-data
 
 build:
 	docker-compose run --rm client "pnpm build"
