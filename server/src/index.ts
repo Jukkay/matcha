@@ -84,6 +84,14 @@ const queryOnlineUsers = (user_id: number) => {
 	return false;
 };
 
+const updateUserActivity = (socket_id: string) => {
+	const i = onlineUsers?.findIndex((item) => item.socket_id === socket_id)
+	if (i > -1) {
+		onlineUsers[i] = {...onlineUsers[i], active: Date.now()}
+		console.log('updated user activity')
+	}
+};
+
 // // Check socket token
 // io.use((socket, next) => {
 // 	const token = socket.handshake.auth.token;
@@ -105,11 +113,11 @@ const queryOnlineUsers = (user_id: number) => {
 io.on('connection', (socket) => {
 	try {
 		console.log(socket.id, 'connected');
-
 		// Chat
 		socket.on('active_chat', (data) => {
 			socket.join(data);
 			previousChat = data;
+			updateUserActivity(socket.id)
 			console.log('active chat is ', data);
 		});
 
@@ -124,6 +132,7 @@ io.on('connection', (socket) => {
 			// Emit to receiver
 			socket.to(matchID).emit('receive_message', data);
 			console.log('Message sent to match ', matchID);
+			updateUserActivity(socket.id)
 		});
 
 		// Notifications
@@ -132,6 +141,7 @@ io.on('connection', (socket) => {
 			if (previousUser) {
 				socket.leave(previousUser);
 			}
+			updateOnlineUsers(data, socket.id)
 			console.log('Notifications for user_id: ', data);
 			socket.join(data);
 			previousUser = data;
@@ -145,6 +155,7 @@ io.on('connection', (socket) => {
 			// Emit to user
 			socket.to(user_id).emit('receive_notification', data);
 			console.log('Notification sent to user_id', user_id);
+			updateUserActivity(socket.id)
 		});
 
 		// Online query
@@ -155,6 +166,7 @@ io.on('connection', (socket) => {
 				queried_id: user_id,
 				online: onlineStatus,
 			});
+			updateUserActivity(socket.id)
 		});
 
 		socket.on('disconnection', () =>

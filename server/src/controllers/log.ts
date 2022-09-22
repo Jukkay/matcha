@@ -11,13 +11,43 @@ export const logVisitor = async (req: Request, res: Response) => {
             return res.status(400).json({
                 message: 'Incomplete log information'
             })
-		const sql =
-			`
-			INSERT INTO 
-				visitors
-					(visited_user, visiting_user, username)
-			VALUES 
-				(?, ?, ?)`;
+		// Check for duplicate log
+		let sql = `
+			SELECT 
+				* 
+			FROM 
+				visitors 
+			WHERE 
+				visiting_user = ? 
+				AND 
+				visited_user = ?`;
+		let response = await execute(sql, [visiting_user, visited_user]);
+		if (response.length > 0) {
+			// update timestamp
+			sql = `
+				UPDATE 
+					visitors 
+				SET 
+					visit_date = CURRENT_TIMESTAMP
+				WHERE 
+					visiting_user = ? 
+					AND 
+					visited_user = ?
+				`
+			const logged = await execute(sql, [visiting_user, visited_user]);
+			if (logged) {
+				return res.status(200).json({
+					message: 'Visit logged',
+				});
+			}
+		}
+		sql =
+		`
+		INSERT INTO 
+			visitors
+				(visited_user, visiting_user, username)
+		VALUES 
+			(?, ?, ?)`;
 		const logged = await execute(sql, [visited_user, visiting_user, username]);
 		if (logged) {
 			return res.status(200).json({

@@ -434,7 +434,7 @@ const ProfilePicture = () => {
 	return (
 		<Link href="/profile">
 			<a className="navbar-item">
-				<figure className="image">
+				<figure className="image navbar-profile-image">
 					<img
 						className="is-rounded"
 						src={

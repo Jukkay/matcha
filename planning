@@ -379,14 +379,17 @@ V Fix profile image default selection
 V Why doesn't search button work again?
 V Remove page refresh on message send
 V Add infinite scroll to chat window
+V Fix online status
+V Added duplicate check and timestamp update to visitor log
+V Test online status
+V Fix navbar profile image aspect ratio
+V Add online status updater function to socket listeners
 
-Fix online status
-Make sure gps and ip location works
 Figure out why socket middleware stops listeners
 Check if it happens in production build also
-Test online status
+
+Make sure gps and ip location works
 Test websockets with multiple users
-Remove duplicates from history
 What happens if user is unmatched or blocked during chat?
 Test all required functionality
 Make production docker-compose
