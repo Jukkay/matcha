@@ -29,7 +29,7 @@ const NotLoggedIn = () => {
 };
 
 const LoggedIn = () => {
-	const { profile, setProfile, userData } = useUserContext();
+	const { userData } = useUserContext();
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
 	const { setNotificationCount, setMessageCount, setLikeCount } =
 		useNotificationContext();
@@ -60,6 +60,10 @@ const LoggedIn = () => {
 			}
 		} catch (err) {}
 	};
+	if (loadStatus == LoadStatus.LOADING) return <Spinner />;
+	if (loadStatus == LoadStatus.ERROR)
+		return <LoadError text="Error loading messages" />;
+
 	return (
 		<div className="is-flex is-flex-direction-row is-justify-content-center is-align-content-center">
 			<ChatWindow />
@@ -408,11 +412,6 @@ const ChatWindow = () => {
 		}
 	}, [inView]);
 
-
-	useEffect(() => {
-			console.log('StartIndex set.', startIndex);
-	}, [startIndex]);
-
 	const onChange = (event: React.ChangeEvent<HTMLInputElement>) =>
 		setOutgoing(event.target.value);
 
@@ -483,12 +482,11 @@ const ChatWindow = () => {
 			socket.on('receive_message', (data) => {
 				setReceived((current) => [...current, data]);
 			});
-			return () => {
-				socket.removeAllListeners('receive_message');
-			};
 		} catch (err) {
-			console.error(err);
 		}
+		return () => {
+			socket.removeAllListeners('receive_message');
+		};
 	}, [socket]);
 
 	useEffect(() => {

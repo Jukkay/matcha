@@ -384,10 +384,11 @@ V Added duplicate check and timestamp update to visitor log
 V Test online status
 V Fix navbar profile image aspect ratio
 V Add online status updater function to socket listeners
-
-Figure out why socket middleware stops listeners
-Check if it happens in production build also
-
+V Figure out why socket middleware stops listeners
+V Check if it happens in production build also
+V Check whats up with famerating NaN warning
+V Fix search results not being brought back after filters are closed
+Fix Reset to default not resetting age range slider
 Make sure gps and ip location works
 Test websockets with multiple users
 What happens if user is unmatched or blocked during chat?

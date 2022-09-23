@@ -260,9 +260,9 @@ export interface ISearchParams {
   city: string,
   min_age: number,
   max_age: number
-  min_famerating: number,
-  max_famerating: number,
-  max_distance: number
+  min_famerating: string,
+  max_famerating: string,
+  max_distance: string
 }
 
 export interface SearchParamsProps {

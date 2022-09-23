@@ -26,7 +26,11 @@ import {
 	saveNotificationToDatabase,
 } from './controllers/notification';
 import { getProfilesUserLikes } from './controllers/like';
-import checkSocketJWT from './middleware/checkSocketJWT';
+import { getSecret } from "docker-secret"
+import jwt, { VerifyErrors } from 'jsonwebtoken'
+
+const server_token = getSecret("server_token")
+
 
 const app: express.Application = express();
 
@@ -92,23 +96,24 @@ const updateUserActivity = (socket_id: string) => {
 	}
 };
 
-// // Check socket token
-// io.use((socket, next) => {
-// 	const token = socket.handshake.auth.token;
-// 	const user_id = socket.handshake.auth.user_id
-// 	if (!token || !user_id) {
-// 		console.log('Missing token or user_id')
-// 		return next(new Error('Unauthorized'));
-// 	}
-// 	updateOnlineUsers(user_id, socket.id)
-// 	if (checkSocketJWT(token)) {
-// 		console.log('Token validated')
-// 		next();
-// 	} else {
-// 		console.log('Invalid token')
-// 		next(new Error('Unauthorized'));
-// 	}
-// });
+// Check socket token
+io.use((socket, next) => {
+	const token = socket.handshake.auth.token;
+	const user_id = socket.handshake.auth.user_id
+	if (!token || !user_id) {
+		console.log('Missing token or user_id')
+		next(new Error('Unauthorized'));
+	}
+	updateOnlineUsers(user_id, socket.id)
+	jwt.verify(token, server_token, (err: VerifyErrors | null) => {
+		if (err) {
+			console.log("err in checkSocketJWT")
+			next(new Error('Unauthorized'));
+		}
+		console.log("All good in checkSocketJWT")
+		next();
+	})
+});
 
 io.on('connection', (socket) => {
 	try {

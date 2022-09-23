@@ -177,9 +177,9 @@ const Filters = ({
 		let filteredResults = results;
 
 		// Filter by distance
-		if (searchParams.max_distance > 0) {
+		if (Number(searchParams.max_distance) > 0) {
 			filteredResults = [...filteredResults].filter(
-				(item) => item.distance <= searchParams.max_distance
+				(item) => Number(item.distance) <= Number(searchParams.max_distance)
 			);
 		}
 		// Filter by interests
@@ -191,15 +191,22 @@ const Filters = ({
 			});
 		}
 		// Filter by famerating
-		if (searchParams.min_famerating > 0) {
+		if (Number(searchParams.min_famerating) > 0) {
 			filteredResults = [...filteredResults].filter(
 				(item) =>
-					item.famerating >= searchParams.min_famerating &&
-					item.famerating <= searchParams.max_famerating
+				Number(item.famerating) >= Number(searchParams.min_famerating) &&
+				Number(item.famerating) <= Number(searchParams.max_famerating)
 			);
 		}
 		setFilteredResults(filteredResults);
 	};
+
+	const handleReset = (event: React.FormEvent) => {
+		event.preventDefault();
+		setSearchParams({...searchParams, max_distance: 0, min_famerating: 1, max_famerating: 1000})
+		setInterests([])
+		setFilteredResults(results)
+	}
 
 	return visible ? (
 		<div className="block">
@@ -232,6 +239,9 @@ const Filters = ({
 			<div className="block">
 				<button className="button is-primary" onClick={handleFilters}>
 					Apply filters
+				</button>
+				<button className="button is-primary" onClick={handleReset}>
+					Reset filters
 				</button>
 			</div>
 		</div>
@@ -616,19 +626,22 @@ export const AgeRangeSlider = ({
 	]);
 
 	useEffect(() => {
+		setValue([searchParams.min_age, searchParams.max_age])
+	}, [searchParams.min_age, searchParams.max_age]);
+
+	const handleChange = (event: Event, newValue: number | number[]) => {
+		const array = newValue as number[];
 		setSearchParams({
 			...searchParams,
-			min_age: value[0],
-			max_age: value[1],
+			min_age: array[0],
+			max_age: array[1],
 		});
-	}, [value]);
-	const handleChange = (event: Event, newValue: number | number[]) => {
-		setValue(newValue as number[]);
 	};
 
 	return (
-		<Box sx={{ width: 300 }}>
+		<Box>
 			<Slider
+				sx={{ width: 250, color: 'success.main' }}
 				getAriaLabel={() => 'Age range'}
 				value={value}
 				onChange={handleChange}

@@ -434,9 +434,7 @@ export const FameratingRange = ({
 							onChange={(event) =>
 								setSearchParams({
 									...searchParams,
-									max_famerating: parseInt(
-										event.target.value
-									),
+									max_famerating: event.target.value,
 								})
 							}
 						/>
