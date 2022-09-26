@@ -77,6 +77,14 @@ const LoggedInControls = () => {
 		}
 	}, []);
 
+	// Update location information to db
+	useEffect(() => {
+		authAPI.post('/geolocation', {
+			latitude: profile.latitude, 
+			longitude: profile.longitude
+		})
+	}, [profile.latitude, profile.longitude])
+
 	const getNotifications = async () => {
 		try {
 			if (!userData.user_id) return;

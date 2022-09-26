@@ -417,3 +417,8 @@ export interface IUser {
 	user?: UserInfo;
 	updateUser?: (user: UserInfo) => void;
 }
+
+export interface IAgeRangeSlider {
+  state: ISearchParams | IProfile
+  setState: SetStateAction<any>
+}

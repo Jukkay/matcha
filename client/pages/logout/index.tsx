@@ -10,6 +10,7 @@ const Logout: NextPage = () => {
 		userData,
 		updateUserData,
 		refreshToken,
+		setProfile
 	} = useUserContext();
 
 	useEffect(() => {
@@ -21,6 +22,7 @@ const Logout: NextPage = () => {
 			updateAccessToken('');
 			updateRefreshToken('');
 			updateUserData({});
+			setProfile({})
 			sessionStorage?.removeItem('accessToken');
 			sessionStorage?.removeItem('refreshToken');
 			sessionStorage?.removeItem('userData');

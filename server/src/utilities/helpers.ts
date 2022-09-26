@@ -41,8 +41,6 @@ export const convertMAX_AGE = (age: number) => {
 export const locateIP = async (user_id: string, req: Request) => {
 	// Get and locate IP
 	const ip = requestIP.getClientIp(req) || '127.0.0.1';
-	console.log(ip);
 	const ip_location = await geoip.lookup(ip);
-	console.log(ip_location);
 	return ip_location;
 };

@@ -6,6 +6,7 @@ import {
 	AdvancedSearchProps,
 	BasicSearchProps,
 	ButtonsProps,
+	IAgeRangeSlider,
 	IProfileCard,
 	LoadStatus,
 	ResultsProps,
@@ -179,7 +180,8 @@ const Filters = ({
 		// Filter by distance
 		if (Number(searchParams.max_distance) > 0) {
 			filteredResults = [...filteredResults].filter(
-				(item) => Number(item.distance) <= Number(searchParams.max_distance)
+				(item) =>
+					Number(item.distance) <= Number(searchParams.max_distance)
 			);
 		}
 		// Filter by interests
@@ -194,8 +196,10 @@ const Filters = ({
 		if (Number(searchParams.min_famerating) > 0) {
 			filteredResults = [...filteredResults].filter(
 				(item) =>
-				Number(item.famerating) >= Number(searchParams.min_famerating) &&
-				Number(item.famerating) <= Number(searchParams.max_famerating)
+					Number(item.famerating) >=
+						Number(searchParams.min_famerating) &&
+					Number(item.famerating) <=
+						Number(searchParams.max_famerating)
 			);
 		}
 		setFilteredResults(filteredResults);
@@ -203,10 +207,15 @@ const Filters = ({
 
 	const handleReset = (event: React.FormEvent) => {
 		event.preventDefault();
-		setSearchParams({...searchParams, max_distance: 0, min_famerating: 1, max_famerating: 1000})
-		setInterests([])
-		setFilteredResults(results)
-	}
+		setSearchParams({
+			...searchParams,
+			max_distance: 0,
+			min_famerating: 1,
+			max_famerating: 1000,
+		});
+		setInterests([]);
+		setFilteredResults(results);
+	};
 
 	return visible ? (
 		<div className="block">
@@ -616,30 +625,27 @@ export const BasicSearchLine = ({
 	);
 };
 
-export const AgeRangeSlider = ({
-	searchParams,
-	setSearchParams,
-}: SearchParamsProps) => {
+export const AgeRangeSlider = ({ state, setState }: IAgeRangeSlider) => {
 	const [value, setValue] = React.useState<number[]>([
-		searchParams.min_age,
-		searchParams.max_age,
+		state.min_age,
+		state.max_age,
 	]);
 
 	useEffect(() => {
-		setValue([searchParams.min_age, searchParams.max_age])
-	}, [searchParams.min_age, searchParams.max_age]);
+		setValue([state.min_age, state.max_age]);
+	}, [state.min_age, state.max_age]);
 
 	const handleChange = (event: Event, newValue: number | number[]) => {
 		const array = newValue as number[];
-		setSearchParams({
-			...searchParams,
+		setState({
+			...state,
 			min_age: array[0],
 			max_age: array[1],
 		});
 	};
 
 	return (
-		<Box>
+		<div className='ml-6'>
 			<Slider
 				sx={{ width: 250, color: 'success.main' }}
 				getAriaLabel={() => 'Age range'}
@@ -650,7 +656,7 @@ export const AgeRangeSlider = ({
 				valueLabelDisplay="on"
 				disableSwap
 			/>
-		</Box>
+		</div>
 	);
 };
 
@@ -666,8 +672,8 @@ export const SearchAgeRange = ({
 				</label>
 				<div className="control" id="ageRange">
 					<AgeRangeSlider
-						searchParams={searchParams}
-						setSearchParams={setSearchParams}
+						state={searchParams}
+						setState={setSearchParams}
 					/>
 				</div>
 			</div>

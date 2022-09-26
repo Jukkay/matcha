@@ -50,7 +50,25 @@ const newProfile = async (req: Request, res: Response) => {
 		}
 
 		const sql =
-			'INSERT INTO profiles(user_id, country, city, gender, birthday, looking, min_age, max_age, introduction, interests, name, profile_image, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+			`INSERT INTO 
+				profiles
+					(
+					user_id, 
+					country, 
+					city, 
+					gender, 
+					birthday, 
+					looking, 
+					min_age, 
+					max_age, 
+					introduction, 
+					interests, 
+					name, 
+					profile_image, 
+					latitude, 
+					longitude) 
+			VALUES 					
+				(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 		const response = await execute(sql, [
 			user_id,
 			country,
@@ -67,7 +85,13 @@ const newProfile = async (req: Request, res: Response) => {
 			latitude,
 			longitude,
 		]);
-		const sql2 = 'UPDATE users SET profile_exists = "1" WHERE user_id = ?;';
+		const sql2 = `
+			UPDATE 
+				users 
+			SET 
+				profile_exists = "1" 
+			WHERE 
+				user_id = ?;`;
 		const response2 = await execute(sql2, [user_id]);
 		if (response && response2)
 			return res.status(200).json({
@@ -180,7 +204,26 @@ const updateProfile = async (req: Request, res: Response) => {
 	let { latitude, longitude } = req.body;
 	console.log(req.body);
 	const sql =
-		'UPDATE profiles SET country=?, city=?, gender=?, birthday=?, looking=?, min_age=?, max_age=?, introduction=?, interests=?, profile_image=?, latitude=?, longitude=?, user_latitude=?, user_longitude=? WHERE user_id = ?;';
+		`
+		UPDATE 
+			profiles 
+		SET 
+			country=?, 
+			city=?, 
+			gender=?, 
+			birthday=?, 
+			looking=?, 
+			min_age=?, 
+			max_age=?, 
+			introduction=?, 
+			interests=?, 
+			profile_image=?, 
+			latitude=?, 
+			longitude=?, 
+			user_latitude=?, 
+			user_longitude=? 
+		WHERE 
+			user_id = ?;`;
 	try {
 		// Get user_id
 		const user_id = await decodeUserFromAccesstoken(req);
@@ -213,7 +256,13 @@ const updateProfile = async (req: Request, res: Response) => {
 		]);
 		if (response) {
 			const sql2 =
-				'UPDATE users SET profile_exists = "1" WHERE user_id = ?;';
+				`
+				UPDATE 
+					users 
+				SET 
+					profile_exists = "1" 
+				WHERE 
+					user_id = ?;`;
 			await execute(sql2, [user_id]);
 			return res.status(200).json({
 				message: 'Profile updated successfully',
@@ -246,9 +295,19 @@ const deleteProfile = async (req: Request, res: Response) => {
 				message: 'ID mismatch. Are you doing something shady?',
 			});
 		// Remove profile
-		const sql = 'DELETE FROM profiles WHERE user_id = ?';
+		const sql = `
+			DELETE FROM 
+				profiles 
+			WHERE 
+				user_id = ?`;
 		const response = await execute(sql, [user_id]);
-		const sql2 = 'UPDATE users SET profile_exists = "0" WHERE user_id = ?;';
+		const sql2 = `
+			UPDATE 
+				users 
+			SET 
+				profile_exists = "0" 
+			WHERE 
+				user_id = ?;`;
 		const response2 = await execute(sql2, [user_id]);
 		if (response && response2)
 			return res.status(200).json({

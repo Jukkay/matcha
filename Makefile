@@ -12,6 +12,9 @@ create: create-client create-server create-db
 up:
 	docker-compose up
 
+up-production:
+	docker compose -f docker-compose.yml -f production.yml up -d
+
 restart:
 	docker-compose up -d
 

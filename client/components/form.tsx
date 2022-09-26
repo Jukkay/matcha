@@ -10,6 +10,7 @@ import {
 	SearchParamsProps,
 	IAgeRange,
 } from '../types/types';
+import { AgeRangeSlider } from './search';
 
 // Input label text
 export const Label = ({ label, name }: IFormInputField) => {
@@ -209,59 +210,76 @@ export const GPSCoordinateInput = ({ profile, setProfile }: any) => {
 export const AgeRange = ({ profile, setProfile }: IAgeRange) => {
 	return (
 		<div className="block">
-			<label htmlFor="min_age" className="label">
-				Age range *
-			</label>
-
-			<div className="field is-horizontal">
-				<div className="field-label is-normal">
-					<label htmlFor="min_age" className="label">
-						Min
-					</label>
-				</div>
-				<div className="field-body">
-					<div className="field">
-						<input
-							type="number"
-							id="min_age"
-							className="input is-primary"
-							min="18"
-							max={profile?.max_age}
-							value={profile?.min_age}
-							onChange={(event) =>
-								setProfile({
-									...profile,
-									min_age: parseInt(event.target.value),
-								})
-							}
-						/>
-					</div>
-					<div className="field-label is-normal">
-						<label htmlFor="max_age" className="label">
-							Max
-						</label>
-					</div>
-					<div className="field">
-						<input
-							type="number"
-							id="max_age"
-							className="input is-primary"
-							min={profile?.min_age}
-							max="122"
-							value={profile?.max_age}
-							onChange={(event) =>
-								setProfile({
-									...profile,
-									max_age: parseInt(event.target.value),
-								})
-							}
-						/>
-					</div>
+			<div className="field">
+				<label htmlFor="ageRange" className="label mb-6">
+					Age range *
+				</label>
+				<div className="control" id="ageRange">
+					<AgeRangeSlider
+						state={profile}
+						setState={setProfile}
+					/>
 				</div>
 			</div>
 		</div>
 	);
 };
+// export const AgeRange = ({ profile, setProfile }: IAgeRange) => {
+// 	return (
+// 		<div className="block">
+// 			<label htmlFor="min_age" className="label">
+// 				Age range *
+// 			</label>
+
+// 			<div className="field is-horizontal">
+// 				<div className="field-label is-normal">
+// 					<label htmlFor="min_age" className="label">
+// 						Min
+// 					</label>
+// 				</div>
+// 				<div className="field-body">
+// 					<div className="field">
+// 						<input
+// 							type="number"
+// 							id="min_age"
+// 							className="input is-primary"
+// 							min="18"
+// 							max={profile?.max_age}
+// 							value={profile?.min_age}
+// 							onChange={(event) =>
+// 								setProfile({
+// 									...profile,
+// 									min_age: parseInt(event.target.value),
+// 								})
+// 							}
+// 						/>
+// 					</div>
+// 					<div className="field-label is-normal">
+// 						<label htmlFor="max_age" className="label">
+// 							Max
+// 						</label>
+// 					</div>
+// 					<div className="field">
+// 						<input
+// 							type="number"
+// 							id="max_age"
+// 							className="input is-primary"
+// 							min={profile?.min_age}
+// 							max="122"
+// 							value={profile?.max_age}
+// 							onChange={(event) =>
+// 								setProfile({
+// 									...profile,
+// 									max_age: parseInt(event.target.value),
+// 								})
+// 							}
+// 						/>
+// 					</div>
+// 				</div>
+// 			</div>
+// 		</div>
+// 	);
+// };
 
 export const GenderSelector = ({
 	profile,

@@ -28,6 +28,7 @@ import {
 import { getProfilesUserLikes } from './controllers/like';
 import { getSecret } from "docker-secret"
 import jwt, { VerifyErrors } from 'jsonwebtoken'
+import { updateLocation } from './controllers/updateLocation';
 
 const server_token = getSecret("server_token")
 
@@ -246,3 +247,6 @@ app.post('/reportuser', checkJWT, reportUser);
 
 // Block user
 app.post('/blockuser', checkJWT, blockUser);
+
+// Update user's location
+app.post('/geolocation', checkJWT, updateLocation);
