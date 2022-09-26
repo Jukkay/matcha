@@ -1,0 +1,11 @@
+services:
+  client:
+    command:
+      - "pnpm start"
+    restart: always
+  
+  server:
+    restart: always
+    environment:
+      PROTOCOL: https
+      CLIENT_URL: https://matcha.jukkay.dev
