@@ -54,9 +54,9 @@ export const ProfileSearch = ({
 }: SearchProps) => {
 	const { profile } = useUserContext();
 	const [interests, setInterests] = useState<string[]>([]);
+	const [formSubmit, setFormSubmit] = useState(false)
 
-	const searchDatabase = async () => {
-		const controller = new AbortController();
+	const searchDatabase = async (controller: AbortController) => {
 		const query = {
 			gender: profile.gender,
 			looking: searchParams.looking,
@@ -100,17 +100,18 @@ export const ProfileSearch = ({
 		} catch (err) {
 		} finally {
 			setLoadStatus(LoadStatus.IDLE);
-			controller.abort();
 		}
 	};
 
 	useEffect(() => {
-		searchDatabase();
-	}, []);
+		const controller = new AbortController();
+		searchDatabase(controller);
+		return () => controller.abort();
+	}, [formSubmit]);
 
 	const handleSubmit = (event: React.FormEvent) => {
 		event.preventDefault();
-		searchDatabase();
+		setFormSubmit(!formSubmit)
 	};
 
 	const resetSearch = (event: React.FormEvent) => {

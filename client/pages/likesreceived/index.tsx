@@ -1,6 +1,6 @@
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNotificationContext } from '../../components/NotificationContext';
 import { useUserContext } from '../../components/UserContext';
 import { ErrorFallback, LoadError, Spinner } from '../../components/utilities';
@@ -13,7 +13,8 @@ import {
 import { authAPI } from '../../utilities/api';
 import { useInView } from 'react-intersection-observer';
 import { LikeProfile } from '../likes';
-import {ErrorBoundary} from 'react-error-boundary'
+import { ErrorBoundary } from 'react-error-boundary';
+import { handleRouteError } from '../../utilities/helpers';
 
 const NotLoggedIn = () => {
 	return (
@@ -43,11 +44,23 @@ const LoggedIn = () => {
 	const { ref, inView } = useInView({
 		threshold: 0,
 	});
+
 	useEffect(() => {
 		if (inView) {
 			setEndIndex((endIndex) => endIndex + 5);
 		}
 	}, [inView]);
+
+	// Router error event listener and handler
+	useEffect(() => {
+		router.events.on('routeChangeError', handleRouteError);
+
+		// If the component is unmounted, unsubscribe
+		// from the event with the `off` method:
+		return () => {
+			router.events.off('routeChangeError', handleRouteError);
+		};
+	}, []);
 
 	// Redirect if user has no profile
 	useEffect(() => {
@@ -56,17 +69,20 @@ const LoggedIn = () => {
 		router.replace('/profile');
 	}, [userData.profile_exists]);
 
-	const getLikerProfiles = async () => {
-		let response = await authAPI.get(`/like/${userData.user_id}`);
+	const getLikerProfiles = async (controller: AbortController) => {
+		let response = await authAPI.get(`/like/${userData.user_id}`, {
+			signal: controller.signal,
+		});
 		if (response.data.profiles.length > 0) {
 			setLikerProfiles(response.data.profiles);
 		}
 	};
 
-	const markLikeNotificationsRead = async () => {
+	const markLikeNotificationsRead = async (controller: AbortController) => {
 		const response = await authAPI.patch('/notifications', {
 			type: NotificationType.LIKE,
 			user_id: userData.user_id,
+			signal: controller.signal,
 		});
 		if (response.status === 200) {
 			setNotificationCount(0);
@@ -76,11 +92,13 @@ const LoggedIn = () => {
 	};
 
 	useEffect(() => {
+		const controller1 = new AbortController();
+		const controller2 = new AbortController();
 		const fetchData = async () => {
 			try {
 				setLoadStatus(LoadStatus.LOADING);
-				await getLikerProfiles();
-				await markLikeNotificationsRead();
+				await getLikerProfiles(controller1);
+				await markLikeNotificationsRead(controller2);
 			} catch (err) {
 				setLoadStatus(LoadStatus.ERROR);
 			} finally {
@@ -89,6 +107,10 @@ const LoggedIn = () => {
 		};
 		fetchData();
 		setActivePage(ActivePage.LIKES);
+		return () => {
+			controller1.abort();
+			controller2.abort();
+		};
 	}, []);
 
 	if (loadStatus == LoadStatus.LOADING) return <Spinner />;
@@ -125,7 +147,7 @@ const LoggedIn = () => {
 const LikesReceived: NextPage = () => {
 	const { accessToken } = useUserContext();
 	return (
-		<ErrorBoundary FallbackComponent={ErrorFallback} >
+		<ErrorBoundary FallbackComponent={ErrorFallback}>
 			<div className="columns is-centered">
 				<div className="column is-three-quarters">
 					{accessToken ? <LoggedIn /> : <NotLoggedIn />}

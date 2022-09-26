@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import type { NextPage } from 'next';
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Gallery } from '../../components/profile';
 import { useUserContext } from '../../components/UserContext';
 import {
@@ -16,6 +16,7 @@ import { authAPI } from '../../utilities/api';
 import { FcLike, FcDislike } from 'react-icons/fc';
 import {
 	convertBirthdayToAge,
+	handleRouteError,
 	reformatDateTime,
 } from '../../utilities/helpers';
 import { useNotificationContext } from '../../components/NotificationContext';
@@ -66,6 +67,17 @@ const LoggedIn = () => {
 	const [wasRedirected, setWasRedirected] = useState(false);
 	const router = useRouter();
 
+	// Router error event listener and handler
+	useEffect(() => {
+		router.events.on('routeChangeError', handleRouteError);
+
+		// If the component is unmounted, unsubscribe
+		// from the event with the `off` method:
+		return () => {
+			router.events.off('routeChangeError', handleRouteError);
+		};
+	}, []);
+
 	// Redirect if user has no profile
 	useEffect(() => {
 		if (wasRedirected || userData.profile_exists) return;
@@ -73,13 +85,14 @@ const LoggedIn = () => {
 		router.replace('/profile');
 	}, [userData.profile_exists]);
 
-	const logVisit = async () => {
+	const logVisit = async (controller: AbortController) => {
 		try {
 			const { user_id } = router.query;
 			await authAPI.post('/log', {
 				visiting_user: userData.user_id,
 				visited_user: user_id,
 				username: userData.username,
+				signal: controller.signal,
 			});
 			// Emit notification
 			const notification = {
@@ -93,11 +106,13 @@ const LoggedIn = () => {
 		} catch (err) {}
 	};
 
-	const getUserProfile = async () => {
+	const getUserProfile = async (controller: AbortController) => {
 		try {
 			setLoadStatus(LoadStatus.LOADING);
 			const { user_id } = router.query;
-			let response = await authAPI.get(`/profile/${user_id}`);
+			let response = await authAPI.get(`/profile/${user_id}`, {
+				signal: controller.signal,
+			});
 			if (response?.data?.profile) {
 				setProfileExists(true);
 				response.data.profile.interests = JSON.parse(
@@ -107,18 +122,23 @@ const LoggedIn = () => {
 			} else setProfileExists(false);
 		} catch (err) {
 			setLoadStatus(LoadStatus.ERROR);
-			console.error(err);
 		} finally {
-			logVisit();
 			setLoadStatus(LoadStatus.IDLE);
 		}
 	};
 
 	useEffect(() => {
+		const controller1 = new AbortController();
+		const controller2 = new AbortController();
 		if (router.isReady) {
-			getUserProfile();
+			getUserProfile(controller1);
+			logVisit(controller2);
 		}
 		setActivePage(ActivePage.OTHER_PROFILE);
+		return () => {
+			controller1.abort();
+			controller2.abort();
+		};
 	}, [router.isReady]);
 
 	if (loadStatus == LoadStatus.LOADING) return <Spinner />;
@@ -242,7 +262,7 @@ const UnlikeButton = ({
 const ViewMode = ({ otherUserProfile }: OtherUserViewProps) => {
 	const [liked, setLiked] = useState(otherUserProfile.liked);
 	const [match, setMatch] = useState(false);
-	
+
 	const closeNotification = () => {
 		setMatch(false);
 	};

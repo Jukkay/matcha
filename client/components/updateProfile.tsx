@@ -121,9 +121,7 @@ export const UpdateProfile = ({
 					sessionStorage.setItem('profile', JSON.stringify(payload));
 				}, 2000);
 			}
-		} catch (err) {
-			console.error(err);
-		}
+		} catch (err) {}
 	};
 	const deleteProfile = async () => {
 		const response = await authAPI.delete(`/profile/${profile.user_id}`);

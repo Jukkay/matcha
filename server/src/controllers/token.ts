@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { getSecret } from 'docker-secret';
 import { IAccesstoken, IEmailToken } from '../interfaces/token';
 import { execute } from '../utilities/SQLConnect';
@@ -41,7 +41,6 @@ export const refreshToken = async (req: Request, res: Response) => {
 				message: 'No token given',
 			});
 		}
-		console.log('Token received')
 		// Check if token is valid
 		const decoded = await verifyJWT(token, refresh_token);
 		if (!decoded) {
@@ -49,7 +48,6 @@ export const refreshToken = async (req: Request, res: Response) => {
 				message: 'Invalid token',
 			});
 		}
-		console.log('Token verified')
 		//Check if refreshToken is on valid token list
 		const findToken = `SELECT * FROM tokens WHERE token = ?;`;
 		const foundToken = await execute(findToken, [token]);
@@ -70,8 +68,8 @@ export const refreshToken = async (req: Request, res: Response) => {
 			accessToken: accessToken,
 		});
 	} catch (err) {
-		return res.status(403).json({
-			message: 'Unauthorized',
+		return res.status(500).json({
+			message: 'Something went wrong',
 		});
 	}
 };

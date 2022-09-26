@@ -1,6 +1,6 @@
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ClosestList, CommonInterestsList, FameratingList, RandomList, Recommendations } from '../components/frontpage';
 import { useUserContext } from '../components/UserContext';
 import { IResultsProfile, LoadStatus } from '../types/types';

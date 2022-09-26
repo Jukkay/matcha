@@ -1,7 +1,6 @@
 import geoip from 'fast-geoip';
 import requestIP from 'request-ip';
 import { Request } from 'express';
-import { execute } from './SQLConnect';
 
 export const convertBirthdayToAge = (birthday: string) => {
 	const now = new Date().getTime();

@@ -1,5 +1,5 @@
 import type { NextPage } from 'next';
-import React, { useState, useEffect, useRef, MutableRefObject } from 'react';
+import { useState, useEffect, useRef, MutableRefObject } from 'react';
 import { useUserContext } from '../../components/UserContext';
 import {
 	LoadStatus,
@@ -9,7 +9,10 @@ import {
 	OnlineStatusProps,
 } from '../../types/types';
 import { authAPI } from '../../utilities/api';
-import { createSQLDatetimeString } from '../../utilities/helpers';
+import {
+	createSQLDatetimeString,
+	handleRouteError,
+} from '../../utilities/helpers';
 import { IoMdSend } from 'react-icons/io';
 import { useRouter } from 'next/router';
 import { useNotificationContext } from '../../components/NotificationContext';
@@ -36,6 +39,17 @@ const LoggedIn = () => {
 	const [wasRedirected, setWasRedirected] = useState(false);
 	const router = useRouter();
 
+	// Router error event listener and handler
+	useEffect(() => {
+		router.events.on('routeChangeError', handleRouteError);
+
+		// If the component is unmounted, unsubscribe
+		// from the event with the `off` method:
+		return () => {
+			router.events.off('routeChangeError', handleRouteError);
+		};
+	}, []);
+	
 	// Redirect if user has no profile
 	useEffect(() => {
 		if (wasRedirected || userData.profile_exists) return;
@@ -307,14 +321,13 @@ const OnlineIndicator = ({ user_id }: OnlineStatusProps) => {
 	useEffect(() => {
 		try {
 			socket.on('online_response', (data) => {
-				console.log('online response', data)
 				if (data.queried_id === user_id) setOnline(data.online);
 			});
 			socket.emit('online_query', user_id);
-			return () => {
-				socket.removeAllListeners('online_response');
-			};
 		} catch (err) {}
+		return () => {
+			socket.removeAllListeners('online_response');
+		};
 	}, []);
 
 	return online ? (
@@ -401,6 +414,7 @@ const ChatWindow = () => {
 	const windowBottom: MutableRefObject<any> = useRef(null);
 	const { profile } = useUserContext();
 	const [startIndex, setStartIndex] = useState(received.length);
+	const [submit, setSubmit] = useState(false);
 
 	// Infinite scroll hooks
 	const { ref, inView } = useInView({
@@ -408,7 +422,9 @@ const ChatWindow = () => {
 	});
 	useEffect(() => {
 		if (inView) {
-			setStartIndex((startIndex) => startIndex - 10 > 0 ? startIndex - 10 : 0);
+			setStartIndex((startIndex) =>
+				startIndex - 10 > 0 ? startIndex - 10 : 0
+			);
 		}
 	}, [inView]);
 
@@ -420,7 +436,7 @@ const ChatWindow = () => {
 	};
 	useEffect(() => {
 		scrollToBottom();
-		setStartIndex(received.length - 10 > 0 ? received.length - 10 : 0)
+		setStartIndex(received.length - 10 > 0 ? received.length - 10 : 0);
 	}, [received]);
 
 	const emitMessageAndNotification = (
@@ -431,8 +447,28 @@ const ChatWindow = () => {
 		socket.emit('send_message', matchData.match_id, payload);
 		socket.emit('send_notification', matchData.receiver_id, notification);
 	};
+
+	const selectChat = async (controller: AbortController) => {
+		try {
+			if (!matchData.match_id) return;
+			setReceived([]);
+			socket.emit('active_chat', matchData.match_id);
+			setLoadStatus(LoadStatus.LOADING);
+			const response = await authAPI(`/messages/${matchData.match_id}`, {
+				signal: controller.signal,
+			});
+			if (response?.data?.messages?.length > 0)
+				setReceived([...response.data.messages]);
+		} catch (err) {
+			setLoadStatus(LoadStatus.ERROR);
+		} finally {
+			setLoadStatus(LoadStatus.IDLE);
+		}
+	};
+
 	const sendMessage = async () => {
 		if (outgoing.length < 1) return;
+		const controller = new AbortController();
 		try {
 			setLoadStatus(LoadStatus.LOADING);
 			const payload = {
@@ -452,29 +488,17 @@ const ChatWindow = () => {
 			};
 			setReceived((current) => [...current, payload]);
 			emitMessageAndNotification(matchData, payload, notification);
-			selectChat();
+			await selectChat(controller);
 			setOutgoing('');
 		} catch (err) {}
+		finally {
+			controller.abort()
+		}
 	};
 
 	const handleSubmit = (event: React.FormEvent) => {
 		event.preventDefault();
 		sendMessage();
-	};
-	const selectChat = async () => {
-		try {
-			if (!matchData.match_id) return;
-			setReceived([]);
-			socket.emit('active_chat', matchData.match_id);
-			setLoadStatus(LoadStatus.LOADING);
-			const response = await authAPI(`/messages/${matchData.match_id}`);
-			if (response?.data?.messages?.length > 0)
-				setReceived([...response.data.messages]);
-		} catch (err) {
-			setLoadStatus(LoadStatus.ERROR);
-		} finally {
-			setLoadStatus(LoadStatus.IDLE);
-		}
 	};
 
 	useEffect(() => {
@@ -482,15 +506,33 @@ const ChatWindow = () => {
 			socket.on('receive_message', (data) => {
 				setReceived((current) => [...current, data]);
 			});
-		} catch (err) {
-		}
+		} catch (err) {}
 		return () => {
 			socket.removeAllListeners('receive_message');
 		};
 	}, [socket]);
 
 	useEffect(() => {
+		const controller = new AbortController();
+		const selectChat = async () => {
+			try {
+				if (!matchData.match_id) return;
+				setReceived([]);
+				socket.emit('active_chat', matchData.match_id);
+				setLoadStatus(LoadStatus.LOADING);
+				const response = await authAPI(`/messages/${matchData.match_id}`, {
+					signal: controller.signal,
+				});
+				if (response?.data?.messages?.length > 0)
+					setReceived([...response.data.messages]);
+			} catch (err) {
+				setLoadStatus(LoadStatus.ERROR);
+			} finally {
+				setLoadStatus(LoadStatus.IDLE);
+			}
+		};
 		selectChat();
+		return () => controller.abort();
 	}, [matchData.match_id]);
 
 	if (loadStatus == LoadStatus.ERROR)
@@ -500,11 +542,12 @@ const ChatWindow = () => {
 		<div className="column">
 			<div className="is-flex is-flex-direction-column mt-6 chat-window">
 				{startIndex > 0 ? (
-					<div ref={ref}>
-					</div>
-				) : received.length > 0 ? <section className="section has-text-centered">
-				<h5 className="title is-5">No more messages</h5>
-			</section> : (
+					<div ref={ref}></div>
+				) : received.length > 0 ? (
+					<section className="section has-text-centered">
+						<h5 className="title is-5">No more messages</h5>
+					</section>
+				) : (
 					<section className="section has-text-centered">
 						<h3 className="title is-3">No messages to show</h3>
 					</section>

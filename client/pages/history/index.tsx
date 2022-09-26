@@ -1,16 +1,19 @@
 import type { NextPage } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNotificationContext } from '../../components/NotificationContext';
 import { OnlineIndicator } from '../../components/profile';
 import { useUserContext } from '../../components/UserContext';
 import { ErrorFallback, LoadError, Spinner } from '../../components/utilities';
 import { ActivePage, LoadStatus, LogEntry } from '../../types/types';
 import { authAPI } from '../../utilities/api';
-import { convertBirthdayToAge } from '../../utilities/helpers';
+import {
+	convertBirthdayToAge,
+	handleRouteError,
+} from '../../utilities/helpers';
 import { useInView } from 'react-intersection-observer';
-import {ErrorBoundary} from 'react-error-boundary'
+import { ErrorBoundary } from 'react-error-boundary';
 
 const NotLoggedIn = () => {
 	return (
@@ -23,7 +26,7 @@ const NotLoggedIn = () => {
 };
 
 const LoggedIn = () => {
-	const { userData, profile, setProfile } = useUserContext();
+	const { userData } = useUserContext();
 	const { setActivePage } = useNotificationContext();
 	const [log, setLog] = useState([]);
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
@@ -35,11 +38,23 @@ const LoggedIn = () => {
 	const { ref, inView } = useInView({
 		threshold: 0,
 	});
+
 	useEffect(() => {
 		if (inView) {
 			setEndIndex((endIndex) => endIndex + 10);
 		}
 	}, [inView]);
+
+	// Router error event listener and handler
+	useEffect(() => {
+		router.events.on('routeChangeError', handleRouteError);
+
+		// If the component is unmounted, unsubscribe
+		// from the event with the `off` method:
+		return () => {
+			router.events.off('routeChangeError', handleRouteError);
+		};
+	}, []);
 	
 	// Redirect if user has no profile
 	useEffect(() => {
@@ -49,10 +64,13 @@ const LoggedIn = () => {
 	}, [userData.profile_exists]);
 
 	useEffect(() => {
+		const controller = new AbortController();
 		const getVisitorLog = async () => {
 			try {
 				setLoadStatus(LoadStatus.LOADING);
-				let response = await authAPI.get(`/log`);
+				let response = await authAPI.get(`/log`, {
+					signal: controller.signal,
+				});
 				if (response.status === 200) {
 					setLog(response.data.log);
 				}
@@ -64,6 +82,7 @@ const LoggedIn = () => {
 		};
 		getVisitorLog();
 		setActivePage(ActivePage.HISTORY);
+		return () => controller.abort();
 	}, []);
 
 	if (loadStatus == LoadStatus.LOADING) return <Spinner />;
@@ -74,11 +93,9 @@ const LoggedIn = () => {
 		<section className="section has-text-centered">
 			<h3 className="title is-3">Recently visited profiles</h3>
 			<div className="block">
-				{log
-						.slice(0, endIndex)
-						.map((visitor: LogEntry, index) => (
-							<SearchResultItem key={index} profile={visitor} />
-						))}
+				{log.slice(0, endIndex).map((visitor: LogEntry, index) => (
+					<SearchResultItem key={index} profile={visitor} />
+				))}
 				{endIndex < log.length ? (
 					<div ref={ref}>
 						<Spinner />
@@ -178,7 +195,7 @@ export const SearchResultItem = ({ profile }: any) => {
 const History: NextPage = () => {
 	const { accessToken } = useUserContext();
 	return (
-		<ErrorBoundary FallbackComponent={ErrorFallback} >
+		<ErrorBoundary FallbackComponent={ErrorFallback}>
 			<div className="columns is-centered">
 				<div className="column is-three-quarters">
 					{accessToken ? <LoggedIn /> : <NotLoggedIn />}

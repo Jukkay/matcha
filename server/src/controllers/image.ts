@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { OkPacket, RowDataPacket } from 'mysql';
+import { RowDataPacket } from 'mysql';
 import { execute } from '../utilities/SQLConnect';
 import {unlink} from "fs";
 import { decodeUserFromAccesstoken } from './token';

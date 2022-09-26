@@ -110,9 +110,7 @@ export const CreateProfile = ({
 					sessionStorage.setItem('profile', JSON.stringify(payload));
 				}, 2000);
 			}
-		} catch (err) {
-			console.error(err);
-		}
+		} catch (err) {}
 	};
 
 	const handleSubmit = (event: React.FormEvent) => {

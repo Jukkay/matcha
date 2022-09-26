@@ -151,14 +151,16 @@ export const VisitorLog = ({ user_id }: any) => {
 	}, [inView]);
 
 	useEffect(() => {
+		const controller = new AbortController();
 		const getVisitorLog = async () => {
-			let response = await authAPI.get(`/log/${user_id}`);
+			let response = await authAPI.get(`/log/${user_id}`, {signal: controller.signal});
 			if (response.status === 200) {
 				setPageVisited(true);
 				setLog(response.data.log);
 			}
 		};
 		getVisitorLog();
+		return () => controller.abort();
 	}, []);
 
 	return pageVisited && log ? (
@@ -305,8 +307,9 @@ export const Gallery = ({ user_id }: OnlineStatusProps) => {
 	const [images, setImages] = useState([]);
 
 	useEffect(() => {
+		const controller = new AbortController()
 		const getUserImages = async () => {
-			let response = await authAPI.get(`/image/user/${user_id}`);
+			let response = await authAPI.get(`/image/user/${user_id}`, {signal: controller.signal});
 			if (response?.data?.photos) {
 				const filenames = response.data.photos.map(
 					(item: any) =>
@@ -316,6 +319,7 @@ export const Gallery = ({ user_id }: OnlineStatusProps) => {
 			}
 		};
 		getUserImages();
+		return () => controller.abort();
 	}, []);
 
 	return images && user_id ? (
@@ -461,9 +465,10 @@ export const OnlineIndicator = ({ user_id }: OnlineStatusProps) => {
 			return () => {
 				socket.removeAllListeners('online_response');
 			};
-		} catch (err) {
-			console.error(err);
-		}
+		} catch (err) {}
+		return () => {
+			socket.removeAllListeners('online_response');
+		};
 	}, []);
 
 	return online ? (

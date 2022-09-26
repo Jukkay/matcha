@@ -13,7 +13,7 @@ up:
 	docker-compose up
 
 up-production:
-	docker compose -f docker-compose.yml -f production.yml up -d
+	docker compose -f docker-compose.yml -f production.yml up
 
 restart:
 	docker-compose up -d

@@ -1,5 +1,4 @@
-import { createPool, Pool, RowDataPacket, PoolConnection } from 'mysql'
-import { IUser } from "../interfaces/IUser";
+import { createPool, Pool, RowDataPacket } from 'mysql'
 import params from "../config/mysql"
 
 let pool: Pool

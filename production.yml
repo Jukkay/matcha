@@ -6,6 +6,3 @@ services:
   
   server:
     restart: always
-    environment:
-      PROTOCOL: https
-      CLIENT_URL: https://matcha.jukkay.dev

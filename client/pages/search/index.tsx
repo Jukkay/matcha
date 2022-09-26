@@ -1,16 +1,12 @@
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
-
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Results, ProfileSearch } from '../../components/search';
-import { useNotificationContext } from '../../components/NotificationContext';
-
 import { useUserContext } from '../../components/UserContext';
 import {
 	LoadStatus,
 	SortType,
 	IResultsProfile,
-	ActivePage,
 } from '../../types/types';
 import { convertBirthdayToAge, handleRouteError } from '../../utilities/helpers';
 import {
@@ -37,8 +33,7 @@ const NotLoggedIn = () => {
 };
 
 const LoggedIn = () => {
-	const { profile, setProfile, userData } = useUserContext();
-	const { setActivePage } = useNotificationContext();
+	const { profile, userData } = useUserContext();
 	const [sort, setSort] = useState<SortType>(SortType.DISTANCE);
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
 	const [searchParams, setSearchParams] = useState({

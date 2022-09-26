@@ -93,7 +93,6 @@ const updateUserActivity = (socket_id: string) => {
 	const i = onlineUsers?.findIndex((item) => item.socket_id === socket_id)
 	if (i > -1) {
 		onlineUsers[i] = {...onlineUsers[i], active: Date.now()}
-		console.log('updated user activity')
 	}
 };
 
@@ -102,16 +101,13 @@ io.use((socket, next) => {
 	const token = socket.handshake.auth.token;
 	const user_id = socket.handshake.auth.user_id
 	if (!token || !user_id) {
-		console.log('Missing token or user_id')
 		next(new Error('Unauthorized'));
 	}
 	updateOnlineUsers(user_id, socket.id)
 	jwt.verify(token, server_token, (err: VerifyErrors | null) => {
 		if (err) {
-			console.log("err in checkSocketJWT")
 			next(new Error('Unauthorized'));
 		}
-		console.log("All good in checkSocketJWT")
 		next();
 	})
 });

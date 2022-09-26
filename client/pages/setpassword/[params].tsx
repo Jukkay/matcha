@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
-import react,{ useState, useEffect} from "react";
-import { FaCheck, FaUser, FaLock, FaEnvelope } from "react-icons/fa";
+import { useState, useEffect} from "react";
+import { FaCheck, FaUser, FaLock } from "react-icons/fa";
 import { FormInput, Notification, SubmitButton } from "../../components/form";;
 import { API } from "../../utilities/api";
 import { useRouter } from 'next/router'

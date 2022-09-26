@@ -128,7 +128,7 @@ export const getRecentProfiles = async (req: Request, res: Response) => {
 		WHERE 
 			visiting_user = ?
 		ORDER BY 
-			visitors.log_id DESC
+			visitors.visit_date DESC
 		LIMIT 
 			100`;
 		const log = await execute(sql, [user_id]);

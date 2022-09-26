@@ -1,7 +1,7 @@
 import type { NextPage } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNotificationContext } from '../../components/NotificationContext';
 import { OnlineIndicator } from '../../components/profile';
 import { useUserContext } from '../../components/UserContext';
@@ -13,8 +13,11 @@ import {
 	NotificationType,
 } from '../../types/types';
 import { authAPI } from '../../utilities/api';
-import { convertBirthdayToAge} from '../../utilities/helpers';
-import {ErrorBoundary} from 'react-error-boundary'
+import {
+	convertBirthdayToAge,
+	handleRouteError,
+} from '../../utilities/helpers';
+import { ErrorBoundary } from 'react-error-boundary';
 
 const NotLoggedIn = () => {
 	return (
@@ -27,7 +30,7 @@ const NotLoggedIn = () => {
 };
 
 const LoggedIn = () => {
-	const { userData, updateUserData, profile, setProfile } = useUserContext();
+	const { userData } = useUserContext();
 	const {
 		setActivePage,
 		setNotificationCount,
@@ -40,6 +43,17 @@ const LoggedIn = () => {
 	const [wasRedirected, setWasRedirected] = useState(false);
 	const router = useRouter();
 
+	// Router error event listener and handler
+	useEffect(() => {
+		router.events.on('routeChangeError', handleRouteError);
+
+		// If the component is unmounted, unsubscribe
+		// from the event with the `off` method:
+		return () => {
+			router.events.off('routeChangeError', handleRouteError);
+		};
+	}, []);
+	
 	// Redirect if user has no profile
 	useEffect(() => {
 		if (wasRedirected || userData.profile_exists) return;
@@ -47,24 +61,29 @@ const LoggedIn = () => {
 		router.replace('/profile');
 	}, [userData.profile_exists]);
 
-	const getLikerProfiles = async () => {
-		let response = await authAPI.get(`/like/${userData.user_id}`);
+	const getLikerProfiles = async (controller: AbortController) => {
+		let response = await authAPI.get(`/like/${userData.user_id}`, {
+			signal: controller.signal,
+		});
 		if (response.data.profiles.length > 0) {
 			setLikerProfiles(response.data.profiles);
 		}
 	};
 
-	const getLikedProfiles = async () => {
-		let response = await authAPI.get(`/likedprofiles/${userData.user_id}`);
+	const getLikedProfiles = async (controller: AbortController) => {
+		let response = await authAPI.get(`/likedprofiles/${userData.user_id}`, {
+			signal: controller.signal,
+		});
 		if (response.data.profiles.length > 0) {
 			setLikedProfiles(response.data.profiles);
 		}
 	};
 
-	const markLikeNotificationsRead = async () => {
+	const markLikeNotificationsRead = async (controller: AbortController) => {
 		const response = await authAPI.patch('/notifications', {
 			type: NotificationType.LIKE,
 			user_id: userData.user_id,
+			signal: controller.signal,
 		});
 		if (response.status === 200) {
 			setNotificationCount(0);
@@ -74,12 +93,15 @@ const LoggedIn = () => {
 	};
 
 	useEffect(() => {
+		const controller1 = new AbortController();
+		const controller2 = new AbortController();
+		const controller3 = new AbortController();
 		const fetchData = async () => {
 			try {
 				setLoadStatus(LoadStatus.LOADING);
-				await getLikedProfiles();
-				await getLikerProfiles();
-				await markLikeNotificationsRead();
+				await getLikedProfiles(controller1);
+				await getLikerProfiles(controller2);
+				await markLikeNotificationsRead(controller3);
 			} catch (err) {
 				setLoadStatus(LoadStatus.ERROR);
 			} finally {
@@ -88,6 +110,11 @@ const LoggedIn = () => {
 		};
 		fetchData();
 		setActivePage(ActivePage.LIKES);
+		return () => {
+			controller1.abort();
+			controller2.abort();
+			controller3.abort();
+		};
 	}, []);
 
 	if (loadStatus == LoadStatus.LOADING) return <Spinner />;
@@ -212,7 +239,7 @@ export const LikeProfile = ({ profile }: any) => {
 const Likes: NextPage = () => {
 	const { accessToken } = useUserContext();
 	return (
-		<ErrorBoundary FallbackComponent={ErrorFallback} >
+		<ErrorBoundary FallbackComponent={ErrorFallback}>
 			<div className="columns is-centered">
 				<div className="column is-three-quarters">
 					{accessToken ? <LoggedIn /> : <NotLoggedIn />}

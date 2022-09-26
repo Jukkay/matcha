@@ -393,6 +393,10 @@ V Change age range selectors to sliders
 V Make location update on location change
 V Make sure gps and ip location works
 V Fix profile creation Age range NaN warnings
+V Add abort controllers where it makes sense
+V Add router error handlers where router is used
+V Clean console logs
+V Add page title
 
 Make production docker-compose
 Configure AWS account

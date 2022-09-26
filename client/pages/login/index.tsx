@@ -1,24 +1,35 @@
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { FaUser, FaLock } from 'react-icons/fa';
 import { FormInput, SubmitButton, Notification } from '../../components/form';
 import { useUserContext } from '../../components/UserContext';
 import { API, authAPI } from '../../utilities/api';
 import Link from 'next/link';
+import { handleRouteError } from '../../utilities/helpers';
 
 const LoginSuccess = () => {
 	const { setProfile, userData, updateUserData } = useUserContext();
 	const [wasRedirected, setWasRedirected] = useState(false);
 	const router = useRouter();
 
+	// Router error event listener and handler
+	useEffect(() => {
+		router.events.on('routeChangeError', handleRouteError);
+
+		// If the component is unmounted, unsubscribe
+		// from the event with the `off` method:
+		return () => {
+			router.events.off('routeChangeError', handleRouteError);
+		};
+	}, []);
 	// Redirect if user has no profile
 	useEffect(() => {
 		if (wasRedirected || userData.profile_exists) return;
 		setWasRedirected(true);
-		const path = userData.profile_exists ? '/' : '/profile'
-    	const timer = setTimeout(() => router.replace(path), 2000);
-		return () => clearTimeout(timer)
+		const path = userData.profile_exists ? '/' : '/profile';
+		const timer = setTimeout(() => router.replace(path), 2000);
+		return () => clearTimeout(timer);
 	}, [userData.profile_exists]);
 
 	useEffect(() => {
@@ -67,11 +78,8 @@ const Login: NextPage = () => {
 	const [notificationText, setNotificationText] = useState('');
 
 	// Get user data from context
-	const {
-		updateUserData,
-		updateAccessToken,
-		updateRefreshToken,
-	} = useUserContext();
+	const { updateUserData, updateAccessToken, updateRefreshToken } =
+		useUserContext();
 
 	// Form values
 	const [values, setValues] = useState({
@@ -131,13 +139,12 @@ const Login: NextPage = () => {
 			setValidForm(true);
 		} else setValidForm(false);
 	}, [values.username, values.password]);
-	
-	const handleLogin = async() => {
 
+	const handleLogin = async () => {
 		const controller = new AbortController();
 		try {
 			const response = await API.post(`login/`, values, {
-				signal: controller.signal
+				signal: controller.signal,
 			});
 			if (response?.status === 200) {
 				if (response.data?.auth !== true) {
@@ -166,7 +173,6 @@ const Login: NextPage = () => {
 				setSuccess(true);
 			}
 		} catch (err: any) {
-			console.error(err);
 			const errorMessage = err.response?.data?.message;
 			const errorField = err.response?.data?.field;
 			if (errorField) {
@@ -183,7 +189,7 @@ const Login: NextPage = () => {
 			setLoading(false);
 			controller.abort();
 		}
-	}
+	};
 
 	const handleSubmit = (event: React.SyntheticEvent) => {
 		event.preventDefault();
@@ -194,7 +200,7 @@ const Login: NextPage = () => {
 			generic: false,
 			server: false,
 		});
-		handleLogin()
+		handleLogin();
 	};
 
 	return success ? (

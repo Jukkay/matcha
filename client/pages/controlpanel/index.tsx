@@ -1,5 +1,5 @@
 import type { NextPage } from 'next';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
 	FaCheck,
 	FaUser,
@@ -25,7 +25,7 @@ const NotLoggedIn = () => {
 
 const LoggedIn = () => {
 	// Context states
-	const { userData, updateUserData, profile, setProfile } = useUserContext();
+	const { userData, updateUserData, profile } = useUserContext();
 	const { setActivePage } = useNotificationContext();
 
 	// validator states

@@ -9,6 +9,9 @@ interface RetryRequest extends AxiosResponse {
 	_retry: boolean;
 }
 
+// This must be set for auto-refresh to get correct baseURL
+axios.defaults.baseURL = 'http://localhost:4000'
+
 // Initialize basic axios connection
 export const API = axios.create({
 	baseURL: 'http://localhost:4000',
@@ -22,9 +25,7 @@ const handleRequest = (config: AxiosRequestConfig) => {
 		if (config.headers)
 		config.headers['Authorization'] = `Bearer ${accessToken}`;
 		return config;
-	} catch (err) {
-		console.error(err)
-	}
+	} catch (err) {}
 };
 
 // Intercept request errors
@@ -53,14 +54,18 @@ const handleResponseError = async (error: AxiosError) => {
 			} else {
 				user_id = '';
 			}
-			const refreshResponse = await API.post('/token', {
-				token: refreshToken,
-				user_id: user_id,
-			});
-			const newToken = refreshResponse.data.accessToken;
-			sessionStorage.setItem('accessToken', newToken);
-			config.headers['Authorization'] = `Bearer ${newToken}`;
-			return API(config);
+			try {
+				const refreshResponse = await API.post('/token', {
+					token: refreshToken,
+					user_id: user_id,
+				});
+				const newToken = refreshResponse?.data.accessToken;
+				sessionStorage.setItem('accessToken', newToken);
+				config.headers['Authorization'] = `Bearer ${newToken}`;
+				return API(config);
+			} catch (err) {
+				return Promise.reject(err);
+			}
 		}
 		return Promise.reject(error);
 };

@@ -2,10 +2,14 @@
 
 const path = require("path");
 const nextConfig = {
-  reactStrictMode: false,
+  reactStrictMode: true,
   swcMinify: true,
   sassOptions: {
     includePaths: [path.join(__dirname, "styles")],
+  },
+  i18n: {
+    locales: ["en-FI"],
+    defaultLocale: "en-FI",
   },
 };
 module.exports = nextConfig

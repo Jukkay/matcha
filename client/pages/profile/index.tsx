@@ -1,5 +1,5 @@
 import type { NextPage } from 'next';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { CreateProfile } from '../../components/createProfile';
 import { useNotificationContext } from '../../components/NotificationContext';
 import {

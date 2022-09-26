@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { IconContext } from 'react-icons';
 import { FaHeart, FaBell } from 'react-icons/fa';
 import { FiMenu } from 'react-icons/fi';
@@ -11,7 +11,7 @@ import { INotification, LikeProp, NotificationType } from '../types/types';
 import axios from 'axios';
 import { socket } from './SocketContext';
 import { ErrorFallback } from './utilities';
-import {ErrorBoundary} from 'react-error-boundary'
+import { ErrorBoundary } from 'react-error-boundary';
 
 const LoggedOutControls = () => {
 	return (
@@ -21,7 +21,7 @@ const LoggedOutControls = () => {
 			</div>
 			<div className="is-flex is-justify-content-space-between fullwidth is-flex-wrap-nowrap">
 				<div className="is-flex is-justify-content-end is-flex-wrap-nowrap is-align-items-center fullwidth buttons mr-6">
-					<ErrorBoundary FallbackComponent={ErrorFallback} >
+					<ErrorBoundary FallbackComponent={ErrorFallback}>
 						<Link href="/signup">
 							<a className="button is-primary">Sign up</a>
 						</Link>
@@ -37,7 +37,7 @@ const LoggedOutControls = () => {
 
 const Logo = () => {
 	return (
-		<ErrorBoundary FallbackComponent={ErrorFallback} >
+		<ErrorBoundary FallbackComponent={ErrorFallback}>
 			<Link href="/">
 				<a className="navbar-item pt-3">
 					<span className="icon is-medium">
@@ -49,7 +49,8 @@ const Logo = () => {
 	);
 };
 const LoggedInControls = () => {
-	const { refreshToken, userData, updateAccessToken, profile, setProfile } = useUserContext();
+	const { refreshToken, userData, updateAccessToken, profile, setProfile } =
+		useUserContext();
 	const {
 		activeChatUser,
 		activePage,
@@ -62,51 +63,60 @@ const LoggedInControls = () => {
 		messageCount,
 		likeCount,
 	} = useNotificationContext();
-	
+
 	// Ask for location permission and locate user
 	useEffect(() => {
 		if ('geolocation' in navigator) {
-			navigator.geolocation.getCurrentPosition(
-				(position) => {
-					if (position) {
-						setProfile({...profile, latitude: position.coords.latitude, longitude: position.coords.longitude})
-						console.log('geolocation', position)
-					}
-					}, 
-				(error) => console.log('Geolocation not permitted by user.', error))
+			navigator.geolocation.getCurrentPosition((position) => {
+				if (position) {
+					setProfile({
+						...profile,
+						latitude: position.coords.latitude,
+						longitude: position.coords.longitude,
+					});
+				}
+			});
 		}
 	}, []);
 
 	// Update location information to db
 	useEffect(() => {
-		authAPI.post('/geolocation', {
-			latitude: profile.latitude, 
-			longitude: profile.longitude
-		})
-	}, [profile.latitude, profile.longitude])
-
-	const getNotifications = async () => {
-		try {
-			if (!userData.user_id) return;
-			socket.emit('set_user', userData.user_id);
-			const response = await authAPI(
-				`/notifications/${userData.user_id}`
-			);
-			if (response?.data?.notifications?.length > 0) {
-				setNotifications([...response.data.notifications]);
-			} else {
-				setNotificationCount(0);
-				setLikeCount(0);
-				setMessageCount(0);
-			}
-		} catch (err) {
-			console.error(err);
+		const controller = new AbortController();
+		const fetch = async() => {
+			try {
+				await authAPI.post('/geolocation', {
+					latitude: profile.latitude,
+					longitude: profile.longitude,
+					signal: controller.signal,
+				});
+			} catch {}
 		}
-	};
+		fetch()
+		return () => controller.abort();
+	}, [profile.latitude, profile.longitude]);
 
 	// Subscribe for and fetch notifications
 	useEffect(() => {
+		const controller = new AbortController();
+		const getNotifications = async () => {
+			try {
+				if (!userData.user_id) return;
+				socket.emit('set_user', userData.user_id);
+				const response = await authAPI(
+					`/notifications/${userData.user_id}`,
+					{ signal: controller.signal }
+				);
+				if (response?.data?.notifications?.length > 0) {
+					setNotifications([...response.data.notifications]);
+				} else {
+					setNotificationCount(0);
+					setLikeCount(0);
+					setMessageCount(0);
+				}
+			} catch (err) {}
+		};
 		getNotifications();
+		return () => controller.abort();
 	}, [socket, userData.user_id]);
 
 	// Listen for notifications
@@ -125,12 +135,10 @@ const LoggedInControls = () => {
 					};
 					updateAccessToken(newToken);
 					sessionStorage.setItem('accessToken', newToken);
-					console.log('AccessToken refreshed by socket handler');
 					socket.connect();
 				}
 			});
 			socket.on('receive_notification', (data) => {
-				console.log('Received notification', data);
 				if (
 					activePage === data.notification_type ||
 					activeChatUser === data.sender_id
@@ -142,13 +150,11 @@ const LoggedInControls = () => {
 					setLikeCount(likeCount + 1);
 				setNotificationCount(notificationCount + 1);
 			});
-			return () => {
-				socket.removeAllListeners('receive_notification');
-				socket.removeAllListeners('connect_error');
-			};
-		} catch (err) {
-			console.error(err);
-		}
+		} catch (err) {}
+		return () => {
+			socket.removeAllListeners('receive_notification');
+			socket.removeAllListeners('connect_error');
+		};
 	}, [socket]);
 
 	// Count notifications and update badges
@@ -211,7 +217,7 @@ const LoggedInControls = () => {
 const TextLinks = ({ likeCount }: LikeProp) => {
 	return (
 		<div className="is-flex-wrap-nowrap text-links">
-			<ErrorBoundary FallbackComponent={ErrorFallback} >
+			<ErrorBoundary FallbackComponent={ErrorFallback}>
 				<Link href="/search">
 					<a className="navbar-item">Search</a>
 				</Link>
@@ -282,12 +288,7 @@ const MainDropdownMenu = () => {
 	);
 };
 const MessageIcon = () => {
-	const {
-		messageCount,
-		setNotificationCount,
-		setMessageCount,
-		setLikeCount,
-	} = useNotificationContext();
+	const { messageCount } = useNotificationContext();
 	return messageCount ? (
 		<Link href="/messages">
 			<a className="navbar-item">
