@@ -25,7 +25,7 @@ const LoginSuccess = () => {
 	}, []);
 	// Redirect if user has no profile
 	useEffect(() => {
-		if (wasRedirected || userData.profile_exists) return;
+		if (wasRedirected) return;
 		setWasRedirected(true);
 		const path = userData.profile_exists ? '/' : '/profile';
 		const timer = setTimeout(() => router.replace(path), 2000);

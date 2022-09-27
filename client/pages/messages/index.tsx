@@ -49,7 +49,7 @@ const LoggedIn = () => {
 			router.events.off('routeChangeError', handleRouteError);
 		};
 	}, []);
-	
+
 	// Redirect if user has no profile
 	useEffect(() => {
 		if (wasRedirected || userData.profile_exists) return;
@@ -271,6 +271,7 @@ const MatchList = () => {
 	const { matchData, setMatchData, setActivePage } = useNotificationContext();
 
 	useEffect(() => {
+		if (!profile.user_id) return
 		const getUsersMatches = async () => {
 			try {
 				setLoadStatus(LoadStatus.LOADING);
@@ -286,7 +287,7 @@ const MatchList = () => {
 		};
 		getUsersMatches();
 		setActivePage(ActivePage.MESSAGES);
-	}, []);
+	}, [profile.user_id]);
 
 	if (loadStatus == LoadStatus.LOADING) return <Spinner />;
 	if (loadStatus == LoadStatus.ERROR)
@@ -343,6 +344,7 @@ const MatchListItem = ({ match, user_id }: any) => {
 	const receiver_id = user_id === match.user1 ? match.user2 : match.user1;
 	const { matchData, setMatchData, setActiveChatUser } =
 		useNotificationContext();
+
 
 	const handleClick = (event: React.MouseEvent) => {
 		event.preventDefault();
@@ -414,7 +416,6 @@ const ChatWindow = () => {
 	const windowBottom: MutableRefObject<any> = useRef(null);
 	const { profile } = useUserContext();
 	const [startIndex, setStartIndex] = useState(received.length);
-	const [submit, setSubmit] = useState(false);
 
 	// Infinite scroll hooks
 	const { ref, inView } = useInView({
@@ -444,26 +445,8 @@ const ChatWindow = () => {
 		payload: {},
 		notification: {}
 	) => {
-		socket.emit('send_message', matchData.match_id, payload);
+		socket.emit('send_message', matchData.receiver_id, payload);
 		socket.emit('send_notification', matchData.receiver_id, notification);
-	};
-
-	const selectChat = async (controller: AbortController) => {
-		try {
-			if (!matchData.match_id) return;
-			setReceived([]);
-			socket.emit('active_chat', matchData.match_id);
-			setLoadStatus(LoadStatus.LOADING);
-			const response = await authAPI(`/messages/${matchData.match_id}`, {
-				signal: controller.signal,
-			});
-			if (response?.data?.messages?.length > 0)
-				setReceived([...response.data.messages]);
-		} catch (err) {
-			setLoadStatus(LoadStatus.ERROR);
-		} finally {
-			setLoadStatus(LoadStatus.IDLE);
-		}
 	};
 
 	const sendMessage = async () => {
@@ -486,13 +469,12 @@ const ChatWindow = () => {
 				notification_text: 'You received a new message.',
 				link: '/messages',
 			};
-			setReceived((current) => [...current, payload]);
+			// setReceived((current) => [...current, payload]);
 			emitMessageAndNotification(matchData, payload, notification);
-			await selectChat(controller);
 			setOutgoing('');
-		} catch (err) {}
-		finally {
-			controller.abort()
+		} catch (err) {
+		} finally {
+			controller.abort();
 		}
 	};
 
@@ -502,13 +484,37 @@ const ChatWindow = () => {
 	};
 
 	useEffect(() => {
+		const controller = new AbortController();
 		try {
 			socket.on('receive_message', (data) => {
-				setReceived((current) => [...current, data]);
-			});
+				console.log('message received', data)
+				console.log('match_id active', matchData.match_id)
+				if (data.match_id === matchData.match_id) {
+					const selectChat = async () => {
+						if (!matchData.match_id) return;
+						setLoadStatus(LoadStatus.LOADING);
+						const response = await authAPI(
+							`/messages/${matchData.match_id}`,
+							{
+								signal: controller.signal,
+							}
+						);
+						console.log(response.data.messages)
+						if (response?.data?.messages?.length > 0)
+							setReceived([...response.data.messages]);
+					}
+					selectChat()
+					
+					// setReceived((current) => [...current, data]);
+				}
+			})
 		} catch (err) {}
+		finally {
+			setLoadStatus(LoadStatus.IDLE);
+		}
 		return () => {
 			socket.removeAllListeners('receive_message');
+			controller.abort();
 		};
 	}, [socket]);
 
@@ -517,12 +523,13 @@ const ChatWindow = () => {
 		const selectChat = async () => {
 			try {
 				if (!matchData.match_id) return;
-				setReceived([]);
-				socket.emit('active_chat', matchData.match_id);
 				setLoadStatus(LoadStatus.LOADING);
-				const response = await authAPI(`/messages/${matchData.match_id}`, {
-					signal: controller.signal,
-				});
+				const response = await authAPI(
+					`/messages/${matchData.match_id}`,
+					{
+						signal: controller.signal,
+					}
+				);
 				if (response?.data?.messages?.length > 0)
 					setReceived([...response.data.messages]);
 			} catch (err) {
@@ -533,6 +540,10 @@ const ChatWindow = () => {
 		};
 		selectChat();
 		return () => controller.abort();
+	}, [matchData]);
+
+	useEffect(() => {
+		console.log(matchData)
 	}, [matchData.match_id]);
 
 	if (loadStatus == LoadStatus.ERROR)
@@ -605,7 +616,7 @@ const ChatWindow = () => {
 };
 
 const ChatMessage = ({ item, user_id }: any) => {
-	return user_id === item.user_id ? (
+	return user_id === item.user_id || user_id === item.sender_id ? (
 		<div className="card has-background-primary-light  is-align-self-flex-end m-3">
 			<div className="m-3">{item.message_text}</div>
 			<div className="is-flex is-flex-direction-row is-flex-wrap-nowrap">

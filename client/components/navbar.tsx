@@ -97,6 +97,7 @@ const LoggedInControls = () => {
 
 	// Subscribe for and fetch notifications
 	useEffect(() => {
+		if (!userData.user_id) return
 		const controller = new AbortController();
 		const getNotifications = async () => {
 			try {
@@ -121,6 +122,7 @@ const LoggedInControls = () => {
 
 	// Listen for notifications
 	useEffect(() => {
+		if (!userData.user_id) return
 		try {
 			socket.on('connect_error', async (err) => {
 				if (err.message === 'Unauthorized') {
@@ -155,7 +157,7 @@ const LoggedInControls = () => {
 			socket.removeAllListeners('receive_notification');
 			socket.removeAllListeners('connect_error');
 		};
-	}, [socket]);
+	}, [socket, userData.user_id]);
 
 	// Count notifications and update badges
 	useEffect(() => {

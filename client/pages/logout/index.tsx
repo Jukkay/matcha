@@ -7,16 +7,15 @@ const Logout: NextPage = () => {
 	const {
 		updateAccessToken,
 		updateRefreshToken,
-		userData,
 		updateUserData,
 		refreshToken,
 		setProfile
 	} = useUserContext();
 
 	useEffect(() => {
+		if (!refreshToken) return
 		try {
 			API.post('/logout/', {
-				user_id: userData.user_id,
 				refreshToken: refreshToken,
 			});
 			updateAccessToken('');
@@ -28,7 +27,7 @@ const Logout: NextPage = () => {
 			sessionStorage?.removeItem('userData');
 			sessionStorage?.removeItem('profile');
 		} catch (err) {}
-	}, []);
+	}, [refreshToken]);
 
 	return (
 		<div className="columns">

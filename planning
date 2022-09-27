@@ -398,6 +398,9 @@ V Add router error handlers where router is used
 V Clean console logs
 V Add page title
 
+V Fix active_chat selection not working
+Fix missing first messages
+Remove .DS_Store from image filenames
 Make production docker-compose
 Configure AWS account
 Deploy to AWS
@@ -405,13 +408,17 @@ Customize CSS styling for the app
 Test websockets with multiple users
 What happens if user is unmatched or blocked during chat?
 Test all required functionality
-Remove extra clogs
 
 Refactor SQL queries using ``
 Change language to very plain language for accessibility
 Show image counter
 Remove error message passthrough in user controller
 Move components to files that make most sense
+
+# Test users
+yellowwolf806 Password1
+greenfrog868 Password1
+tinycat539
 
 # Possible bonuses
 AWS deployment
