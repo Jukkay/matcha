@@ -7,9 +7,16 @@ import { useUserContext } from '../../components/UserContext';
 import { API, authAPI } from '../../utilities/api';
 import Link from 'next/link';
 import { handleRouteError } from '../../utilities/helpers';
+import { socket } from '../../components/SocketContext';
 
 const LoginSuccess = () => {
-	const { setProfile, userData, updateUserData } = useUserContext();
+	const {
+		setProfile,
+		userData,
+		updateUserData,
+		updateAccessToken,
+		updateRefreshToken,
+	} = useUserContext();
 	const [wasRedirected, setWasRedirected] = useState(false);
 	const router = useRouter();
 
@@ -161,6 +168,11 @@ const Login: NextPage = () => {
 				if (response.data.accessToken && response.data.refreshToken) {
 					updateAccessToken(response.data.accessToken);
 					updateRefreshToken(response.data.refreshToken);
+					(socket as any).auth = {
+						token: response.data.accessToken,
+						user_id: response.data.user.user_id,
+					};
+					socket.disconnect().connect();
 					sessionStorage.setItem(
 						'accessToken',
 						response.data.accessToken

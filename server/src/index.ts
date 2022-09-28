@@ -59,13 +59,11 @@ const io = new Server(httpServer, {
 });
 
 // Socket.io listeners
-// let previousChat: any;
-// let previousUser: any;
 let onlineUsers: any[] = [];
 
 const updateOnlineUsers = (user_id: number, socket_id: string) => {
 	const i = onlineUsers?.findIndex((item) => item.user_id === user_id);
-	if (i > -1) {
+	if (i && i > -1) {
 		onlineUsers[i] = {user_id: user_id, socket_id: socket_id, active: Date.now()}
 		console.log(onlineUsers[i], 'updated')
 	} else {
@@ -81,7 +79,6 @@ const updateOnlineUsers = (user_id: number, socket_id: string) => {
 const queryOnlineUsers = (user_id: number) => {
 	const maxTimeInactive = 1000 * 60 * 5
 	const i = onlineUsers?.findIndex((item) => item.user_id === user_id)
-	console.log(`user_id ${user_id} found at index ${i}`)
 	if (i > -1) {
 		if ((Date.now() - onlineUsers[i].active) < maxTimeInactive)
 			return true;
@@ -91,7 +88,6 @@ const queryOnlineUsers = (user_id: number) => {
 };
 
 const updateUserActivity = (socket_id: string) => {
-	console.log('updating socket activity', socket_id)
 	const i = onlineUsers?.findIndex((item) => item.socket_id === socket_id)
 	if (i > -1) {
 		onlineUsers[i] = {...onlineUsers[i], active: Date.now()}
@@ -116,28 +112,30 @@ io.use((socket, next) => {
 
 io.on('connection', (socket) => {
 	try {
+		// Chat
+		socket.on('active_chat', (data) => {
+			socket.join(data);
+			updateUserActivity(socket.id)
+		});
 
-		socket.on('send_message', async (user_id, data) => {
-			if (!user_id) return;
-			console.log('Message from send_message:', data)
+		socket.on('send_message', async (matchID, data) => {
+			if (!matchID) return;
+
 			// Save message to database
 			const response = await saveMessageToDatabase(data);
 			if (!response)
 				throw new Error('Failed to save message. Please try again.');
-			
+
 			// Emit to receiver
-			socket.to(user_id).emit('receive_message', data);
+			socket.to(matchID).emit('receive_message', data);
 			updateUserActivity(socket.id)
-			console.log('Message sent to user ', user_id);
 		});
 
 		// Notifications
 
 		socket.on('set_user', (data) => {
 			updateOnlineUsers(data, socket.id)
-			console.log('Notifications for user_id: ', data);
 			socket.join(data);
-			updateUserActivity(socket.id)
 		});
 
 		socket.on('send_notification', async (user_id, data) => {
@@ -147,12 +145,12 @@ io.on('connection', (socket) => {
 
 			// Emit to user
 			socket.to(user_id).emit('receive_notification', data);
+			updateUserActivity(socket.id)
 		});
 
 		// Online query
 		socket.on('online_query', (user_id) => {
 			const onlineStatus = queryOnlineUsers(user_id);
-			console.log('user', user_id, 'online status', onlineStatus);
 			socket.emit('online_response', {
 				queried_id: user_id,
 				online: onlineStatus,

@@ -126,6 +126,7 @@ const LoggedInControls = () => {
 		try {
 			socket.on('connect_error', async (err) => {
 				if (err.message === 'Unauthorized') {
+					console.log('Caught socket error in navbar. Refreshing token.')
 					const refreshResponse = await axios.post(`/token/`, {
 						token: refreshToken,
 						user_id: userData.user_id,

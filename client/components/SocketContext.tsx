@@ -14,6 +14,7 @@ interface ClientToServerEvents {
 	set_user: (receiver_id: number) => void;
 	active_chat: (match_id: number) => void;
 	online_query: (user_id: number) => void;
+	auth: { token: string, user_id: number}
 }
 
 const getTokenFromSessionStorage = () => {
