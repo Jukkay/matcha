@@ -22,8 +22,8 @@ const sql2 =
 const sql3 = 'SELECT user_id FROM users WHERE username = ?';
 const hash = '$2a$10$FMUz0quSrsDNryT2TRvSJu7JavNK8iZPYKfF68K4408Y0jPBT/vpC';
 const genderOptions = ['Male', 'Female'];
-const malePictureOptions = fs.readdirSync('./images/Men/')
-const femalePictureOptions = fs.readdirSync('./images/Women/')
+const malePictureOptions = fs.readdirSync('./images/Men/').filter(file => file !== '.DS_Store')
+const femalePictureOptions = fs.readdirSync('./images/Women/').filter(file => file !== '.DS_Store')
 
 const removeDuplicates = (data: any) => {
 	return data.filter((item: any, index: number) => {

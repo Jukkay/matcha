@@ -397,19 +397,23 @@ V Add abort controllers where it makes sense
 V Add router error handlers where router is used
 V Clean console logs
 V Add page title
-
 V Fix active_chat selection not working
-Fix missing first messages
-Remove .DS_Store from image filenames
-Make production docker-compose
-Configure AWS account
-Deploy to AWS
-Customize CSS styling for the app
-Test websockets with multiple users
-What happens if user is unmatched or blocked during chat?
-Test all required functionality
+V Fix missing first messages
+V Make production docker-compose
+V Configure AWS account
+V Test websockets with multiple users
+V Remove .DS_Store from image filenames
 
+Clean package-jsons
+Remove dead code
+Test all required functionality
+Customize CSS styling for the app
+What happens if user is unmatched or blocked during chat?
 Refactor SQL queries using ``
+
+
+# Backlog
+Deploy to AWS
 Change language to very plain language for accessibility
 Show image counter
 Remove error message passthrough in user controller
@@ -434,5 +438,6 @@ Infinite scroll
 Socket based online status
 Socket based messaging
 Socket based notifications
+Socket authentication
 Random user script
 Delete profile and/or userdata
