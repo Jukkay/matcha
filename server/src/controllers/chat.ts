@@ -1,6 +1,5 @@
 import { execute } from "../utilities/SQLConnect";
 import { Request, Response } from 'express';
-import { decodeUserFromAccesstoken } from "./token";
 
 export const saveMessageToDatabase = async(data: {
     match_id: number

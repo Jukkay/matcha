@@ -4,7 +4,6 @@ import { execute } from '../utilities/SQLConnect';
 import { decodeUserFromAccesstoken } from './token';
 
 const newProfile = async (req: Request, res: Response) => {
-	console.log(req.body);
 	const {
 		country,
 		city,
@@ -202,7 +201,6 @@ const updateProfile = async (req: Request, res: Response) => {
 		user_longitude,
 	} = req.body;
 	let { latitude, longitude } = req.body;
-	console.log(req.body);
 	const sql =
 		`
 		UPDATE 
@@ -278,7 +276,6 @@ const updateProfile = async (req: Request, res: Response) => {
 
 const deleteProfile = async (req: Request, res: Response) => {
 	const user_id = req.params.id;
-	console.log('Deleting profile for user', user_id);
 	if (!user_id)
 		return res.status(400).json({
 			message: 'Incomplete information',

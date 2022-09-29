@@ -64,40 +64,9 @@ const LoggedInControls = () => {
 		likeCount,
 	} = useNotificationContext();
 
-	// Ask for location permission and locate user
-	useEffect(() => {
-		if ('geolocation' in navigator) {
-			navigator.geolocation.getCurrentPosition((position) => {
-				if (position) {
-					setProfile({
-						...profile,
-						latitude: position.coords.latitude,
-						longitude: position.coords.longitude,
-					});
-				}
-			});
-		}
-	}, []);
-
-	// Update location information to db
-	useEffect(() => {
-		const controller = new AbortController();
-		const fetch = async() => {
-			try {
-				await authAPI.post('/geolocation', {
-					latitude: profile.latitude,
-					longitude: profile.longitude,
-					signal: controller.signal,
-				});
-			} catch {}
-		}
-		fetch()
-		return () => controller.abort();
-	}, [profile.latitude, profile.longitude]);
-
 	// Subscribe for and fetch notifications
 	useEffect(() => {
-		if (!userData.user_id) return
+		if (!userData.user_id) return;
 		const controller = new AbortController();
 		const getNotifications = async () => {
 			try {
@@ -122,11 +91,13 @@ const LoggedInControls = () => {
 
 	// Listen for notifications
 	useEffect(() => {
-		if (!userData.user_id) return
+		if (!userData.user_id) return;
 		try {
 			socket.on('connect_error', async (err) => {
 				if (err.message === 'Unauthorized') {
-					console.log('Caught socket error in navbar. Refreshing token.')
+					console.log(
+						'Caught socket error in navbar. Refreshing token.'
+					);
 					const refreshResponse = await axios.post(`/token/`, {
 						token: refreshToken,
 						user_id: userData.user_id,
@@ -232,7 +203,7 @@ const TextLinks = ({ likeCount }: LikeProp) => {
 						<a className="navbar-item">
 							<span
 								title="Badge top right"
-								className="badge is-danger"
+								className="badge is-danger mt-3"
 							>
 								{likeCount}
 							</span>
@@ -295,7 +266,7 @@ const MessageIcon = () => {
 	return messageCount ? (
 		<Link href="/messages">
 			<a className="navbar-item">
-				<span title="Badge top right" className="badge is-danger">
+				<span title="Badge top right" className="badge is-danger mt-3">
 					{messageCount}
 				</span>
 				<span className="icon is-medium ">
@@ -367,7 +338,7 @@ const NotificationDropdownMenu = () => {
 					<a className="navbar-item">
 						<span
 							title="Badge top right"
-							className="badge is-danger"
+							className="badge is-danger mt-3"
 						>
 							{notificationCount}
 						</span>
@@ -419,7 +390,7 @@ const NotificationsList = () => {
 				<a className="dropdown-item">
 					<span className="">{notification.notification_text}</span>
 					<span className="help">
-						{notification.notification_time}
+						{new Date(notification.notification_time).toLocaleString()}
 					</span>
 				</a>
 			</Link>
@@ -451,7 +422,12 @@ const ProfilePicture = () => {
 						className="is-rounded"
 						src={
 							profile.profile_image === 'default.png' ||
-							!profile.profile_image
+							profile.profile_image === '' ||
+							profile.profile_image === '0' ||
+							profile.profile_image === '1' ||
+							profile.profile_image === '2' ||
+							profile.profile_image === '3' ||
+							profile.profile_image === '4'
 								? '/default.png'
 								: `${authAPI.defaults.baseURL}/images/${profile.profile_image}`
 						}

@@ -153,7 +153,9 @@ export const VisitorLog = ({ user_id }: any) => {
 	useEffect(() => {
 		const controller = new AbortController();
 		const getVisitorLog = async () => {
-			let response = await authAPI.get(`/log/${user_id}`, {signal: controller.signal});
+			let response = await authAPI.get(`/log/${user_id}`, {
+				signal: controller.signal,
+			});
 			if (response.status === 200) {
 				setPageVisited(true);
 				setLog(response.data.log);
@@ -167,22 +169,20 @@ export const VisitorLog = ({ user_id }: any) => {
 		<section className="section">
 			<h3 className="title is-3">Visitor log</h3>
 			<div className="block">
-				{log
-						.slice(0, endIndex)
-						.map((result: IProfileCard, index) => (
-							<SearchResultItem
-								key={index}
-								user_id={result.user_id}
-								profile_image={result.profile_image}
-								name={result.name}
-								birthday={result.birthday}
-								city={result.city}
-								country={result.country}
-								famerating={result.famerating}
-								distance={result.distance}
-								interests={result.interests}
-							/>
-						))}
+				{log.slice(0, endIndex).map((result: IProfileCard, index) => (
+					<SearchResultItem
+						key={index}
+						user_id={result.user_id}
+						profile_image={result.profile_image}
+						name={result.name}
+						birthday={result.birthday}
+						city={result.city}
+						country={result.country}
+						famerating={result.famerating}
+						distance={result.distance}
+						interests={result.interests}
+					/>
+				))}
 				{endIndex < log.length ? (
 					<div ref={ref}>
 						<Spinner />
@@ -276,30 +276,36 @@ export const SearchResult = ({
 	query,
 }: ISearchResult) => {
 	return interests ? (
-		<div className="tags" id="interests">
-			{interests.map((interest, index) => (
-				<SelectedTag
-					key={'selected'.concat(interest.concat(index.toString()))}
-					text={interest}
-					interests={interests}
-					setInterests={setInterests}
-					setTagError={setTagError}
-				/>
-			))}
-			{result.map((interest, index) =>
-				interests.includes(interest) ? null : (
-					<Tag
-						text={interest}
+		<>
+			<div className="tags" id="interests">
+				{interests.map((interest, index) => (
+					<SelectedTag
 						key={'selected'.concat(
 							interest.concat(index.toString())
 						)}
+						text={interest}
 						interests={interests}
 						setInterests={setInterests}
 						setTagError={setTagError}
 					/>
-				)
-			)}
-		</div>
+				))}
+			</div>
+			<div className="tags" id="interests">
+				{result.map((interest, index) =>
+					interests.includes(interest) ? null : (
+						<Tag
+							text={interest}
+							key={'selected'.concat(
+								interest.concat(index.toString())
+							)}
+							interests={interests}
+							setInterests={setInterests}
+							setTagError={setTagError}
+						/>
+					)
+				)}
+			</div>
+		</>
 	) : null;
 };
 
@@ -307,9 +313,11 @@ export const Gallery = ({ user_id }: OnlineStatusProps) => {
 	const [images, setImages] = useState([]);
 
 	useEffect(() => {
-		const controller = new AbortController()
+		const controller = new AbortController();
 		const getUserImages = async () => {
-			let response = await authAPI.get(`/image/user/${user_id}`, {signal: controller.signal});
+			let response = await authAPI.get(`/image/user/${user_id}`, {
+				signal: controller.signal,
+			});
 			if (response?.data?.photos) {
 				const filenames = response.data.photos.map(
 					(item: any) =>
@@ -436,14 +444,24 @@ export const Thumbnails = ({ preview, setPreview }: IThumbnails) => {
 							Remove
 						</button>
 						{}
-						<button
-							type="button"
-							className="button is-small is-primary is-centered mt-3"
-							id={index.toString()}
-							onClick={handleProfilePicture}
-						>
-							Set as profile picture
-						</button>
+						{profile.profile_image == index.toString() ? (
+							<button
+								className="button is-small is-centered mt-3"
+								id={index.toString()}
+								onClick={handleProfilePicture}
+							>
+								Current profile picture
+							</button>
+						) : (
+							<button
+								type="button"
+								className="button is-small is-primary is-centered mt-3"
+								id={index.toString()}
+								onClick={handleProfilePicture}
+							>
+								Set as profile picture
+							</button>
+						)}
 					</div>
 				))}
 			</div>

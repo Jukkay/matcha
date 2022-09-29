@@ -61,7 +61,7 @@ export const login = async (req: Request, res: Response) => {
 			});
 
 		// Get user data
-		const sql = `SELECT user_id, username, password, email, name, validated, birthday, profile_exists FROM users WHERE username = ?;`;
+		const sql = `SELECT user_id, username, password, email, name, validated, birthday, profile_exists, location_permitted FROM users WHERE username = ?;`;
 		const user = await execute(sql, username);
 		if (!user[0]) {
 			return res.status(401).json({
@@ -109,6 +109,7 @@ export const login = async (req: Request, res: Response) => {
 					name: user[0].name,
 					birthday: user[0].birthday,
 					profile_exists: user[0].profile_exists,
+					location_permitted: user[0].location_permitted,
 				},
 				accessToken: accessToken,
 				refreshToken: refreshToken,
@@ -187,7 +188,6 @@ const getUserInformation = async (req: Request, res: Response) => {
 
 const deleteUser = async (req: Request, res: Response) => {
 	const user_id = req.params.id;
-	console.log('Deleting user', user_id);
 	if (!user_id)
 		return res.status(400).json({
 			message: 'Incomplete information',
@@ -329,7 +329,6 @@ const deleteUser = async (req: Request, res: Response) => {
 
 const updateUser = async (req: Request, res: Response) => {
 	const { username, password, name, email, birthday } = req.body;
-	console.log(req.body);
 	const sql =
 		'UPDATE users SET username=?, password=?, email=?, name=?, birthday=? WHERE user_id = ?;';
 	try {
@@ -455,6 +454,34 @@ export const reportUser = async (req: Request, res: Response) => {
 		if (response)
 			return res.status(200).json({
 				message: 'User reported successfully',
+			});
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({
+			message: 'Something went wrong',
+		});
+	}
+};
+
+export const updateLocationPermission = async (req: Request, res: Response) => {
+	const { location_permitted } = req.body;
+	console.log(req.body);
+	const sql =
+		'UPDATE users SET location_permitted=? WHERE user_id = ?;';
+	try {
+		// Get user_id
+		const user_id = await decodeUserFromAccesstoken(req);
+		if (!user_id)
+			return res.status(401).json({
+				message: 'Unauthorized',
+			});
+		const response = await execute(sql, [
+			location_permitted,
+			user_id
+		]);
+		if (response)
+			return res.status(200).json({
+				message: 'Location permission updated successfully',
 			});
 	} catch (err) {
 		console.error(err);

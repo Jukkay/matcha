@@ -69,7 +69,6 @@ const LoggedIn = () => {
 			setLikerProfiles(response.data.profiles);
 		}
 	};
-
 	const getLikedProfiles = async (controller: AbortController) => {
 		let response = await authAPI.get(`/likedprofiles/${userData.user_id}`, {
 			signal: controller.signal,
@@ -96,11 +95,12 @@ const LoggedIn = () => {
 		const controller1 = new AbortController();
 		const controller2 = new AbortController();
 		const controller3 = new AbortController();
+		setActivePage(ActivePage.LIKES);
 		const fetchData = async () => {
 			try {
 				setLoadStatus(LoadStatus.LOADING);
-				await getLikedProfiles(controller1);
-				await getLikerProfiles(controller2);
+				await getLikerProfiles(controller1);
+				await getLikedProfiles(controller2);
 				await markLikeNotificationsRead(controller3);
 			} catch (err) {
 				setLoadStatus(LoadStatus.ERROR);
@@ -109,13 +109,12 @@ const LoggedIn = () => {
 			}
 		};
 		fetchData();
-		setActivePage(ActivePage.LIKES);
 		return () => {
 			controller1.abort();
 			controller2.abort();
 			controller3.abort();
 		};
-	}, []);
+	}, [userData.user_id]);
 
 	if (loadStatus == LoadStatus.LOADING) return <Spinner />;
 	if (loadStatus == LoadStatus.ERROR)

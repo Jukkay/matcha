@@ -8,6 +8,7 @@ import {
 	FaBirthdayCake,
 } from 'react-icons/fa';
 import { FormInput, Notification, SubmitButton } from '../../components/form';
+import { LocationPermissionRequest } from '../../components/locationPermissionRequest';
 import { useNotificationContext } from '../../components/NotificationContext';
 import { useUserContext } from '../../components/UserContext';
 import { ActivePage } from '../../types/types';
@@ -377,6 +378,9 @@ const LoggedIn = () => {
 						notificationState={showGenericError}
 						handleClick={() => setShowGenericError(false)}
 					/>
+				</section>
+				<section className="section">
+					<LocationPermissionRequest />
 				</section>
 				<section className="section">
 					<p className="block">

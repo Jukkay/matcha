@@ -9,7 +9,6 @@ const updateFamerating = async(liker: string, liked: string) => {
 	await execute(sql, [likerFamerating, liker]);
 	const likedFamerating = await calculateFamerating(liked)
 	await execute(sql, [likedFamerating, liked]);
-	console.log('Famerating updated: ', likerFamerating, likedFamerating);
 }
 
 const calculateFamerating = async(user_id: string) => {
@@ -99,7 +98,6 @@ const addNewLike = async (req: Request, res: Response) => {
 			return res.status(400).json({
 				message: 'You already liked this person',
 			});
-		console.log('User', liker, 'likes user', liked)
 		// Check if liked likes liker
 		sql = `
 			SELECT 
@@ -239,7 +237,6 @@ export const getProfilesUserLikes = async (req: Request, res: Response) => {
 
 const removeLike = async (req: Request, res: Response) => {
 	const { liker, liked } = req.query;
-	console.log('user', liker, 'removes like to user', liked)
 	if (!liker || !liked)
 		return res.status(400).json({
 			message: 'Incomplete like information',

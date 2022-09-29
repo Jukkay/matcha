@@ -15,7 +15,7 @@ const createResetMessage = (email_token: string) => {
 	<section class="section">
 	<h1 class="title is-1">Reset your 42 Dates password</h1>
 	<p class="block">We've received a request to reset your password. Please click the link below to reset your password. If it wasn't you, please just ignore this message.</p>
-	<p class="block"><a href="${CLIENT_URL}/setpassword/${email_token}">${CLIENT_URL}/setpassword/${email_token}</a></p>
+	<p class="block"><a href="${CLIENT_URL}/setpassword/${email_token}">Click here to reset password.</a></p>
 	<p class="block has-text-weight-bold">Best regards,</p>
 	<p class="block has-text-weight-bold">42 Dates Team</p>
 	</section>

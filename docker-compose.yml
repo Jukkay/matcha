@@ -22,7 +22,6 @@ services:
     volumes:
       - ./server:/server
       - ./config/db/init.sql:/server/config/init.sql
-      - ./config/db/reset.sql:/server/config/reset.sql
     working_dir: "/server"
     secrets:
         - mysql_password

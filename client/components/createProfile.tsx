@@ -95,7 +95,7 @@ export const CreateProfile = ({
 				return;
 			}
 			// Get profile picture filename
-			payload.profile_image = profile.profile_image === 'default.png' ? photoUpload.data.filenames[0] : profile.profile_image
+			payload.profile_image = profile.profile_image === 'default.png' ? photoUpload.data.filenames[0] : photoUpload.data.filenames[profile.profile_image]
 			// Add other information user can't change
 			payload.birthday = userData.birthday;
 			payload.name = userData.name;

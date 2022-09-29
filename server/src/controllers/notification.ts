@@ -36,7 +36,6 @@ export const saveNotificationToDatabase = async (data: {
 
 export const getNotifications = async (req: Request, res: Response) => {
 	const user_id = req.params.id;
-	console.log('getNotifications for user_id: ', user_id);
 	try {
 		if (!user_id)
 			return res.status(400).json({
@@ -59,7 +58,7 @@ export const getNotifications = async (req: Request, res: Response) => {
                     LIMIT 15
                     `;
 		const notifications = await execute(sql, [user_id]);
-		// console.log(notifications);
+		console.log(notifications);
 		if (notifications.length > 0)
 			return res.status(200).json({
 				message: 'Notifications retrieved successfully',

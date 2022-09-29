@@ -33,6 +33,7 @@ import Slider from '@mui/material/Slider';
 import { useInView } from 'react-intersection-observer';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
+import { LocationPermissionRequest } from './locationPermissionRequest';
 
 // Dynamically imported components
 const CitySearchSelector = dynamic(() => import('./searchCitySelector'), {
@@ -144,6 +145,7 @@ export const ProfileSearch = ({
 					handleSubmit={handleSubmit}
 				/>
 			</form>
+			<LocationPermissionRequest />
 			<hr />
 
 			<Filters
@@ -247,10 +249,10 @@ const Filters = ({
 				<Interests interests={interests} setInterests={setInterests} />
 			</div>
 			<div className="block">
-				<button className="button is-primary" onClick={handleFilters}>
+				<button className="button is-primary m-1" onClick={handleFilters}>
 					Apply filters
 				</button>
-				<button className="button is-primary" onClick={handleReset}>
+				<button className="button is-primary m-1" onClick={handleReset}>
 					Reset filters
 				</button>
 			</div>

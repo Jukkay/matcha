@@ -12,7 +12,7 @@ import {
 } from './controllers/mailer';
 import * as SQLConnect from './utilities/SQLConnect';
 import { getURL } from './utilities/getURL';
-import { blockUser, login, logout, reportUser } from './controllers/user';
+import { blockUser, login, logout, reportUser, updateLocationPermission } from './controllers/user';
 import likeRouter from './routes/like';
 import checkJWT from './middleware/checkJWT';
 import { searchProfiles } from './controllers/search';
@@ -229,3 +229,6 @@ app.post('/blockuser', checkJWT, blockUser);
 
 // Update user's location
 app.post('/geolocation', checkJWT, updateLocation);
+
+// Update user's location permission
+app.post('/gpspermission', checkJWT, updateLocationPermission);

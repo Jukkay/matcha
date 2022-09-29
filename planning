@@ -403,8 +403,19 @@ V Make production docker-compose
 V Configure AWS account
 V Test websockets with multiple users
 V Remove .DS_Store from image filenames
+V Clean package-jsons
+V Add location permission request button
+V Likes page doesn't show people who just liked you. Only after match.
+V Maybe show selected interests on separate line from searched interests
+V Shorten visible email link
+V Notification badge is barely visible
+V Clean notification time display
+V Add space between filter buttons
 
-Clean package-jsons
+Going to likes clears message notifications
+Empty in famerating  input gives Nan warning
+Check if there's 200 range status for token update 
+See if you can do something about front page mobile view
 Remove dead code
 Test all required functionality
 Customize CSS styling for the app
@@ -418,11 +429,6 @@ Change language to very plain language for accessibility
 Show image counter
 Remove error message passthrough in user controller
 Move components to files that make most sense
-
-# Test users
-yellowwolf806 Password1
-greenfrog868 Password1
-tinycat539
 
 # Possible bonuses
 AWS deployment
@@ -441,3 +447,4 @@ Socket based notifications
 Socket authentication
 Random user script
 Delete profile and/or userdata
+Makefile

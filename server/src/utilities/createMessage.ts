@@ -15,7 +15,7 @@ const createMessage = (email_token: string) => {
 	<section class="section">
 	<h1 class="title is-1">Welcome to 42 dates!</h1>
 	<p class="block">For the last step of registration we ask you to click the link below to validate this email address.</p>
-	<p class="block"><a href="${CLIENT_URL}/verifyemail/${email_token}">${CLIENT_URL}/verifyemail/${email_token}</a></p>
+	<p class="block"><a href="${CLIENT_URL}/verifyemail/${email_token}">Click here to validate your account.</a></p>
 	<p class="block has-text-weight-bold">Best regards,</p>
 	<p class="block has-text-weight-bold">42 Dates Team</p>
 	</section>

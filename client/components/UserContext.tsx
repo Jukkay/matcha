@@ -23,6 +23,7 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
 		email: '',
 		birthday: '',
 		profile_exists: false,
+		location_permitted: false
 	});
 	
 	const [profile, setProfile] = useState<IProfile>({

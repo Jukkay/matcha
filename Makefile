@@ -48,8 +48,7 @@ goto-db:
 logs:
 	docker-compose logs -f
 
-reset-db:
-	docker-compose exec server npm run reset-db
+reset-db: clean
 
 create-users:
 	docker-compose exec server npm run createusers
