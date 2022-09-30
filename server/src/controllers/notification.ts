@@ -58,7 +58,6 @@ export const getNotifications = async (req: Request, res: Response) => {
                     LIMIT 15
                     `;
 		const notifications = await execute(sql, [user_id]);
-		console.log(notifications);
 		if (notifications.length > 0)
 			return res.status(200).json({
 				message: 'Notifications retrieved successfully',

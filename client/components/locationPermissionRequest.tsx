@@ -61,13 +61,13 @@ export const LocationPermissionRequest = () => {
 	}, [profile.latitude, profile.longitude]);
 
 	return userData.location_permitted ? (
-		<button className="button mt-3 ml-4 is-primary" onClick={handleDeny}>
+		<button className="button is-primary" onClick={handleDeny}>
 			<span className="mr-3">GPS location ON</span>
 			<MdLocationOn />
 		</button>
 	) : (
 		<div>
-		<button className="button mt-3 ml-4 is-primary" onClick={handleAllow}>
+		<button className="button is-primary" onClick={handleAllow}>
 			<span className="mr-3">GPS location OFF</span>
 			<MdLocationOff />
 		</button>

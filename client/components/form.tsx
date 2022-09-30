@@ -215,71 +215,12 @@ export const AgeRange = ({ profile, setProfile }: IAgeRange) => {
 					Age range *
 				</label>
 				<div className="control" id="ageRange">
-					<AgeRangeSlider
-						state={profile}
-						setState={setProfile}
-					/>
+					<AgeRangeSlider state={profile} setState={setProfile} />
 				</div>
 			</div>
 		</div>
 	);
 };
-// export const AgeRange = ({ profile, setProfile }: IAgeRange) => {
-// 	return (
-// 		<div className="block">
-// 			<label htmlFor="min_age" className="label">
-// 				Age range *
-// 			</label>
-
-// 			<div className="field is-horizontal">
-// 				<div className="field-label is-normal">
-// 					<label htmlFor="min_age" className="label">
-// 						Min
-// 					</label>
-// 				</div>
-// 				<div className="field-body">
-// 					<div className="field">
-// 						<input
-// 							type="number"
-// 							id="min_age"
-// 							className="input is-primary"
-// 							min="18"
-// 							max={profile?.max_age}
-// 							value={profile?.min_age}
-// 							onChange={(event) =>
-// 								setProfile({
-// 									...profile,
-// 									min_age: parseInt(event.target.value),
-// 								})
-// 							}
-// 						/>
-// 					</div>
-// 					<div className="field-label is-normal">
-// 						<label htmlFor="max_age" className="label">
-// 							Max
-// 						</label>
-// 					</div>
-// 					<div className="field">
-// 						<input
-// 							type="number"
-// 							id="max_age"
-// 							className="input is-primary"
-// 							min={profile?.min_age}
-// 							max="122"
-// 							value={profile?.max_age}
-// 							onChange={(event) =>
-// 								setProfile({
-// 									...profile,
-// 									max_age: parseInt(event.target.value),
-// 								})
-// 							}
-// 						/>
-// 					</div>
-// 				</div>
-// 			</div>
-// 		</div>
-// 	);
-// };
 
 export const GenderSelector = ({
 	profile,
@@ -405,6 +346,21 @@ export const FameratingRange = ({
 	searchParams,
 	setSearchParams,
 }: SearchParamsProps) => {
+	const handleMinChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		if (event.target.value !== undefined)
+			setSearchParams({
+				...searchParams,
+				min_famerating: event.target.value,
+			});
+	};
+
+	const handleMaxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		if (event.target.value !== undefined)
+			setSearchParams({
+				...searchParams,
+				max_famerating: event.target.value,
+			});
+	};
 	return (
 		<div className="block">
 			<label htmlFor="min_age" className="label">
@@ -426,14 +382,7 @@ export const FameratingRange = ({
 							min="1"
 							max={searchParams.max_famerating}
 							value={searchParams.min_famerating}
-							onChange={(event) =>
-								setSearchParams({
-									...searchParams,
-									min_famerating: parseInt(
-										event.target.value
-									),
-								})
-							}
+							onChange={handleMinChange}
 						/>
 					</div>
 					<div className="field-label is-normal">
@@ -449,12 +398,7 @@ export const FameratingRange = ({
 							min={searchParams.min_famerating}
 							max="1000"
 							value={searchParams.max_famerating}
-							onChange={(event) =>
-								setSearchParams({
-									...searchParams,
-									max_famerating: event.target.value,
-								})
-							}
+							onChange={handleMaxChange}
 						/>
 					</div>
 				</div>
@@ -467,6 +411,13 @@ export const DistanceRange = ({
 	searchParams,
 	setSearchParams,
 }: SearchParamsProps) => {
+	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		if (event.target.value !== undefined)
+			setSearchParams({
+				...searchParams,
+				max_distance: event.target.value,
+		})
+	};
 	return (
 		<div className="block">
 			<label htmlFor="max_distance" className="label my-3">
@@ -479,12 +430,7 @@ export const DistanceRange = ({
 					min={0}
 					className="input is-primary"
 					value={searchParams.max_distance}
-					onChange={(event) =>
-						setSearchParams({
-							...searchParams,
-							max_distance: event.target.value,
-						})
-					}
+					onChange={handleChange}
 				/>
 			</div>
 		</div>

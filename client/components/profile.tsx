@@ -153,13 +153,15 @@ export const VisitorLog = ({ user_id }: any) => {
 	useEffect(() => {
 		const controller = new AbortController();
 		const getVisitorLog = async () => {
-			let response = await authAPI.get(`/log/${user_id}`, {
-				signal: controller.signal,
-			});
-			if (response.status === 200) {
-				setPageVisited(true);
-				setLog(response.data.log);
-			}
+			try {
+				let response = await authAPI.get(`/log/${user_id}`, {
+					signal: controller.signal,
+				});
+				if (response.status === 200) {
+					setPageVisited(true);
+					setLog(response.data.log);
+				}
+			} catch (err) {}
 		};
 		getVisitorLog();
 		return () => controller.abort();
@@ -315,16 +317,18 @@ export const Gallery = ({ user_id }: OnlineStatusProps) => {
 	useEffect(() => {
 		const controller = new AbortController();
 		const getUserImages = async () => {
-			let response = await authAPI.get(`/image/user/${user_id}`, {
-				signal: controller.signal,
-			});
-			if (response?.data?.photos) {
-				const filenames = response.data.photos.map(
-					(item: any) =>
-						`${authAPI.defaults.baseURL}/images/${item['filename']}`
-				);
-				setImages(filenames);
-			}
+			try {
+				let response = await authAPI.get(`/image/user/${user_id}`, {
+					signal: controller.signal,
+				});
+				if (response?.data?.photos) {
+					const filenames = response.data.photos.map(
+						(item: any) =>
+							`${authAPI.defaults.baseURL}/images/${item['filename']}`
+					);
+					setImages(filenames);
+				}
+			} catch (err) {}
 		};
 		getUserImages();
 		return () => controller.abort();

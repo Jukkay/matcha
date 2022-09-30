@@ -95,9 +95,6 @@ const LoggedInControls = () => {
 		try {
 			socket.on('connect_error', async (err) => {
 				if (err.message === 'Unauthorized') {
-					console.log(
-						'Caught socket error in navbar. Refreshing token.'
-					);
 					const refreshResponse = await axios.post(`/token/`, {
 						token: refreshToken,
 						user_id: userData.user_id,
@@ -191,7 +188,6 @@ const LoggedInControls = () => {
 const TextLinks = ({ likeCount }: LikeProp) => {
 	return (
 		<div className="is-flex-wrap-nowrap text-links">
-			<ErrorBoundary FallbackComponent={ErrorFallback}>
 				<Link href="/search">
 					<a className="navbar-item">Search</a>
 				</Link>
@@ -215,7 +211,6 @@ const TextLinks = ({ likeCount }: LikeProp) => {
 						<a className="navbar-item">Likes</a>
 					</Link>
 				)}
-			</ErrorBoundary>
 		</div>
 	);
 };
@@ -314,19 +309,21 @@ const NotificationDropdownMenu = () => {
 
 	const markNotificationsRead = async () => {
 		if (!userData.user_id) return;
-		const response = await authAPI(`/notifications/${userData.user_id}`);
-		if (response?.data?.notifications?.length > 0) {
-			setNotifications([...response.data.notifications]);
-		}
-		const response2 = await authAPI.patch('/notifications', {
-			type: 'all',
-			user_id: userData.user_id,
-		});
-		if (response2.status === 200) {
-			setNotificationCount(0);
-			setMessageCount(0);
-			setLikeCount(0);
-		}
+		try {
+			const response = await authAPI(`/notifications/${userData.user_id}`);
+			if (response?.data?.notifications?.length > 0) {
+				setNotifications([...response.data.notifications]);
+			}
+			const response2 = await authAPI.patch('/notifications', {
+				type: 'all',
+				user_id: userData.user_id,
+			});
+			if (response2.status === 200) {
+				setNotificationCount(0);
+				setMessageCount(0);
+				setLikeCount(0);
+			}
+		} catch (err) {}
 	};
 	return (
 		<div className="dropdown is-hoverable">
@@ -390,7 +387,9 @@ const NotificationsList = () => {
 				<a className="dropdown-item">
 					<span className="">{notification.notification_text}</span>
 					<span className="help">
-						{new Date(notification.notification_time).toLocaleString()}
+						{new Date(
+							notification.notification_time
+						).toLocaleString()}
 					</span>
 				</a>
 			</Link>
@@ -427,7 +426,8 @@ const ProfilePicture = () => {
 							profile.profile_image === '1' ||
 							profile.profile_image === '2' ||
 							profile.profile_image === '3' ||
-							profile.profile_image === '4'
+							profile.profile_image === '4' ||
+							profile.profile_image === undefined
 								? '/default.png'
 								: `${authAPI.defaults.baseURL}/images/${profile.profile_image}`
 						}
@@ -454,7 +454,9 @@ const NavbarComponent = () => {
 				role="navigation"
 				aria-label="main navigation"
 			>
-				{accessToken ? <LoggedInControls /> : <LoggedOutControls />}
+				<ErrorBoundary FallbackComponent={ErrorFallback}>
+					{accessToken ? <LoggedInControls /> : <LoggedOutControls />}
+				</ErrorBoundary>
 			</nav>
 		</div>
 	);

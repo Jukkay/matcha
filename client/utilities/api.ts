@@ -4,13 +4,14 @@ import axios, {
 	AxiosRequestConfig,
 	AxiosResponse,
 } from 'axios';
+import { socket } from '../components/SocketContext';
 
 interface RetryRequest extends AxiosResponse {
 	_retry: boolean;
 }
 
 // This must be set for auto-refresh to get correct baseURL
-axios.defaults.baseURL = 'http://localhost:4000'
+axios.defaults.baseURL = 'http://localhost:4000';
 
 // Initialize basic axios connection
 export const API = axios.create({
@@ -23,7 +24,7 @@ const handleRequest = (config: AxiosRequestConfig) => {
 	try {
 		const accessToken = sessionStorage.getItem('accessToken');
 		if (config.headers)
-		config.headers['Authorization'] = `Bearer ${accessToken}`;
+			config.headers['Authorization'] = `Bearer ${accessToken}`;
 		return config;
 	} catch (err) {}
 };
@@ -38,7 +39,7 @@ const handleResponse = (response: AxiosResponse): AxiosResponse => {
 	return response;
 };
 
-// Intercept reponse errors and update access token if 401
+// Intercept response errors and update access token if 401
 const handleResponseError = async (error: AxiosError) => {
 		const config = error.config as RetryRequest;
 		const refreshToken = sessionStorage.getItem('refreshToken');
@@ -61,6 +62,10 @@ const handleResponseError = async (error: AxiosError) => {
 				});
 				const newToken = refreshResponse?.data.accessToken;
 				sessionStorage.setItem('accessToken', newToken);
+				socket.auth = {
+					token: newToken,
+					user_id: user_id,
+				};
 				config.headers['Authorization'] = `Bearer ${newToken}`;
 				return API(config);
 			} catch (err) {

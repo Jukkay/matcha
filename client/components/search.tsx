@@ -55,7 +55,7 @@ export const ProfileSearch = ({
 }: SearchProps) => {
 	const { profile } = useUserContext();
 	const [interests, setInterests] = useState<string[]>([]);
-	const [formSubmit, setFormSubmit] = useState(false)
+	const [formSubmit, setFormSubmit] = useState(false);
 
 	const searchDatabase = async (controller: AbortController) => {
 		const query = {
@@ -112,7 +112,7 @@ export const ProfileSearch = ({
 
 	const handleSubmit = (event: React.FormEvent) => {
 		event.preventDefault();
-		setFormSubmit(!formSubmit)
+		setFormSubmit(!formSubmit);
 	};
 
 	const resetSearch = (event: React.FormEvent) => {
@@ -145,7 +145,9 @@ export const ProfileSearch = ({
 					handleSubmit={handleSubmit}
 				/>
 			</form>
-			<LocationPermissionRequest />
+			<div className="is-flex is-justify-content-end is-align-items-end">
+				<LocationPermissionRequest />
+			</div>
 			<hr />
 
 			<Filters
@@ -249,7 +251,10 @@ const Filters = ({
 				<Interests interests={interests} setInterests={setInterests} />
 			</div>
 			<div className="block">
-				<button className="button is-primary m-1" onClick={handleFilters}>
+				<button
+					className="button is-primary m-1"
+					onClick={handleFilters}
+				>
 					Apply filters
 				</button>
 				<button className="button is-primary m-1" onClick={handleReset}>
@@ -648,7 +653,7 @@ export const AgeRangeSlider = ({ state, setState }: IAgeRangeSlider) => {
 	};
 
 	return (
-		<div className='ml-6'>
+		<div className="ml-6">
 			<Slider
 				sx={{ width: 250, color: 'success.main' }}
 				getAriaLabel={() => 'Age range'}

@@ -124,16 +124,20 @@ export const UpdateProfile = ({
 		} catch (err) {}
 	};
 	const deleteProfile = async () => {
-		const response = await authAPI.delete(`/profile/${profile.user_id}`);
-		if (response.status === 200) {
-			setDeleted(true);
-			setTimeout(() => {
-				updateUserData({ ...userData, profile_exists: false });
-				setDeleted(false);
-				setEditMode(false);
-				sessionStorage.removeItem('profile');
-			}, 2000);
-		}
+		try {
+			const response = await authAPI.delete(
+				`/profile/${profile.user_id}`
+			);
+			if (response.status === 200) {
+				setDeleted(true);
+				setTimeout(() => {
+					updateUserData({ ...userData, profile_exists: false });
+					setDeleted(false);
+					setEditMode(false);
+					sessionStorage.removeItem('profile');
+				}, 2000);
+			}
+		} catch (err) {}
 	};
 	const handleSubmit = (event: React.FormEvent) => {
 		event.preventDefault();
@@ -312,11 +316,13 @@ export const EditGallery = ({ files, setImageError }: GalleryProps) => {
 				profile_image: images[0].substring(url.lastIndexOf('/') + 1),
 			});
 		}
-		let response = await authAPI.delete(`/image/${removedImage}`);
-		if (response.status === 200) {
-			const newImages = images.filter((item) => item != url);
-			setImages([...newImages]);
-		}
+		try {
+			let response = await authAPI.delete(`/image/${removedImage}`);
+			if (response.status === 200) {
+				const newImages = images.filter((item) => item != url);
+				setImages([...newImages]);
+			}
+		} catch (err) {}
 	};
 
 	// Set as profile picture
@@ -330,14 +336,18 @@ export const EditGallery = ({ files, setImageError }: GalleryProps) => {
 
 	useEffect(() => {
 		const getUserImages = async () => {
-			let response = await authAPI.get(`/image/user/${userData.user_id}`);
-			if (response?.data?.photos) {
-				const filenames = response.data.photos.map(
-					(item: any) =>
-						`${authAPI.defaults.baseURL}/images/${item['filename']}`
+			try {
+				let response = await authAPI.get(
+					`/image/user/${userData.user_id}`
 				);
-				setImages(filenames);
-			}
+				if (response?.data?.photos) {
+					const filenames = response.data.photos.map(
+						(item: any) =>
+							`${authAPI.defaults.baseURL}/images/${item['filename']}`
+					);
+					setImages(filenames);
+				}
+			} catch (err) {}
 		};
 		getUserImages();
 	}, []);

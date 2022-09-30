@@ -411,17 +411,16 @@ V Shorten visible email link
 V Notification badge is barely visible
 V Clean notification time display
 V Add space between filter buttons
+V Empty in famerating  input gives Nan warning
+V Hunt down the uncaught error
+V Going to likes clears message notifications
 
-Going to likes clears message notifications
-Empty in famerating  input gives Nan warning
-Check if there's 200 range status for token update 
 See if you can do something about front page mobile view
 Remove dead code
 Test all required functionality
 Customize CSS styling for the app
 What happens if user is unmatched or blocked during chat?
 Refactor SQL queries using ``
-
 
 # Backlog
 Deploy to AWS

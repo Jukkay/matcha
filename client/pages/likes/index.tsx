@@ -85,8 +85,6 @@ const LoggedIn = () => {
 			signal: controller.signal,
 		});
 		if (response.status === 200) {
-			setNotificationCount(0);
-			setMessageCount(0);
 			setLikeCount(0);
 		}
 	};
