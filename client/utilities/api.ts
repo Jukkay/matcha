@@ -4,7 +4,6 @@ import axios, {
 	AxiosRequestConfig,
 	AxiosResponse,
 } from 'axios';
-import { socket } from '../components/SocketContext';
 
 interface RetryRequest extends AxiosResponse {
 	_retry: boolean;
@@ -62,10 +61,6 @@ const handleResponseError = async (error: AxiosError) => {
 				});
 				const newToken = refreshResponse?.data.accessToken;
 				sessionStorage.setItem('accessToken', newToken);
-				socket.auth = {
-					token: newToken,
-					user_id: user_id,
-				};
 				config.headers['Authorization'] = `Bearer ${newToken}`;
 				return API(config);
 			} catch (err) {

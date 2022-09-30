@@ -415,7 +415,8 @@ V Empty in famerating  input gives Nan warning
 V Hunt down the uncaught error
 V Going to likes clears message notifications
 
-See if you can do something about front page mobile view
+V Make number of slides shown on frontpage carousels responsive
+Make sure div is centered on frontpage in mobile view
 Remove dead code
 Test all required functionality
 Customize CSS styling for the app

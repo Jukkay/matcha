@@ -71,7 +71,7 @@ export const LocationPermissionRequest = () => {
 			<span className="mr-3">GPS location OFF</span>
 			<MdLocationOff />
 		</button>
-		<p className="mt-3 ml-4 help">We can give you more accurate distance information and better suggestions, if you give us access to your location information.</p>
+		<p className="mt-3 help">We can give you more accurate distance information and better suggestions, if you give us access to your location information.</p>
 		</div>
 	);
 };

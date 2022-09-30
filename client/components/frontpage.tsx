@@ -81,7 +81,6 @@ export const ProfileCarousel = ({ profiles }: ResultProfiles) => {
 
 	return images.length > 0 ? (
 		<Swiper
-			slidesPerView={5}
 			spaceBetween={30}
 			lazy={true}
 			pagination={{
@@ -90,6 +89,17 @@ export const ProfileCarousel = ({ profiles }: ResultProfiles) => {
 			navigation={true}
 			modules={[Pagination, Navigation, Lazy]}
 			className="swiper"
+			breakpoints={{
+				0: {
+					slidesPerView: 3,
+				},
+				960: {
+					slidesPerView: 4,
+				},
+				1200: {
+					slidesPerView: 5,
+				},
+			  }}
 		>
 			{images.map((image, index) => (
 				<SwiperSlide className="swiper-slide" key={index}>

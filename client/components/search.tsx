@@ -145,9 +145,6 @@ export const ProfileSearch = ({
 					handleSubmit={handleSubmit}
 				/>
 			</form>
-			<div className="is-flex is-justify-content-end is-align-items-end">
-				<LocationPermissionRequest />
-			</div>
 			<hr />
 
 			<Filters
@@ -224,18 +221,33 @@ const Filters = ({
 
 	return visible ? (
 		<div className="block">
-			<div className="is-flex is-justify-content-space-between is-align-items-start">
-				<div className="block">
-					<label htmlFor="filter" className="label">
-						Filter
-					</label>
-					<div className="block">
+			<div className="block">
+				<div className="columns is-centered">
+					<div className="column is-one-third">
+						<div className="is-flex is-align-items-baseline">
+							<label htmlFor="filter" className="label">
+								Filter
+							</label>
+							<span className="icon is-medium">
+								<IconContext.Provider
+									value={{
+										size: '0.9rem',
+										className: 'react-icons',
+									}}
+								>
+									<div>
+										<FaFilter />
+									</div>
+								</IconContext.Provider>
+							</span>
+						</div>
 						<button className="button" onClick={onClick}>
 							Hide filters
 						</button>
 					</div>
+					<div className="column is-one-third">{}</div>
+					<SortSelector sort={sort} setSort={setSort} />
 				</div>
-				<SortSelector sort={sort} setSort={setSort} />
 			</div>
 			<div className="block">
 				<FameratingRange
@@ -250,7 +262,7 @@ const Filters = ({
 				/>
 				<Interests interests={interests} setInterests={setInterests} />
 			</div>
-			<div className="block">
+			<div className="block is-pulled-right">
 				<button
 					className="button is-primary m-1"
 					onClick={handleFilters}
@@ -264,10 +276,10 @@ const Filters = ({
 		</div>
 	) : (
 		<div className="block">
-			<div className="block is-flex is-justify-content-space-between is-align-items-start">
-				<div className="block">
+			<div className="columns is-centered">
+				<div className="column is-one-third">
 					<div className="is-flex is-align-items-baseline">
-						<label htmlFor="filter" className="label mr-1">
+						<label htmlFor="filter" className="label">
 							Filter
 						</label>
 						<span className="icon is-medium">
@@ -287,6 +299,7 @@ const Filters = ({
 						Show filters
 					</button>
 				</div>
+				<div className="column is-one-third">{}</div>
 				<SortSelector sort={sort} setSort={setSort} />
 			</div>
 		</div>
@@ -496,7 +509,7 @@ export const SearchResultItem = ({
 
 export const SortSelector = ({ sort, setSort }: SortProps) => {
 	return (
-		<div className="block">
+		<div className="column is-one-third">
 			<div className="is-flex is-align-items-start">
 				<label htmlFor="sort" className="label">
 					Sort by
@@ -563,7 +576,7 @@ export const BasicSearchLine = ({
 
 	return optionalsVisible ? (
 		<div>
-			<div className="is-flex is-justify-content-space-between is-align-items-start">
+			<div className="columns is-centered">
 				<SearchAgeRange
 					searchParams={searchParams}
 					setSearchParams={setSearchParams}
@@ -577,34 +590,45 @@ export const BasicSearchLine = ({
 					handleSubmit={handleSubmit}
 				/>
 			</div>
-			<div className="buttons">
-				<button
-					className="button is-ghost has-text-black"
-					onClick={handleClick}
-				>
-					Hide optional parameters
-				</button>
-				<button className="button is-ghost" onClick={handleClick}>
-					<span className="bulma-arrow-mixin"></span>
-				</button>
+			<div className="columns is-centered">
+				<div className="buttons column is-one-third">
+					<button
+						className="button is-ghost has-text-black"
+						onClick={handleClick}
+					>
+						Hide optional parameters
+					</button>
+					<button className="button is-ghost" onClick={handleClick}>
+						<span className="bulma-arrow-mixin"></span>
+					</button>
+				</div>
+				<div className="column is-one-third">{}</div>
+				<div className="column is-one-third">
+					<LocationPermissionRequest />
+				</div>
 			</div>
-			<div className="block is-flex is-justify-content-space-between is-align-items-start">
+			<div className="columns is-centered">
 				{/* Location. Components imported dynamically */}
 				<Suspense fallback={<Spinner />}>
-					<CountrySearchSelector
-						searchParams={searchParams}
-						setSearchParams={setSearchParams}
-					/>
-					<CitySearchSelector
-						searchParams={searchParams}
-						setSearchParams={setSearchParams}
-					/>
+					<div className="column is-one-third">
+						<CountrySearchSelector
+							searchParams={searchParams}
+							setSearchParams={setSearchParams}
+						/>
+					</div>
+					<div className="column is-one-third">{}</div>
+					<div className="column is-one-third">
+						<CitySearchSelector
+							searchParams={searchParams}
+							setSearchParams={setSearchParams}
+						/>
+					</div>
 				</Suspense>
 			</div>
 		</div>
 	) : (
 		<div>
-			<div className="is-flex is-justify-content-space-between is-align-items-start">
+			<div className="columns is-centered">
 				<SearchAgeRange
 					searchParams={searchParams}
 					setSearchParams={setSearchParams}
@@ -618,16 +642,22 @@ export const BasicSearchLine = ({
 					handleSubmit={handleSubmit}
 				/>
 			</div>
-			<div className="buttons">
-				<button
-					className="button is-ghost has-text-black"
-					onClick={handleClick}
-				>
-					Search by location
-				</button>
-				<button className="button is-ghost" onClick={handleClick}>
-					<span className="bulma-arrow-mixin"></span>
-				</button>
+			<div className="columns is-centered">
+				<div className="buttons column is-one-third">
+					<button
+						className="button is-ghost has-text-black"
+						onClick={handleClick}
+					>
+						Search by location
+					</button>
+					<button className="button is-ghost" onClick={handleClick}>
+						<span className="bulma-arrow-mixin"></span>
+					</button>
+				</div>
+				<div className="column is-one-third">{}</div>
+				<div className="column is-one-third">
+					<LocationPermissionRequest />
+				</div>
 			</div>
 		</div>
 	);
@@ -653,7 +683,7 @@ export const AgeRangeSlider = ({ state, setState }: IAgeRangeSlider) => {
 	};
 
 	return (
-		<div className="ml-6">
+		<div className="mx-3">
 			<Slider
 				sx={{ width: 250, color: 'success.main' }}
 				getAriaLabel={() => 'Age range'}
@@ -673,7 +703,7 @@ export const SearchAgeRange = ({
 	setSearchParams,
 }: SearchParamsProps) => {
 	return (
-		<div className="block">
+		<div className="column is-one-third">
 			<div className="field">
 				<label htmlFor="ageRange" className="label mb-6">
 					Age range *
@@ -694,31 +724,33 @@ export const SearchGenderSelector = ({
 	setSearchParams,
 }: SearchParamsProps) => {
 	return (
-		<div className="block">
-			<label htmlFor="looking" className="label my-3">
-				Gender *
-			</label>
-			<div className="select is-primary">
-				<select
-					id="looking"
-					value={searchParams.looking}
-					onChange={(event) =>
-						setSearchParams({
-							...searchParams,
-							looking: event.target.value,
-						})
-					}
-				>
-					<option value={''} disabled>
-						Choose a gender
-					</option>
-					<option value="Male">Male</option>
-					<option value="Female">Female</option>
-					<option value="Non-binary">Non-binary</option>
-					<option value="Trans-man">Trans-man</option>
-					<option value="Trans-woman">Trans-woman</option>
-					<option value="Anything goes">Anything goes</option>
-				</select>
+		<div className="column is-one-third">
+			<div className="">
+				<label htmlFor="looking" className="label">
+					Gender *
+				</label>
+				<div className="select is-primary">
+					<select
+						id="looking"
+						value={searchParams.looking}
+						onChange={(event) =>
+							setSearchParams({
+								...searchParams,
+								looking: event.target.value,
+							})
+						}
+					>
+						<option value={''} disabled>
+							Choose a gender
+						</option>
+						<option value="Male">Male</option>
+						<option value="Female">Female</option>
+						<option value="Non-binary">Non-binary</option>
+						<option value="Trans-man">Trans-man</option>
+						<option value="Trans-woman">Trans-woman</option>
+						<option value="Anything goes">Anything goes</option>
+					</select>
+				</div>
 			</div>
 		</div>
 	);
@@ -729,7 +761,7 @@ export const SubmitAndResetButtons = ({
 	handleSubmit,
 }: ButtonsProps) => {
 	return (
-		<div className="block">
+		<div className="column is-one-third">
 			<div className="label is-invisible">Submit</div>
 			<div className="buttons">
 				<button
