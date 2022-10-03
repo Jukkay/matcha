@@ -1,27 +1,21 @@
 import { useRouter } from 'next/router';
 import type { NextPage } from 'next';
 import { useState, useEffect } from 'react';
-import { Gallery } from '../../components/profile';
 import { useUserContext } from '../../components/UserContext';
 import {
 	ActivePage,
 	IOtherUserProfile,
-	LikeButtonProps,
 	LoadStatus,
 	NotificationType,
-	OtherUserViewProps,
-	UnlikeButtonProps,
 } from '../../types/types';
 import { authAPI } from '../../utilities/api';
-import { FcLike, FcDislike } from 'react-icons/fc';
 import {
-	convertBirthdayToAge,
 	handleRouteError,
-	reformatDateTime,
 } from '../../utilities/helpers';
 import { useNotificationContext } from '../../components/NotificationContext';
 import { useSocketContext } from '../../components/SocketContext';
 import { LoadError, Spinner } from '../../components/utilities';
+import { ProfileViewWithLikeButtons } from '../../components/profileCards';
 
 const NotLoggedIn = () => {
 	return (
@@ -146,7 +140,7 @@ const LoggedIn = () => {
 		return <LoadError text="Error loading profile" />;
 
 	return profileExists ? (
-		<ViewMode otherUserProfile={otherUserProfile} />
+		<ProfileViewWithLikeButtons otherUserProfile={otherUserProfile} />
 	) : (
 		<section className="section has-text-centered">
 			<h3 className="title is-3">No profile found.</h3>
@@ -154,244 +148,10 @@ const LoggedIn = () => {
 	);
 };
 
-const LikeButton = ({ profile, setLiked, setMatch }: LikeButtonProps) => {
-	const { userData } = useUserContext();
-	const socket = useSocketContext();
-
-	const likeProfile = async () => {
-		const liked = profile.user_id;
-		const liker = userData.user_id;
-		try {
-			const response = await authAPI.post('/like', {
-				liker: liker,
-				liked: liked,
-			});
-
-			if (response.status === 200) {
-				// Emit notification
-				const notification = {
-					sender_id: liker,
-					receiver_id: liked,
-					notification_type: NotificationType.LIKE,
-					notification_text: `Somebody liked you!`,
-					link: `/profile/${liker}`,
-				};
-				socket.emit('send_notification', liked, notification);
-				// Send match notification
-				if (response.data.match) {
-					setMatch(true);
-					const notification = {
-						sender_id: liker,
-						receiver_id: liked,
-						notification_type: NotificationType.MATCH,
-						notification_text: `You have a new match! Start a conversation`,
-						link: `/profile/${liker}`,
-					};
-					socket.emit('send_notification', liked, notification);
-					const notification2 = {
-						sender_id: liker,
-						receiver_id: liker,
-						notification_type: NotificationType.MATCH,
-						notification_text: `You have a new match! Start a conversation`,
-						link: `/profile/${liked}`,
-					};
-					socket.emit('send_notification', liker, notification2);
-				}
-			}
-		} catch (err) {}
-	};
-	const handleClick = () => {
-		setLiked(true);
-		likeProfile();
-	};
-
-	return (
-		<button className="button is-primary is-medium" onClick={handleClick}>
-			<span className="icon is-medium">
-				<FcLike />
-			</span>
-			<span>Like</span>
-		</button>
-	);
-};
-
-const UnlikeButton = ({
-	otherUserProfile,
-	setLiked,
-	setMatch,
-}: UnlikeButtonProps) => {
-	const { userData } = useUserContext();
-	const socket = useSocketContext();
-
-	const unlikeProfile = async () => {
-		const liked = otherUserProfile.user_id;
-		const liker: number = userData.user_id;
-		try {
-			await authAPI.delete(`/like?liker=${liker}&liked=${liked}`, {});
-
-			// Emit notification
-			const notification = {
-				sender_id: liker,
-				receiver_id: liked,
-				notification_type: NotificationType.UNLIKE,
-				notification_text: `Somebody unliked you!`,
-				link: `/profile/${liker}`,
-			};
-			socket.emit('send_notification', liked, notification);
-		} catch (err) {}
-	};
-
-	const handleClick = () => {
-		setLiked(false);
-		setMatch(false);
-		unlikeProfile();
-	};
-	return (
-		<button
-			className="button is-medium has-background-primary-light"
-			onClick={handleClick}
-		>
-			<span className="icon is-medium">
-				<FcDislike />
-			</span>
-			<span>Unlike</span>
-		</button>
-	);
-};
-
-const ViewMode = ({ otherUserProfile }: OtherUserViewProps) => {
-	const [liked, setLiked] = useState(otherUserProfile.liked);
-	const [match, setMatch] = useState(false);
-
-	const closeNotification = () => {
-		setMatch(false);
-	};
-	return (
-		<div className="columns card my-6">
-			<div className="column card-image has-text-left is-two-thirds">
-				<Gallery user_id={otherUserProfile.user_id} />
-			</div>
-			<div className="column mt-3 has-text-left m-3">
-				<div className="block">
-					<span className="has-text-weight-semibold mr-3">Name:</span>
-					{otherUserProfile.name}
-				</div>
-				<div className="block">
-					<span className="has-text-weight-semibold mr-3">Age:</span>
-					{otherUserProfile.birthday &&
-						convertBirthdayToAge(otherUserProfile.birthday)}
-				</div>
-				<div className="block">
-					<span className="has-text-weight-semibold mr-3">
-						Famerating:
-					</span>
-					{otherUserProfile.famerating}
-				</div>
-
-				<div className="block">
-					<span className="has-text-weight-semibold mr-3">City:</span>
-					{otherUserProfile.city}
-				</div>
-				<div className="block">
-					<span className="has-text-weight-semibold mr-3">
-						Country:
-					</span>
-					{otherUserProfile.country}
-				</div>
-				<div className="block">
-					<span className="has-text-weight-semibold mr-3">
-						Interests:
-					</span>
-					{otherUserProfile.interests
-						? otherUserProfile.interests.map(
-								(interest: string, index: number) => (
-									<span
-										className="tag is-primary mx-2 my-1"
-										key={index}
-									>
-										{interest}
-									</span>
-								)
-						  )
-						: null}
-				</div>
-				<div className="block">
-					<span className="has-text-weight-semibold mr-3">
-						Introduction:
-					</span>
-					<p className="notification has-background-primary-light">
-						{otherUserProfile.introduction}
-					</p>
-				</div>
-				<div className="block">
-					<span className="has-text-weight-semibold mr-3">
-						Gender:
-					</span>
-					{otherUserProfile.gender}
-				</div>
-				<div className="block">
-					<span className="has-text-weight-semibold mr-3">
-						Looking for:
-					</span>
-					{otherUserProfile.looking}
-				</div>
-				<div className="block">
-					<span className="has-text-weight-semibold mr-3">
-						Minimum age:
-					</span>
-					{otherUserProfile.min_age}
-				</div>
-				<div className="block">
-					<span className="has-text-weight-semibold mr-3">
-						Maximum age:
-					</span>
-					{otherUserProfile.max_age}
-				</div>
-				<div className="block">
-					<span className="has-text-weight-semibold mr-3">
-						Last login:
-					</span>
-					{reformatDateTime(otherUserProfile.last_login)}
-				</div>
-				{match ? (
-					<div className="notification is-primary">
-						<button
-							className="delete"
-							onClick={closeNotification}
-						></button>
-						<h3 className="title is-3">It's a match!</h3>
-					</div>
-				) : null}
-				{otherUserProfile.likes_requester &&
-				!otherUserProfile.match_id ? (
-					<div className="notification is-primary is-light">
-						<p className="is-3">{`${otherUserProfile.name} likes you. Like them back to match them!`}</p>
-					</div>
-				) : null}
-				<div className="block buttons">
-					{liked ? (
-						<UnlikeButton
-							otherUserProfile={otherUserProfile}
-							setLiked={setLiked}
-							setMatch={setMatch}
-						/>
-					) : (
-						<LikeButton
-							profile={otherUserProfile}
-							setLiked={setLiked}
-							setMatch={setMatch}
-						/>
-					)}
-				</div>
-			</div>
-		</div>
-	);
-};
-
 const ShowProfile: NextPage = () => {
 	const { accessToken } = useUserContext();
 	return (
-		<div className="columns is-centered">
+		<div className="columns is-centered is-gapless">
 			<div className="column is-two-thirds">
 				{accessToken ? <LoggedIn /> : <NotLoggedIn />}
 			</div>

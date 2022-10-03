@@ -14,7 +14,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
 			<UserContextProvider>
 				<SocketContextProvider>
 					<NotificationContextProvider>
-						<div className="columns is-flex-direction-column is-fullheight-100vh">
+						<div className="columns is-flex-direction-column is-fullheight-100vh is-align-content-center is-gapless">
 							<NavbarComponent />
 							<main className="column">{children}</main>
 							<Footer />

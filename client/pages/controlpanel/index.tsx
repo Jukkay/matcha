@@ -401,7 +401,7 @@ const LoggedIn = () => {
 const ControlPanel: NextPage = () => {
 	const { accessToken } = useUserContext();
 	return (
-		<div className="columns is-centered">
+		<div className="columns is-centered is-gapless">
 			<div className="column is-three-quarters">
 				{accessToken ? <LoggedIn /> : <NotLoggedIn />}
 			</div>

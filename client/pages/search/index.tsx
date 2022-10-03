@@ -133,8 +133,8 @@ const Search: NextPage = () => {
 	const { accessToken } = useUserContext();
 	return (
 		<ErrorBoundary FallbackComponent={ErrorFallback}>
-		<div className="columns is-centered">
-			<div className="column is-three-quarters mt-6 pt-6 mx-6">
+		<div className="columns is-centered is-gapless">
+			<div className="column is-three-quarters">
 				{accessToken ? <LoggedIn /> : <NotLoggedIn />}
 			</div>
 		</div>

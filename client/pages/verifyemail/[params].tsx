@@ -38,7 +38,7 @@ const VerifyEmail: NextPage = () => {
 
   // Component
   return success ? (
-    <div className="columns">
+    <div className="columns is-gapless">
       <div className="column is-half is-offset-one-quarter">
         <section className="section">
           <div className="box has-text-centered">
@@ -51,7 +51,7 @@ const VerifyEmail: NextPage = () => {
       </div>
     </div>
   ) : (
-    <div className="columns">
+    <div className="columns is-gapless">
       <div className="column is-half is-offset-one-quarter">
         <section className="section">
           <div className="box">

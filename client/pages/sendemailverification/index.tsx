@@ -2,7 +2,8 @@ import type { NextPage } from 'next';
 import { useState, useEffect } from 'react';
 import { API } from '../../utilities/api';
 import { FaCheck, FaEnvelope } from 'react-icons/fa';
-import { FormInput, SubmitButton, Notification } from '../../components/form';
+import { FormInput, Notification } from '../../components/form';
+import { SubmitButton } from '../../components/buttons';
 
 const EmailConfirmation: NextPage = () => {
 	// validator states
@@ -12,7 +13,6 @@ const EmailConfirmation: NextPage = () => {
 
 	// Form states
 	const [success, setSuccess] = useState(false);
-	const [showGenericError, setShowGenericError] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [notification, setNotification] = useState(false);
 	const [notificationText, setNotificationText] = useState('');
@@ -83,7 +83,6 @@ const EmailConfirmation: NextPage = () => {
 	const handleSubmit = async (event: React.SyntheticEvent) => {
 		event.preventDefault();
 		setLoading(true);
-		setShowGenericError(false);
 		try {
 			const response = await API.post('/emailtoken/', values);
 			if (response.status === 200) setSuccess(true);
@@ -107,7 +106,7 @@ const EmailConfirmation: NextPage = () => {
 
 	// Component
 	return success ? (
-		<div className="columns">
+		<div className="columns is-gapless">
 			<div className="column is-half is-offset-one-quarter">
 				<section className="section">
 					<div className="box has-text-centered">
@@ -122,7 +121,7 @@ const EmailConfirmation: NextPage = () => {
 			</div>
 		</div>
 	) : (
-		<div className="columns">
+		<div className="columns is-gapless">
 			<div className="column is-half is-offset-one-quarter">
 				<section className="section">
 					<div className="box">

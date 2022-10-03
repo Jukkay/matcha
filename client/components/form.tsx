@@ -6,7 +6,6 @@ import {
 	IButton,
 	ISelectorProfile,
 	ITextArea,
-	EditButtonProps,
 	SearchParamsProps,
 	IAgeRange,
 } from '../types/types';
@@ -59,33 +58,6 @@ export const ErrorMessage = ({ errorMessage, error }: IFormInputField) => {
 		<p className="help is-danger">{errorMessage}</p>
 	) : (
 		<p className="help is-danger is-sr-only">{errorMessage}</p>
-	);
-};
-
-// Submit button with disabled and loading
-export const SubmitButton = ({ validForm, loadingState }: IButton) => {
-	if (!validForm)
-		return (
-			<button type="submit" className="button is-primary" disabled>
-				Submit
-			</button>
-		);
-	if (validForm && !loadingState)
-		return (
-			<button type="submit" className="button is-primary">
-				Submit
-			</button>
-		);
-	if (validForm && loadingState)
-		return (
-			<button type="submit" className="button is-primary is-loading">
-				Submit
-			</button>
-		);
-	return (
-		<button type="submit" className="button is-primary is-loading" disabled>
-			Submit
-		</button>
 	);
 };
 
@@ -321,24 +293,6 @@ export const TextArea = ({
 				required
 			></textarea>
 		</div>
-	);
-};
-
-export const LikeButton = () => {
-	return (
-		<button className="button">
-			<span className="icon is-small">
-				<i className="fas fa-bold"></i>
-			</span>
-		</button>
-	);
-};
-
-export const EditButton = ({ setEditMode }: EditButtonProps) => {
-	return (
-		<button className="button is-primary" onClick={() => setEditMode(true)}>
-			Edit profile
-		</button>
 	);
 };
 

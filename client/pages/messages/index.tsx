@@ -630,7 +630,7 @@ const ChatMessage = ({ item, user_id }: any) => {
 const Messages: NextPage = () => {
 	const { accessToken } = useUserContext();
 	return (
-		<div className="columns is-centered">
+		<div className="columns is-centered is-gapless">
 			<div className="column is-11">
 				{accessToken ? <LoggedIn /> : <NotLoggedIn />}
 			</div>

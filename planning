@@ -414,8 +414,11 @@ V Add space between filter buttons
 V Empty in famerating  input gives Nan warning
 V Hunt down the uncaught error
 V Going to likes clears message notifications
-
 V Make number of slides shown on frontpage carousels responsive
+V Refactor all profile cards to use same components where possible
+V Move profile card components to separate file
+V Move button components to separate file
+
 Make sure div is centered on frontpage in mobile view
 Remove dead code
 Test all required functionality

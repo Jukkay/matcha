@@ -4,17 +4,14 @@ import {
 	ITag,
 	ISearchResult,
 	IThumbnails,
-	EditButtonProps,
 	ProfileViewProps,
 	FileInputProps,
 	IProfileCard,
 	OnlineStatusProps,
 } from '../types/types';
-import { EditButton } from './form';
 import { authAPI } from '../utilities/api';
 import { useUserContext } from './UserContext';
 import { convertBirthdayToAge } from '../utilities/helpers';
-import { SearchResultItem } from './search';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Lazy, Navigation, Pagination } from 'swiper';
 import 'swiper/css';
@@ -23,115 +20,119 @@ import 'swiper/css/navigation';
 import { socket } from './SocketContext';
 import { useInView } from 'react-intersection-observer';
 import { Spinner } from './utilities';
+import { SearchResultItemWithoutDistance } from './profileCards';
+import { EditButton } from './buttons';
 
 export const ProfileView = ({ profile, setEditMode }: ProfileViewProps) => {
 	const { userData } = useUserContext();
 	return (
-		<div className="my-6">
-			<h1 className="title is-1">Your profile</h1>
-			<div className="columns card my-6 rounded-corners">
-				<div className="column has-text-left is-two-thirds">
-					<Gallery user_id={userData.user_id} />
-				</div>
-				<div className="column mt-3 has-text-left m-3">
-					<div className="block">
-						<span className="has-text-weight-semibold mr-3">
-							Name:
-						</span>
-						{profile.name}
+		<>
+			<div className="my-6">
+				<h1 className="title is-1">Your profile</h1>
+				<div className="columns card p-3 rounded-corners is-gapless">
+					<div className="column is-two-thirds">
+						<Gallery user_id={userData.user_id} />
 					</div>
-					<div className="block">
-						<span className="has-text-weight-semibold mr-3">
-							Age:
-						</span>
-						{profile.birthday &&
-							convertBirthdayToAge(profile.birthday)}
-					</div>
-					<div className="block">
-						<span className="has-text-weight-semibold mr-3">
-							Famerating:
-						</span>
-						{profile.famerating}
-					</div>
+					<div className="column m-3">
+						<div className="block">
+							<span className="has-text-weight-semibold mr-3">
+								Name:
+							</span>
+							{profile.name}
+						</div>
+						<div className="block">
+							<span className="has-text-weight-semibold mr-3">
+								Age:
+							</span>
+							{profile.birthday &&
+								convertBirthdayToAge(profile.birthday)}
+						</div>
+						<div className="block">
+							<span className="has-text-weight-semibold mr-3">
+								Famerating:
+							</span>
+							{profile.famerating}
+						</div>
 
-					<div className="block">
-						<span className="has-text-weight-semibold mr-3">
-							City:
-						</span>
-						{profile.city}
+						<div className="block">
+							<span className="has-text-weight-semibold mr-3">
+								City:
+							</span>
+							{profile.city}
+						</div>
+						<div className="block">
+							<span className="has-text-weight-semibold mr-3">
+								Country:
+							</span>
+							{profile.country}
+						</div>
+						<div className="block">
+							<span className="has-text-weight-semibold mr-3">
+								Interests:
+							</span>
+							{profile.interests
+								? profile.interests.map(
+										(interest: string, index: number) => (
+											<span
+												className="tag is-primary mx-2 my-1"
+												key={index}
+											>
+												{interest}
+											</span>
+										)
+								  )
+								: null}
+						</div>
+						<div className="block">
+							<span className="has-text-weight-semibold mr-3">
+								Introduction:
+							</span>
+							<p className="notification has-background-primary-light">
+								{profile.introduction}
+							</p>
+						</div>
+						<div className="block">
+							<span className="has-text-weight-semibold mr-3">
+								Gender:
+							</span>
+							{profile.gender}
+						</div>
+						<div className="block">
+							<span className="has-text-weight-semibold mr-3">
+								Looking for:
+							</span>
+							{profile.looking}
+						</div>
+						<div className="block">
+							<span className="has-text-weight-semibold mr-3">
+								Minimum age:
+							</span>
+							{profile.min_age}
+						</div>
+						<div className="block">
+							<span className="has-text-weight-semibold mr-3">
+								Maximum age:
+							</span>
+							{profile.max_age}
+						</div>
+						<div className="block">
+							<span className="has-text-weight-semibold mr-3">
+								Latitude:
+							</span>
+							{profile.latitude}
+						</div>
+						<div className="block">
+							<span className="has-text-weight-semibold mr-3">
+								Longitude:
+							</span>
+							{profile.longitude}
+						</div>
+						<EditButton setEditMode={setEditMode} />
 					</div>
-					<div className="block">
-						<span className="has-text-weight-semibold mr-3">
-							Country:
-						</span>
-						{profile.country}
-					</div>
-					<div className="block">
-						<span className="has-text-weight-semibold mr-3">
-							Interests:
-						</span>
-						{profile.interests
-							? profile.interests.map(
-									(interest: string, index: number) => (
-										<span
-											className="tag is-primary mx-2 my-1"
-											key={index}
-										>
-											{interest}
-										</span>
-									)
-							  )
-							: null}
-					</div>
-					<div className="block">
-						<span className="has-text-weight-semibold mr-3">
-							Introduction:
-						</span>
-						<p className="notification has-background-primary-light">
-							{profile.introduction}
-						</p>
-					</div>
-					<div className="block">
-						<span className="has-text-weight-semibold mr-3">
-							Gender:
-						</span>
-						{profile.gender}
-					</div>
-					<div className="block">
-						<span className="has-text-weight-semibold mr-3">
-							Looking for:
-						</span>
-						{profile.looking}
-					</div>
-					<div className="block">
-						<span className="has-text-weight-semibold mr-3">
-							Minimum age:
-						</span>
-						{profile.min_age}
-					</div>
-					<div className="block">
-						<span className="has-text-weight-semibold mr-3">
-							Maximum age:
-						</span>
-						{profile.max_age}
-					</div>
-					<div className="block">
-						<span className="has-text-weight-semibold mr-3">
-							Latitude:
-						</span>
-						{profile.latitude}
-					</div>
-					<div className="block">
-						<span className="has-text-weight-semibold mr-3">
-							Longitude:
-						</span>
-						{profile.longitude}
-					</div>
-					<EditButton setEditMode={setEditMode} />
 				</div>
 			</div>
 			<VisitorLog user_id={userData.user_id} />
-		</div>
+		</>
 	);
 };
 
@@ -168,21 +169,13 @@ export const VisitorLog = ({ user_id }: any) => {
 	}, []);
 
 	return pageVisited && log ? (
-		<section className="section">
+		<div>
 			<h3 className="title is-3">Visitor log</h3>
 			<div className="block">
-				{log.slice(0, endIndex).map((result: IProfileCard, index) => (
-					<SearchResultItem
+				{log.slice(0, endIndex).map((profile: IProfileCard, index) => (
+					<SearchResultItemWithoutDistance
 						key={index}
-						user_id={result.user_id}
-						profile_image={result.profile_image}
-						name={result.name}
-						birthday={result.birthday}
-						city={result.city}
-						country={result.country}
-						famerating={result.famerating}
-						distance={result.distance}
-						interests={result.interests}
+						profile={profile}
 					/>
 				))}
 				{endIndex < log.length ? (
@@ -197,28 +190,12 @@ export const VisitorLog = ({ user_id }: any) => {
 					</section>
 				)}
 			</div>
-		</section>
+		</div>
 	) : (
 		<section className="section">
 			<h3 className="title is-3">Visitor log</h3>
 			<div className="block">No visits yet</div>
 		</section>
-	);
-};
-
-export const NewProfileButton = ({ setEditMode }: EditButtonProps) => {
-	return (
-		<div className="section has-text-centered">
-			<h3 className="title is-3">
-				Before we start, let's create a profile for you!
-			</h3>
-			<button
-				className="button is-primary"
-				onClick={() => setEditMode(true)}
-			>
-				Create new profile
-			</button>
-		</div>
 	);
 };
 

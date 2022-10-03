@@ -28,12 +28,13 @@ import { LoadError, Spinner } from './utilities';
 import { FaFilter } from 'react-icons/fa';
 import { BiSortAlt2 } from 'react-icons/bi';
 import { IconContext } from 'react-icons';
-import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
 import { useInView } from 'react-intersection-observer';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import { LocationPermissionRequest } from './locationPermissionRequest';
+import { SearchResultItem } from './profileCards';
+import { SubmitAndResetButtons } from './buttons';
 
 // Dynamically imported components
 const CitySearchSelector = dynamic(() => import('./searchCitySelector'), {
@@ -135,8 +136,8 @@ export const ProfileSearch = ({
 	};
 
 	return (
-		<div>
-			<h3 className="title is-3">Search</h3>
+		<div className="my-6">
+			<h1 className="title is-1">Search</h1>
 			<form onSubmit={handleSubmit}>
 				<BasicSearchLine
 					searchParams={searchParams}
@@ -222,7 +223,7 @@ const Filters = ({
 	return visible ? (
 		<div className="block">
 			<div className="block">
-				<div className="columns is-centered">
+				<div className="columns is-centered is-gapless">
 					<div className="column is-one-third">
 						<div className="is-flex is-align-items-baseline">
 							<label htmlFor="filter" className="label">
@@ -276,7 +277,7 @@ const Filters = ({
 		</div>
 	) : (
 		<div className="block">
-			<div className="columns is-centered">
+			<div className="columns is-centered is-gapless">
 				<div className="column is-one-third">
 					<div className="is-flex is-align-items-baseline">
 						<label htmlFor="filter" className="label">
@@ -381,7 +382,7 @@ export const Results = ({ sortedResults, loadStatus }: ResultsProps) => {
 		return <LoadError text="Error loading profiles" />;
 
 	return sortedResults.length > 0 ? (
-		<section className="section has-text-centered">
+		<div>
 			<h5 className="title is-5">{searchResultText}</h5>
 			<div>
 				{sortedResults.slice(0, endIndex).map((result, index) => (
@@ -410,100 +411,11 @@ export const Results = ({ sortedResults, loadStatus }: ResultsProps) => {
 					</section>
 				)}
 			</div>
-		</section>
+		</div>
 	) : (
 		<section className="section has-text-centered">
 			<h3 className="title is-3">No matching profiles found</h3>
 		</section>
-	);
-};
-
-export const SearchResultItem = ({
-	user_id,
-	profile_image,
-	name,
-	birthday,
-	city,
-	country,
-	famerating,
-	distance,
-	interests,
-}: IProfileCard) => {
-	return (
-		<Link href={`/profile/${user_id}`}>
-			<a>
-				<div className="columns card my-6 rounded-corners">
-					<div className="column has-text-left is-two-thirds">
-						<figure className="image is-square">
-							<img
-								src={`${authAPI.defaults.baseURL}/images/${profile_image}`}
-								alt="Placeholder image"
-								crossOrigin=""
-								className="rounded-corners"
-							/>
-							<div className="is-overlay">
-								<OnlineIndicator user_id={user_id} />
-							</div>
-						</figure>
-					</div>
-					<div className="column mt-3 has-text-left">
-						<div className="block">
-							<span className="has-text-weight-semibold mr-3">
-								Name:
-							</span>
-							{name}
-						</div>
-						<div className="block">
-							<span className="has-text-weight-semibold mr-3">
-								Age:
-							</span>
-							{birthday && convertBirthdayToAge(birthday)}
-						</div>
-						<div className="block">
-							<span className="has-text-weight-semibold mr-3">
-								Famerating:
-							</span>
-							{famerating}
-						</div>
-						<div className="block">
-							<span className="has-text-weight-semibold mr-3">
-								Distance:
-							</span>
-							{`${distance} km`}
-						</div>
-						<div className="block">
-							<span className="has-text-weight-semibold mr-3">
-								City:
-							</span>
-							{city}
-						</div>
-						<div className="block">
-							<span className="has-text-weight-semibold mr-3">
-								Country:
-							</span>
-							{country}
-						</div>
-						<div className="block">
-							<span className="has-text-weight-semibold mr-3">
-								Interests:
-							</span>
-							{interests
-								? JSON.parse(interests).map(
-										(interest: string, index: number) => (
-											<span
-												className="tag is-primary mx-2 my-1"
-												key={index}
-											>
-												{interest}
-											</span>
-										)
-								  )
-								: null}
-						</div>
-					</div>
-				</div>
-			</a>
-		</Link>
 	);
 };
 
@@ -576,7 +488,7 @@ export const BasicSearchLine = ({
 
 	return optionalsVisible ? (
 		<div>
-			<div className="columns is-centered">
+			<div className="columns is-centered is-gapless">
 				<SearchAgeRange
 					searchParams={searchParams}
 					setSearchParams={setSearchParams}
@@ -590,7 +502,7 @@ export const BasicSearchLine = ({
 					handleSubmit={handleSubmit}
 				/>
 			</div>
-			<div className="columns is-centered">
+			<div className="columns is-centered is-gapless">
 				<div className="buttons column is-one-third">
 					<button
 						className="button is-ghost has-text-black"
@@ -607,7 +519,7 @@ export const BasicSearchLine = ({
 					<LocationPermissionRequest />
 				</div>
 			</div>
-			<div className="columns is-centered">
+			<div className="columns is-centered is-gapless">
 				{/* Location. Components imported dynamically */}
 				<Suspense fallback={<Spinner />}>
 					<div className="column is-one-third">
@@ -628,7 +540,7 @@ export const BasicSearchLine = ({
 		</div>
 	) : (
 		<div>
-			<div className="columns is-centered">
+			<div className="columns is-centered is-gapless">
 				<SearchAgeRange
 					searchParams={searchParams}
 					setSearchParams={setSearchParams}
@@ -642,7 +554,7 @@ export const BasicSearchLine = ({
 					handleSubmit={handleSubmit}
 				/>
 			</div>
-			<div className="columns is-centered">
+			<div className="columns is-centered is-gapless">
 				<div className="buttons column is-one-third">
 					<button
 						className="button is-ghost has-text-black"
@@ -751,29 +663,6 @@ export const SearchGenderSelector = ({
 						<option value="Anything goes">Anything goes</option>
 					</select>
 				</div>
-			</div>
-		</div>
-	);
-};
-
-export const SubmitAndResetButtons = ({
-	resetSearch,
-	handleSubmit,
-}: ButtonsProps) => {
-	return (
-		<div className="column is-one-third">
-			<div className="label is-invisible">Submit</div>
-			<div className="buttons">
-				<button
-					type="submit"
-					onClick={handleSubmit}
-					className="button is-primary"
-				>
-					Search
-				</button>
-				<button type="reset" onClick={resetSearch} className="button">
-					Reset to default
-				</button>
 			</div>
 		</div>
 	);

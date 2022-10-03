@@ -2,7 +2,7 @@ import { NextPage } from 'next';
 
 const Terms: NextPage = () => {
 	return (
-		<div className="columns is-centered">
+		<div className="columns is-centered is-gapless">
 			<div className="column is-three-quarters mt-6 pt-6 content">
 				<h3 className="title is-1">Terms and conditions</h3>
 

@@ -14,6 +14,7 @@ import {
 } from '../../utilities/helpers';
 import { useInView } from 'react-intersection-observer';
 import { ErrorBoundary } from 'react-error-boundary';
+import { SearchResultItemWithoutDistance } from '../../components/profileCards';
 
 const NotLoggedIn = () => {
 	return (
@@ -87,11 +88,10 @@ const LoggedIn = () => {
 		return <LoadError text="Error loading history" />;
 
 	return log.length > 0 ? (
-		<section className="section has-text-centered">
-			<h3 className="title is-3">Recently visited profiles</h3>
-			<div className="block">
+		<div className="my-6">
+				<h1 className="title is-1">Recently visited profiles</h1>
 				{log.slice(0, endIndex).map((visitor: LogEntry, index) => (
-					<SearchResultItem key={index} profile={visitor} />
+					<SearchResultItemWithoutDistance key={index} profile={visitor} />
 				))}
 				{endIndex < log.length ? (
 					<div ref={ref}>
@@ -105,7 +105,6 @@ const LoggedIn = () => {
 					</section>
 				)}
 			</div>
-		</section>
 	) : (
 		<section className="section">
 			<h3 className="title is-3">Recently visited profiles</h3>
@@ -114,86 +113,11 @@ const LoggedIn = () => {
 	);
 };
 
-export const SearchResultItem = ({ profile }: any) => {
-	return (
-		<Link href={`/profile/${profile.user_id}`}>
-			<a>
-				<div className="columns card my-6 rounded-corners">
-					<div className="column has-text-left is-two-thirds">
-						<figure className="image is-square">
-							<img
-								src={`${authAPI.defaults.baseURL}/images/${profile.profile_image}`}
-								alt="Placeholder image"
-								crossOrigin=""
-								className="rounded-corners"
-							/>
-							<div className="is-overlay">
-								<OnlineIndicator user_id={profile.user_id} />
-							</div>
-						</figure>
-					</div>
-					<div className="column mt-3 has-text-left">
-						<div className="block">
-							<span className="has-text-weight-semibold mr-3">
-								Name:
-							</span>
-							{profile.name}
-						</div>
-						<div className="block">
-							<span className="has-text-weight-semibold mr-3">
-								Age:
-							</span>
-							{profile.birthday &&
-								convertBirthdayToAge(profile.birthday)}
-						</div>
-						<div className="block">
-							<span className="has-text-weight-semibold mr-3">
-								Famerating:
-							</span>
-							{profile.famerating}
-						</div>
-
-						<div className="block">
-							<span className="has-text-weight-semibold mr-3">
-								City:
-							</span>
-							{profile.city}
-						</div>
-						<div className="block">
-							<span className="has-text-weight-semibold mr-3">
-								Country:
-							</span>
-							{profile.country}
-						</div>
-						<div className="block">
-							<span className="has-text-weight-semibold mr-3">
-								Interests:
-							</span>
-							{profile.interests
-								? JSON.parse(profile.interests).map(
-										(interest: string, index: number) => (
-											<span
-												className="tag is-primary mx-2 my-1"
-												key={index}
-											>
-												{interest}
-											</span>
-										)
-								  )
-								: null}
-						</div>
-					</div>
-				</div>
-			</a>
-		</Link>
-	);
-};
-
 const History: NextPage = () => {
 	const { accessToken } = useUserContext();
 	return (
 		<ErrorBoundary FallbackComponent={ErrorFallback}>
-			<div className="columns is-centered">
+			<div className="columns is-centered is-gapless">
 				<div className="column is-three-quarters">
 					{accessToken ? <LoggedIn /> : <NotLoggedIn />}
 				</div>

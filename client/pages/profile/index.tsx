@@ -1,9 +1,9 @@
 import type { NextPage } from 'next';
 import { useState, useEffect } from 'react';
+import { NewProfileButton } from '../../components/buttons';
 import { CreateProfile } from '../../components/createProfile';
 import { useNotificationContext } from '../../components/NotificationContext';
 import {
-	NewProfileButton,
 	ProfileView,
 } from '../../components/profile';
 import { UpdateProfile } from '../../components/updateProfile';
@@ -99,7 +99,7 @@ const ViewMode = ({ setEditMode, profile }: ViewProps) => {
 const Profile: NextPage = () => {
 	const { accessToken } = useUserContext();
 	return (
-		<div className="columns is-centered">
+		<div className="columns is-centered is-gapless">
 			<div className="column is-three-quarters">
 				{accessToken ? <LoggedIn /> : <NotLoggedIn />}
 			</div>

@@ -102,7 +102,7 @@ const PasswordReset: NextPage = () => {
 	// Component
 	return success ? (
 		<div className="columns">
-			<div className="column is-half is-offset-one-quarter">
+			<div className="column is-half is-offset-one-quarter is-gapless">
 				<section className="section">
 					<div className="box has-text-centered">
 						<section className="section">
@@ -117,7 +117,7 @@ const PasswordReset: NextPage = () => {
 		</div>
 	) : (
 		<div className="columns">
-			<div className="column is-half is-offset-one-quarter">
+			<div className="column is-half is-offset-one-quarter is-gapless">
 				<section className="section">
 					<div className="box">
 						<section className="section">

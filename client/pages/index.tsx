@@ -110,7 +110,7 @@ const LoggedIn = () => {
 const Home: NextPage = () => {
 	const { accessToken } = useUserContext();
 	return (
-		<div className="columns is-centered">
+		<div className="columns is-centered is-gapless">
 			<div className="column is-11">
 				{accessToken ? <LoggedIn /> : <NotLoggedIn />}
 			</div>

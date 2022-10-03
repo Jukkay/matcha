@@ -1,7 +1,8 @@
 import type { NextPage } from "next";
 import { useState, useEffect} from "react";
 import { FaCheck, FaUser, FaLock, FaEnvelope, FaBirthdayCake } from "react-icons/fa";
-import { FormInput, Notification, SubmitButton } from "../../components/form";;
+import { SubmitButton } from "../../components/buttons";
+import { FormInput, Notification } from "../../components/form";;
 import { API } from "../../utilities/api";
 
 const Signup: NextPage = () => {
@@ -252,7 +253,7 @@ const Signup: NextPage = () => {
 
   // Component
   return success ? (
-    <div className="columns">
+    <div className="columns is-gapless">
       <div className="column is-half is-offset-one-quarter">
         <section className="section">
           <div className="box has-text-centered">
@@ -265,7 +266,7 @@ const Signup: NextPage = () => {
       </div>
     </div>
   ) : (
-    <div className="columns">
+    <div className="columns is-gapless">
       <div className="column is-half is-offset-one-quarter">
         <section className="section">
           <div className="box">

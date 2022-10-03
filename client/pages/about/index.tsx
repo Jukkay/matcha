@@ -2,7 +2,7 @@ import { NextPage } from 'next';
 
 const About: NextPage = () => {
 	return (
-		<div className="columns is-centered">
+		<div className="columns is-centered is-gapless">
 			<div className="column is-three-quarters mt-6 pt-6 content">
 				<section className="section">
 					<h1 className="title is-1">About</h1>

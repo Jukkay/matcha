@@ -12,9 +12,9 @@ import {
 } from '../../types/types';
 import { authAPI } from '../../utilities/api';
 import { useInView } from 'react-intersection-observer';
-import { LikeProfile } from '../likes';
 import { ErrorBoundary } from 'react-error-boundary';
 import { handleRouteError } from '../../utilities/helpers';
+import { SearchResultItemWithoutDistance } from '../../components/profileCards';
 
 const NotLoggedIn = () => {
 	return (
@@ -122,7 +122,7 @@ const LoggedIn = () => {
 			<h3 className="title is-3">They liked your profile:</h3>
 			<div className="block">
 				{likerProfiles.slice(0, endIndex).map((liker, index) => (
-					<LikeProfile key={index} profile={liker} />
+					<SearchResultItemWithoutDistance key={index} profile={liker} />
 				))}
 				{endIndex < likerProfiles.length ? (
 					<div ref={ref}>
@@ -148,7 +148,7 @@ const LikesReceived: NextPage = () => {
 	const { accessToken } = useUserContext();
 	return (
 		<ErrorBoundary FallbackComponent={ErrorFallback}>
-			<div className="columns is-centered">
+			<div className="columns is-centered is-gapless">
 				<div className="column is-three-quarters">
 					{accessToken ? <LoggedIn /> : <NotLoggedIn />}
 				</div>
