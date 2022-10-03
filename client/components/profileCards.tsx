@@ -1,10 +1,10 @@
-import { authAPI } from "../utilities/api";
-import { convertBirthdayToAge, reformatDateTime } from "../utilities/helpers";
-import { Gallery, OnlineIndicator } from "./profile";
+import { authAPI } from '../utilities/api';
+import { convertBirthdayToAge, reformatDateTime } from '../utilities/helpers';
+import { Gallery, OnlineIndicator } from './profile';
 import Link from 'next/link';
-import { IProfileCard, OtherUserViewProps } from "../types/types";
-import { useState } from "react";
-import { LikeButton, UnlikeButton } from "./buttons";
+import { IProfileCard, OtherUserViewProps } from '../types/types';
+import { useState } from 'react';
+import { LikeButton, UnlikeButton } from './buttons';
 
 export const SearchResultItemWithoutDistance = ({ profile }: any) => {
 	return (
@@ -21,7 +21,9 @@ export const SearchResultItemWithoutDistance = ({ profile }: any) => {
 									className="rounded-corners"
 								/>
 								<div className="is-overlay">
-									<OnlineIndicator user_id={profile.user_id} />
+									<OnlineIndicator
+										user_id={profile.user_id}
+									/>
 								</div>
 							</div>
 						</div>
@@ -36,7 +38,8 @@ export const SearchResultItemWithoutDistance = ({ profile }: any) => {
 								<span className="has-text-weight-semibold mr-3">
 									Age:
 								</span>
-								{profile.birthday && convertBirthdayToAge(profile.birthday)}
+								{profile.birthday &&
+									convertBirthdayToAge(profile.birthday)}
 							</div>
 							<div className="block">
 								<span className="has-text-weight-semibold mr-3">
@@ -178,7 +181,9 @@ export const SearchResultItem = ({
 	);
 };
 
-export const ProfileViewWithLikeButtons = ({ otherUserProfile }: OtherUserViewProps) => {
+export const ProfileViewWithLikeButtons = ({
+	otherUserProfile,
+}: OtherUserViewProps) => {
 	const [liked, setLiked] = useState(otherUserProfile.liked);
 	const [match, setMatch] = useState(false);
 
@@ -278,7 +283,7 @@ export const ProfileViewWithLikeButtons = ({ otherUserProfile }: OtherUserViewPr
 							className="delete"
 							onClick={closeNotification}
 						></button>
-						<h3 className="title is-3">It's a match!</h3>
+						<h3 className="title is-3">It&apos;s a match!</h3>
 					</div>
 				) : null}
 				{otherUserProfile.likes_requester &&

@@ -77,7 +77,7 @@ export const ProfileCarousel = ({ profiles }: ResultProfiles) => {
 				`${authAPI.defaults.baseURL}/images/${item['profile_image']}`
 		);
 		setImages(urls);
-	}, []);
+	}, [profiles]);
 
 	return images.length > 0 ? (
 		<Swiper
@@ -99,24 +99,27 @@ export const ProfileCarousel = ({ profiles }: ResultProfiles) => {
 				1200: {
 					slidesPerView: 5,
 				},
-			  }}
+			}}
 		>
 			{images.map((image, index) => (
 				<SwiperSlide className="swiper-slide" key={index}>
 					<Link href={`/profile/${profiles[index].user_id}`}>
-					<a>
-
-					<div className="is-relative image is-square rounded-corners">
-						<img
-							src={image}
-							alt="Placeholder image"
-							crossOrigin=""
-							className="rounded-corners"
-							/>
-						<p className="is-overlay has-text-weight-bold has-text-white mt-3 ml-3">{`${profiles[index].name}, ${convertBirthdayToAge(profiles[index].birthday)}`}</p>
-					</div>
-							</a>
-							</Link>
+						<a>
+							<div className="is-relative image is-square rounded-corners">
+								<img
+									src={image}
+									alt="Placeholder image"
+									crossOrigin=""
+									className="rounded-corners"
+								/>
+								<p className="is-overlay has-text-weight-bold has-text-white mt-3 ml-3">{`${
+									profiles[index].name
+								}, ${convertBirthdayToAge(
+									profiles[index].birthday
+								)}`}</p>
+							</div>
+						</a>
+					</Link>
 				</SwiperSlide>
 			))}
 		</Swiper>

@@ -1,10 +1,21 @@
-import { FcDislike, FcLike } from "react-icons/fc";
-import { ButtonsProps, EditButtonProps, IButton, LikeButtonProps, NotificationType, UnlikeButtonProps } from "../types/types";
-import { authAPI } from "../utilities/api";
-import { useSocketContext } from "./SocketContext";
-import { useUserContext } from "./UserContext";
+import { FcDislike, FcLike } from 'react-icons/fc';
+import {
+	ButtonsProps,
+	EditButtonProps,
+	IButton,
+	LikeButtonProps,
+	NotificationType,
+	UnlikeButtonProps,
+} from '../types/types';
+import { authAPI } from '../utilities/api';
+import { useSocketContext } from './SocketContext';
+import { useUserContext } from './UserContext';
 
-export const LikeButton = ({ profile, setLiked, setMatch }: LikeButtonProps) => {
+export const LikeButton = ({
+	profile,
+	setLiked,
+	setMatch,
+}: LikeButtonProps) => {
 	const { userData } = useUserContext();
 	const socket = useSocketContext();
 
@@ -121,7 +132,7 @@ export const NewProfileButton = ({ setEditMode }: EditButtonProps) => {
 	return (
 		<div className="section has-text-centered">
 			<h3 className="title is-3">
-				Before we start, let's create a profile for you!
+				Before we start, let&apos;s create a profile for you!
 			</h3>
 			<button
 				className="button is-primary"
@@ -132,7 +143,6 @@ export const NewProfileButton = ({ setEditMode }: EditButtonProps) => {
 		</div>
 	);
 };
-
 
 export const SubmitAndResetButtons = ({
 	resetSearch,

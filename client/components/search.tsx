@@ -1,13 +1,10 @@
-import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
-import { OnlineIndicator, SearchResult } from './profile';
+import { SearchResult } from './profile';
 import { useUserContext } from './UserContext';
 import {
 	AdvancedSearchProps,
 	BasicSearchProps,
-	ButtonsProps,
 	IAgeRangeSlider,
-	IProfileCard,
 	LoadStatus,
 	ResultsProps,
 	SearchParamsProps,
@@ -585,7 +582,7 @@ export const AgeRangeSlider = ({ state, setState }: IAgeRangeSlider) => {
 		setValue([state.min_age, state.max_age]);
 	}, [state.min_age, state.max_age]);
 
-	const handleChange = (event: Event, newValue: number | number[]) => {
+	const handleChange = (_event: Event, newValue: number | number[]) => {
 		const array = newValue as number[];
 		setState({
 			...state,
@@ -597,7 +594,7 @@ export const AgeRangeSlider = ({ state, setState }: IAgeRangeSlider) => {
 	return (
 		<div className="mx-3">
 			<Slider
-				sx={{ width: 250, color: 'success.main' }}
+				sx={{ width: 250, color: 'hsl(315, 97%, 26%)' }}
 				getAriaLabel={() => 'Age range'}
 				value={value}
 				onChange={handleChange}

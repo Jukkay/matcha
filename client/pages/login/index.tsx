@@ -2,34 +2,27 @@ import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import { FaUser, FaLock } from 'react-icons/fa';
-import { FormInput, SubmitButton, Notification } from '../../components/form';
+import { FormInput, Notification } from '../../components/form';
 import { useUserContext } from '../../components/UserContext';
 import { API, authAPI } from '../../utilities/api';
 import Link from 'next/link';
 import { handleRouteError } from '../../utilities/helpers';
 import { socket } from '../../components/SocketContext';
+import { SubmitButton } from '../../components/buttons';
 
 const LoginSuccess = () => {
-	const {
-		setProfile,
-		userData,
-		updateUserData,
-		updateAccessToken,
-		updateRefreshToken,
-	} = useUserContext();
+	const { setProfile, userData, updateUserData } = useUserContext();
 	const [wasRedirected, setWasRedirected] = useState(false);
 	const router = useRouter();
 
 	// Router error event listener and handler
 	useEffect(() => {
 		router.events.on('routeChangeError', handleRouteError);
-
-		// If the component is unmounted, unsubscribe
-		// from the event with the `off` method:
 		return () => {
 			router.events.off('routeChangeError', handleRouteError);
 		};
 	}, []);
+
 	// Redirect if user has no profile
 	useEffect(() => {
 		if (wasRedirected) return;
@@ -42,6 +35,7 @@ const LoginSuccess = () => {
 	useEffect(() => {
 		const getUserProfile = async () => {
 			try {
+				if (!userData.user_id) return;
 				let response = await authAPI.get(
 					`/profile/${userData.user_id}`
 				);
@@ -59,7 +53,7 @@ const LoginSuccess = () => {
 			} catch (err) {}
 		};
 		getUserProfile();
-	}, []);
+	}, [userData.user_id]);
 
 	return (
 		<div className="columns">
@@ -103,7 +97,7 @@ const Login: NextPage = () => {
 	});
 
 	// Error messages
-	const [errorMessages, setErrorMessages] = useState({
+	const [errorMessages, _setErrorMessages] = useState({
 		username: 'Invalid username',
 		password: 'Invalid password',
 		generic: '',

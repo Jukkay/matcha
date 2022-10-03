@@ -10,7 +10,7 @@ const Terms: NextPage = () => {
 
 				<p>
 					These terms and conditions outline the rules and regulations
-					for the use of Matcha ltd's Website, located at
+					for the use of Matcha ltd&apos;s Website, located at
 					https://matcha.jukka.codes.
 				</p>
 
@@ -24,20 +24,23 @@ const Terms: NextPage = () => {
 				<p>
 					The following terminology applies to these Terms and
 					Conditions, Privacy Statement and Disclaimer Notice and all
-					Agreements: "Client", "You" and "Your" refers to you, the
-					person log on this website and compliant to the Company’s
-					terms and conditions. "The Company", "Ourselves", "We",
-					"Our" and "Us", refers to our Company. "Party", "Parties",
-					or "Us", refers to both the Client and ourselves. All terms
-					refer to the offer, acceptance and consideration of payment
-					necessary to undertake the process of our assistance to the
-					Client in the most appropriate manner for the express
-					purpose of meeting the Client’s needs in respect of
-					provision of the Company’s stated services, in accordance
-					with and subject to, prevailing law of Netherlands. Any use
-					of the above terminology or other words in the singular,
-					plural, capitalization and/or he/she or they, are taken as
-					interchangeable and therefore as referring to same.
+					Agreements: &quot;Client&quot;, &quot;You&quot; and
+					&quot;Your&quot; refers to you, the person log on this
+					website and compliant to the Company&apos;s terms and
+					conditions. &quot;The Company&quot;, &quot;Ourselves&quot;,
+					&quot;We&quot;, &quot;Our&quot; and &quot;Us&quot;, refers
+					to our Company. &quot;Party&quot;, &quot;Parties&quot;, or
+					&quot;Us&quot;, refers to both the Client and ourselves. All
+					terms refer to the offer, acceptance and consideration of
+					payment necessary to undertake the process of our assistance
+					to the Client in the most appropriate manner for the express
+					purpose of meeting the Client&apos;s needs in respect of
+					provision of the Company&apos;s stated services, in
+					accordance with and subject to, prevailing law of
+					Netherlands. Any use of the above terminology or other words
+					in the singular, plural, capitalization and/or he/she or
+					they, are taken as interchangeable and therefore as
+					referring to same.
 				</p>
 
 				<h3>
@@ -46,13 +49,13 @@ const Terms: NextPage = () => {
 
 				<p>
 					We employ the use of cookies. By accessing Matcha, you
-					agreed to use cookies in agreement with the Matcha ltd's
-					Privacy Policy.{' '}
+					agreed to use cookies in agreement with the Matcha
+					ltd&apos;s Privacy Policy.{' '}
 				</p>
 
 				<p>
 					Most interactive websites use cookies to let us retrieve the
-					user’s details for each visit. Cookies are used by our
+					user&apos;s details for each visit. Cookies are used by our
 					website to enable the functionality of certain areas to make
 					it easier for people visiting our website. Some of our
 					affiliate/advertising partners may also use cookies.
@@ -171,7 +174,7 @@ const Terms: NextPage = () => {
 					link: (a) is not in any way deceptive; (b) does not falsely
 					imply sponsorship, endorsement or approval of the linking
 					party and its products and/or services; and (c) fits within
-					the context of the linking party’s site.
+					the context of the linking party&apos;s site.
 				</p>
 
 				<p>
@@ -209,7 +212,7 @@ const Terms: NextPage = () => {
 					link: (a) is not in any way deceptive; (b) does not falsely
 					imply sponsorship, endorsement or approval of the linking
 					party and its products or services; and (c) fits within the
-					context of the linking party’s site.
+					context of the linking party&apos;s site.
 				</p>
 
 				<p>
@@ -237,13 +240,13 @@ const Terms: NextPage = () => {
 					<li>
 						By use of any other description of our Website being
 						linked to that makes sense within the context and format
-						of content on the linking party’s site.
+						of content on the linking party&apos;s site.
 					</li>
 				</ul>
 
 				<p>
-					No use of Matcha ltd's logo or other artwork will be allowed
-					for linking absent a trademark license agreement.
+					No use of Matcha ltd&apos;s logo or other artwork will be
+					allowed for linking absent a trademark license agreement.
 				</p>
 
 				<h3>
@@ -285,9 +288,9 @@ const Terms: NextPage = () => {
 					any particular link to our Website. You approve to
 					immediately remove all links to our Website upon request. We
 					also reserve the right to amen these terms and conditions
-					and it’s linking policy at any time. By continuously linking
-					to our Website, you agree to be bound to and follow these
-					linking terms and conditions.
+					and it&apos;s linking policy at any time. By continuously
+					linking to our Website, you agree to be bound to and follow
+					these linking terms and conditions.
 				</p>
 
 				<h3>

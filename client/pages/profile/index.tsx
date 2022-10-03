@@ -3,9 +3,7 @@ import { useState, useEffect } from 'react';
 import { NewProfileButton } from '../../components/buttons';
 import { CreateProfile } from '../../components/createProfile';
 import { useNotificationContext } from '../../components/NotificationContext';
-import {
-	ProfileView,
-} from '../../components/profile';
+import { ProfileView } from '../../components/profile';
 import { UpdateProfile } from '../../components/updateProfile';
 import { useUserContext } from '../../components/UserContext';
 import { ActivePage, EditProps, ViewProps } from '../../types/types';
@@ -23,12 +21,13 @@ const NotLoggedIn = () => {
 
 const LoggedIn = () => {
 	const { userData, updateUserData, profile, setProfile } = useUserContext();
-	const { setActivePage } = useNotificationContext()
+	const { setActivePage } = useNotificationContext();
 	const [editMode, setEditMode] = useState(false);
-	
+
 	// Fetch profile data
 	useEffect(() => {
 		const getUserProfile = async () => {
+			if (!userData.user_id) return;
 			try {
 				let response = await authAPI.get(
 					`/profile/${userData.user_id}`
@@ -44,11 +43,11 @@ const LoggedIn = () => {
 						JSON.stringify(response.data.profile)
 					);
 				} else updateUserData({ ...userData, profile_exists: false });
-			} catch (err) {} 
+			} catch (err) {}
 		};
 		getUserProfile();
-		setActivePage(ActivePage.PROFILE)
-	}, []);
+		setActivePage(ActivePage.PROFILE);
+	}, [userData.user_id]);
 
 	return editMode ? (
 		<EditMode
@@ -57,19 +56,12 @@ const LoggedIn = () => {
 			setProfile={setProfile}
 		/>
 	) : (
-		<ViewMode
-			setEditMode={setEditMode}
-			profile={profile}
-		/>
+		<ViewMode setEditMode={setEditMode} profile={profile} />
 	);
 };
 
 // Edit profile
-const EditMode = ({
-	setEditMode,
-	profile,
-	setProfile
-}: EditProps) => {
+const EditMode = ({ setEditMode, profile, setProfile }: EditProps) => {
 	const { userData } = useUserContext();
 	return userData.profile_exists ? (
 		<UpdateProfile

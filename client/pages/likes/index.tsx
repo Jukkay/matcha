@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import { useNotificationContext } from '../../components/NotificationContext';
-import { OnlineIndicator } from '../../components/profile';
 import { useUserContext } from '../../components/UserContext';
 import { ErrorFallback, LoadError, Spinner } from '../../components/utilities';
 import {
@@ -13,10 +12,7 @@ import {
 	NotificationType,
 } from '../../types/types';
 import { authAPI } from '../../utilities/api';
-import {
-	convertBirthdayToAge,
-	handleRouteError,
-} from '../../utilities/helpers';
+import { handleRouteError } from '../../utilities/helpers';
 import { ErrorBoundary } from 'react-error-boundary';
 import { SearchResultItemWithoutDistance } from '../../components/profileCards';
 
@@ -32,12 +28,7 @@ const NotLoggedIn = () => {
 
 const LoggedIn = () => {
 	const { userData } = useUserContext();
-	const {
-		setActivePage,
-		setNotificationCount,
-		setMessageCount,
-		setLikeCount,
-	} = useNotificationContext();
+	const { setActivePage, setLikeCount } = useNotificationContext();
 	const [likedProfiles, setLikedProfiles] = useState<ILikeProfile[]>([]);
 	const [likerProfiles, setLikerProfiles] = useState<ILikeProfile[]>([]);
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
@@ -47,14 +38,11 @@ const LoggedIn = () => {
 	// Router error event listener and handler
 	useEffect(() => {
 		router.events.on('routeChangeError', handleRouteError);
-
-		// If the component is unmounted, unsubscribe
-		// from the event with the `off` method:
 		return () => {
 			router.events.off('routeChangeError', handleRouteError);
 		};
 	}, []);
-	
+
 	// Redirect if user has no profile
 	useEffect(() => {
 		if (wasRedirected || userData.profile_exists) return;
@@ -91,6 +79,7 @@ const LoggedIn = () => {
 	};
 
 	useEffect(() => {
+		if (!userData.user_id) return;
 		const controller1 = new AbortController();
 		const controller2 = new AbortController();
 		const controller3 = new AbortController();
@@ -127,7 +116,10 @@ const LoggedIn = () => {
 					likerProfiles
 						.slice(0, 5)
 						.map((liker, index) => (
-							<SearchResultItemWithoutDistance key={index} profile={liker} />
+							<SearchResultItemWithoutDistance
+								key={index}
+								profile={liker}
+							/>
 						))
 				) : (
 					<p>Nothing to show yet</p>
@@ -144,7 +136,10 @@ const LoggedIn = () => {
 					likedProfiles
 						.slice(0, 5)
 						.map((liker, index) => (
-							<SearchResultItemWithoutDistance key={index} profile={liker} />
+							<SearchResultItemWithoutDistance
+								key={index}
+								profile={liker}
+							/>
 						))
 				) : (
 					<p>Nothing to show yet</p>

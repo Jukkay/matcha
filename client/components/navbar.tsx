@@ -49,8 +49,7 @@ const Logo = () => {
 	);
 };
 const LoggedInControls = () => {
-	const { refreshToken, userData, updateAccessToken, profile, setProfile } =
-		useUserContext();
+	const { refreshToken, userData, updateAccessToken } = useUserContext();
 	const {
 		activeChatUser,
 		activePage,
@@ -70,7 +69,6 @@ const LoggedInControls = () => {
 		const controller = new AbortController();
 		const getNotifications = async () => {
 			try {
-				if (!userData.user_id) return;
 				socket.emit('set_user', userData.user_id);
 				const response = await authAPI(
 					`/notifications/${userData.user_id}`,
@@ -87,7 +85,7 @@ const LoggedInControls = () => {
 		};
 		getNotifications();
 		return () => controller.abort();
-	}, [socket, userData.user_id]);
+	}, [userData.user_id]);
 
 	// Listen for notifications
 	useEffect(() => {
@@ -126,7 +124,7 @@ const LoggedInControls = () => {
 			socket.removeAllListeners('receive_notification');
 			socket.removeAllListeners('connect_error');
 		};
-	}, [socket, userData.user_id]);
+	}, [userData.user_id]);
 
 	// Count notifications and update badges
 	useEffect(() => {
@@ -188,29 +186,29 @@ const LoggedInControls = () => {
 const TextLinks = ({ likeCount }: LikeProp) => {
 	return (
 		<div className="is-flex-wrap-nowrap text-links">
-				<Link href="/search">
-					<a className="navbar-item">Search</a>
+			<Link href="/search">
+				<a className="navbar-item">Search</a>
+			</Link>
+			<Link href="/history">
+				<a className="navbar-item">Recent profiles</a>
+			</Link>
+			{likeCount ? (
+				<Link href="/likes">
+					<a className="navbar-item">
+						<span
+							title="Badge top right"
+							className="badge is-danger mt-3"
+						>
+							{likeCount}
+						</span>
+						Likes
+					</a>
 				</Link>
-				<Link href="/history">
-					<a className="navbar-item">Recent profiles</a>
+			) : (
+				<Link href="/likes">
+					<a className="navbar-item">Likes</a>
 				</Link>
-				{likeCount ? (
-					<Link href="/likes">
-						<a className="navbar-item">
-							<span
-								title="Badge top right"
-								className="badge is-danger mt-3"
-							>
-								{likeCount}
-							</span>
-							Likes
-						</a>
-					</Link>
-				) : (
-					<Link href="/likes">
-						<a className="navbar-item">Likes</a>
-					</Link>
-				)}
+			)}
 		</div>
 	);
 };
@@ -310,7 +308,9 @@ const NotificationDropdownMenu = () => {
 	const markNotificationsRead = async () => {
 		if (!userData.user_id) return;
 		try {
-			const response = await authAPI(`/notifications/${userData.user_id}`);
+			const response = await authAPI(
+				`/notifications/${userData.user_id}`
+			);
 			if (response?.data?.notifications?.length > 0) {
 				setNotifications([...response.data.notifications]);
 			}

@@ -1,9 +1,4 @@
-import {
-	createContext,
-	ReactNode,
-	useContext,
-	useState,
-} from 'react';
+import { createContext, ReactNode, useContext, useState } from 'react';
 import { ActivePage, INotification } from '../types/types';
 
 export const NotificationContext = createContext<any>(null);
@@ -12,14 +7,18 @@ export const useNotificationContext = () => {
 	return useContext(NotificationContext);
 };
 
-export const NotificationContextProvider = ({ children }: { children: ReactNode }) => {
-    const [activePage, setActivePage] = useState<ActivePage>(ActivePage.NONE);
-    const [matchData, setMatchData] = useState({
+export const NotificationContextProvider = ({
+	children,
+}: {
+	children: ReactNode;
+}) => {
+	const [activePage, setActivePage] = useState<ActivePage>(ActivePage.NONE);
+	const [matchData, setMatchData] = useState({
 		match_id: 0,
 		sender_id: 0,
 		receiver_id: 0,
 	});
-    const [activeChatUser, setActiveChatUser] = useState(0);
+	const [activeChatUser, setActiveChatUser] = useState(0);
 	const [notifications, setNotifications] = useState<INotification[]>([]);
 	const [notificationCount, setNotificationCount] = useState(0);
 	const [messageCount, setMessageCount] = useState(0);
@@ -29,12 +28,12 @@ export const NotificationContextProvider = ({ children }: { children: ReactNode 
 	return (
 		<NotificationContext.Provider
 			value={{
-                activePage,
-                setActivePage,
-                matchData, 
-                setMatchData, 
-                activeChatUser, 
-                setActiveChatUser,
+				activePage,
+				setActivePage,
+				matchData,
+				setMatchData,
+				activeChatUser,
+				setActiveChatUser,
 				notifications,
 				setNotifications,
 				notificationCount,
@@ -44,8 +43,8 @@ export const NotificationContextProvider = ({ children }: { children: ReactNode 
 				likeCount,
 				setLikeCount,
 				viewCount,
-				setViewCount
-            }}
+				setViewCount,
+			}}
 		>
 			{children}
 		</NotificationContext.Provider>

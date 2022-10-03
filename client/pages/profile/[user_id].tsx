@@ -9,9 +9,7 @@ import {
 	NotificationType,
 } from '../../types/types';
 import { authAPI } from '../../utilities/api';
-import {
-	handleRouteError,
-} from '../../utilities/helpers';
+import { handleRouteError } from '../../utilities/helpers';
 import { useNotificationContext } from '../../components/NotificationContext';
 import { useSocketContext } from '../../components/SocketContext';
 import { LoadError, Spinner } from '../../components/utilities';
@@ -64,9 +62,6 @@ const LoggedIn = () => {
 	// Router error event listener and handler
 	useEffect(() => {
 		router.events.on('routeChangeError', handleRouteError);
-
-		// If the component is unmounted, unsubscribe
-		// from the event with the `off` method:
 		return () => {
 			router.events.off('routeChangeError', handleRouteError);
 		};

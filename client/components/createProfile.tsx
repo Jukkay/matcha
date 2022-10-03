@@ -1,14 +1,20 @@
-import { useEffect, useState } from "react";
-import { dummyData } from "./data";
-import { EditProps } from "../types/types";
-import { authAPI } from "../utilities/api";
-import { convertBirthdayToAge } from "../utilities/helpers";
-import { AgeRange, ErrorMessage, GenderSelector, LookingSelector, TextArea } from "./form";
-import { FileInput, SearchResult } from "./profile";
-import { useUserContext } from "./UserContext";
+import { useEffect, useState } from 'react';
+import { dummyData } from './data';
+import { EditProps } from '../types/types';
+import { authAPI } from '../utilities/api';
+import { convertBirthdayToAge } from '../utilities/helpers';
+import {
+	AgeRange,
+	ErrorMessage,
+	GenderSelector,
+	LookingSelector,
+	TextArea,
+} from './form';
+import { FileInput, SearchResult } from './profile';
+import { useUserContext } from './UserContext';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
-import { Spinner } from "./utilities";
+import { Spinner } from './utilities';
 
 // Dynamically imported components
 const CitySelector = dynamic(() => import('./profileCitySelector'), {
@@ -95,7 +101,10 @@ export const CreateProfile = ({
 				return;
 			}
 			// Get profile picture filename
-			payload.profile_image = profile.profile_image === 'default.png' ? photoUpload.data.filenames[0] : photoUpload.data.filenames[profile.profile_image]
+			payload.profile_image =
+				profile.profile_image === 'default.png'
+					? photoUpload.data.filenames[0]
+					: photoUpload.data.filenames[profile.profile_image];
 			// Add other information user can't change
 			payload.birthday = userData.birthday;
 			payload.name = userData.name;
@@ -148,7 +157,9 @@ export const CreateProfile = ({
 
 					{/* Gender */}
 					<GenderSelector
-						profile={profile} setProfile={setProfile} isRequired={true}
+						profile={profile}
+						setProfile={setProfile}
+						isRequired={true}
 					/>
 
 					{/* Introduction */}
@@ -158,7 +169,9 @@ export const CreateProfile = ({
 						value={profile.introduction}
 						placeholder="Introduction"
 						size={10}
-						onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+						onChange={(
+							event: React.ChangeEvent<HTMLInputElement>
+						) =>
 							setProfile({
 								...profile,
 								introduction: event.target.value,
@@ -206,11 +219,13 @@ export const CreateProfile = ({
 					</h3>
 					{/* Looking For */}
 					<LookingSelector
-						profile={profile} setProfile={setProfile} isRequired={true}
+						profile={profile}
+						setProfile={setProfile}
+						isRequired={true}
 					/>
 
 					{/* Age range */}
-					<AgeRange profile={profile} setProfile={setProfile}/>
+					<AgeRange profile={profile} setProfile={setProfile} />
 					<button type="submit" className="button is-primary">
 						Save profile
 					</button>

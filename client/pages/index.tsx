@@ -1,7 +1,13 @@
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { ClosestList, CommonInterestsList, FameratingList, RandomList, Recommendations } from '../components/frontpage';
+import {
+	ClosestList,
+	CommonInterestsList,
+	FameratingList,
+	RandomList,
+	Recommendations,
+} from '../components/frontpage';
 import { useUserContext } from '../components/UserContext';
 import { IResultsProfile, LoadStatus } from '../types/types';
 import { authAPI } from '../utilities/api';
@@ -21,11 +27,9 @@ const NotLoggedIn = () => {
 };
 
 const LoggedIn = () => {
-	const { userData, profile, setProfile } = useUserContext();
+	const { userData, profile } = useUserContext();
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
-	const [results, setResults] = useState<IResultsProfile[]>(
-		[]
-	);
+	const [results, setResults] = useState<IResultsProfile[]>([]);
 	const [wasRedirected, setWasRedirected] = useState(false);
 	const router = useRouter();
 
@@ -37,6 +41,13 @@ const LoggedIn = () => {
 	}, [userData.profile_exists]);
 
 	const searchDatabase = async () => {
+		if (
+			!profile.gender ||
+			!profile.looking ||
+			!profile.min_age ||
+			!profile.max_age
+		)
+			return;
 		const query = {
 			gender: profile.gender,
 			looking: profile.looking,
@@ -84,24 +95,33 @@ const LoggedIn = () => {
 	return (
 		<section className="section">
 			<section className="section">
-			<h3 className="title is-3">Recommendations</h3>
-			<Recommendations sortedResults={results} loadStatus={loadStatus} />
+				<h3 className="title is-3">Recommendations</h3>
+				<Recommendations
+					sortedResults={results}
+					loadStatus={loadStatus}
+				/>
 			</section>
 			<section className="section">
-			<h3 className="title is-3">Closest people</h3>
-			<ClosestList sortedResults={results} loadStatus={loadStatus} />
+				<h3 className="title is-3">Closest people</h3>
+				<ClosestList sortedResults={results} loadStatus={loadStatus} />
 			</section>
 			<section className="section">
-			<h3 className="title is-3">Most common interests</h3>
-			<CommonInterestsList sortedResults={results} loadStatus={loadStatus} />
+				<h3 className="title is-3">Most common interests</h3>
+				<CommonInterestsList
+					sortedResults={results}
+					loadStatus={loadStatus}
+				/>
 			</section>
 			<section className="section">
-			<h3 className="title is-3">Best Famerating</h3>
-			<FameratingList sortedResults={results} loadStatus={loadStatus} />
+				<h3 className="title is-3">Best Famerating</h3>
+				<FameratingList
+					sortedResults={results}
+					loadStatus={loadStatus}
+				/>
 			</section>
 			<section className="section">
-			<h3 className="title is-3">Random</h3>
-			<RandomList sortedResults={results} loadStatus={loadStatus} />
+				<h3 className="title is-3">Random</h3>
+				<RandomList sortedResults={results} loadStatus={loadStatus} />
 			</section>
 		</section>
 	);

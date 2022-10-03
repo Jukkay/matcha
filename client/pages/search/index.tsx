@@ -3,12 +3,11 @@ import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import { Results, ProfileSearch } from '../../components/search';
 import { useUserContext } from '../../components/UserContext';
+import { LoadStatus, SortType, IResultsProfile } from '../../types/types';
 import {
-	LoadStatus,
-	SortType,
-	IResultsProfile,
-} from '../../types/types';
-import { convertBirthdayToAge, handleRouteError } from '../../utilities/helpers';
+	convertBirthdayToAge,
+	handleRouteError,
+} from '../../utilities/helpers';
 import {
 	farFirst,
 	highFameratingFirst,
@@ -19,7 +18,7 @@ import {
 	oldFirst,
 	youngFirst,
 } from '../../utilities/sort';
-import {ErrorBoundary} from 'react-error-boundary'
+import { ErrorBoundary } from 'react-error-boundary';
 import { ErrorFallback } from '../../components/utilities';
 
 const NotLoggedIn = () => {
@@ -51,28 +50,23 @@ const LoggedIn = () => {
 	const [filteredResults, setFilteredResults] = useState<IResultsProfile[]>(
 		[]
 	);
-	const [sortedResults, setSortedResults] = useState<IResultsProfile[]>(
-		[]
-	);
+	const [sortedResults, setSortedResults] = useState<IResultsProfile[]>([]);
 	const [wasRedirected, setWasRedirected] = useState(false);
 	const router = useRouter();
 
 	// Router error event listener and handler
 	useEffect(() => {
-		router.events.on('routeChangeError', handleRouteError)
-	
-		// If the component is unmounted, unsubscribe
-		// from the event with the `off` method:
+		router.events.on('routeChangeError', handleRouteError);
 		return () => {
-		  router.events.off('routeChangeError', handleRouteError)
-		}
-	  }, [])
+			router.events.off('routeChangeError', handleRouteError);
+		};
+	}, []);
 
 	// Redirect if user has no profile
 	useEffect(() => {
 		if (wasRedirected || userData.profile_exists) return;
 		setWasRedirected(true);
-    	router.replace('/profile')
+		router.replace('/profile');
 	}, [userData.profile_exists]);
 
 	// Needs to exist to make sure these searchParams don't end up undefined on reload.
@@ -81,8 +75,8 @@ const LoggedIn = () => {
 			...searchParams,
 			gender: profile.gender,
 			looking: profile.looking,
-		})
-	}, [profile.gender, profile.looking])
+		});
+	}, [profile.gender, profile.looking]);
 
 	useEffect(() => {
 		if (sort === SortType.DISTANCE)
@@ -108,7 +102,7 @@ const LoggedIn = () => {
 		searchParams.max_distance,
 		searchParams.country,
 		searchParams.city,
-		filteredResults
+		filteredResults,
 	]);
 
 	return (
@@ -121,7 +115,7 @@ const LoggedIn = () => {
 				filteredResults={filteredResults}
 				setFilteredResults={setFilteredResults}
 				setLoadStatus={setLoadStatus}
-				sort={sort} 
+				sort={sort}
 				setSort={setSort}
 			/>
 			<Results sortedResults={sortedResults} loadStatus={loadStatus} />
@@ -133,11 +127,11 @@ const Search: NextPage = () => {
 	const { accessToken } = useUserContext();
 	return (
 		<ErrorBoundary FallbackComponent={ErrorFallback}>
-		<div className="columns is-centered is-gapless">
-			<div className="column is-three-quarters">
-				{accessToken ? <LoggedIn /> : <NotLoggedIn />}
+			<div className="columns is-centered is-gapless">
+				<div className="column is-three-quarters">
+					{accessToken ? <LoggedIn /> : <NotLoggedIn />}
+				</div>
 			</div>
-		</div>
 		</ErrorBoundary>
 	);
 };

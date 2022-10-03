@@ -33,23 +33,19 @@ const NotLoggedIn = () => {
 
 const LoggedIn = () => {
 	const { userData } = useUserContext();
-	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
-	const { setNotificationCount, setMessageCount, setLikeCount } =
-		useNotificationContext();
+	const [loadStatus, _setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
+	const { setMessageCount } = useNotificationContext();
 	const [wasRedirected, setWasRedirected] = useState(false);
 	const router = useRouter();
 
 	// Router error event listener and handler
 	useEffect(() => {
 		router.events.on('routeChangeError', handleRouteError);
-
-		// If the component is unmounted, unsubscribe
-		// from the event with the `off` method:
 		return () => {
 			router.events.off('routeChangeError', handleRouteError);
 		};
 	}, []);
-	
+
 	// Redirect if user has no profile
 	useEffect(() => {
 		if (wasRedirected || userData.profile_exists) return;
@@ -59,10 +55,11 @@ const LoggedIn = () => {
 
 	useEffect(() => {
 		markMessageNotificationsRead();
-	}, []);
+	}, [userData.user_id]);
 
 	const markMessageNotificationsRead = async () => {
 		try {
+			if (!userData.user_id) return;
 			const response = await authAPI.patch('/notifications', {
 				type: NotificationType.MESSAGE,
 				user_id: userData.user_id,
@@ -72,6 +69,7 @@ const LoggedIn = () => {
 			}
 		} catch (err) {}
 	};
+
 	if (loadStatus == LoadStatus.LOADING) return <Spinner />;
 	if (loadStatus == LoadStatus.ERROR)
 		return <LoadError text="Error loading messages" />;
@@ -83,6 +81,7 @@ const LoggedIn = () => {
 		</div>
 	);
 };
+
 const Modal = ({
 	showModal,
 	closeModal,
@@ -158,9 +157,9 @@ const ReportMenu = ({ reporter, reported }: any) => {
 				buttonTitle={'Block user'}
 			>
 				<p>
-					Blocking user will hide user profile from you and remove
+					{`Blocking user will hide user profile from you and remove
 					match and like if they exist. You won't be able to contact
-					each other anymore. This action cannot be reversed.
+					each other anymore. This action cannot be reversed.`}
 				</p>
 				<p>
 					Please tell us below why you decided to block this user, so
@@ -181,7 +180,9 @@ const ReportMenu = ({ reporter, reported }: any) => {
 								Select reason for blocking
 							</option>
 							<option value={1}>Harrasment</option>
-							<option value={2}>I don't like this person</option>
+							<option
+								value={2}
+							>{`I don't like this person</option>`}</option>
 							<option value={3}>
 								Threaths my life or health
 							</option>
@@ -205,8 +206,8 @@ const ReportMenu = ({ reporter, reported }: any) => {
 					below what exactly is wrong.
 				</p>
 				<p>
-					If you don't want to see this profile anymore and want to
-					prevent the user from matching or contacting with you,
+					If you don&apos;t want to see this profile anymore and want
+					to prevent the user from matching or contacting with you,
 					please block the user separately.
 				</p>
 				<div className="block">
@@ -270,6 +271,7 @@ const MatchList = () => {
 
 	useEffect(() => {
 		const getUsersMatches = async () => {
+			if (!profile.user_id) return;
 			try {
 				setLoadStatus(LoadStatus.LOADING);
 				let response = await authAPI.get(`/match/${profile.user_id}`);
@@ -284,7 +286,7 @@ const MatchList = () => {
 		};
 		getUsersMatches();
 		setActivePage(ActivePage.MESSAGES);
-	}, []);
+	}, [profile.user_id]);
 
 	if (loadStatus == LoadStatus.LOADING) return <Spinner />;
 	if (loadStatus == LoadStatus.ERROR)
@@ -326,7 +328,7 @@ const OnlineIndicator = ({ user_id }: OnlineStatusProps) => {
 		return () => {
 			socket.removeAllListeners('online_response');
 		};
-	}, []);
+	}, [user_id]);
 
 	return online ? (
 		<div className="round-green"></div>
@@ -412,7 +414,6 @@ const ChatWindow = () => {
 	const windowBottom: MutableRefObject<any> = useRef(null);
 	const { profile } = useUserContext();
 	const [startIndex, setStartIndex] = useState(received.length);
-	const [submit, setSubmit] = useState(false);
 
 	// Infinite scroll hooks
 	const { ref, inView } = useInView({
@@ -488,9 +489,9 @@ const ChatWindow = () => {
 			emitMessageAndNotification(matchData, payload, notification);
 			await selectChat(controller);
 			setOutgoing('');
-		} catch (err) {}
-		finally {
-			controller.abort()
+		} catch (err) {
+		} finally {
+			controller.abort();
 		}
 	};
 
@@ -508,7 +509,7 @@ const ChatWindow = () => {
 		return () => {
 			socket.removeAllListeners('receive_message');
 		};
-	}, [socket]);
+	}, []);
 
 	useEffect(() => {
 		const controller = new AbortController();
@@ -518,9 +519,12 @@ const ChatWindow = () => {
 				setReceived([]);
 				socket.emit('active_chat', matchData.match_id);
 				setLoadStatus(LoadStatus.LOADING);
-				const response = await authAPI(`/messages/${matchData.match_id}`, {
-					signal: controller.signal,
-				});
+				const response = await authAPI(
+					`/messages/${matchData.match_id}`,
+					{
+						signal: controller.signal,
+					}
+				);
 				if (response?.data?.messages?.length > 0)
 					setReceived([...response.data.messages]);
 			} catch (err) {

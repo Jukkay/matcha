@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { authAPI } from '../utilities/api';
 import { useUserContext } from './UserContext';
 import { MdLocationOn, MdLocationOff } from 'react-icons/md';
@@ -10,13 +10,13 @@ export const LocationPermissionRequest = () => {
 		event.preventDefault();
 		askForPermission();
 		updateUserData({ ...userData, location_permitted: true });
-		updatePermission(true)
+		updatePermission(true);
 	};
 
 	const handleDeny = (event: React.MouseEvent) => {
 		event.preventDefault();
 		updateUserData({ ...userData, location_permitted: false });
-		updatePermission(false)
+		updatePermission(false);
 	};
 	// Ask for location permission and locate user
 	const askForPermission = () => {
@@ -32,14 +32,14 @@ export const LocationPermissionRequest = () => {
 			});
 		}
 	};
-	
+
 	// Update permission to database
 	const updatePermission = async (permission: boolean) => {
 		try {
 			if (!userData.user_id) return;
 			await authAPI.post(`/gpspermission/`, {
 				user_id: userData.user_id,
-				location_permitted: permission
+				location_permitted: permission,
 			});
 		} catch {}
 	};
@@ -67,11 +67,14 @@ export const LocationPermissionRequest = () => {
 		</button>
 	) : (
 		<div>
-		<button className="button is-primary" onClick={handleAllow}>
-			<span className="mr-3">GPS location OFF</span>
-			<MdLocationOff />
-		</button>
-		<p className="mt-3 help">We can give you more accurate distance information and better suggestions, if you give us access to your location information.</p>
+			<button className="button is-primary" onClick={handleAllow}>
+				<span className="mr-3">GPS location OFF</span>
+				<MdLocationOff />
+			</button>
+			<p className="mt-3 help">
+				We can give you more accurate distance information and better
+				suggestions, if you give us access to your location information.
+			</p>
 		</div>
 	);
 };

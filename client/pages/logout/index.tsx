@@ -9,11 +9,11 @@ const Logout: NextPage = () => {
 		updateRefreshToken,
 		updateUserData,
 		refreshToken,
-		setProfile
+		setProfile,
 	} = useUserContext();
 
 	useEffect(() => {
-		if (!refreshToken) return
+		if (!refreshToken) return;
 		try {
 			API.post('/logout/', {
 				refreshToken: refreshToken,
@@ -21,7 +21,7 @@ const Logout: NextPage = () => {
 			updateAccessToken('');
 			updateRefreshToken('');
 			updateUserData({});
-			setProfile({})
+			setProfile({});
 			sessionStorage?.removeItem('accessToken');
 			sessionStorage?.removeItem('refreshToken');
 			sessionStorage?.removeItem('userData');

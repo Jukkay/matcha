@@ -7,7 +7,8 @@ import {
 	FaEnvelope,
 	FaBirthdayCake,
 } from 'react-icons/fa';
-import { FormInput, Notification, SubmitButton } from '../../components/form';
+import { SubmitButton } from '../../components/buttons';
+import { FormInput, Notification } from '../../components/form';
 import { LocationPermissionRequest } from '../../components/locationPermissionRequest';
 import { useNotificationContext } from '../../components/NotificationContext';
 import { useUserContext } from '../../components/UserContext';
@@ -162,6 +163,7 @@ const LoggedIn = () => {
 	useEffect(() => {
 		const getUserData = async () => {
 			try {
+				if (!userData.user_id) return;
 				let response = await authAPI.get(`/user/${userData.user_id}`);
 				if (response?.data?.userData) {
 					setValues({
@@ -178,7 +180,7 @@ const LoggedIn = () => {
 		};
 		getUserData();
 		setActivePage(ActivePage.CONTROL_PANEL);
-	}, []);
+	}, [userData.user_id]);
 
 	// Update object values
 	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -193,10 +195,7 @@ const LoggedIn = () => {
 		const age = (now - birthday) / (1000 * 60 * 60 * 24) / 365;
 		if (age >= 18) {
 			setValidBirthday(true);
-			setErrors({
-				...errors,
-				birthday: false,
-			});
+			setErrors({ ...errors, birthday: false });
 		} else {
 			setValidBirthday(false);
 			setErrors({
@@ -318,6 +317,7 @@ const LoggedIn = () => {
 			}
 		} catch (err) {}
 	};
+
 	// Component
 	return deleted ? (
 		<section className="section">
@@ -386,7 +386,7 @@ const LoggedIn = () => {
 					<p className="block">
 						Caution: Removing account is irreversible and all data
 						related to your account will be removed. If you want to
-						come back you'll have to create a new account and
+						come back you&apos;ll have to create a new account and
 						profile.
 					</p>
 					<button className="button is-danger" onClick={deleteUser}>

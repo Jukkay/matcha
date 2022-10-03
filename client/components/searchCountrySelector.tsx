@@ -1,5 +1,5 @@
-import { Country} from 'country-state-city';
-import { ISelectorProfile, SearchParamsProps } from '../types/types';
+import { Country } from 'country-state-city';
+import { SearchParamsProps } from '../types/types';
 
 export const CountrySearchSelector = ({
 	searchParams,
@@ -37,4 +37,4 @@ export const CountrySearchSelector = ({
 	);
 };
 
-export default CountrySearchSelector
+export default CountrySearchSelector;

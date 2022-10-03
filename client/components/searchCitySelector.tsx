@@ -61,4 +61,4 @@ const CitySearchSelector = ({
 	);
 };
 
-export default CitySearchSelector
+export default CitySearchSelector;

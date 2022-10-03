@@ -66,4 +66,4 @@ export const CitySelector = ({
 	);
 };
 
-export default CitySelector
+export default CitySelector;

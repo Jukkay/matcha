@@ -77,7 +77,7 @@ const EmailConfirmation: NextPage = () => {
 		if (validEmail) {
 			setValidForm(true);
 		}
-	});
+	}, [validEmail]);
 
 	// Handle submit
 	const handleSubmit = async (event: React.SyntheticEvent) => {

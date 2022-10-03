@@ -3,7 +3,6 @@ import {
 	IFormInputField,
 	IHelper,
 	IState,
-	IButton,
 	ISelectorProfile,
 	ITextArea,
 	SearchParamsProps,
@@ -370,7 +369,7 @@ export const DistanceRange = ({
 			setSearchParams({
 				...searchParams,
 				max_distance: event.target.value,
-		})
+			});
 	};
 	return (
 		<div className="block">

@@ -1,7 +1,6 @@
 import { Country } from 'country-state-city';
 import { ISelectorProfile } from '../types/types';
 
-
 export const CountrySelector = ({
 	profile,
 	setProfile,
@@ -42,4 +41,4 @@ export const CountrySelector = ({
 	);
 };
 
-export default CountrySelector
+export default CountrySelector;

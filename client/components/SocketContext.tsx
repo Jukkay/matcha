@@ -14,29 +14,29 @@ interface ClientToServerEvents {
 	set_user: (receiver_id: number) => void;
 	active_chat: (match_id: number) => void;
 	online_query: (user_id: number) => void;
-	auth: { token: string, user_id: number}
+	auth: { token: string; user_id: number };
 }
 
 const getTokenFromSessionStorage = () => {
-	if (typeof window === "undefined")
-		return null
-	return window.sessionStorage.getItem('accessToken')
-}
+	if (typeof window === 'undefined') return null;
+	return window.sessionStorage.getItem('accessToken');
+};
 
 const getUserIDFromSessionStorage = () => {
-	if (typeof window === "undefined")
-		return null
+	if (typeof window === 'undefined') return null;
 	const storedInfo = window.sessionStorage.getItem('userData');
 	if (storedInfo) {
 		return JSON.parse(storedInfo).user_id;
 	}
-	return null
-}
+	return null;
+};
 
 const API = authAPI.defaults.baseURL || 'http://localhost:4000';
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(API, {
-	auth: { token: getTokenFromSessionStorage(),
-			user_id: getUserIDFromSessionStorage()},
+	auth: {
+		token: getTokenFromSessionStorage(),
+		user_id: getUserIDFromSessionStorage(),
+	},
 });
 
 export const SocketContext = createContext(socket);
@@ -45,7 +45,11 @@ export const useSocketContext = () => {
 	return useContext(SocketContext);
 };
 
-export const SocketContextProvider = ({children}: {children: ReactNode}) => {
+export const SocketContextProvider = ({
+	children,
+}: {
+	children: ReactNode;
+}) => {
 	return (
 		<SocketContext.Provider value={socket}>
 			{children}
@@ -53,4 +57,4 @@ export const SocketContextProvider = ({children}: {children: ReactNode}) => {
 	);
 };
 
-export { socket }
+export { socket };

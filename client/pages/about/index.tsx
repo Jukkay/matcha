@@ -21,8 +21,8 @@ const About: NextPage = () => {
 						search, instant notifications, and instant messaging
 						between matched users. Users are located using
 						Geolocation API and it falls back on IP location with
-						Fast-geoip library. You're free to try it out, but it
-						requires registration with working email address.
+						Fast-geoip library. You&apos;re free to try it out, but
+						it requires registration with working email address.
 						Unfortunately matches cannot be simulated unless you
 						create two users that like each other. The accounts can
 						be removed after testing.
@@ -62,7 +62,9 @@ const About: NextPage = () => {
 					</p>
 					<p>
 						The project can be found in Github here:{' '}
-                        <a href="https://github.com/Jukkay/matcha">https://github.com/Jukkay/matcha</a>
+						<a href="https://github.com/Jukkay/matcha">
+							https://github.com/Jukkay/matcha
+						</a>
 					</p>
 				</section>
 			</div>

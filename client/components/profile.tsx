@@ -152,6 +152,7 @@ export const VisitorLog = ({ user_id }: any) => {
 	}, [inView]);
 
 	useEffect(() => {
+		if (!user_id) return;
 		const controller = new AbortController();
 		const getVisitorLog = async () => {
 			try {
@@ -166,7 +167,7 @@ export const VisitorLog = ({ user_id }: any) => {
 		};
 		getVisitorLog();
 		return () => controller.abort();
-	}, []);
+	}, [user_id]);
 
 	return pageVisited && log ? (
 		<div>
@@ -252,7 +253,6 @@ export const SearchResult = ({
 	interests,
 	setInterests,
 	setTagError,
-	query,
 }: ISearchResult) => {
 	return interests ? (
 		<>
@@ -292,6 +292,7 @@ export const Gallery = ({ user_id }: OnlineStatusProps) => {
 	const [images, setImages] = useState([]);
 
 	useEffect(() => {
+		if (!user_id) return;
 		const controller = new AbortController();
 		const getUserImages = async () => {
 			try {
@@ -309,7 +310,7 @@ export const Gallery = ({ user_id }: OnlineStatusProps) => {
 		};
 		getUserImages();
 		return () => controller.abort();
-	}, []);
+	}, [user_id]);
 
 	return images && user_id ? (
 		<div>
@@ -456,6 +457,7 @@ export const OnlineIndicator = ({ user_id }: OnlineStatusProps) => {
 
 	// Query online status and listen for response
 	useEffect(() => {
+		if (!user_id) return;
 		try {
 			socket.on('online_response', (data) => {
 				if (data.queried_id === user_id) setOnline(data.online);
@@ -468,7 +470,7 @@ export const OnlineIndicator = ({ user_id }: OnlineStatusProps) => {
 		return () => {
 			socket.removeAllListeners('online_response');
 		};
-	}, []);
+	}, [user_id]);
 
 	return online ? (
 		<span className="tag is-primary online-indicator mt-5 ml-5">

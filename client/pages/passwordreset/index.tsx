@@ -2,7 +2,8 @@ import type { NextPage } from 'next';
 import { useState, useEffect } from 'react';
 import { API } from '../../utilities/api';
 import { FaCheck, FaEnvelope } from 'react-icons/fa';
-import { FormInput, SubmitButton, Notification } from '../../components/form';
+import { FormInput, Notification } from '../../components/form';
+import { SubmitButton } from '../../components/buttons';
 
 const PasswordReset: NextPage = () => {
 	// validator states
@@ -71,7 +72,7 @@ const PasswordReset: NextPage = () => {
 		if (validEmail) {
 			setValidForm(true);
 		}
-	});
+	}, [validEmail]);
 
 	// Handle submit
 	const handleSubmit = async (event: React.SyntheticEvent) => {

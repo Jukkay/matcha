@@ -40,34 +40,34 @@ const handleResponse = (response: AxiosResponse): AxiosResponse => {
 
 // Intercept response errors and update access token if 401
 const handleResponseError = async (error: AxiosError) => {
-		const config = error.config as RetryRequest;
-		const refreshToken = sessionStorage.getItem('refreshToken');
-		// Refresh access token
-		// _retry property is added to filter double requests
-		if (error?.response?.status === 401 && !config._retry) {
-			config._retry = true;
-			const userData = sessionStorage.getItem('userData');
-			let user_id;
-			if (userData) {
-				const data = JSON.parse(userData);
-				user_id = data.user_id;
-			} else {
-				user_id = '';
-			}
-			try {
-				const refreshResponse = await API.post('/token', {
-					token: refreshToken,
-					user_id: user_id,
-				});
-				const newToken = refreshResponse?.data.accessToken;
-				sessionStorage.setItem('accessToken', newToken);
-				config.headers['Authorization'] = `Bearer ${newToken}`;
-				return API(config);
-			} catch (err) {
-				return Promise.reject(err);
-			}
+	const config = error.config as RetryRequest;
+	const refreshToken = sessionStorage.getItem('refreshToken');
+	// Refresh access token
+	// _retry property is added to filter double requests
+	if (error?.response?.status === 401 && !config._retry) {
+		config._retry = true;
+		const userData = sessionStorage.getItem('userData');
+		let user_id;
+		if (userData) {
+			const data = JSON.parse(userData);
+			user_id = data.user_id;
+		} else {
+			user_id = '';
 		}
-		return Promise.reject(error);
+		try {
+			const refreshResponse = await API.post('/token', {
+				token: refreshToken,
+				user_id: user_id,
+			});
+			const newToken = refreshResponse?.data.accessToken;
+			sessionStorage.setItem('accessToken', newToken);
+			config.headers['Authorization'] = `Bearer ${newToken}`;
+			return API(config);
+		} catch (err) {
+			return Promise.reject(err);
+		}
+	}
+	return Promise.reject(error);
 };
 
 // Add interceptors to axios instance

@@ -50,7 +50,7 @@ export const UpdateProfile = ({
 	useEffect(() => {
 		setInterests(profile.interests);
 		setSuccess(false);
-	}, []);
+	}, [profile.interests]);
 
 	// Live query interest from interest list
 	useEffect(() => {
@@ -279,10 +279,10 @@ export const UpdateProfile = ({
 			<section className="section">
 				<p className="block">
 					Caution: Removing profile is irreversible. If you remove
-					your profile, you won't be able to use the site normally
-					anymore unless you create a new profile. This action will
-					not remove your whole account. If you wish to remove your
-					account too, you can do that in User settings.
+					your profile, you won&apos;t be able to use the site
+					normally anymore unless you create a new profile. This
+					action will not remove your whole account. If you wish to
+					remove your account too, you can do that in User settings.
 				</p>
 				<button className="button is-danger" onClick={deleteProfile}>
 					Remove profile
@@ -292,7 +292,7 @@ export const UpdateProfile = ({
 	);
 };
 
-export const EditGallery = ({ files, setImageError }: GalleryProps) => {
+export const EditGallery = ({ setImageError }: GalleryProps) => {
 	const [images, setImages] = useState<string[]>([]);
 	const { userData, updateUserData, profile, setProfile } = useUserContext();
 
@@ -336,6 +336,7 @@ export const EditGallery = ({ files, setImageError }: GalleryProps) => {
 
 	useEffect(() => {
 		const getUserImages = async () => {
+			if (!userData.user_id) return;
 			try {
 				let response = await authAPI.get(
 					`/image/user/${userData.user_id}`
@@ -350,7 +351,7 @@ export const EditGallery = ({ files, setImageError }: GalleryProps) => {
 			} catch (err) {}
 		};
 		getUserImages();
-	}, []);
+	}, [userData.user_id]);
 
 	return images ? (
 		<div className="block">

@@ -53,9 +53,6 @@ const LoggedIn = () => {
 	// Router error event listener and handler
 	useEffect(() => {
 		router.events.on('routeChangeError', handleRouteError);
-
-		// If the component is unmounted, unsubscribe
-		// from the event with the `off` method:
 		return () => {
 			router.events.off('routeChangeError', handleRouteError);
 		};
@@ -91,6 +88,7 @@ const LoggedIn = () => {
 	};
 
 	useEffect(() => {
+		if (!userData.user_id) return;
 		const controller1 = new AbortController();
 		const controller2 = new AbortController();
 		const fetchData = async () => {
@@ -110,7 +108,7 @@ const LoggedIn = () => {
 			controller1.abort();
 			controller2.abort();
 		};
-	}, []);
+	}, [userData.user_id]);
 
 	if (loadStatus == LoadStatus.LOADING) return <Spinner />;
 	if (loadStatus == LoadStatus.ERROR)
@@ -121,7 +119,10 @@ const LoggedIn = () => {
 			<h3 className="title is-3">You liked their profiles:</h3>
 			<div className="block">
 				{likedProfiles.slice(0, endIndex).map((liker, index) => (
-					<SearchResultItemWithoutDistance key={index} profile={liker} />
+					<SearchResultItemWithoutDistance
+						key={index}
+						profile={liker}
+					/>
 				))}
 				{endIndex < likedProfiles.length ? (
 					<div ref={ref}>

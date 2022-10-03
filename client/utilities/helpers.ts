@@ -7,29 +7,12 @@ export const convertBirthdayToAge = (birthday: string) => {
 	return Math.floor(age);
 };
 
-export const convertAgeToBirthday = (age: number) => {
-	const now = new Date().getTime();
-	const ageInMilliseconds = age * 31556952000 + 364 * 86400000;
-	const bd = new Date(now - ageInMilliseconds);
-	return `${bd.getFullYear()}-${bd.getMonth() + 1}-${bd.getDate()}`;
-};
-
-
-// export const calculateTimeSinceMatching = (timestamp: string) => {
-// 	const now = new Date().getTime();
-// 	const before = new Date(timestamp).getTime()
-// 	const timeElapsed = new Date(now - before);
-// 	return `Matched ${timeElapsed.getFullYear()} years, ${timeElapsed.getMonth() + 1} months and${timeElapsed.getDate()} days ago`;
-// }
-
-export const reformatDate = (date: string) => {
-    const dateObject = new Date(date)
-    return `${dateObject.getFullYear()}-${dateObject.getMonth() + 1}-${dateObject.getDate()}`
-}
 export const reformatDateTime = (datetime: string) => {
-    const dateObject = new Date(datetime)
-    return `${dateObject.getFullYear()}-${dateObject.getMonth() + 1}-${dateObject.getDate()} ${dateObject.toLocaleTimeString()}`
-}
+	const dateObject = new Date(datetime);
+	return `${dateObject.getFullYear()}-${
+		dateObject.getMonth() + 1
+	}-${dateObject.getDate()} ${dateObject.toLocaleTimeString()}`;
+};
 export const distanceBetweenPoints = (
 	latitude1: string,
 	longitude1: string,
@@ -81,22 +64,24 @@ export const addCommonTagsToProfiles = (
 ) => {
 	const resultsWithCommonTags = results.map((profile) => ({
 		...profile,
-		common_tags: countCommonTags(JSON.parse(profile.interests), ownTags)
+		common_tags: countCommonTags(JSON.parse(profile.interests), ownTags),
 	}));
 	return resultsWithCommonTags;
 };
 
 export const countCommonTags = (profileTags: {}, ownTags: {}) => {
-	const count = Object.values(profileTags).filter((tag) => Object.values(ownTags).includes(tag)).length
-	return count
-}
+	const count = Object.values(profileTags).filter((tag) =>
+		Object.values(ownTags).includes(tag)
+	).length;
+	return count;
+};
 
 export const createSQLDatetimeString = () => {
-	return new Date().toISOString().slice(0, 19).replace('T', ' ')
-}
+	return new Date().toISOString().slice(0, 19).replace('T', ' ');
+};
 
 export const handleRouteError = (err: any, url: any) => {
 	if (err.cancelled) {
-        console.log(`Route to ${url} was cancelled!`)
-    }
-}
+		console.log(`Route to ${url} was cancelled!`);
+	}
+};

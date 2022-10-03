@@ -1,17 +1,12 @@
 import type { NextPage } from 'next';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import { useNotificationContext } from '../../components/NotificationContext';
-import { OnlineIndicator } from '../../components/profile';
 import { useUserContext } from '../../components/UserContext';
 import { ErrorFallback, LoadError, Spinner } from '../../components/utilities';
 import { ActivePage, LoadStatus, LogEntry } from '../../types/types';
 import { authAPI } from '../../utilities/api';
-import {
-	convertBirthdayToAge,
-	handleRouteError,
-} from '../../utilities/helpers';
+import { handleRouteError } from '../../utilities/helpers';
 import { useInView } from 'react-intersection-observer';
 import { ErrorBoundary } from 'react-error-boundary';
 import { SearchResultItemWithoutDistance } from '../../components/profileCards';
@@ -53,7 +48,7 @@ const LoggedIn = () => {
 			router.events.off('routeChangeError', handleRouteError);
 		};
 	}, []);
-	
+
 	// Redirect if user has no profile
 	useEffect(() => {
 		if (wasRedirected || userData.profile_exists) return;
@@ -89,22 +84,23 @@ const LoggedIn = () => {
 
 	return log.length > 0 ? (
 		<div className="my-6">
-				<h1 className="title is-1">Recently visited profiles</h1>
-				{log.slice(0, endIndex).map((visitor: LogEntry, index) => (
-					<SearchResultItemWithoutDistance key={index} profile={visitor} />
-				))}
-				{endIndex < log.length ? (
-					<div ref={ref}>
-						<Spinner />
-					</div>
-				) : (
-					<section className="section has-text-centered">
-						<h3 className="title is-3">
-							No more matching profiles
-						</h3>
-					</section>
-				)}
-			</div>
+			<h1 className="title is-1">Recently visited profiles</h1>
+			{log.slice(0, endIndex).map((visitor: LogEntry, index) => (
+				<SearchResultItemWithoutDistance
+					key={index}
+					profile={visitor}
+				/>
+			))}
+			{endIndex < log.length ? (
+				<div ref={ref}>
+					<Spinner />
+				</div>
+			) : (
+				<section className="section has-text-centered">
+					<h3 className="title is-3">No more matching profiles</h3>
+				</section>
+			)}
+		</div>
 	) : (
 		<section className="section">
 			<h3 className="title is-3">Recently visited profiles</h3>
