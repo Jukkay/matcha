@@ -133,7 +133,7 @@ export const ProfileSearch = ({
 	};
 
 	return (
-		<div className="my-6">
+		<div className="my-6 pt-6">
 			<h1 className="title is-1">Search</h1>
 			<form onSubmit={handleSubmit}>
 				<BasicSearchLine

@@ -3,10 +3,10 @@ import { NextPage } from 'next';
 const About: NextPage = () => {
 	return (
 		<div className="columns is-centered is-gapless">
-			<div className="column is-three-quarters mt-6 pt-6 content">
+			<div className="column is-three-quarters mt-6 pt-6">
 				<section className="section">
 					<h1 className="title is-1">About</h1>
-					<p>
+					<p className="content">
 						Matcha is a dating app project made for my studies at
 						Hive Helsinki Coding School. The app is built with React
 						on Next.js create-next-app. Backend is using Node and
@@ -15,7 +15,7 @@ const About: NextPage = () => {
 						Node script, so unfortunately this is not the place to
 						find real love.
 					</p>
-					<p>
+					<p className="content">
 						The app has basic functionality including dating
 						profile, suggested matches based on preferences, profile
 						search, instant notifications, and instant messaging
@@ -30,23 +30,24 @@ const About: NextPage = () => {
 				</section>
 				<section className="section">
 					<h3 className="title is-3">Technologies</h3>
-					<ul>
-						<li>React</li>
-						<li>Next.js</li>
-						<li>Typescript</li>
-						<li>Node</li>
-						<li>Express</li>
-						<li>MariaDB</li>
-						<li>Socket.io</li>
-						<li>JSON web tokens</li>
-						<li>Axios</li>
-						<li>Geolocation API</li>
-						<li>Random User Generator API</li>
-						<li>Docker</li>
-						<li>AWS</li>
-					</ul>
-
-					<p>
+					<p className="content">
+						<ul>
+							<li>React</li>
+							<li>Next.js</li>
+							<li>Typescript</li>
+							<li>Node</li>
+							<li>Express</li>
+							<li>MariaDB</li>
+							<li>Socket.io</li>
+							<li>JSON web tokens</li>
+							<li>Axios</li>
+							<li>Geolocation API</li>
+							<li>Random User Generator API</li>
+							<li>Docker</li>
+							<li>AWS</li>
+						</ul>
+					</p>
+					<p className="content">
 						Next.js is used mainly as a create-react-app
 						replacement. No server-side rendering is used for this
 						project and API is done with Node and Express. API
@@ -56,11 +57,11 @@ const About: NextPage = () => {
 						handling websocket connections for notifications and
 						instant messaging.
 					</p>
-					<p>
+					<p className="content">
 						Development environment and deployment to AWS is done
 						with Docker.
 					</p>
-					<p>
+					<p className="content">
 						The project can be found in Github here:{' '}
 						<a href="https://github.com/Jukkay/matcha">
 							https://github.com/Jukkay/matcha

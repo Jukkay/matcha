@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useEffect } from 'react';
 import { IconContext } from 'react-icons';
-import { FaHeart, FaBell } from 'react-icons/fa';
+import { FaBell } from 'react-icons/fa';
 import { FiMenu } from 'react-icons/fi';
 import { BsFillChatFill } from 'react-icons/bs';
 import { authAPI } from '../utilities/api';
@@ -39,10 +39,8 @@ const Logo = () => {
 	return (
 		<ErrorBoundary FallbackComponent={ErrorFallback}>
 			<Link href="/">
-				<a className="navbar-item pt-3">
-					<span className="icon is-medium">
-						<FaHeart />
-					</span>
+				<a className="navbar-item">
+					<img className="image" src="/logo.svg" alt="Main page"/>
 				</a>
 			</Link>
 		</ErrorBoundary>
@@ -214,9 +212,9 @@ const TextLinks = ({ likeCount }: LikeProp) => {
 };
 const MainDropdownMenu = () => {
 	return (
-		<div className="dropdown is-hoverable is-right">
+		<div className="dropdown is-hoverable is-right fullheight">
 			<div className="dropdown-trigger">
-				<a className="navbar-item">
+				<a className="navbar-item fullheight">
 					<span className="icon is-medium">
 						<IconContext.Provider
 							value={{
@@ -258,7 +256,7 @@ const MessageIcon = () => {
 	const { messageCount } = useNotificationContext();
 	return messageCount ? (
 		<Link href="/messages">
-			<a className="navbar-item">
+			<a className="navbar-item fullheight">
 				<span title="Badge top right" className="badge is-danger mt-3">
 					{messageCount}
 				</span>
@@ -278,7 +276,7 @@ const MessageIcon = () => {
 		</Link>
 	) : (
 		<Link href="/messages">
-			<a className="navbar-item">
+			<a className="navbar-item fullheight">
 				<span className="icon is-medium">
 					<IconContext.Provider
 						value={{
@@ -326,13 +324,13 @@ const NotificationDropdownMenu = () => {
 		} catch (err) {}
 	};
 	return (
-		<div className="dropdown is-hoverable">
+		<div className="dropdown is-hoverable fullheight">
 			<div
 				className="dropdown-trigger"
 				onMouseEnter={markNotificationsRead}
 			>
 				{notificationCount ? (
-					<a className="navbar-item">
+					<a className="navbar-item fullheight">
 						<span
 							title="Badge top right"
 							className="badge is-danger mt-3"
@@ -353,7 +351,7 @@ const NotificationDropdownMenu = () => {
 						</span>
 					</a>
 				) : (
-					<a className="navbar-item">
+					<a className="navbar-item fullheight">
 						<span className="icon is-medium">
 							<IconContext.Provider
 								value={{
@@ -405,7 +403,7 @@ const Username = () => {
 	const { userData } = useUserContext();
 	return (
 		<Link href="/profile" className="username">
-			<a className="navbar-item">
+			<a className="navbar-item fullheight">
 				<strong>{userData.username}</strong>
 			</a>
 		</Link>
@@ -415,7 +413,7 @@ const ProfilePicture = () => {
 	const { profile } = useUserContext();
 	return (
 		<Link href="/profile">
-			<a className="navbar-item">
+			<a className="navbar-item fullheight">
 				<figure className="image navbar-profile-image">
 					<img
 						className="is-rounded"
@@ -450,7 +448,7 @@ const NavbarComponent = () => {
 	return (
 		<div className="column is-narrow">
 			<nav
-				className="navbar is-fixed-top"
+				className="navbar is-fixed-top is-primary"
 				role="navigation"
 				aria-label="main navigation"
 			>

@@ -109,8 +109,9 @@ const LoggedIn = () => {
 		return <LoadError text="Error loading likes" />;
 
 	return (
-		<section className="section has-text-centered">
-			<h3 className="title is-3">They liked your profile:</h3>
+		<div className="my-6 pt-6">
+			<h1 className="title is-1">Likes</h1>
+			<h4 className="title is-4">They liked your profile:</h4>
 			<div className="block">
 				{likerProfiles.length > 0 ? (
 					likerProfiles
@@ -130,7 +131,7 @@ const LoggedIn = () => {
 					</Link>
 				) : null}
 			</div>
-			<h3 className="title is-3">You liked their profiles:</h3>
+			<h4 className="title is-4">You liked their profiles:</h4>
 			<div className="block">
 				{likedProfiles.length > 0 ? (
 					likedProfiles
@@ -150,7 +151,7 @@ const LoggedIn = () => {
 					</Link>
 				) : null}
 			</div>
-		</section>
+		</div>
 	);
 };
 

@@ -422,8 +422,11 @@ V Make sure div is centered on frontpage in mobile view
 V Fix lint errors and warnings
 V Remove dead code
 V Customize colors for the app
-Add logo
+V Add logo
+V Reformat about, terms and privacy to use standard styling
+Stylize footer
 Consider custom font
+Try moving sass and babel to dev dependencies
 Test all required functionality
 What happens if user is unmatched or blocked during chat?
 Refactor SQL queries using ``
