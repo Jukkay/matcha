@@ -2,11 +2,11 @@ import Link from 'next/link';
 
 const Footer = () => {
 	return (
-		<footer className="column is-narrow has-background-primary-light">
-			<div className="columns is-centered">
+		<footer className="column is-narrow has-background-primary-light has-text-primary">
+			<div className="columns is-centered is-gapless pt-3 pb-4">
 				<div className="column has-text-centered">
 					<Link href="/about">
-						<a className="">About</a>
+						<a className="link">About</a>
 					</Link>
 				</div>
 				<div className="column has-text-centered">

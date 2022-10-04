@@ -191,121 +191,129 @@ export const ProfileViewWithLikeButtons = ({
 		setMatch(false);
 	};
 	return (
-		<div className="columns card my-6 is-gapless">
-			<div className="column card-image has-text-left is-two-thirds">
-				<Gallery user_id={otherUserProfile.user_id} />
-			</div>
-			<div className="column mt-3 has-text-left m-3">
-				<div className="block">
-					<span className="has-text-weight-semibold mr-3">Name:</span>
-					{otherUserProfile.name}
+		<div className="my-6 pt-6">
+			<div className="columns card p-3 is-gapless">
+				<div className="column card-image has-text-left is-two-thirds">
+					<Gallery user_id={otherUserProfile.user_id} />
 				</div>
-				<div className="block">
-					<span className="has-text-weight-semibold mr-3">Age:</span>
-					{otherUserProfile.birthday &&
-						convertBirthdayToAge(otherUserProfile.birthday)}
-				</div>
-				<div className="block">
-					<span className="has-text-weight-semibold mr-3">
-						Famerating:
-					</span>
-					{otherUserProfile.famerating}
-				</div>
+				<div className="column mt-3 has-text-left m-3">
+					<div className="block">
+						<span className="has-text-weight-semibold mr-3">
+							Name:
+						</span>
+						{otherUserProfile.name}
+					</div>
+					<div className="block">
+						<span className="has-text-weight-semibold mr-3">
+							Age:
+						</span>
+						{otherUserProfile.birthday &&
+							convertBirthdayToAge(otherUserProfile.birthday)}
+					</div>
+					<div className="block">
+						<span className="has-text-weight-semibold mr-3">
+							Famerating:
+						</span>
+						{otherUserProfile.famerating}
+					</div>
 
-				<div className="block">
-					<span className="has-text-weight-semibold mr-3">City:</span>
-					{otherUserProfile.city}
-				</div>
-				<div className="block">
-					<span className="has-text-weight-semibold mr-3">
-						Country:
-					</span>
-					{otherUserProfile.country}
-				</div>
-				<div className="block">
-					<span className="has-text-weight-semibold mr-3">
-						Interests:
-					</span>
-					{otherUserProfile.interests
-						? otherUserProfile.interests.map(
-								(interest: string, index: number) => (
-									<span
-										className="tag is-primary mx-2 my-1"
-										key={index}
-									>
-										{interest}
-									</span>
-								)
-						  )
-						: null}
-				</div>
-				<div className="block">
-					<span className="has-text-weight-semibold mr-3">
-						Introduction:
-					</span>
-					<p className="notification has-background-primary-light">
-						{otherUserProfile.introduction}
-					</p>
-				</div>
-				<div className="block">
-					<span className="has-text-weight-semibold mr-3">
-						Gender:
-					</span>
-					{otherUserProfile.gender}
-				</div>
-				<div className="block">
-					<span className="has-text-weight-semibold mr-3">
-						Looking for:
-					</span>
-					{otherUserProfile.looking}
-				</div>
-				<div className="block">
-					<span className="has-text-weight-semibold mr-3">
-						Minimum age:
-					</span>
-					{otherUserProfile.min_age}
-				</div>
-				<div className="block">
-					<span className="has-text-weight-semibold mr-3">
-						Maximum age:
-					</span>
-					{otherUserProfile.max_age}
-				</div>
-				<div className="block">
-					<span className="has-text-weight-semibold mr-3">
-						Last login:
-					</span>
-					{reformatDateTime(otherUserProfile.last_login)}
-				</div>
-				{match ? (
-					<div className="notification is-primary">
-						<button
-							className="delete"
-							onClick={closeNotification}
-						></button>
-						<h3 className="title is-3">It&apos;s a match!</h3>
+					<div className="block">
+						<span className="has-text-weight-semibold mr-3">
+							City:
+						</span>
+						{otherUserProfile.city}
 					</div>
-				) : null}
-				{otherUserProfile.likes_requester &&
-				!otherUserProfile.match_id ? (
-					<div className="notification is-primary is-light">
-						<p className="is-3">{`${otherUserProfile.name} likes you. Like them back to match them!`}</p>
+					<div className="block">
+						<span className="has-text-weight-semibold mr-3">
+							Country:
+						</span>
+						{otherUserProfile.country}
 					</div>
-				) : null}
-				<div className="block buttons">
-					{liked ? (
-						<UnlikeButton
-							otherUserProfile={otherUserProfile}
-							setLiked={setLiked}
-							setMatch={setMatch}
-						/>
-					) : (
-						<LikeButton
-							profile={otherUserProfile}
-							setLiked={setLiked}
-							setMatch={setMatch}
-						/>
-					)}
+					<div className="block">
+						<span className="has-text-weight-semibold mr-3">
+							Interests:
+						</span>
+						{otherUserProfile.interests
+							? otherUserProfile.interests.map(
+									(interest: string, index: number) => (
+										<span
+											className="tag is-primary mx-2 my-1"
+											key={index}
+										>
+											{interest}
+										</span>
+									)
+							  )
+							: null}
+					</div>
+					<div className="block">
+						<span className="has-text-weight-semibold mr-3">
+							Introduction:
+						</span>
+						<p className="notification has-background-primary-light">
+							{otherUserProfile.introduction}
+						</p>
+					</div>
+					<div className="block">
+						<span className="has-text-weight-semibold mr-3">
+							Gender:
+						</span>
+						{otherUserProfile.gender}
+					</div>
+					<div className="block">
+						<span className="has-text-weight-semibold mr-3">
+							Looking for:
+						</span>
+						{otherUserProfile.looking}
+					</div>
+					<div className="block">
+						<span className="has-text-weight-semibold mr-3">
+							Minimum age:
+						</span>
+						{otherUserProfile.min_age}
+					</div>
+					<div className="block">
+						<span className="has-text-weight-semibold mr-3">
+							Maximum age:
+						</span>
+						{otherUserProfile.max_age}
+					</div>
+					<div className="block">
+						<span className="has-text-weight-semibold mr-3">
+							Last login:
+						</span>
+						{reformatDateTime(otherUserProfile.last_login)}
+					</div>
+					{match ? (
+						<div className="notification is-primary">
+							<button
+								className="delete"
+								onClick={closeNotification}
+							></button>
+							<h3 className="title is-3">It&apos;s a match!</h3>
+						</div>
+					) : null}
+					{otherUserProfile.likes_requester &&
+					!otherUserProfile.match_id ? (
+						<div className="notification is-primary is-light">
+							<p className="is-3">{`${otherUserProfile.name} likes you. Like them back to match them!`}</p>
+						</div>
+					) : null}
+					<div className="block buttons">
+						{liked ? (
+							<UnlikeButton
+								otherUserProfile={otherUserProfile}
+								setLiked={setLiked}
+								setMatch={setMatch}
+							/>
+						) : (
+							<LikeButton
+								profile={otherUserProfile}
+								setLiked={setLiked}
+								setMatch={setMatch}
+							/>
+						)}
+					</div>
 				</div>
 			</div>
 		</div>

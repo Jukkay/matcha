@@ -238,9 +238,7 @@ const ReportMenu = ({ reporter, reported }: any) => {
 			<div className="p-2 dropdown is-right is-hoverable">
 				<div className="dropdown-trigger">
 					<div className="navbar-item" id="controlpanel">
-						<div>
-							<BsThreeDotsVertical />
-						</div>
+						<BsThreeDotsVertical className="has-text-primary" />
 					</div>
 				</div>
 				<div className="dropdown-menu" id="dropdown-menu" role="menu">
@@ -599,8 +597,10 @@ const ChatWindow = () => {
 		</div>
 	) : (
 		<div className="column">
-			<section className="section">
-				<p>Select one of your matches and start chatting!</p>
+			<section className="section has-text-centered">
+				<h4 className="title is-4">
+					Select one of your matches and start chatting!
+				</h4>
 			</section>
 		</div>
 	);
@@ -634,7 +634,7 @@ const ChatMessage = ({ item, user_id }: any) => {
 const Messages: NextPage = () => {
 	const { accessToken } = useUserContext();
 	return (
-		<div className="columns is-centered is-gapless">
+		<div className="columns is-centered is-gapless mt-6">
 			<div className="column is-11">
 				{accessToken ? <LoggedIn /> : <NotLoggedIn />}
 			</div>

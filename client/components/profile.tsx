@@ -27,7 +27,7 @@ export const ProfileView = ({ profile, setEditMode }: ProfileViewProps) => {
 	const { userData } = useUserContext();
 	return (
 		<>
-			<div className="my-6">
+			<div className="my-6 pt-6">
 				<h1 className="title is-1">Your profile</h1>
 				<div className="columns card p-3 rounded-corners is-gapless">
 					<div className="column is-two-thirds">
