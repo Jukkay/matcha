@@ -262,8 +262,8 @@ const Signup: NextPage = () => {
 
 	// Component
 	return success ? (
-		<div className="columns is-gapless">
-			<div className="column is-half is-offset-one-quarter">
+		<div className="columns is-gapless is-centered my-6">
+			<div className="column is-half">
 				<section className="section">
 					<div className="box has-text-centered">
 						<section className="section">
@@ -277,8 +277,8 @@ const Signup: NextPage = () => {
 			</div>
 		</div>
 	) : (
-		<div className="columns is-gapless">
-			<div className="column is-half is-offset-one-quarter">
+		<div className="columns is-gapless is-centered my-6">
+			<div className="column is-half">
 				<section className="section">
 					<div className="box">
 						<section className="section">

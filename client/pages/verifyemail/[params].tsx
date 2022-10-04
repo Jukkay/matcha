@@ -15,7 +15,7 @@ const VerifyEmail: NextPage = () => {
 	useEffect(() => {
 		const { params } = router.query;
 		verifyToken(params as string);
-	});
+	}, [router.query]);
 
 	// Handle submit
 	const verifyToken = async (token: string) => {
@@ -35,8 +35,8 @@ const VerifyEmail: NextPage = () => {
 
 	// Component
 	return success ? (
-		<div className="columns is-gapless">
-			<div className="column is-half is-offset-one-quarter">
+		<div className="columns is-gapless is-centered">
+			<div className="column is-half">
 				<section className="section">
 					<div className="box has-text-centered">
 						<section className="section">
@@ -50,8 +50,8 @@ const VerifyEmail: NextPage = () => {
 			</div>
 		</div>
 	) : (
-		<div className="columns is-gapless">
-			<div className="column is-half is-offset-one-quarter">
+		<div className="columns is-gapless is-centered">
+			<div className="column is-half my-6">
 				<section className="section">
 					<div className="box">
 						<section className="section">
@@ -60,7 +60,7 @@ const VerifyEmail: NextPage = () => {
 							</h3>
 
 							<Notification
-								notificationText="Server error. Please try again later."
+								notificationText="Invalid token."
 								notificationState={showGenericError}
 								handleClick={() => setShowGenericError(false)}
 							/>

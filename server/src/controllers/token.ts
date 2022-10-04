@@ -26,7 +26,7 @@ export const verifyEmailToken = async (req: Request, res: Response) => {
 		});
 	} catch (err) {
 		return res.status(400).json({
-			message: 'Cannot verify email token',
+			message: 'Invalid token',
 		});
 	}
 };

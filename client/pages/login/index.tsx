@@ -56,8 +56,8 @@ const LoginSuccess = () => {
 	}, [userData.user_id]);
 
 	return (
-		<div className="columns is-centered">
-			<div className="column is-half is-gapless mt-6">
+		<div className="columns is-centered is-gapless">
+			<div className="column is-half mt-6">
 				<section className="section">
 					<div className="box has-text-centered">
 						<section className="section">
@@ -212,8 +212,8 @@ const Login: NextPage = () => {
 	return success ? (
 		<LoginSuccess />
 	) : (
-		<div className="columns is-centered">
-			<div className="column is-half is-gapless mt-6">
+		<div className="columns is-centered is-gapless">
+			<div className="column is-half mt-6">
 				<section className="section">
 					<div className="box">
 						<section className="section">

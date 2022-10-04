@@ -7,11 +7,13 @@ export const LandingPage = () => {
 		<div className="columns is-centered my-6 pt-6">
 			<div className="column is-three-quarters has-text-centered">
 				<h1 className="title is-1">Welcome to</h1>
+				<section className="section">
 				<img
 					className="image"
 					src="/logo_frontpage.svg"
 					alt="42 Dates Logo"
 				/>
+				</section>
 				<ErrorBoundary FallbackComponent={ErrorFallback}>
 					<p className="my-3">
 						<Link href="/signup">
@@ -21,10 +23,10 @@ export const LandingPage = () => {
 					<h4 className="title is-4 has-text-primary">or</h4>
 					<p className="my-3">
 						<Link href="/login">
-							<a className="button">Log in</a>
+							<a className="button is-primary is-outlined">Log in</a>
 						</Link>
 					</p>
-					<h4 className="title is-4 has-text-primary">to continue</h4>
+					<h4 className="title is-4 has-text-primary my-3">to continue</h4>
 				</ErrorBoundary>
 			</div>
 		</div>

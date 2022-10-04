@@ -28,10 +28,10 @@ const LoggedOutControls = () => {
 				<div className="is-flex is-justify-content-end is-flex-wrap-nowrap is-align-items-center fullwidth buttons mr-6">
 					<ErrorBoundary FallbackComponent={ErrorFallback}>
 						<Link href="/signup">
-							<a className="button is-primary">Sign up</a>
+							<a className="button has-text-primary">Sign up</a>
 						</Link>
 						<Link href="/login">
-							<a className="button">Log in</a>
+							<a className="button has-text-primary">Log in</a>
 						</Link>
 					</ErrorBoundary>
 				</div>

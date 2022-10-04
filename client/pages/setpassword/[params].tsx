@@ -154,8 +154,8 @@ const SetPassword: NextPage = () => {
 
 	// Component
 	return success ? (
-		<div className="columns is-gapless">
-			<div className="column is-half is-offset-one-quarter">
+		<div className="columns is-gapless is-centered">
+			<div className="column is-half my-6">
 				<section className="section">
 					<div className="box has-text-centered">
 						<section className="section">
@@ -169,8 +169,8 @@ const SetPassword: NextPage = () => {
 			</div>
 		</div>
 	) : (
-		<div className="columns is-gapless">
-			<div className="column is-half is-offset-one-quarter">
+		<div className="columns is-gapless is-centered">
+			<div className="column is-half my-6">
 				<section className="section">
 					<div className="box">
 						<section className="section">

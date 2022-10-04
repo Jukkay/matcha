@@ -30,8 +30,8 @@ const Logout: NextPage = () => {
 	}, [refreshToken]);
 
 	return (
-		<div className="columns is-centered">
-			<div className="column is-half is-gapless mt-6">
+		<div className="columns is-centered is-gapless">
+			<div className="column is-half mt-6">
 				<section className="section">
 					<div className="box has-text-centered">
 						<section className="section">

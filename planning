@@ -429,8 +429,9 @@ V Change profile image and username in navbar to one item
 V Fix styling on login, logout and control panel pages
 V Make username disappear in navbar in mobile view again
 V Make separate landing page component
-Consider custom font
-Try moving sass and babel to dev dependencies
+V Try moving sass and babel to dev dependencies
+V Consider custom font
+
 Test all required functionality
 What happens if user is unmatched or blocked during chat?
 Refactor SQL queries using ``
