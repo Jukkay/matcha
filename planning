@@ -424,7 +424,11 @@ V Remove dead code
 V Customize colors for the app
 V Add logo
 V Reformat about, terms and privacy to use standard styling
-Stylize footer
+V Stylize footer
+V Change profile image and username in navbar to one item
+V Fix styling on login, logout and control panel pages
+V Make username disappear in navbar in mobile view again
+V Make separate landing page component
 Consider custom font
 Try moving sass and babel to dev dependencies
 Test all required functionality

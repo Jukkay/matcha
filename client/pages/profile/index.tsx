@@ -2,22 +2,13 @@ import type { NextPage } from 'next';
 import { useState, useEffect } from 'react';
 import { NewProfileButton } from '../../components/buttons';
 import { CreateProfile } from '../../components/createProfile';
+import { LandingPage } from '../../components/landingPage';
 import { useNotificationContext } from '../../components/NotificationContext';
 import { ProfileView } from '../../components/profile';
 import { UpdateProfile } from '../../components/updateProfile';
 import { useUserContext } from '../../components/UserContext';
 import { ActivePage, EditProps, ViewProps } from '../../types/types';
 import { authAPI } from '../../utilities/api';
-
-const NotLoggedIn = () => {
-	return (
-		<div>
-			<section className="section">
-				<p>Please log in first.</p>
-			</section>
-		</div>
-	);
-};
 
 const LoggedIn = () => {
 	const { userData, updateUserData, profile, setProfile } = useUserContext();
@@ -93,7 +84,7 @@ const Profile: NextPage = () => {
 	return (
 		<div className="columns is-centered is-gapless">
 			<div className="column is-three-quarters">
-				{accessToken ? <LoggedIn /> : <NotLoggedIn />}
+				{accessToken ? <LoggedIn /> : <LandingPage />}
 			</div>
 		</div>
 	);

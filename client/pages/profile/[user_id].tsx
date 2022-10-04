@@ -14,16 +14,7 @@ import { useNotificationContext } from '../../components/NotificationContext';
 import { useSocketContext } from '../../components/SocketContext';
 import { LoadError, Spinner } from '../../components/utilities';
 import { ProfileViewWithLikeButtons } from '../../components/profileCards';
-
-const NotLoggedIn = () => {
-	return (
-		<div>
-			<section className="section">
-				<p>Please log in first.</p>
-			</section>
-		</div>
-	);
-};
+import { LandingPage } from '../../components/landingPage';
 
 const LoggedIn = () => {
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
@@ -148,7 +139,7 @@ const ShowProfile: NextPage = () => {
 	return (
 		<div className="columns is-centered is-gapless">
 			<div className="column is-two-thirds">
-				{accessToken ? <LoggedIn /> : <NotLoggedIn />}
+				{accessToken ? <LoggedIn /> : <LandingPage />}
 			</div>
 		</div>
 	);

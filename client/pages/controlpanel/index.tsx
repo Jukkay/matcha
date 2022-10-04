@@ -9,21 +9,12 @@ import {
 } from 'react-icons/fa';
 import { SubmitButton } from '../../components/buttons';
 import { FormInput, Notification } from '../../components/form';
+import { LandingPage } from '../../components/landingPage';
 import { LocationPermissionRequest } from '../../components/locationPermissionRequest';
 import { useNotificationContext } from '../../components/NotificationContext';
 import { useUserContext } from '../../components/UserContext';
 import { ActivePage } from '../../types/types';
 import { authAPI } from '../../utilities/api';
-
-const NotLoggedIn = () => {
-	return (
-		<div>
-			<section className="section">
-				<p>Please log in first.</p>
-			</section>
-		</div>
-	);
-};
 
 const LoggedIn = () => {
 	// Context states
@@ -320,7 +311,7 @@ const LoggedIn = () => {
 
 	// Component
 	return deleted ? (
-		<section className="section">
+		<div className="my-6 pt-6">
 			<div className="box has-text-centered">
 				<section className="section">
 					<h3 className="title is-3">
@@ -328,17 +319,17 @@ const LoggedIn = () => {
 					</h3>
 				</section>
 			</div>
-		</section>
+		</div>
 	) : success ? (
-		<section className="section">
+		<div className="my-6 pt-6">
 			<div className="box has-text-centered">
 				<section className="section">
 					<h3 className="title is-3">Changes saved successfully</h3>
 				</section>
 			</div>
-		</section>
+		</div>
 	) : (
-		<section className="section">
+		<div className="my-6 pt-6">
 			<div className="box">
 				<section className="section">
 					<form onSubmit={handleSubmit} autoComplete="on">
@@ -394,7 +385,7 @@ const LoggedIn = () => {
 					</button>
 				</section>
 			</div>
-		</section>
+		</div>
 	);
 };
 
@@ -402,8 +393,8 @@ const ControlPanel: NextPage = () => {
 	const { accessToken } = useUserContext();
 	return (
 		<div className="columns is-centered is-gapless">
-			<div className="column is-three-quarters">
-				{accessToken ? <LoggedIn /> : <NotLoggedIn />}
+			<div className="column is-half">
+				{accessToken ? <LoggedIn /> : <LandingPage />}
 			</div>
 		</div>
 	);

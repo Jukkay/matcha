@@ -7,7 +7,12 @@ import { BsFillChatFill } from 'react-icons/bs';
 import { authAPI } from '../utilities/api';
 import { useUserContext } from './UserContext';
 import { useNotificationContext } from './NotificationContext';
-import { INotification, LikeProp, NotificationType } from '../types/types';
+import {
+	INavbarProfile,
+	INotification,
+	LikeProp,
+	NotificationType,
+} from '../types/types';
 import axios from 'axios';
 import { socket } from './SocketContext';
 import { ErrorFallback } from './utilities';
@@ -40,14 +45,15 @@ const Logo = () => {
 		<ErrorBoundary FallbackComponent={ErrorFallback}>
 			<Link href="/">
 				<a className="navbar-item">
-					<img className="image" src="/logo.svg" alt="Main page"/>
+					<img className="image" src="/logo.svg" alt="Main page" />
 				</a>
 			</Link>
 		</ErrorBoundary>
 	);
 };
 const LoggedInControls = () => {
-	const { refreshToken, userData, updateAccessToken } = useUserContext();
+	const { refreshToken, userData, updateAccessToken, profile } =
+		useUserContext();
 	const {
 		activeChatUser,
 		activePage,
@@ -172,12 +178,49 @@ const LoggedInControls = () => {
 				<div className="is-flex is-justify-content-end is-flex-wrap-nowrap is-align-items-center fullwidth">
 					<NotificationDropdownMenu />
 					<MessageIcon />
-					<Username />
-					<ProfilePicture />
+					<Profile
+						username={userData.username}
+						profile_image={profile.profile_image}
+					/>
 					<MainDropdownMenu />
 				</div>
 			</div>
 		</div>
+	);
+};
+
+const Profile = ({ username, profile_image }: INavbarProfile) => {
+	return (
+		<Link href="/profile">
+			<a className="navbar-item fullheight">
+				<div className="username mr-3">
+					<strong>{username}</strong>
+				</div>
+				<figure className="image navbar-profile-image">
+					<img
+						className="is-rounded"
+						src={
+							profile_image === 'default.png' ||
+							profile_image === '' ||
+							profile_image === '0' ||
+							profile_image === '1' ||
+							profile_image === '2' ||
+							profile_image === '3' ||
+							profile_image === '4' ||
+							profile_image === undefined
+								? '/default.png'
+								: `${authAPI.defaults.baseURL}/images/${profile_image}`
+						}
+						onError={({ currentTarget }) => {
+							currentTarget.onerror = null;
+							currentTarget.src = '/default.png';
+						}}
+						alt="Profile picture"
+						crossOrigin=""
+					/>
+				</figure>
+			</a>
+		</Link>
 	);
 };
 
@@ -396,49 +439,6 @@ const NotificationsList = () => {
 		<a className="dropdown-item">
 			<span className="">No notifications</span>
 		</a>
-	);
-};
-
-const Username = () => {
-	const { userData } = useUserContext();
-	return (
-		<Link href="/profile" className="username">
-			<a className="navbar-item fullheight">
-				<strong>{userData.username}</strong>
-			</a>
-		</Link>
-	);
-};
-const ProfilePicture = () => {
-	const { profile } = useUserContext();
-	return (
-		<Link href="/profile">
-			<a className="navbar-item fullheight">
-				<figure className="image navbar-profile-image">
-					<img
-						className="is-rounded"
-						src={
-							profile.profile_image === 'default.png' ||
-							profile.profile_image === '' ||
-							profile.profile_image === '0' ||
-							profile.profile_image === '1' ||
-							profile.profile_image === '2' ||
-							profile.profile_image === '3' ||
-							profile.profile_image === '4' ||
-							profile.profile_image === undefined
-								? '/default.png'
-								: `${authAPI.defaults.baseURL}/images/${profile.profile_image}`
-						}
-						onError={({ currentTarget }) => {
-							currentTarget.onerror = null;
-							currentTarget.src = '/default.png';
-						}}
-						alt="Profile picture"
-						crossOrigin=""
-					/>
-				</figure>
-			</a>
-		</Link>
 	);
 };
 

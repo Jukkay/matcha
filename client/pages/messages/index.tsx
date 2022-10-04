@@ -20,16 +20,7 @@ import { BsThreeDotsVertical } from 'react-icons/bs';
 import { LoadError, Spinner } from '../../components/utilities';
 import { socket } from '../../components/SocketContext';
 import { useInView } from 'react-intersection-observer';
-
-const NotLoggedIn = () => {
-	return (
-		<div>
-			<section className="section">
-				<p>Please log in first.</p>
-			</section>
-		</div>
-	);
-};
+import { LandingPage } from '../../components/landingPage';
 
 const LoggedIn = () => {
 	const { userData } = useUserContext();
@@ -636,7 +627,7 @@ const Messages: NextPage = () => {
 	return (
 		<div className="columns is-centered is-gapless mt-6">
 			<div className="column is-11">
-				{accessToken ? <LoggedIn /> : <NotLoggedIn />}
+				{accessToken ? <LoggedIn /> : <LandingPage />}
 			</div>
 		</div>
 	);

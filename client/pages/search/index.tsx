@@ -20,16 +20,7 @@ import {
 } from '../../utilities/sort';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ErrorFallback } from '../../components/utilities';
-
-const NotLoggedIn = () => {
-	return (
-		<div>
-			<section className="section">
-				<p>Please log in first.</p>
-			</section>
-		</div>
-	);
-};
+import { LandingPage } from '../../components/landingPage';
 
 const LoggedIn = () => {
 	const { profile, userData } = useUserContext();
@@ -129,7 +120,7 @@ const Search: NextPage = () => {
 		<ErrorBoundary FallbackComponent={ErrorFallback}>
 			<div className="columns is-centered is-gapless">
 				<div className="column is-three-quarters">
-					{accessToken ? <LoggedIn /> : <NotLoggedIn />}
+					{accessToken ? <LoggedIn /> : <LandingPage />}
 				</div>
 			</div>
 		</ErrorBoundary>

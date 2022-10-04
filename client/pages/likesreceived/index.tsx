@@ -15,16 +15,7 @@ import { useInView } from 'react-intersection-observer';
 import { ErrorBoundary } from 'react-error-boundary';
 import { handleRouteError } from '../../utilities/helpers';
 import { SearchResultItemWithoutDistance } from '../../components/profileCards';
-
-const NotLoggedIn = () => {
-	return (
-		<div>
-			<section className="section">
-				<p>Please log in first.</p>
-			</section>
-		</div>
-	);
-};
+import { LandingPage } from '../../components/landingPage';
 
 const LoggedIn = () => {
 	const { userData } = useUserContext();
@@ -151,7 +142,7 @@ const LikesReceived: NextPage = () => {
 		<ErrorBoundary FallbackComponent={ErrorFallback}>
 			<div className="columns is-centered is-gapless">
 				<div className="column is-three-quarters">
-					{accessToken ? <LoggedIn /> : <NotLoggedIn />}
+					{accessToken ? <LoggedIn /> : <LandingPage />}
 				</div>
 			</div>
 		</ErrorBoundary>
