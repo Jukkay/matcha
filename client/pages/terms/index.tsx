@@ -7,17 +7,17 @@ const Terms: NextPage = () => {
 				<section className="section">
 					<h1 className="title is-1">Terms and conditions</h1>
 
-					<p className="content">Welcome to Matcha!</p>
+					<p className="content">Welcome to 42 Dates!</p>
 
 					<p className="content">
 						These terms and conditions outline the rules and
-						regulations for the use of Matcha ltd&apos;s Website,
-						located at https://matcha.jukka.codes.
+						regulations for the use of 42 Dates ltd&apos;s Website,
+						located at https://42 dates.jukka.codes.
 					</p>
 
 					<p className="content">
 						By accessing this website we assume you accept these
-						terms and conditions. Do not continue to use Matcha if
+						terms and conditions. Do not continue to use 42 Dates if
 						you do not agree to take all of the terms and conditions
 						stated on this page.
 					</p>
@@ -50,8 +50,8 @@ const Terms: NextPage = () => {
 					</h3>
 
 					<p className="content">
-						We employ the use of cookies. By accessing Matcha, you
-						agreed to use cookies in agreement with the Matcha
+						We employ the use of cookies. By accessing 42 Dates, you
+						agreed to use cookies in agreement with the 42 Dates
 						ltd&apos;s Privacy Policy.{' '}
 					</p>
 
@@ -69,28 +69,28 @@ const Terms: NextPage = () => {
 					</h3>
 
 					<p className="content">
-						Unless otherwise stated, Matcha ltd and/or its licensors
+						Unless otherwise stated, 42 Dates ltd and/or its licensors
 						own the intellectual property rights for all material on
-						Matcha. All intellectual property rights are reserved.
-						You may access this from Matcha for your own personal
+						42 Dates. All intellectual property rights are reserved.
+						You may access this from 42 Dates for your own personal
 						use subjected to restrictions set in these terms and
 						conditions.
 					</p>
 
-					<p className="content">
+					<div className="content">
 						You must not:
 						<ul>
-							<li>Republish material from Matcha</li>
+							<li>Republish material from 42 Dates</li>
 							<li>
-								Sell, rent or sub-license material from Matcha
+								Sell, rent or sub-license material from 42 Dates
 							</li>
 							<li>
 								Reproduce, duplicate or copy material from
-								Matcha
+								42 Dates
 							</li>
-							<li>Redistribute content from Matcha</li>
+							<li>Redistribute content from 42 Dates</li>
 						</ul>
-					</p>
+					</div>
 
 					<p className="content">
 						This Agreement shall begin on the date hereof. Our Terms
@@ -104,13 +104,13 @@ const Terms: NextPage = () => {
 					<p className="content">
 						Parts of this website offer an opportunity for users to
 						post and exchange opinions and information in certain
-						areas of the website. Matcha ltd does not filter, edit,
+						areas of the website. 42 Dates ltd does not filter, edit,
 						publish or review Comments prior to their presence on
 						the website. Comments do not reflect the views and
-						opinions of Matcha ltd,its agents and/or affiliates.
+						opinions of 42 Dates ltd,its agents and/or affiliates.
 						Comments reflect the views and opinions of the person
 						who post their views and opinions. To the extent
-						permitted by applicable laws, Matcha ltd shall not be
+						permitted by applicable laws, 42 Dates ltd shall not be
 						liable for the Comments or for any liability, damages or
 						expenses caused and/or suffered as a result of any use
 						of and/or posting of and/or appearance of the Comments
@@ -118,13 +118,13 @@ const Terms: NextPage = () => {
 					</p>
 
 					<p className="content">
-						Matcha ltd reserves the right to monitor all Comments
+						42 Dates ltd reserves the right to monitor all Comments
 						and to remove any Comments which can be considered
 						inappropriate, offensive or causes breach of these Terms
 						and Conditions.
 					</p>
 
-					<p className="content">
+					<div className="content">
 						You warrant and represent that:
 						<ul>
 							<li>
@@ -150,10 +150,10 @@ const Terms: NextPage = () => {
 								activities or unlawful activity.
 							</li>
 						</ul>
-					</p>
+					</div>
 
 					<p className="content">
-						You hereby grant Matcha ltd a non-exclusive license to
+						You hereby grant 42 Dates ltd a non-exclusive license to
 						use, reproduce, edit and authorize others to use,
 						reproduce and edit any of your Comments in any and all
 						forms, formats or media.
@@ -163,7 +163,7 @@ const Terms: NextPage = () => {
 						<strong>Hyperlinking to our Content</strong>
 					</h3>
 
-					<p className="content">
+					<div className="content">
 						The following organizations may link to our Website
 						without prior written approval:
 						<ul>
@@ -182,7 +182,7 @@ const Terms: NextPage = () => {
 								which may not hyperlink to our Web site.
 							</li>
 						</ul>
-					</p>
+					</div>
 
 					<p className="content">
 						These organizations may link to our home page, to
@@ -194,7 +194,7 @@ const Terms: NextPage = () => {
 						site.
 					</p>
 
-					<p className="content">
+					<div className="content">
 						We may consider and approve other link requests from the
 						following types of organizations:
 						<ul>
@@ -214,7 +214,7 @@ const Terms: NextPage = () => {
 								educational institutions and trade associations.
 							</li>
 						</ul>
-					</p>
+					</div>
 
 					<p className="content">
 						We will approve link requests from these organizations
@@ -223,7 +223,7 @@ const Terms: NextPage = () => {
 						businesses; (b) the organization does not have any
 						negative records with us; (c) the benefit to us from the
 						visibility of the hyperlink compensates the absence of
-						Matcha ltd; and (d) the link is in the context of
+						42 Dates ltd; and (d) the link is in the context of
 						general resource information.
 					</p>
 
@@ -239,7 +239,7 @@ const Terms: NextPage = () => {
 					<p className="content">
 						If you are one of the organizations listed in paragraph
 						2 above and are interested in linking to our website,
-						you must inform us by sending an e-mail to Matcha ltd.
+						you must inform us by sending an e-mail to 42 Dates ltd.
 						Please include your name, your organization name,
 						contact information as well as the URL of your site, a
 						list of any URLs from which you intend to link to our
@@ -247,7 +247,7 @@ const Terms: NextPage = () => {
 						would like to link. Wait 2-3 weeks for a response.
 					</p>
 
-					<p className="content">
+					<div className="content">
 						Approved organizations may hyperlink to our Website as
 						follows:
 						<ul>
@@ -263,10 +263,10 @@ const Terms: NextPage = () => {
 								party&apos;s site.
 							</li>
 						</ul>
-					</p>
+					</div>
 
 					<p className="content">
-						No use of Matcha ltd&apos;s logo or other artwork will
+						No use of 42 Dates ltd&apos;s logo or other artwork will
 						be allowed for linking absent a trademark license
 						agreement.
 					</p>
@@ -341,7 +341,7 @@ const Terms: NextPage = () => {
 						<strong>Disclaimer</strong>
 					</h3>
 
-					<p className="content">
+					<div className="content">
 						To the maximum extent permitted by applicable law, we
 						exclude all representations, warranties and conditions
 						relating to our website and the use of this website.
@@ -364,7 +364,7 @@ const Terms: NextPage = () => {
 								not be excluded under applicable law.
 							</li>
 						</ul>
-					</p>
+					</div>
 
 					<p className="content">
 						The limitations and prohibitions of liability set in

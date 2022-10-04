@@ -218,7 +218,7 @@ const Login: NextPage = () => {
 					<div className="box">
 						<section className="section">
 							<form onSubmit={handleSubmit} autoComplete="on">
-								<h3 className="title is-3">Log in</h3>
+								<h1 className="title is-1">Log in</h1>
 								{inputs.map((input) => (
 									<FormInput
 										key={input.id}

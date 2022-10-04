@@ -7,7 +7,7 @@ const About: NextPage = () => {
 				<section className="section">
 					<h1 className="title is-1">About</h1>
 					<p className="content">
-						Matcha is a dating app project made for my studies at
+						42 Dates is a dating app I built for a project called Matcha at
 						Hive Helsinki Coding School. The app is built with React
 						on Next.js create-next-app. Backend is using Node and
 						Express with MariaDB database. Userbase has about 3800
@@ -30,7 +30,7 @@ const About: NextPage = () => {
 				</section>
 				<section className="section">
 					<h3 className="title is-3">Technologies</h3>
-					<p className="content">
+					<div className="content">
 						<ul>
 							<li>React</li>
 							<li>Next.js</li>
@@ -46,7 +46,7 @@ const About: NextPage = () => {
 							<li>Docker</li>
 							<li>AWS</li>
 						</ul>
-					</p>
+					</div>
 					<p className="content">
 						Next.js is used mainly as a create-react-app
 						replacement. No server-side rendering is used for this
@@ -58,8 +58,7 @@ const About: NextPage = () => {
 						instant messaging.
 					</p>
 					<p className="content">
-						Development environment and deployment to AWS is done
-						with Docker.
+						Development environment runs in Docker containers and the Docker files are included in the repository.
 					</p>
 					<p className="content">
 						The project can be found in Github here:{' '}

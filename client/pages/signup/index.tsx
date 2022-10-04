@@ -283,9 +283,9 @@ const Signup: NextPage = () => {
 					<div className="box">
 						<section className="section">
 							<form onSubmit={handleSubmit} autoComplete="on">
-								<h3 className="title is-3">
-									Create new account
-								</h3>
+								<h1 className="title is-1">
+									Sign up
+								</h1>
 
 								{inputs.map((input) => (
 									<FormInput
