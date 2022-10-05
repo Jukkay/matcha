@@ -10,17 +10,17 @@ export const saveNotificationToDatabase = async (data: {
 }) => {
 	const sql = `
                 INSERT INTO
-                    notifications (
+                    notifications 
+					(
                         receiver_id,
                         notification_text,
                         notification_type,
                         sender_id,
                         link
-                        )
+                    )
                 VALUES (?, ?, ?, ?, ?)
                 `;
 	try {
-		
 		const response = await execute(sql, [
 			data.receiver_id,
 			data.notification_text,
@@ -30,9 +30,9 @@ export const saveNotificationToDatabase = async (data: {
 		]);
 		return response;
 	} catch (err) {
-		console.error(err)
+		console.error(err);
 	}
-	};
+};
 
 export const getNotifications = async (req: Request, res: Response) => {
 	const user_id = req.params.id;

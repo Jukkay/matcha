@@ -1,10 +1,11 @@
-
 export const getURL = () => {
+	const protocol = process.env.PROTOCOL + '://';
+	const domain = process.env.DOMAIN_NAME || 'localhost';
+	const port =
+		process.env.PORT == '80' || process.env.PORT == '443'
+			? ''
+			: ':' + process.env.PORT;
+	return `${protocol}${domain}${port}`;
+};
 
-	const protocol = process.env.PROTOCOL + '\:\/\/';
-	const domain = process.env.DOMAIN_NAME || 'localhost'
-	const port = process.env.PORT == '80' || process.env.PORT == '443' ? '' : ':' + process.env.PORT
-	return `${protocol}${domain}${port}`
-}
-
-export const CLIENT_URL = process.env.CLIENT_URL
+export const CLIENT_URL = process.env.CLIENT_URL;

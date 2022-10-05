@@ -1,23 +1,16 @@
 export interface IEmailToken {
-	email: string,
-	iat: number,
-	exp: number,
-	iss: string
-}
-
-interface IUserToken {
-	username: string,
-	iat: number,
-	exp: number,
-	iss: string
+	email: string;
+	iat: number;
+	exp: number;
+	iss: string;
 }
 
 export interface ITokenList {
-	[key: string]: number
+	[key: string]: number;
 }
 export interface IAccesstoken {
-	user_id: string,
-	iat: number,
-	exp: number,
-	iss: string
+	user_id: string;
+	iat: number;
+	exp: number;
+	iss: string;
 }

@@ -1,6 +1,4 @@
-
 const createReportMessage = (report_id: number, report_reason: number) => {
-
 	return `
 	<!DOCTYPE html>
 	<html lang="en">
@@ -19,7 +17,7 @@ const createReportMessage = (report_id: number, report_reason: number) => {
 	<p class="block has-text-weight-bold">42 Bot</p>
 	</section>
 	</body>
-	</html>`
-}
+	</html>`;
+};
 
-export default createReportMessage
+export default createReportMessage;

@@ -15,7 +15,13 @@ export const verifyEmailToken = async (req: Request, res: Response) => {
 		}
 		const decoded = await verifyJWT(token, server_token);
 		const { email } = decoded as IEmailToken;
-		const sql = `UPDATE users SET validated = "1" WHERE email = ?;`;
+		const sql = `
+			UPDATE 
+				users 
+			SET 
+				validated = "1" 
+			WHERE 
+				email = ?;`;
 		const result = await execute(sql, [email]);
 		if (result)
 			return res.status(200).json({
@@ -37,23 +43,29 @@ export const refreshToken = async (req: Request, res: Response) => {
 		const refresh_token = getSecret('refresh_token');
 		if (!token) {
 			return res.status(204).json({
-				error: 'No token given'
-			})
+				error: 'No token given',
+			});
 		}
 		// Check if token is valid
 		const decoded = await verifyJWT(token, refresh_token);
 		if (!decoded) {
 			return res.status(204).json({
-				error: 'Unauthorized'
-			})
+				error: 'Unauthorized',
+			});
 		}
 		//Check if refreshToken is on valid token list
-		const findToken = `SELECT * FROM tokens WHERE token = ?;`;
+		const findToken = `
+			SELECT 
+				* 
+			FROM 
+				tokens 
+			WHERE 
+				token = ?;`;
 		const foundToken = await execute(findToken, [token]);
 		if (!foundToken) {
 			return res.status(204).json({
-				error: 'Token has been invalidated'
-			})
+				error: 'Token has been invalidated',
+			});
 		}
 		// Create and return new access token
 		const accessToken = await signAccessToken(user_id);
@@ -79,15 +91,38 @@ export const updateRefreshTokenList = async (
 ) => {
 	try {
 		//Check number of existing user tokens
-		const findTokens = `SELECT user_id FROM tokens WHERE user_id = ?;`;
+		const findTokens = `
+			SELECT 
+				user_id 
+			FROM 
+				tokens 
+			WHERE 
+				user_id = ?;`;
 		const userTokens = await execute(findTokens, [user_id]);
 		// Update first if more than 5
 		if (userTokens.length > 4) {
-			const updateToken = `UPDATE tokens SET token = ? WHERE user_id = ? ORDER BY token_id ASC LIMIT 1;`;
+			const updateToken = `
+				UPDATE 
+					tokens 
+				SET 
+					token = ? 
+				WHERE 
+					user_id = ? 
+				ORDER BY 
+					token_id 
+					ASC 
+				LIMIT 1;`;
 			await execute(updateToken, [refreshToken, user_id]);
 			return;
 		}
-		const sql = `INSERT INTO tokens (token, user_id) VALUES (?, ?);`;
+		const sql = `
+			INSERT INTO 
+				tokens 
+				(
+					token, 
+					user_id
+				) 
+			VALUES (?, ?);`;
 		await execute(sql, [refreshToken, user_id]);
 	} catch (err) {
 		console.error(err);
@@ -96,7 +131,11 @@ export const updateRefreshTokenList = async (
 
 export const deleteRefreshToken = async (refreshToken: string) => {
 	try {
-		const sql = `DELETE FROM tokens WHERE token = ?;`;
+		const sql = `
+			DELETE FROM 
+				tokens 
+			WHERE 
+				token = ?;`;
 		await execute(sql, [refreshToken]);
 	} catch (err) {
 		console.error(err);
@@ -104,14 +143,14 @@ export const deleteRefreshToken = async (refreshToken: string) => {
 };
 
 export const decodeUserFromAccesstoken = async (req: Request) => {
-  try {
-    const accessToken = req.headers.authorization?.split(' ')[1]
-    const server_token = getSecret('server_token');
-    if (!accessToken || !server_token) return
-	const decoded = await verifyJWT(accessToken, server_token);
-    if (!decoded) return 
-    const { user_id } = decoded as IAccesstoken;
-    return user_id
+	try {
+		const accessToken = req.headers.authorization?.split(' ')[1];
+		const server_token = getSecret('server_token');
+		if (!accessToken || !server_token) return;
+		const decoded = await verifyJWT(accessToken, server_token);
+		if (!decoded) return;
+		const { user_id } = decoded as IAccesstoken;
+		return user_id;
 	} catch (err) {
 		console.error(err);
 	}

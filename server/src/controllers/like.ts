@@ -3,15 +3,15 @@ import { execute } from '../utilities/SQLConnect';
 import { createMatch, findMatch, removeMatch } from './match';
 import { decodeUserFromAccesstoken } from './token';
 
-const updateFamerating = async(liker: string, liked: string) => {
-	const likerFamerating = await calculateFamerating(liker)
+const updateFamerating = async (liker: string, liked: string) => {
+	const likerFamerating = await calculateFamerating(liker);
 	const sql = `UPDATE profiles SET famerating = ? WHERE user_id = ?`;
 	await execute(sql, [likerFamerating, liker]);
-	const likedFamerating = await calculateFamerating(liked)
+	const likedFamerating = await calculateFamerating(liked);
 	await execute(sql, [likedFamerating, liked]);
-}
+};
 
-const calculateFamerating = async(user_id: string) => {
+const calculateFamerating = async (user_id: string) => {
 	// get number of likes received during last month
 	let sql = `
 		SELECT
@@ -24,7 +24,7 @@ const calculateFamerating = async(user_id: string) => {
 			DATE(like_date) 
 				BETWEEN (CURRENT_DATE - INTERVAL 1 MONTH) AND CURRENT_DATE`;
 	const likesReceived = await execute(sql, [user_id]);
-	
+
 	// get number matches during last month
 	sql = `
 		SELECT 
@@ -54,18 +54,16 @@ const calculateFamerating = async(user_id: string) => {
 	const messages = await execute(sql, [user_id]);
 
 	// Calculate famerating
-	let messagesPerMatch
+	let messagesPerMatch;
 	if (messages[0].message_count && matches[0].match_count)
-		messagesPerMatch =  messages[0].message_count as number / matches[0].match_count as number
-	else
-		messagesPerMatch = 0
-	const famerating = likesReceived[0].like_count as number + messagesPerMatch
-	if (famerating > 1000)
-		return 1000
-	return famerating
-
-
-}
+		messagesPerMatch = ((messages[0].message_count as number) /
+			matches[0].match_count) as number;
+	else messagesPerMatch = 0;
+	const famerating =
+		(likesReceived[0].like_count as number) + messagesPerMatch;
+	if (famerating > 1000) return 1000;
+	return famerating;
+};
 const addNewLike = async (req: Request, res: Response) => {
 	const { liker, liked } = req.body;
 	if (!liker || !liked)
@@ -85,14 +83,14 @@ const addNewLike = async (req: Request, res: Response) => {
 			});
 		// Check for duplicate like
 		let sql = `
-				SELECT 
-					* 
-				FROM 
-					likes 
-				WHERE 
-					user_id = ? 
-					AND 
-					target_id = ?`;
+			SELECT 
+				* 
+			FROM 
+				likes 
+			WHERE 
+				user_id = ? 
+				AND 
+				target_id = ?`;
 		let response = await execute(sql, [liker, liked]);
 		if (response.length > 0)
 			return res.status(400).json({
@@ -113,7 +111,11 @@ const addNewLike = async (req: Request, res: Response) => {
 			// Create like
 			sql = `
 				INSERT INTO 
-					likes(user_id, target_id) 
+					likes
+					(
+						user_id, 
+						target_id
+					) 
 				VALUES 
 					(?, ?)`;
 			response = await execute(sql, [liker, liked]);
@@ -124,10 +126,10 @@ const addNewLike = async (req: Request, res: Response) => {
 					match: true,
 					message: 'Match already exists',
 				});
-			
+
 			// Update famerating
-			await updateFamerating(liker, liked)
-			
+			await updateFamerating(liker, liked);
+
 			return res.status(200).json({
 				match: true,
 				message: 'Match',
@@ -136,13 +138,17 @@ const addNewLike = async (req: Request, res: Response) => {
 		// Create like
 		sql = `
 			INSERT INTO 
-				likes(user_id, target_id) 
+				likes
+				(
+					user_id, 
+					target_id
+				) 
 			VALUES 
 				(?, ?)`;
 		response = await execute(sql, [liker, liked]);
 		if (response) {
 			// Update famerating
-			await updateFamerating(liker, liked)
+			await updateFamerating(liker, liked);
 
 			return res.status(200).json({
 				match: false,
@@ -202,7 +208,7 @@ export const getProfilesUserLikes = async (req: Request, res: Response) => {
 		return res.status(400).json({
 			message: 'No user id given',
 		});
-		const sql = `
+	const sql = `
 				SELECT
 					*
 				FROM 
@@ -253,7 +259,10 @@ const removeLike = async (req: Request, res: Response) => {
 				message: 'ID mismatch. Are you doing something shady?',
 			});
 		// Check if it's a match
-		const isMatch = await findMatch(parseInt(user_id), parseInt(liked as string));
+		const isMatch = await findMatch(
+			parseInt(user_id),
+			parseInt(liked as string)
+		);
 		if (isMatch) {
 			// TODO remove match
 			const removed = await removeMatch(
@@ -276,7 +285,7 @@ const removeLike = async (req: Request, res: Response) => {
 				target_id = ?`;
 		const response = await execute(sql, [user_id, liked]);
 		// Update famerating
-		await updateFamerating(liker, liked as string)
+		await updateFamerating(liker, liked as string);
 		if (response)
 			return res.status(200).json({
 				message: 'Like removed successfully',

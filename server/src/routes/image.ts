@@ -5,7 +5,6 @@ import { v4 as uuidv4 } from 'uuid';
 import multer from 'multer';
 import path from 'path';
 import { decodeUserFromAccesstoken } from '../controllers/token';
-import { encode } from "blurhash";
 
 const checkFileValidity = (req: any, file: any, callback: any) => {
 	const validExtensions = /png|jpg|jpeg|gif|/;
@@ -48,14 +47,14 @@ imageRouter.get('/', (req: express.Request, res: express.Response) => {
 imageRouter.post(
 	'/',
 	[checkJWT, upload.array('files')],
-	async(req: any, res: any) => {
+	async (req: any, res: any) => {
 		try {
 			// Get new filenames
 			let filenames: string[] = [];
 			req.files.map((file: any) => {
 				filenames.push(file.filename);
 			});
-			
+
 			// Get user_id
 			const user_id = await decodeUserFromAccesstoken(req);
 			if (!user_id)
@@ -63,11 +62,14 @@ imageRouter.post(
 					message: 'Cannot parse user_id',
 				});
 			// Save filenames to database
-			const photo_IDs = await controller.saveFilenames(user_id, filenames);
+			const photo_IDs = await controller.saveFilenames(
+				user_id,
+				filenames
+			);
 			if (!photo_IDs)
 				return res.status(500).json({
-					message: 'Failed to save filenames to database'
-			});
+					message: 'Failed to save filenames to database',
+				});
 			// Send filenames as response
 			return res.status(200).json({
 				message: 'Files uploaded successfully',
@@ -81,10 +83,7 @@ imageRouter.post(
 		}
 	}
 );
-imageRouter
-	.route('/:id')
-	.delete(checkJWT, controller.deleteImage);
+imageRouter.route('/:id').delete(checkJWT, controller.deleteImage);
 imageRouter.get('/user/:id', checkJWT, controller.getUsersImages);
-
 
 export default imageRouter;

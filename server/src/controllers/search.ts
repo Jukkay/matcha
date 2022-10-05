@@ -4,14 +4,7 @@ import { execute } from '../utilities/SQLConnect';
 import { decodeUserFromAccesstoken } from './token';
 
 export const searchProfiles = async (req: Request, res: Response) => {
-	const {
-		looking,
-		gender,
-		min_age,
-		max_age,
-		country,
-		city,
-	} = req.body.data;
+	const { looking, gender, min_age, max_age, country, city } = req.body.data;
 
 	if (!gender || !min_age || !max_age || !looking)
 		return res.status(400).json({
@@ -31,29 +24,27 @@ export const searchProfiles = async (req: Request, res: Response) => {
 		const maxDate = convertMAX_AGE(max_age);
 
 		// Create search parameters for gender
-		let lookingOptions = []
-		let genderOptions = []
-		if (looking == 'Male or Female')
-			lookingOptions = ['Male', 'Female']
+		let lookingOptions = [];
+		let genderOptions = [];
+		if (looking == 'Male or Female') lookingOptions = ['Male', 'Female'];
 		else if (looking == 'Anything goes')
-			lookingOptions = ['Male',
-			'Female',
-			'Non-binary',
-			'Trans-man',
-			'Trans-woman',
-			'Other']
-		else
-			lookingOptions = [looking]
-		
+			lookingOptions = [
+				'Male',
+				'Female',
+				'Non-binary',
+				'Trans-man',
+				'Trans-woman',
+				'Other',
+			];
+		else lookingOptions = [looking];
+
 		if (gender == 'Male' || gender == 'Female')
-			genderOptions = [gender, 'Male or Female', 'Anything goes']
-		else
-			genderOptions = [gender, 'Anything goes']
+			genderOptions = [gender, 'Male or Female', 'Anything goes'];
+		else genderOptions = [gender, 'Anything goes'];
 		// Search logic
 		let sql;
 		let results;
 		if (country && city) {
-
 			sql = `
 			SELECT 
 				profiles.*,
@@ -194,7 +185,7 @@ export const searchProfiles = async (req: Request, res: Response) => {
 				user_id,
 				genderOptions,
 			]);
-		} 
+		}
 		console.log('Searched with:', req.body.data);
 		if (results.length > 0) {
 			return res.status(200).json({

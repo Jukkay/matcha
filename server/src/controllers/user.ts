@@ -3,9 +3,7 @@ import { execute } from '../utilities/SQLConnect';
 import bcryptjs from 'bcryptjs';
 import { signAccessToken, signRefreshToken } from '../utilities/promisifyJWT';
 import { sendEmailVerification } from '../utilities/sendEmailVerification';
-import {
-	reformatDate,
-} from '../utilities/helpers';
+import { reformatDate } from '../utilities/helpers';
 import { validateRegistrationInput } from '../utilities/validators';
 import {
 	decodeUserFromAccesstoken,
@@ -21,15 +19,19 @@ const register = async (req: Request, res: Response) => {
 	if (validationResponse !== undefined) return;
 	const { username, password, name, email, birthday } = req.body;
 	const hash = await bcryptjs.hash(password, 10);
-	const sql = `INSERT INTO users (username, password, email, name, birthday) VALUES (?, ?, ?, ?, ?);`;
+	const sql = `
+		INSERT INTO 
+			users 
+			(
+				username, 
+				password, 
+				email, 
+				name, 
+				birthday
+			) 
+		VALUES (?, ?, ?, ?, ?);`;
 	try {
-		await execute(sql, [
-			username,
-			hash,
-			email,
-			name,
-			birthday,
-		]);
+		await execute(sql, [username, hash, email, name, birthday]);
 		await sendEmailVerification(req.body.email);
 		return res.status(201).json({
 			message: 'User added successfully',
@@ -61,7 +63,21 @@ export const login = async (req: Request, res: Response) => {
 			});
 
 		// Get user data
-		const sql = `SELECT user_id, username, password, email, name, validated, birthday, profile_exists, location_permitted FROM users WHERE username = ?;`;
+		const sql = `
+			SELECT 
+				user_id, 
+				username, 
+				password, 
+				email, 
+				name, 
+				validated, 
+				birthday, 
+				profile_exists, 
+				location_permitted 
+			FROM 
+				users 
+			WHERE 
+				username = ?;`;
 		const user = await execute(sql, username);
 		if (!user[0]) {
 			return res.status(401).json({
@@ -94,8 +110,13 @@ export const login = async (req: Request, res: Response) => {
 		const refreshToken = await signRefreshToken(user[0].user_id);
 
 		// Update last login
-		const sql2 =
-			'UPDATE profiles SET last_login=now() WHERE user_id = ?;';
+		const sql2 = `
+			UPDATE 
+				profiles 
+			SET 
+				last_login=now() 
+			WHERE 
+				user_id = ?;`;
 		const response = await execute(sql2, user[0].user_id);
 		// Return user data to frontend
 		if (accessToken && refreshToken) {
@@ -204,38 +225,42 @@ const deleteUser = async (req: Request, res: Response) => {
 				message: 'ID mismatch. Are you doing something shady?',
 			});
 		// Remove profile
-		let sql = 'DELETE FROM profiles WHERE user_id = ?';
+		let sql = `
+			DELETE FROM 
+				profiles 
+			WHERE 
+				user_id = ?`;
 		let response = await execute(sql, [user_id]);
 
 		// Delete matches
 		sql = `
-		DELETE FROM
-			matches
-		WHERE
-			user1 = ?
-			OR
-			user2 = ?
-		`;
+			DELETE FROM
+				matches
+			WHERE
+				user1 = ?
+				OR
+				user2 = ?
+			`;
 		response = await execute(sql, [user_id, user_id]);
 
 		// Delete likes
 		sql = `
-		DELETE FROM
-			likes
-		WHERE
-			user_id = ?
-			OR
-			target_id = ?
-		`;
+			DELETE FROM
+				likes
+			WHERE
+				user_id = ?
+				OR
+				target_id = ?
+			`;
 		response = await execute(sql, [user_id, user_id]);
 
 		// Delete messages
 		sql = `
-		DELETE FROM
-			messages
-		WHERE
-			user_id = ?
-		`;
+			DELETE FROM
+				messages
+			WHERE
+				user_id = ?
+			`;
 		response = await execute(sql, [user_id]);
 
 		// Delete blocks
@@ -262,7 +287,9 @@ const deleteUser = async (req: Request, res: Response) => {
 
 		// Get user images
 		sql = `
-			SELECT filename FROM 
+			SELECT 
+				filename 
+			FROM 
 				photos 
 			WHERE 
 				user_id = ?
@@ -329,8 +356,17 @@ const deleteUser = async (req: Request, res: Response) => {
 
 const updateUser = async (req: Request, res: Response) => {
 	const { username, password, name, email, birthday } = req.body;
-	const sql =
-		'UPDATE users SET username=?, password=?, email=?, name=?, birthday=? WHERE user_id = ?;';
+	const sql = `
+		UPDATE 
+			users 
+		SET 
+			username=?, 
+			password=?, 
+			email=?, 
+			name=?, 
+			birthday=? 
+		WHERE 
+			user_id = ?;`;
 	try {
 		// Get user_id
 		const user_id = await decodeUserFromAccesstoken(req);
@@ -379,7 +415,15 @@ export const blockUser = async (req: Request, res: Response) => {
 				message: 'ID mismatch. Are you doing something shady?',
 			});
 		// Check for duplicate block
-		let sql = 'SELECT * FROM blocks WHERE blocker = ? AND blocked = ?';
+		let sql = `
+			SELECT 
+				* 
+			FROM 
+				blocks 
+			WHERE 
+				blocker = ? 
+				AND 
+				blocked = ?`;
 		let response = await execute(sql, [blocker, blocked]);
 		if (response.length > 0)
 			return res.status(400).json({
@@ -388,10 +432,14 @@ export const blockUser = async (req: Request, res: Response) => {
 		// add to db
 		sql = `
 			INSERT INTO 
-			blocks 
-			(blocker, blocked, block_reason)
+				blocks 
+				(
+					blocker, 
+					blocked, 
+					block_reason
+				)
 			VALUES 
-			(?, ?, ?); 
+				(?, ?, ?); 
 			`;
 		response = await execute(sql, [blocker, blocked, reason]);
 		if (!response) throw new Error('Failed to write block to database');
@@ -403,7 +451,13 @@ export const blockUser = async (req: Request, res: Response) => {
 			if (!removed) throw new Error('Failed to remove match');
 		}
 		// Remove like
-		sql = 'DELETE FROM likes WHERE user_id = ? AND target_id = ?';
+		sql = `
+			DELETE FROM 
+				likes 
+			WHERE 
+				user_id = ? 
+				AND 
+				target_id = ?`;
 		response = await execute(sql, [blocker, blocked]);
 		if (!response) throw new Error('Failed to remove like');
 
@@ -439,10 +493,14 @@ export const reportUser = async (req: Request, res: Response) => {
 		// add to db
 		let sql = `
 				INSERT INTO 
-				reports 
-				(reporter, reported, report_reason)
+					reports 
+					(
+						reporter, 
+						reported, 
+						report_reason
+					)
 				VALUES 
-				(?, ?, ?); 
+					(?, ?, ?); 
 				`;
 		const response = await execute(sql, [reporter, reported, reason]);
 		if (!response) throw new Error('Failed to save report to database');
@@ -466,8 +524,13 @@ export const reportUser = async (req: Request, res: Response) => {
 export const updateLocationPermission = async (req: Request, res: Response) => {
 	const { location_permitted } = req.body;
 	console.log(req.body);
-	const sql =
-		'UPDATE users SET location_permitted=? WHERE user_id = ?;';
+	const sql = `
+		UPDATE 
+			users 
+		SET 
+			location_permitted = ? 
+		WHERE 
+			user_id = ?;`;
 	try {
 		// Get user_id
 		const user_id = await decodeUserFromAccesstoken(req);
@@ -475,10 +538,7 @@ export const updateLocationPermission = async (req: Request, res: Response) => {
 			return res.status(401).json({
 				message: 'Unauthorized',
 			});
-		const response = await execute(sql, [
-			location_permitted,
-			user_id
-		]);
+		const response = await execute(sql, [location_permitted, user_id]);
 		if (response)
 			return res.status(200).json({
 				message: 'Location permission updated successfully',

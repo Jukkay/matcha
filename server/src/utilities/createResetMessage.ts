@@ -1,7 +1,6 @@
-import { CLIENT_URL } from './getURL'
+import { CLIENT_URL } from './getURL';
 
 const createResetMessage = (email_token: string) => {
-
 	return `
 	<!DOCTYPE html>
 	<html lang="en">
@@ -20,7 +19,7 @@ const createResetMessage = (email_token: string) => {
 	<p class="block has-text-weight-bold">42 Dates Team</p>
 	</section>
 	</body>
-	</html>`
-}
+	</html>`;
+};
 
-export default createResetMessage
+export default createResetMessage;

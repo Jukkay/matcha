@@ -9,7 +9,11 @@ export const createMatch = async (user1: number, user2: number) => {
 	// Create Match
 	const sql = `
 				INSERT INTO
-					matches(user1, user2)
+					matches
+					(
+						user1, 
+						user2
+					)
 				VALUES
 					(?, ?)
 				`;
@@ -52,7 +56,12 @@ const getAllMatches = async (req: Request, res: Response) => {
 					matches.match_date DESC
 				`;
 	try {
-		const matches = await execute(sql, [user_id, user_id, user_id, user_id]);
+		const matches = await execute(sql, [
+			user_id,
+			user_id,
+			user_id,
+			user_id,
+		]);
 		if (matches.length > 0)
 			return res.status(200).json({
 				message: 'Matches retrieved successfully',
@@ -71,8 +80,7 @@ const getAllMatches = async (req: Request, res: Response) => {
 
 export const findMatch = async (user1: number, user2: number) => {
 	// Check if it's a match
-	const sql =
-		`
+	const sql = `
 		SELECT
 			*
 		FROM
@@ -88,8 +96,7 @@ export const findMatch = async (user1: number, user2: number) => {
 
 export const removeMatch = async (user1: number, user2: number) => {
 	// get match id
-	let sql = 
-		`
+	let sql = `
 		SELECT
 			match_id
 		FROM
@@ -98,13 +105,12 @@ export const removeMatch = async (user1: number, user2: number) => {
 			(user1 = ? AND user2 = ?)
 			OR
 			(user2 = ? AND user1 = ?)
-		`
+		`;
 	let response = await execute(sql, [user1, user2, user1, user2]);
 
 	// Delete match
 	const match_id = response[0]?.match_id;
-	sql =
-		`
+	sql = `
 		DELETE FROM
 			matches
 		WHERE
@@ -113,7 +119,7 @@ export const removeMatch = async (user1: number, user2: number) => {
 	response = await execute(sql, [match_id]);
 
 	// Delete likes
-    sql = `
+	sql = `
 		DELETE FROM
 			likes
 		WHERE
@@ -121,7 +127,7 @@ export const removeMatch = async (user1: number, user2: number) => {
 			OR
 			(user_id = ? AND target_id = ?)
 		`;
-    response = await execute(sql, [user1, user2, user2, user1]);
+	response = await execute(sql, [user1, user2, user2, user1]);
 
 	// Delete messages
 	sql = `
@@ -129,7 +135,7 @@ export const removeMatch = async (user1: number, user2: number) => {
 			messages
 		WHERE
 			match_id = ?
-		`;	
+		`;
 	response = await execute(sql, [match_id]);
 	return response;
 };
@@ -138,9 +144,9 @@ export const removeMatchEndpoint = async (req: Request, res: Response) => {
 	try {
 		const { user1, user2 } = req.body;
 		if (!user1 || !user2)
-		return res.status(400).json({
-			message: 'Incomplete match information',
-		});
+			return res.status(400).json({
+				message: 'Incomplete match information',
+			});
 		// Get user_id
 		const user_id = await decodeUserFromAccesstoken(req);
 		if (!user_id)
@@ -167,4 +173,4 @@ export const removeMatchEndpoint = async (req: Request, res: Response) => {
 	}
 };
 
-export default { getAllMatches, removeMatchEndpoint};
+export default { getAllMatches, removeMatchEndpoint };

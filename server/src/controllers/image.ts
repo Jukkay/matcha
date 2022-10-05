@@ -1,13 +1,20 @@
 import { Request, Response } from 'express';
 import { RowDataPacket } from 'mysql';
 import { execute } from '../utilities/SQLConnect';
-import {unlink} from "fs";
+import { unlink } from 'fs';
 import { decodeUserFromAccesstoken } from './token';
 
 const saveFilenames = async (user_id: string, filenames: string[]) => {
 	// user_id was decoded from accesstoken on calling function
 	if (filenames.length < 1) return;
-	const sql = 'INSERT INTO photos(user_id, filename) VALUES (?, ?)';
+	const sql = `
+		INSERT INTO 
+			photos
+			(
+				user_id, 
+				filename
+			) 
+		VALUES (?, ?)`;
 	let photo_IDs = [];
 	return (photo_IDs = await Promise.all(
 		filenames.map(
@@ -22,9 +29,15 @@ const saveFilenames = async (user_id: string, filenames: string[]) => {
 };
 
 const deleteImage = async (req: Request, res: Response) => {
-	const image = req.params.id
-	if (!image) return res.status(400).json({ message: 'No image specified'})
-	const sql = 'DELETE FROM photos WHERE filename = ? AND user_id = ?';
+	const image = req.params.id;
+	if (!image) return res.status(400).json({ message: 'No image specified' });
+	const sql = `
+		DELETE FROM 
+			photos 
+		WHERE 
+			filename = ? 
+			AND 
+			user_id = ?`;
 	try {
 		// Get user_id
 		const user_id = await decodeUserFromAccesstoken(req);
@@ -38,23 +51,27 @@ const deleteImage = async (req: Request, res: Response) => {
 		// Delete file from server
 		unlink(`./images/${image}`, (err) => {
 			if (err) {
-				console.error(err)
-				return res.status(400).json({ message: 'No image found'})
+				console.error(err);
+				return res.status(400).json({ message: 'No image found' });
 			}
 			return res.status(200).json({
-				message: 'Image deleted'
+				message: 'Image deleted',
 			});
-
-		})
+		});
 	} catch (err) {
 		console.error(err);
-		return res.status(500).json({ message: 'Something went wrong'})
+		return res.status(500).json({ message: 'Something went wrong' });
 	}
 };
 
 const getUsersImages = async (req: Request, res: Response) => {
-	
-	const sql = 'SELECT filename FROM photos WHERE user_id = ?';
+	const sql = `
+		SELECT 
+			filename 
+		FROM 
+			photos 
+		WHERE 
+			user_id = ?`;
 	try {
 		// Get user_id
 		const user_id = req.params.id;
@@ -63,9 +80,9 @@ const getUsersImages = async (req: Request, res: Response) => {
 			message: 'Photo filenames retrieved',
 			photos: photos,
 		});
-	}catch (err) {
+	} catch (err) {
 		console.error(err);
-		return res.status(500).json({ message: 'Something went wrong'})
+		return res.status(500).json({ message: 'Something went wrong' });
 	}
 };
 export default { saveFilenames, deleteImage, getUsersImages };

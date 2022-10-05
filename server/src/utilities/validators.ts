@@ -1,143 +1,149 @@
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 import { execute } from '../utilities/SQLConnect';
-import bcryptjs from "bcryptjs";
+import bcryptjs from 'bcryptjs';
 
-export const validateRegistrationInput = async(req: Request, res: Response) => {
-	const { username, password, confirmPassword, name, email, birthday } = req.body
+export const validateRegistrationInput = async (
+	req: Request,
+	res: Response
+) => {
+	const { username, password, confirmPassword, name, email, birthday } =
+		req.body;
 
 	// check exists
 
 	if (!username)
 		return res.status(400).json({
-			field: "username",
-			message: "Missing username."
-		})
+			field: 'username',
+			message: 'Missing username.',
+		});
 	if (!password)
 		return res.status(400).json({
-			field: "password",
-			message: "Missing password."
-		})
+			field: 'password',
+			message: 'Missing password.',
+		});
 	if (!confirmPassword)
 		return res.status(400).json({
-			field: "confirmPassword",
-			message: "Missing password confirmation."
-		})
+			field: 'confirmPassword',
+			message: 'Missing password confirmation.',
+		});
 	if (!email)
 		return res.status(400).json({
-			field: "email",
-			message: "Missing email."
-		})
+			field: 'email',
+			message: 'Missing email.',
+		});
 	if (!birthday)
 		return res.status(400).json({
-			field: "birthday",
-			message: "Missing birthday."
-		})
+			field: 'birthday',
+			message: 'Missing birthday.',
+		});
 
 	// check input length
 
 	if (username.length > 32 || username.length < 3)
 		return res.status(400).json({
-			field: "username",
-			message: "Username must be between 3 and 32 characters long."
-		})
+			field: 'username',
+			message: 'Username must be between 3 and 32 characters long.',
+		});
 	if (password.length > 255 || password.length < 8)
 		return res.status(400).json({
-			field: "password",
-			message: "Password must be between 8 and 255 characters long."
-		})
+			field: 'password',
+			message: 'Password must be between 8 and 255 characters long.',
+		});
 	if (email.length > 320 || email.length < 6)
 		return res.status(400).json({
-			field: "email",
-			message: "Email must be between 6 and 320 characters long."
-		})
+			field: 'email',
+			message: 'Email must be between 6 and 320 characters long.',
+		});
 	if (name?.length > 255)
 		return res.status(400).json({
-			field: "name",
-			message: "Name has maximum length of 255 characters."
-		})
+			field: 'name',
+			message: 'Name has maximum length of 255 characters.',
+		});
 	if (birthday.length != 10)
 		return res.status(400).json({
-			field: "birthday",
-			message: "Invalid birthday length."
-		})
+			field: 'birthday',
+			message: 'Invalid birthday length.',
+		});
 
 	// check username validity
 	if (!/^[a-zA-Z0-9.]{3,32}$/i.test(username))
 		return res.status(400).json({
-			field: "username",
-			message: "Invalid username. Only characters a-z and 0-9 are allowed."
-		})
+			field: 'username',
+			message:
+				'Invalid username. Only characters a-z and 0-9 are allowed.',
+		});
 	// check email validity
 	if (!/^\S+@\S+\.\S+$/i.test(email))
 		return res.status(400).json({
-			field: "email",
-			message: "Invalid email address."
-		})
+			field: 'email',
+			message: 'Invalid email address.',
+		});
 	// check password match
 	if (password !== confirmPassword)
 		return res.status(400).json({
-			field: "confirmPassword",
-			message: "Passwords don't match."
-		})
+			field: 'confirmPassword',
+			message: "Passwords don't match.",
+		});
 
 	// check password validity
-	if(!/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/i.test(password))
+	if (!/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/i.test(password))
 		return res.status(400).json({
-			field: "password",
-			message: "Password must include at least one number and one uppercase and lowercase characters."
-		})
+			field: 'password',
+			message:
+				'Password must include at least one number and one uppercase and lowercase characters.',
+		});
 
 	// Check birthday validity
-    const now = new Date().getTime()
-	const bd = new Date(birthday).getTime()
-    const age = (now - bd) / (1000 * 60 * 60 * 24) / 365
-    if (age < 18)
+	const now = new Date().getTime();
+	const bd = new Date(birthday).getTime();
+	const age = (now - bd) / (1000 * 60 * 60 * 24) / 365;
+	if (age < 18)
 		return res.status(400).json({
-			field: "birthday",
-			message: "You seem to be too young. Must be at least 18 years old to register."
-		})
-	
+			field: 'birthday',
+			message:
+				'You seem to be too young. Must be at least 18 years old to register.',
+		});
+
 	// check username exists
-	const sql = "SELECT username FROM users WHERE username = ?;"
-	const usercheck = await execute(sql, [username])
+	const sql = 'SELECT username FROM users WHERE username = ?;';
+	const usercheck = await execute(sql, [username]);
 	if (usercheck.length)
 		return res.status(400).json({
-			field: "username",
-			message: "Username is already taken."
-		})
+			field: 'username',
+			message: 'Username is already taken.',
+		});
 	// check email exists
-	const sql2 = "SELECT email FROM users WHERE email = ?;"
-	const emailcheck = await execute(sql2, [email])
+	const sql2 = 'SELECT email FROM users WHERE email = ?;';
+	const emailcheck = await execute(sql2, [email]);
 	if (emailcheck.length)
 		return res.status(400).json({
-			field: "email",
-			message: "Email is associated with an existing account."
-		})
-}
+			field: 'email',
+			message: 'Email is associated with an existing account.',
+		});
+};
 
-export const validateLoginInput = async(req: Request, res: Response) => {
-
-		const { username, password } = req.body
-		const sql = `SELECT user_id, username, password, validated FROM users WHERE username = ?;`
-		const user = await execute(sql, username)
-		if (!user) {
-			return res.status(400).json({
-				auth: false,
-				message: 'Invalid user'
-			})
-		}
-		if (user[0].validated != true) {
-			return res.status(400).json({
-				auth: false,
-				message: 'Email not validated'
-			})
-		}
-		const match = await bcryptjs.compare(password, user[0].password)
-		if (!match) {
-			return res.status(400).json({
-				auth: false,
-				message: 'Invalid password'
-			})
-		}
-		return user[0]
-}
+export const validateLoginInput = async (req: Request, res: Response) => {
+	const { username, password } = req.body;
+	const sql = `SELECT user_id, username, password, validated FROM users WHERE username = ?;`;
+	const user = await execute(sql, username);
+	if (!user) {
+		return res.status(400).json({
+			auth: false,
+			message: 'Invalid user',
+		});
+	}
+	if (user[0].validated != true) {
+		return res.status(400).json({
+			auth: false,
+			message: 'Email not validated',
+		});
+	}
+	const match = await bcryptjs.compare(password, user[0].password);
+	if (!match) {
+		return res.status(400).json({
+			auth: false,
+			message: 'Invalid password',
+		});
+	}
+	return user[0];
+};

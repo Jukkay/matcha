@@ -48,10 +48,9 @@ const newProfile = async (req: Request, res: Response) => {
 			longitude = location?.ll[1] || '24.93545';
 		}
 
-		const sql =
-			`INSERT INTO 
+		const sql = `INSERT INTO 
 				profiles
-					(
+				(
 					user_id, 
 					country, 
 					city, 
@@ -65,7 +64,8 @@ const newProfile = async (req: Request, res: Response) => {
 					name, 
 					profile_image, 
 					latitude, 
-					longitude) 
+					longitude
+				) 
 			VALUES 					
 				(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 		const response = await execute(sql, [
@@ -201,8 +201,7 @@ const updateProfile = async (req: Request, res: Response) => {
 		user_longitude,
 	} = req.body;
 	let { latitude, longitude } = req.body;
-	const sql =
-		`
+	const sql = `
 		UPDATE 
 			profiles 
 		SET 
@@ -253,8 +252,7 @@ const updateProfile = async (req: Request, res: Response) => {
 			user_id,
 		]);
 		if (response) {
-			const sql2 =
-				`
+			const sql2 = `
 				UPDATE 
 					users 
 				SET 

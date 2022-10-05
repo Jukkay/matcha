@@ -1,36 +1,41 @@
-import { execute } from "../utilities/SQLConnect";
+import { execute } from '../utilities/SQLConnect';
 import { Request, Response } from 'express';
 
-export const saveMessageToDatabase = async(data: {
-    match_id: number
-    sender_id: number
-    message_text: string
-    message_time: string
+export const saveMessageToDatabase = async (data: {
+	match_id: number;
+	sender_id: number;
+	message_text: string;
+	message_time: string;
 }) => {
-    const sql = `
+	const sql = `
 				INSERT INTO
-					messages (
+					messages 
+					(
 						match_id,
 						user_id,
 						message_text,
-						message_time)
+						message_time
+					)
 				VALUES
 					(?, ?, ?, ?)
-				`
-    const response = await execute(sql, [data.match_id, data.sender_id, data.message_text, data.message_time]);
-	return response
+				`;
+	const response = await execute(sql, [
+		data.match_id,
+		data.sender_id,
+		data.message_text,
+		data.message_time,
+	]);
+	return response;
+};
 
-}
-
-export const getChatMessages = async(req: Request, res: Response) => {
-    const requestedID = req.params.id;
+export const getChatMessages = async (req: Request, res: Response) => {
+	const requestedID = req.params.id;
 	try {
 		if (!requestedID)
 			return res.status(400).json({
 				message: 'No match_id given',
 			});
-		const sql =
-			`
+		const sql = `
 			SELECT
 				messages.*,
 				profiles.name
@@ -44,7 +49,7 @@ export const getChatMessages = async(req: Request, res: Response) => {
 				match_id = ?
 			ORDER BY
 				message_time
-			`
+			`;
 		const messages = await execute(sql, [requestedID]);
 		if (messages.length > 0)
 			return res.status(200).json({

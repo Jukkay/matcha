@@ -1,15 +1,15 @@
 import express from 'express';
-import checkJWT from '../middleware/checkJWT'
-import controller from '../controllers/like'
+import checkJWT from '../middleware/checkJWT';
+import controller from '../controllers/like';
 
 const likeRouter: express.Router = express.Router();
 
-likeRouter.post('/', controller.addNewLike)
-likeRouter.delete('/',checkJWT, controller.removeLike)
+likeRouter.post('/', controller.addNewLike);
+likeRouter.delete('/', checkJWT, controller.removeLike);
 // userRouter.get('/images', controller.getUserImageIDs)
 likeRouter
 	.route('/:id')
 	.get(checkJWT, controller.getLikerProfiles)
-	.delete(checkJWT, controller.removeLike)
+	.delete(checkJWT, controller.removeLike);
 
-export default likeRouter
+export default likeRouter;

@@ -12,7 +12,13 @@ import {
 } from './controllers/mailer';
 import * as SQLConnect from './utilities/SQLConnect';
 import { getURL } from './utilities/getURL';
-import { blockUser, login, logout, reportUser, updateLocationPermission } from './controllers/user';
+import {
+	blockUser,
+	login,
+	logout,
+	reportUser,
+	updateLocationPermission,
+} from './controllers/user';
 import likeRouter from './routes/like';
 import checkJWT from './middleware/checkJWT';
 import { searchProfiles } from './controllers/search';
@@ -26,12 +32,11 @@ import {
 	saveNotificationToDatabase,
 } from './controllers/notification';
 import { getProfilesUserLikes } from './controllers/like';
-import { getSecret } from "docker-secret"
-import jwt, { VerifyErrors } from 'jsonwebtoken'
+import { getSecret } from 'docker-secret';
+import jwt, { VerifyErrors } from 'jsonwebtoken';
 import { updateLocation } from './controllers/updateLocation';
 
-const server_token = getSecret("server_token")
-
+const server_token = getSecret('server_token');
 
 const app: express.Application = express();
 
@@ -64,40 +69,43 @@ let onlineUsers: any[] = [];
 const updateOnlineUsers = (user_id: number, socket_id: string) => {
 	const i = onlineUsers?.findIndex((item) => item.user_id === user_id);
 	if (i && i > -1) {
-		onlineUsers[i] = {user_id: user_id, socket_id: socket_id, active: Date.now()}
-		console.log(onlineUsers[i], 'updated')
+		onlineUsers[i] = {
+			user_id: user_id,
+			socket_id: socket_id,
+			active: Date.now(),
+		};
+		console.log(onlineUsers[i], 'updated');
 	} else {
 		onlineUsers.push({
 			user_id: user_id,
 			socket_id: socket_id,
 			active: Date.now(),
 		});
-		console.log(onlineUsers[onlineUsers.length - 1], 'added')
+		console.log(onlineUsers[onlineUsers.length - 1], 'added');
 	}
 };
 
 const queryOnlineUsers = (user_id: number) => {
-	const maxTimeInactive = 1000 * 60 * 5
-	const i = onlineUsers?.findIndex((item) => item.user_id === user_id)
+	const maxTimeInactive = 1000 * 60 * 5;
+	const i = onlineUsers?.findIndex((item) => item.user_id === user_id);
 	if (i > -1) {
-		if ((Date.now() - onlineUsers[i].active) < maxTimeInactive)
-			return true;
+		if (Date.now() - onlineUsers[i].active < maxTimeInactive) return true;
 		onlineUsers.splice(i, 1);
 	}
 	return false;
 };
 
 const updateUserActivity = (socket_id: string) => {
-	const i = onlineUsers?.findIndex((item) => item.socket_id === socket_id)
+	const i = onlineUsers?.findIndex((item) => item.socket_id === socket_id);
 	if (i > -1) {
-		onlineUsers[i] = {...onlineUsers[i], active: Date.now()}
+		onlineUsers[i] = { ...onlineUsers[i], active: Date.now() };
 	}
 };
 
 // Check socket token
 io.use((socket, next) => {
 	const token = socket.handshake.auth.token;
-	const user_id = socket.handshake.auth.user_id
+	const user_id = socket.handshake.auth.user_id;
 	if (!token || !user_id) {
 		return next(new Error('Unauthorized'));
 	}
@@ -105,9 +113,9 @@ io.use((socket, next) => {
 		if (err) {
 			return next(new Error('Unauthorized'));
 		}
-		updateOnlineUsers(user_id, socket.id)
+		updateOnlineUsers(user_id, socket.id);
 		next();
-	})
+	});
 });
 
 io.on('connection', (socket) => {
@@ -115,7 +123,7 @@ io.on('connection', (socket) => {
 		// Chat
 		socket.on('active_chat', (data) => {
 			socket.join(data);
-			updateUserActivity(socket.id)
+			updateUserActivity(socket.id);
 		});
 
 		socket.on('send_message', async (matchID, data) => {
@@ -128,13 +136,13 @@ io.on('connection', (socket) => {
 
 			// Emit to receiver
 			socket.to(matchID).emit('receive_message', data);
-			updateUserActivity(socket.id)
+			updateUserActivity(socket.id);
 		});
 
 		// Notifications
 
 		socket.on('set_user', (data) => {
-			updateOnlineUsers(data, socket.id)
+			updateOnlineUsers(data, socket.id);
 			socket.join(data);
 		});
 
@@ -145,7 +153,7 @@ io.on('connection', (socket) => {
 
 			// Emit to user
 			socket.to(user_id).emit('receive_notification', data);
-			updateUserActivity(socket.id)
+			updateUserActivity(socket.id);
 		});
 
 		// Online query
@@ -155,7 +163,7 @@ io.on('connection', (socket) => {
 				queried_id: user_id,
 				online: onlineStatus,
 			});
-			updateUserActivity(socket.id)
+			updateUserActivity(socket.id);
 		});
 	} catch (err) {
 		console.error(err);
