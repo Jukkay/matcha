@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { RowDataPacket } from 'mysql';
 import { execute } from '../utilities/SQLConnect';
 import { unlink } from 'fs';
 import { decodeUserFromAccesstoken } from './token';
@@ -15,17 +14,13 @@ const saveFilenames = async (user_id: string, filenames: string[]) => {
 				filename
 			) 
 		VALUES (?, ?)`;
-	let photo_IDs = [];
-	return (photo_IDs = await Promise.all(
+	const response = await Promise.all(
 		filenames.map(
 			(filename) =>
-				new Promise(async (resolve, reject) => {
-					const response = await execute(sql, [user_id, filename]);
-					if (!response) reject(response);
-					resolve(await (<RowDataPacket>response).insertId);
-				})
+				Promise.resolve(execute(sql, [user_id, filename]))
 		)
-	));
+	)
+	return response
 };
 
 const deleteImage = async (req: Request, res: Response) => {
@@ -46,7 +41,7 @@ const deleteImage = async (req: Request, res: Response) => {
 				message: 'Cannot parse user_id',
 			});
 		// Delete from database
-		const photos = await execute(sql, [image, user_id]);
+		await execute(sql, [image, user_id]);
 
 		// Delete file from server
 		unlink(`./images/${image}`, (err) => {

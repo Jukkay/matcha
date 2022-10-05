@@ -62,11 +62,11 @@ imageRouter.post(
 					message: 'Cannot parse user_id',
 				});
 			// Save filenames to database
-			const photo_IDs = await controller.saveFilenames(
+			const response = await controller.saveFilenames(
 				user_id,
 				filenames
 			);
-			if (!photo_IDs)
+			if (!response)
 				return res.status(500).json({
 					message: 'Failed to save filenames to database',
 				});

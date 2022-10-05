@@ -14,3 +14,9 @@ export interface IAccesstoken {
 	exp: number;
 	iss: string;
 }
+
+export interface IOnlineUser {
+		user_id: number,
+		socket_id: string,
+		active: number,
+}

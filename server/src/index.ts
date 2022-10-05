@@ -35,6 +35,8 @@ import { getProfilesUserLikes } from './controllers/like';
 import { getSecret } from 'docker-secret';
 import jwt, { VerifyErrors } from 'jsonwebtoken';
 import { updateLocation } from './controllers/updateLocation';
+import { IOnlineUser } from './interfaces/token';
+
 
 const server_token = getSecret('server_token');
 
@@ -64,7 +66,7 @@ const io = new Server(httpServer, {
 });
 
 // Socket.io listeners
-let onlineUsers: any[] = [];
+const onlineUsers: IOnlineUser[] = [];
 
 const updateOnlineUsers = (user_id: number, socket_id: string) => {
 	const i = onlineUsers?.findIndex((item) => item.user_id === user_id);
