@@ -46,6 +46,7 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
 		famerating: 0,
 	});
 
+	// Read from sessionStorage
 	useEffect(() => {
 		updateUserData((current) => {
 			// Look for user information in session storage
@@ -79,13 +80,13 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
 		});
 	}, []);
 
+	// Persist to sessionStorage
 	useEffect(() => {
 		if (!accessToken) return
 		sessionStorage.setItem(
 			'accessToken',
 			accessToken
 		);
-		console.log('Access Token:', accessToken);
 	}, [accessToken]);
 
 	useEffect(() => {

@@ -13,6 +13,7 @@ import { SubmitButton } from '../../components/buttons';
 const LoginSuccess = () => {
 	const { setProfile, userData, updateUserData } = useUserContext();
 	const [wasRedirected, setWasRedirected] = useState(false);
+	const [redirectTimeout, setRedirectTimeout] = useState(2);
 	const router = useRouter();
 
 	// Router error event listener and handler
@@ -25,18 +26,23 @@ const LoginSuccess = () => {
 
 	// Redirect if user has no profile
 	useEffect(() => {
-		if (wasRedirected) return;
-		setWasRedirected(true);
-		const path = userData.profile_exists ? '/' : '/profile';
-		const timer = setTimeout(() => router.replace(path), 2000);
+		if (redirectTimeout == 0) {
+			if (wasRedirected) return;
+			const path = userData.profile_exists ? '/' : '/profile';
+			router.replace(path)
+			setWasRedirected(true);
+		}
+		const timer = setTimeout(() => {
+			setRedirectTimeout((current) => current - 1)
+		}, 1000);
 		return () => clearTimeout(timer);
-	}, [userData.profile_exists]);
+	}, [redirectTimeout]);
 
 	useEffect(() => {
 		const getUserProfile = async () => {
 			try {
 				if (!userData.user_id) return;
-				let response = await authAPI.get(
+				const response = await authAPI.get(
 					`/profile/${userData.user_id}`
 				);
 				if (response?.data?.profile) {
@@ -154,10 +160,6 @@ const Login: NextPage = () => {
 				if (response.data.user) {
 					const newUserData = await response.data.user;
 					updateUserData(newUserData);
-					sessionStorage.setItem(
-						'userData',
-						JSON.stringify(newUserData)
-					);
 				}
 				if (response.data.accessToken && response.data.refreshToken) {
 					updateAccessToken(response.data.accessToken);

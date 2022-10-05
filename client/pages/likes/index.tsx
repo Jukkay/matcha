@@ -41,34 +41,36 @@ const LoggedIn = () => {
 		router.replace('/profile');
 	}, [userData.profile_exists]);
 
-	const getLikerProfiles = async (controller: AbortController) => {
-		let response = await authAPI.get(`/like/${userData.user_id}`, {
-			signal: controller.signal,
+	const queryAPI = async (
+		controller1: AbortController,
+		controller2: AbortController,
+		controller3: AbortController
+	) => {
+		const promises = [
+			authAPI.patch('/notifications', {
+				type: NotificationType.LIKE,
+				user_id: userData.user_id,
+				signal: controller1.signal,
+			}),
+			authAPI.get(`/like/${userData.user_id}`, {
+				signal: controller2.signal,
+			}),
+			authAPI.get(`/likedprofiles/${userData.user_id}`, {
+				signal: controller3.signal,
+			}),
+		];
+		Promise.all(promises).then((responses) => {
+			if (responses[0].status === 200) {
+				setLikeCount(0);
+			}
+			if (responses[1].data?.profiles?.length > 0) {
+				setLikerProfiles(responses[1].data.profiles);
+			}
+			if (responses[2].data?.profiles?.length > 0) {
+				setLikedProfiles(responses[2].data.profiles);
+			}
 		});
-		if (response.data.profiles.length > 0) {
-			setLikerProfiles(response.data.profiles);
-		}
 	};
-	const getLikedProfiles = async (controller: AbortController) => {
-		let response = await authAPI.get(`/likedprofiles/${userData.user_id}`, {
-			signal: controller.signal,
-		});
-		if (response.data.profiles.length > 0) {
-			setLikedProfiles(response.data.profiles);
-		}
-	};
-
-	const markLikeNotificationsRead = async (controller: AbortController) => {
-		const response = await authAPI.patch('/notifications', {
-			type: NotificationType.LIKE,
-			user_id: userData.user_id,
-			signal: controller.signal,
-		});
-		if (response.status === 200) {
-			setLikeCount(0);
-		}
-	};
-
 	useEffect(() => {
 		if (!userData.user_id) return;
 		const controller1 = new AbortController();
@@ -78,9 +80,8 @@ const LoggedIn = () => {
 		const fetchData = async () => {
 			try {
 				setLoadStatus(LoadStatus.LOADING);
-				await getLikerProfiles(controller1);
-				await getLikedProfiles(controller2);
-				await markLikeNotificationsRead(controller3);
+				// Must do this in its own function and promise.all to avoid 204s stopping execution
+				await queryAPI(controller1, controller2, controller3);
 			} catch (err) {
 				setLoadStatus(LoadStatus.ERROR);
 			} finally {

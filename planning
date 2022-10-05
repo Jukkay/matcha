@@ -439,6 +439,9 @@ V Fixed reset password error messages
 V Change access token expiration
 V Made usercontext to persist data to sessionstorage to fix problems with browser refreshing
 V Refresh on search page redirects to profile page
+V Fix login page redirection
+
+Check what's up with online status showing
 
 Test all required functionality
 What happens if user is unmatched or blocked during chat?
