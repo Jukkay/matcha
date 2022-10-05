@@ -167,14 +167,6 @@ const Login: NextPage = () => {
 						user_id: response.data.user.user_id,
 					};
 					socket.disconnect().connect();
-					sessionStorage.setItem(
-						'accessToken',
-						response.data.accessToken
-					);
-					sessionStorage.setItem(
-						'refreshToken',
-						response.data.refreshToken
-					);
 				}
 				setSuccess(true);
 			}

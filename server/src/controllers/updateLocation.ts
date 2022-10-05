@@ -18,7 +18,6 @@ export const updateLocation = async (req: Request, res: Response) => {
 			latitude = location?.ll[0] || '60.16952';
 			longitude = location?.ll[1] || '24.93545';
 		}
-		console.log('New location', latitude, longitude);
 		const sql = `UPDATE
             profiles
         SET 

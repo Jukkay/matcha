@@ -40,7 +40,7 @@ export const signAccessToken = async (
 	user_id: RowDataPacket
 ): Promise<string> => {
 	return new Promise((resolve, reject) => {
-		const expirationTime = '1m';
+		const expirationTime = '15m';
 		jwt.sign(
 			{
 				user_id: user_id,

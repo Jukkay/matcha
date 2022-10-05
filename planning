@@ -432,12 +432,17 @@ V Make separate landing page component
 V Try moving sass and babel to dev dependencies
 V Consider custom font
 V Refactor SQL queries using ``
-eslint server side code
-Make online indicator green again
-Check that cosmetically everything is ok
-Do final clean up
+V eslint server side code
+V Make online indicator green again
+V Do final clean up
+V Fixed reset password error messages
+V Change access token expiration
+V Made usercontext to persist data to sessionstorage to fix problems with browser refreshing
+V Refresh on search page redirects to profile page
+
 Test all required functionality
 What happens if user is unmatched or blocked during chat?
+Check that cosmetically everything is ok
 
 # Backlog
 Deploy to AWS

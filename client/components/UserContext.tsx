@@ -79,6 +79,36 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
 		});
 	}, []);
 
+	useEffect(() => {
+		if (!accessToken) return
+		sessionStorage.setItem(
+			'accessToken',
+			accessToken
+		);
+		console.log('Access Token:', accessToken);
+	}, [accessToken]);
+
+	useEffect(() => {
+		if (!refreshToken) return
+		sessionStorage.setItem(
+			'refreshToken',
+			refreshToken
+		);
+	}, [refreshToken]);
+
+	useEffect(() => {
+		if (!userData.user_id) return
+		sessionStorage.setItem(
+			'userData',
+			JSON.stringify(userData)
+		);
+	}, [userData]);
+
+	useEffect(() => {
+		if (!profile.user_id) return
+		sessionStorage.setItem('profile', JSON.stringify(profile));
+	}, [profile]);
+
 	return (
 		<UserContext.Provider
 			value={{

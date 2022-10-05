@@ -53,7 +53,7 @@ app.use('/images', express.static('./images'));
 
 // Server start
 const httpServer = app.listen(process.env.PORT, () => {
-	console.log(`backend server running at ${getURL()}`);
+	console.log(`API running at ${getURL()}`);
 });
 
 // Socket.io initialization
@@ -75,14 +75,12 @@ const updateOnlineUsers = (user_id: number, socket_id: string) => {
 			socket_id: socket_id,
 			active: Date.now(),
 		};
-		console.log(onlineUsers[i], 'updated');
 	} else {
 		onlineUsers.push({
 			user_id: user_id,
 			socket_id: socket_id,
 			active: Date.now(),
 		});
-		console.log(onlineUsers[onlineUsers.length - 1], 'added');
 	}
 };
 

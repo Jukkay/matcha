@@ -523,7 +523,6 @@ export const reportUser = async (req: Request, res: Response) => {
 
 export const updateLocationPermission = async (req: Request, res: Response) => {
 	const { location_permitted } = req.body;
-	console.log(req.body);
 	const sql = `
 		UPDATE 
 			users 

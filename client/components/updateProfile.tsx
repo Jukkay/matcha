@@ -144,26 +144,26 @@ export const UpdateProfile = ({
 		uploadProfile();
 	};
 	return deleted ? (
-		<section className="section">
-			<div className="box has-text-centered">
+		<div className="my-6 pt-6">
+			<div className="card p-3 rounded-corners has-text-centered">
 				<section className="section">
 					<h3 className="title is-3">Profile deleted successfully</h3>
 				</section>
 			</div>
-		</section>
+		</div>
 	) : success ? (
-		<section className="section">
-			<div className="box has-text-centered">
+		<div className="my-6 pt-6">
+			<div className="card p-3 rounded-corners has-text-centered">
 				<section className="section">
 					<h3 className="title is-3">Profile updated successfully</h3>
 				</section>
 			</div>
-		</section>
+		</div>
 	) : (
-		<div>
+		<div className="my-6">
 			<form onSubmit={handleSubmit}>
 				<section className="section">
-					<h3 className="title is-3">Edit profile</h3>
+					<h1 className="title is-1">Edit profile</h1>
 
 					{/* Location. Components imported dynamically */}
 					<Suspense fallback={<Spinner />}>
@@ -379,7 +379,7 @@ export const EditGallery = ({ setImageError }: GalleryProps) => {
 							{profile.profile_image ==
 							image.substring(image.lastIndexOf('/') + 1) ? (
 								<button
-									className="button is-small is-centered mt-3"
+									className="button is-small is-centered mt-3 is-primary is-outlined"
 									id={image}
 									onClick={handleProfilePicture}
 								>

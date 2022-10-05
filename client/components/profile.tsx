@@ -453,7 +453,6 @@ export const Thumbnails = ({ preview, setPreview }: IThumbnails) => {
 
 export const OnlineIndicator = ({ user_id }: OnlineStatusProps) => {
 	const [online, setOnline] = useState(false);
-	// const socket = useSocketContext();
 
 	// Query online status and listen for response
 	useEffect(() => {
@@ -473,7 +472,7 @@ export const OnlineIndicator = ({ user_id }: OnlineStatusProps) => {
 	}, [user_id]);
 
 	return online ? (
-		<span className="tag is-primary online-indicator mt-5 ml-5">
+		<span className="tag is-success online-indicator mt-5 ml-5">
 			Online
 		</span>
 	) : (

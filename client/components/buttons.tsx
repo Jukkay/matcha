@@ -109,7 +109,7 @@ export const UnlikeButton = ({
 	};
 	return (
 		<button
-			className="button is-medium has-background-primary-light"
+			className="button is-medium is-primary is-outlined"
 			onClick={handleClick}
 		>
 			<span className="icon is-medium">
@@ -130,16 +130,20 @@ export const EditButton = ({ setEditMode }: EditButtonProps) => {
 
 export const NewProfileButton = ({ setEditMode }: EditButtonProps) => {
 	return (
-		<div className="section has-text-centered">
-			<h3 className="title is-3">
-				Before we start, let&apos;s create a profile for you!
-			</h3>
-			<button
-				className="button is-primary"
-				onClick={() => setEditMode(true)}
-			>
-				Create new profile
-			</button>
+		<div className="my-6 pt-6">
+			<div className="card p-3 rounded-corners has-text-centered">
+				<section className="section">
+					<h3 className="title is-3">
+						Before we start, let&apos;s create a profile for you!
+					</h3>
+					<button
+						className="button is-primary mt-3"
+						onClick={() => setEditMode(true)}
+					>
+						Create new profile
+					</button>
+				</section>
+			</div>
 		</div>
 	);
 };
@@ -159,7 +163,7 @@ export const SubmitAndResetButtons = ({
 				>
 					Search
 				</button>
-				<button type="reset" onClick={resetSearch} className="button">
+				<button type="reset" onClick={resetSearch} className="button is-primary is-outlined">
 					Reset to default
 				</button>
 			</div>

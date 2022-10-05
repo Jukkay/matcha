@@ -239,7 +239,7 @@ const Filters = ({
 								</IconContext.Provider>
 							</span>
 						</div>
-						<button className="button" onClick={onClick}>
+						<button className="button is-primary is-outlined" onClick={onClick}>
 							Hide filters
 						</button>
 					</div>
@@ -267,7 +267,7 @@ const Filters = ({
 				>
 					Apply filters
 				</button>
-				<button className="button is-primary m-1" onClick={handleReset}>
+				<button className="button is-primary is-outlined m-1" onClick={handleReset}>
 					Reset filters
 				</button>
 			</div>
@@ -293,7 +293,7 @@ const Filters = ({
 							</IconContext.Provider>
 						</span>
 					</div>
-					<button className="button" onClick={onClick}>
+					<button className="button is-primary" onClick={onClick}>
 						Show filters
 					</button>
 				</div>
@@ -380,7 +380,9 @@ export const Results = ({ sortedResults, loadStatus }: ResultsProps) => {
 
 	return sortedResults.length > 0 ? (
 		<div>
-			<h5 className="title is-5">{searchResultText}</h5>
+			<div className="has-text-centered">
+				<h5 className="title is-5">{searchResultText}</h5>
+			</div>
 			<div>
 				{sortedResults.slice(0, endIndex).map((result, index) => (
 					<SearchResultItem
@@ -436,7 +438,7 @@ export const SortSelector = ({ sort, setSort }: SortProps) => {
 					</IconContext.Provider>
 				</span>
 			</div>
-			<div className="select">
+			<div className="select is-primary">
 				<select
 					id="sort"
 					name="sort"
@@ -502,7 +504,7 @@ export const BasicSearchLine = ({
 			<div className="columns is-centered is-gapless">
 				<div className="buttons column is-one-third">
 					<button
-						className="button is-ghost has-text-black"
+						className="button is-ghost has-text-primary"
 						onClick={handleClick}
 					>
 						Hide optional parameters
@@ -554,7 +556,7 @@ export const BasicSearchLine = ({
 			<div className="columns is-centered is-gapless">
 				<div className="buttons column is-one-third">
 					<button
-						className="button is-ghost has-text-black"
+						className="button is-ghost has-text-primary"
 						onClick={handleClick}
 					>
 						Search by location

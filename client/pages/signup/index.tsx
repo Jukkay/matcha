@@ -195,7 +195,13 @@ const Signup: NextPage = () => {
 
 	// Email validation
 	useEffect(() => {
-		if (values.email.length < 3) return;
+		if (values.email.length < 3) {
+			setErrors({
+				...errors,
+				email: false,
+			});
+			return;
+		}
 		const result = /^\S+@\S+\.\S+$/i.test(values.email);
 		setErrors({
 			...errors,

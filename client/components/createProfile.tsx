@@ -128,18 +128,18 @@ export const CreateProfile = ({
 	};
 
 	return success ? (
-		<section className="section">
-			<div className="box has-text-centered">
+		<div className="my-6 pt-6">
+			<div className="card p-3 rounded-corners has-text-centered">
 				<section className="section">
 					<h3 className="title is-3">Profile created successfully</h3>
 				</section>
 			</div>
-		</section>
+		</div>
 	) : (
-		<div>
+		<div className="my-6">
 			<form onSubmit={handleSubmit}>
 				<section className="section">
-					<h3 className="title is-3">Create new profile</h3>
+					<h1 className="title is-1">Create new profile</h1>
 
 					{/* Location. Components imported dynamically*/}
 					<Suspense fallback={<Spinner />}>

@@ -56,7 +56,7 @@ export const sendPasswordReset = async (req: Request, res: Response) => {
 	const emailExists = await execute(sql, [email]);
 	if (!emailExists[0])
 		return res.status(400).json({
-			field: 'generic',
+			field: 'email',
 			message: 'No matching email was found',
 		});
 	const emailSent = await sendPasswordResetEmail(email);
@@ -66,6 +66,7 @@ export const sendPasswordReset = async (req: Request, res: Response) => {
 		});
 	}
 	return res.status(500).json({
+		field: 'generic',
 		message: 'Email verification could not be sent',
 	});
 };

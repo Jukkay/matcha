@@ -13,22 +13,15 @@ const PasswordReset: NextPage = () => {
 
 	// Form states
 	const [success, setSuccess] = useState(false);
-	const [showGenericError, setShowGenericError] = useState(false);
+	const [genericError, setGenericError] = useState(false);
+	const [emailError, setEmailError] = useState(false);
+	const [genericErrorMessage, setGenericErrorMessage] = useState('');
+	const [emailErrorMessage, setEmailErrorMessage] = useState('');
 	const [loading, setLoading] = useState(false);
 
 	// input values
 	const [values, setValues] = useState({
 		email: '',
-	});
-
-	// error states
-	const [errors, setErrors] = useState({
-		email: false,
-	});
-
-	// Error messages
-	const [errorMessages, setErrorMessages] = useState({
-		email: 'Invalid email address',
 	});
 
 	// Data for input fields
@@ -56,14 +49,7 @@ const PasswordReset: NextPage = () => {
 	useEffect(() => {
 		if (values.email.length < 3) return;
 		const result = /^\S+@\S+\.\S+$/i.test(values.email);
-		setErrors({
-			...errors,
-			email: !result,
-		});
-		setErrorMessages({
-			...errorMessages,
-			email: 'Invalid email address',
-		});
+		setEmailError(!result);
 		setValidEmail(result);
 	}, [values.email]);
 
@@ -78,22 +64,21 @@ const PasswordReset: NextPage = () => {
 	const handleSubmit = async (event: React.SyntheticEvent) => {
 		event.preventDefault();
 		setLoading(true);
-		setShowGenericError(false);
+		setGenericError(false);
+		setEmailError(false);
 		try {
 			const response = await API.post('/resetpasswordtoken/', values);
 			if (response.status === 200) setSuccess(true);
 		} catch (err: any) {
 			const errorMessage = err.response?.data?.message;
 			const errorField = err.response?.data?.field;
-			if (errorMessage && errorField) {
-				setErrorMessages({
-					...errorMessages,
-					[errorField]: errorMessage,
-				});
-				setErrors({ ...errors, [errorField]: true });
+			if (errorField == 'email' && errorMessage) {
+				setEmailError(true);
+				setEmailErrorMessage(errorMessage);
 			}
-			if (errorMessage && !errorField) {
-				setShowGenericError(true);
+			if (errorField == 'generic' && errorMessage) {
+				setGenericError(true);
+				setGenericErrorMessage(errorMessage);
 			}
 		} finally {
 			setLoading(false);
@@ -132,16 +117,8 @@ const PasswordReset: NextPage = () => {
 									<FormInput
 										key={input.id}
 										{...input}
-										errorMessage={
-											errorMessages[
-												input.name as keyof typeof errorMessages
-											]
-										}
-										error={
-											errors[
-												input.name as keyof typeof errors
-											]
-										}
+										errorMessage={emailErrorMessage}
+										error={emailError}
 										validator={input.validator}
 										leftIcon={input.leftIcon}
 										rightIcon={input.rightIcon}
@@ -161,9 +138,9 @@ const PasswordReset: NextPage = () => {
 								</div>
 							</form>
 							<Notification
-								notificationText="Server error. Please try again later."
-								notificationState={showGenericError}
-								handleClick={() => setShowGenericError(false)}
+								notificationText={genericErrorMessage}
+								notificationState={genericError}
+								handleClick={() => setGenericError(false)}
 							/>
 						</section>
 					</div>
