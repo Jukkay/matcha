@@ -3,7 +3,7 @@ import { getSecret } from 'docker-secret';
 import { RowDataPacket } from 'mysql';
 
 export const signEmailToken = async (email: string): Promise<string> => {
-	return new Promise(async (resolve, reject) => {
+	return new Promise((resolve, reject) => {
 		const expirationTime = 3600;
 		jwt.sign(
 			{
@@ -27,7 +27,7 @@ export const verifyJWT = async (
 	userToken: string,
 	serverToken: string
 ): Promise<string | JwtPayload | undefined> => {
-	return new Promise(async (resolve, reject) => {
+	return new Promise((resolve, reject) => {
 		jwt.verify(userToken, serverToken, (err, decoded) => {
 			if (err) {
 				reject(err);
@@ -39,7 +39,7 @@ export const verifyJWT = async (
 export const signAccessToken = async (
 	user_id: RowDataPacket
 ): Promise<string> => {
-	return new Promise(async (resolve, reject) => {
+	return new Promise((resolve, reject) => {
 		const expirationTime = '1m';
 		jwt.sign(
 			{
@@ -62,7 +62,7 @@ export const signAccessToken = async (
 export const signRefreshToken = async (
 	user_id: RowDataPacket
 ): Promise<string> => {
-	return new Promise(async (resolve, reject) => {
+	return new Promise((resolve, reject) => {
 		const expirationTime = '5 days';
 		jwt.sign(
 			{

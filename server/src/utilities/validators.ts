@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { execute } from '../utilities/SQLConnect';
-import bcryptjs from 'bcryptjs';
 
 export const validateRegistrationInput = async (
 	req: Request,
@@ -120,30 +119,4 @@ export const validateRegistrationInput = async (
 			field: 'email',
 			message: 'Email is associated with an existing account.',
 		});
-};
-
-export const validateLoginInput = async (req: Request, res: Response) => {
-	const { username, password } = req.body;
-	const sql = `SELECT user_id, username, password, validated FROM users WHERE username = ?;`;
-	const user = await execute(sql, username);
-	if (!user) {
-		return res.status(400).json({
-			auth: false,
-			message: 'Invalid user',
-		});
-	}
-	if (user[0].validated != true) {
-		return res.status(400).json({
-			auth: false,
-			message: 'Email not validated',
-		});
-	}
-	const match = await bcryptjs.compare(password, user[0].password);
-	if (!match) {
-		return res.status(400).json({
-			auth: false,
-			message: 'Invalid password',
-		});
-	}
-	return user[0];
 };

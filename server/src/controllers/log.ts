@@ -19,7 +19,7 @@ export const logVisitor = async (req: Request, res: Response) => {
 				visiting_user = ? 
 				AND 
 				visited_user = ?`;
-		let response = await execute(sql, [visiting_user, visited_user]);
+		const response = await execute(sql, [visiting_user, visited_user]);
 		if (response.length > 0) {
 			// update timestamp
 			sql = `

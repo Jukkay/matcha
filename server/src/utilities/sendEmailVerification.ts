@@ -9,7 +9,7 @@ export const sendEmailVerification = async (email: string) => {
 	try {
 		const email_token = await signEmailToken(email);
 		const message = createMessage(email_token);
-		const transporter = await nodemailer.createTransport({
+		const transporter = nodemailer.createTransport({
 			service: 'Outlook365',
 			auth: {
 				user: mailUser,
@@ -23,7 +23,6 @@ export const sendEmailVerification = async (email: string) => {
 			html: message,
 		};
 		await transporter.sendMail(messageOptions);
-		console.log('Nodemailer sent message');
 		return true;
 	} catch (err) {
 		console.error(err);

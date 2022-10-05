@@ -11,7 +11,7 @@ export const sendReportMessage = async (
 	const adminEmail = 'jukkacamagru@outlook.com';
 	try {
 		const message = createReportMessage(report_id, report_reason);
-		const transporter = await nodemailer.createTransport({
+		const transporter = nodemailer.createTransport({
 			service: 'Outlook365',
 			auth: {
 				user: mailUser,
@@ -25,7 +25,6 @@ export const sendReportMessage = async (
 			html: message,
 		};
 		await transporter.sendMail(messageOptions);
-		console.log('Nodemailer sent message');
 		return true;
 	} catch (err) {
 		console.error(err);

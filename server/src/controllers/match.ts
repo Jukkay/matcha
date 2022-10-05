@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { execute } from '../utilities/SQLConnect';
-import { decodeUserFromAccesstoken } from './token';
 
 export const createMatch = async (user1: number, user2: number) => {
 	// Check for duplicates
@@ -140,37 +139,4 @@ export const removeMatch = async (user1: number, user2: number) => {
 	return response;
 };
 
-export const removeMatchEndpoint = async (req: Request, res: Response) => {
-	try {
-		const { user1, user2 } = req.body;
-		if (!user1 || !user2)
-			return res.status(400).json({
-				message: 'Incomplete match information',
-			});
-		// Get user_id
-		const user_id = await decodeUserFromAccesstoken(req);
-		if (!user_id)
-			return res.status(401).json({
-				message: 'Unauthorized',
-			});
-		if (user_id !== user1 || user_id !== user2)
-			return res.status(400).json({
-				message: 'ID mismatch. Are you doing something shady?',
-			});
-		const response = await removeMatch(user1, user2);
-		if (response)
-			return res.status(200).json({
-				message: 'Match removed successfully',
-			});
-		return res.status(400).json({
-			message: 'No user found',
-		});
-	} catch (err) {
-		console.error(err);
-		return res.status(500).json({
-			message: 'Something went wrong',
-		});
-	}
-};
-
-export default { getAllMatches, removeMatchEndpoint };
+export default { getAllMatches };

@@ -117,8 +117,8 @@ export const login = async (req: Request, res: Response) => {
 				last_login=now() 
 			WHERE 
 				user_id = ?;`;
-		const response = await execute(sql2, user[0].user_id);
-		// Return user data to frontend
+		await execute(sql2, user[0].user_id);
+		// Return user data to client
 		if (accessToken && refreshToken) {
 			await updateRefreshTokenList(refreshToken, user[0].user_id);
 			return res.status(200).json({
@@ -491,7 +491,7 @@ export const reportUser = async (req: Request, res: Response) => {
 				message: 'ID mismatch. Are you doing something shady?',
 			});
 		// add to db
-		let sql = `
+		const sql = `
 				INSERT INTO 
 					reports 
 					(

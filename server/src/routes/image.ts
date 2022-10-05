@@ -1,27 +1,30 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import checkJWT from '../middleware/checkJWT';
 import controller from '../controllers/image';
 import { v4 as uuidv4 } from 'uuid';
-import multer from 'multer';
+import multer, { FileFilterCallback } from 'multer';
 import path from 'path';
 import { decodeUserFromAccesstoken } from '../controllers/token';
 
-const checkFileValidity = (req: any, file: any, callback: any) => {
+type DestinationCallback = (err: Error | null, destination: string) => void
+type FilenameCallback = (err: Error | null, filename: string) => void
+
+const checkFileValidity = (req: Request, file: Express.Multer.File, callback: FileFilterCallback) => {
 	const validExtensions = /png|jpg|jpeg|gif|/;
 	const validFileType = validExtensions.test(
 		path?.extname(file.originalname).toLowerCase()
 	);
-	const validMimeType = validExtensions.test(file?.mimeType);
-	if (!validFileType) return callback('Invalid file extension', false);
-	if (!validMimeType) return callback('Invalid Mime type', false);
+	const validMimeType = validExtensions.test(file?.mimetype);
+	if (!validFileType) return callback(null, false);
+	if (!validMimeType) return callback(null, false);
 	callback(null, true);
 };
 
 const diskStorage = multer.diskStorage({
-	destination: (req: any, file: any, callback: any) => {
+	destination: (req: Request, file: Express.Multer.File, callback: DestinationCallback) => {
 		callback(null, './images');
 	},
-	filename: (req: any, file: any, callback: any) => {
+	filename: (req: Request, file: Express.Multer.File, callback: FilenameCallback) => {
 		const extension = file.mimetype.split('/')[1].toLowerCase();
 		const filename = `${uuidv4().toString()}.${extension}`;
 		callback(null, filename);
@@ -47,12 +50,11 @@ imageRouter.get('/', (req: express.Request, res: express.Response) => {
 imageRouter.post(
 	'/',
 	[checkJWT, upload.array('files')],
-	async (req: any, res: any) => {
+	async (req: Request, res: Response) => {
 		try {
 			// Get new filenames
-			let filenames: string[] = [];
-			req.files.map((file: any) => {
-				filenames.push(file.filename);
+			const filenames = (req.files as Express.Multer.File[]).map((file) => {
+					return file.filename;
 			});
 
 			// Get user_id

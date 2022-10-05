@@ -30,17 +30,16 @@ export const resetPassword = async (req: Request, res: Response) => {
 		const { email } = decoded as IEmailToken;
 		const hash = await bcryptjs.hash(password, 10);
 		const sql = `
-      UPDATE 
-        users 
-      SET 
-        password = ? 
-      WHERE 
-        email = ? 
-        AND 
-        username = ?;`;
+			UPDATE 
+				users 
+			SET 
+				password = ? 
+			WHERE 
+				email = ? 
+				AND 
+				username = ?;`;
 		const response = await execute(sql, [hash, email, username]);
-		const result: any = response;
-		if (result.affectedRows > 0)
+		if (response)
 			return res.status(201).json({
 				message: 'Password changed',
 			});

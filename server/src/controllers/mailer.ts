@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { execute } from '../utilities/SQLConnect';
 import { sendEmailVerification } from '../utilities/sendEmailVerification';
 import { sendPasswordResetEmail } from '../utilities/sendPasswordResetEmail';

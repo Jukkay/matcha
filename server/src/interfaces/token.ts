@@ -5,9 +5,6 @@ export interface IEmailToken {
 	iss: string;
 }
 
-export interface ITokenList {
-	[key: string]: number;
-}
 export interface IAccesstoken {
 	user_id: string;
 	iat: number;
@@ -16,7 +13,7 @@ export interface IAccesstoken {
 }
 
 export interface IOnlineUser {
-		user_id: number,
-		socket_id: string,
-		active: number,
+	user_id: number;
+	socket_id: string;
+	active: number;
 }

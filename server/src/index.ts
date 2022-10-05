@@ -37,7 +37,6 @@ import jwt, { VerifyErrors } from 'jsonwebtoken';
 import { updateLocation } from './controllers/updateLocation';
 import { IOnlineUser } from './interfaces/token';
 
-
 const server_token = getSecret('server_token');
 
 const app: express.Application = express();
