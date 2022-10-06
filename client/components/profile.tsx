@@ -119,13 +119,13 @@ export const ProfileView = ({ profile, setEditMode }: ProfileViewProps) => {
 							<span className="has-text-weight-semibold mr-3">
 								Latitude:
 							</span>
-							{profile.latitude}
+							{profile.user_latitude ? profile.user_latitude : profile.latitude}
 						</div>
 						<div className="block">
 							<span className="has-text-weight-semibold mr-3">
 								Longitude:
 							</span>
-							{profile.longitude}
+							{profile.user_longitude ? profile.user_longitude : profile.longitude}
 						</div>
 						<EditButton setEditMode={setEditMode} />
 					</div>

@@ -5,7 +5,6 @@ import { decodeUserFromAccesstoken } from './token';
 
 export const searchProfiles = async (req: Request, res: Response) => {
 	const { looking, gender, min_age, max_age, country, city } = req.body.data;
-
 	if (!gender || !min_age || !max_age || !looking)
 		return res.status(400).json({
 			message: 'Insufficient search parameters',
@@ -82,7 +81,6 @@ export const searchProfiles = async (req: Request, res: Response) => {
 			ORDER BY 
 				famerating DESC
 			`;
-
 			results = await execute(sql, [
 				user_id,
 				user_id,

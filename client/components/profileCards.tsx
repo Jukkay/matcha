@@ -293,6 +293,15 @@ export const ProfileViewWithLikeButtons = ({
 							<h3 className="title is-3">It&apos;s a match!</h3>
 						</div>
 					) : null}
+					{otherUserProfile.match_id ? (
+						<div className="notification is-primary">
+							<button
+								className="delete"
+								onClick={closeNotification}
+							></button>
+							<h3 className="title is-3">You&apos;re matched!</h3>
+						</div>
+					) : null}
 					{otherUserProfile.likes_requester &&
 					!otherUserProfile.match_id ? (
 						<div className="notification is-primary is-light">

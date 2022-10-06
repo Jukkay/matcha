@@ -440,11 +440,17 @@ V Change access token expiration
 V Made usercontext to persist data to sessionstorage to fix problems with browser refreshing
 V Refresh on search page redirects to profile page
 V Fix login page redirection
-
-Check what's up with online status showing
+V Make user logout after deleting user data
+V Check that account delete works
+V Check what's up with online status sometimes not updating
+V Add trim to user coordinates
+V Show user_coordinates in profile view if set
+V Fix top margin on email verified card at verifyemail
+V Show match on profile page if match
+V Make sure report and block modals close on success
+V What happens if user is unmatched or blocked during chat?
 
 Test all required functionality
-What happens if user is unmatched or blocked during chat?
 Check that cosmetically everything is ok
 
 # Backlog

@@ -81,8 +81,8 @@ const newProfile = async (req: Request, res: Response) => {
 			JSON.stringify(interests),
 			name,
 			profile_image,
-			latitude,
-			longitude,
+			latitude.trim(),
+			longitude.trim(),
 		]);
 		const sql2 = `
 			UPDATE 
@@ -245,10 +245,10 @@ const updateProfile = async (req: Request, res: Response) => {
 			introduction,
 			JSON.stringify(interests),
 			profile_image,
-			latitude,
-			longitude,
-			user_latitude,
-			user_longitude,
+			latitude.trim(),
+			longitude.trim(),
+			user_latitude.trim(),
+			user_longitude.trim(),
 			user_id,
 		]);
 		if (response) {

@@ -81,18 +81,21 @@ export const UpdateProfile = ({
 
 	const uploadProfile = async () => {
 		try {
-			if (profile.latitude && profile.longitude) {
+			if (profile.user_latitude && profile.user_longitude) {
 				const latitudeTest =
 					/^(-?[1-8]?\d(?:\.\d{1,18})?|90(?:\.0{1,18})?)$/.test(
-						profile.latitude
+						profile.user_latitude.trim()
 					);
 				const longitudeTest =
 					/^(-?(?:1[0-7]|[1-9])?\d(?:\.\d{1,18})?|180(?:\.0{1,18})?)$/.test(
-						profile.longitude
+						profile.user_longitude.trim()
 					);
 				if (!latitudeTest || !longitudeTest) {
 					setCoordinateError(true);
 					return;
+				}
+				else {
+					setProfile({...profile, user_latitude: profile.user_latitude.trim(), user_longitude: profile.user_longitude.trim()})
 				}
 			}
 			// Check interests amount
@@ -105,9 +108,10 @@ export const UpdateProfile = ({
 				// upload photos
 				await uploadPhotos();
 			}
-			// Add interests object to profile
 			let payload = profile;
 			payload.interests = interests;
+			payload.user_latitude = profile.user_latitude?.trim()
+			payload.user_longitude = profile.user_longitude?.trim()
 			// Add other information user can't change
 			payload.birthday = userData.birthday;
 			payload.name = userData.name;

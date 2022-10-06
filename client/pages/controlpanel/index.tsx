@@ -14,11 +14,11 @@ import { LocationPermissionRequest } from '../../components/locationPermissionRe
 import { useNotificationContext } from '../../components/NotificationContext';
 import { useUserContext } from '../../components/UserContext';
 import { ActivePage } from '../../types/types';
-import { authAPI } from '../../utilities/api';
+import { API, authAPI } from '../../utilities/api';
 
 const LoggedIn = () => {
 	// Context states
-	const { userData, updateUserData, profile } = useUserContext();
+	const { userData, updateUserData, setProfile, refreshToken, updateRefreshToken, updateAccessToken } = useUserContext();
 	const { setActivePage } = useNotificationContext();
 
 	// validator states
@@ -297,13 +297,21 @@ const LoggedIn = () => {
 
 	const deleteUser = async () => {
 		try {
-			const response = await authAPI.delete(`/user/${profile.user_id}`);
+			const response = await authAPI.delete(`/user/${userData.user_id}`);
 			if (response.status === 200) {
 				setDeleted(true);
 				setTimeout(() => {
+					API.post('/logout/', {
+						refreshToken: refreshToken,
+					});
+					updateAccessToken('');
+					updateRefreshToken('');
 					updateUserData({});
-					setDeleted(false);
-					sessionStorage.removeItem('userData');
+					setProfile({});
+					sessionStorage?.removeItem('accessToken');
+					sessionStorage?.removeItem('refreshToken');
+					sessionStorage?.removeItem('userData');
+					sessionStorage?.removeItem('profile');
 				}, 2000);
 			}
 		} catch (err) {}

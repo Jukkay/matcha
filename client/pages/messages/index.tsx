@@ -109,7 +109,7 @@ const Modal = ({
 		</div>
 	) : null;
 };
-const ReportMenu = ({ reporter, reported }: any) => {
+const ReportMenu = ({ reporter, reported, setMatchData, setActiveChatUser }: any) => {
 	const [showReportModal, setShowReportModal] = useState(false);
 	const [showBlockModal, setShowBlockModal] = useState(false);
 	const [reason, setReason] = useState('');
@@ -123,6 +123,8 @@ const ReportMenu = ({ reporter, reported }: any) => {
 			});
 			if (response.status === 200) {
 				setShowBlockModal(false);
+				setActiveChatUser(0)
+				setMatchData({})
 			}
 		} catch (err) {}
 	};
@@ -134,7 +136,9 @@ const ReportMenu = ({ reporter, reported }: any) => {
 				reason: reason,
 			});
 			if (response.status === 200) {
-				setShowBlockModal(false);
+				setShowReportModal(false);
+				setActiveChatUser(0)
+				setMatchData({})
 			}
 		} catch (err) {}
 	};
@@ -173,7 +177,7 @@ const ReportMenu = ({ reporter, reported }: any) => {
 							<option value={1}>Harrasment</option>
 							<option
 								value={2}
-							>{`I don't like this person</option>`}</option>
+							>{`I don't like this person`}</option>
 							<option value={3}>
 								Threaths my life or health
 							</option>
@@ -366,7 +370,7 @@ const MatchListItem = ({ match, user_id }: any) => {
 			<div className="p-2">
 				<strong className="is-size-7">{name}</strong>
 			</div>
-			<ReportMenu reporter={user_id} reported={receiver_id} />
+			<ReportMenu reporter={user_id} reported={receiver_id}setMatchData={setMatchData} setActiveChatUser={setActiveChatUser} />
 		</div>
 	) : (
 		<div

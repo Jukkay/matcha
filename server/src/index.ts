@@ -85,7 +85,7 @@ const updateOnlineUsers = (user_id: number, socket_id: string) => {
 };
 
 const queryOnlineUsers = (user_id: number) => {
-	const maxTimeInactive = 1000 * 60 * 5;
+	const maxTimeInactive = 1000 * 60 * 10;
 	const i = onlineUsers?.findIndex((item) => item.user_id === user_id);
 	if (i > -1) {
 		if (Date.now() - onlineUsers[i].active < maxTimeInactive) return true;
