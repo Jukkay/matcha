@@ -450,9 +450,9 @@ V Show match on profile page if match
 V Make sure report and block modals close on success
 V What happens if user is unmatched or blocked during chat?
 V Add validators to profile, chat and search inputs
+V Check that cosmetically everything is ok
 
 Test all required functionality
-Check that cosmetically everything is ok
 
 # Backlog
 Deploy to AWS

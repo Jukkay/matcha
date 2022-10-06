@@ -23,7 +23,12 @@ down:
 
 clean:
 	docker-compose down --remove-orphans
+	rm -rf client/.next
 	docker volume rm matcha-data
+
+clean-modules:
+	rm -rf client/node_modules
+	rm -rf server/node_modules
 
 build:
 	docker-compose run --rm client "pnpm build"
@@ -31,10 +36,18 @@ build:
 install-client:
 	docker-compose run --rm client "pnpm install"
 
+install-client-production:
+	docker-compose run --rm client "pnpm i -P"
+
 install-server:
 	docker-compose run --rm server "npm install"
 
+install-server-production:
+	docker-compose run --rm server "npm install --omit=dev"
+
 install: install-client install-server
+
+install-production: install-client-production install-server-production
 
 goto-client:
 	docker-compose exec client bash
@@ -52,3 +65,5 @@ reset-db: clean
 
 create-users:
 	docker-compose exec server npm run createusers
+
+production: install-production build up-production create-users
