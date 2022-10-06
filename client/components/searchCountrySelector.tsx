@@ -1,7 +1,7 @@
 import { Country } from 'country-state-city';
 import { SearchParamsProps } from '../types/types';
 
-export const CountrySearchSelector = ({
+const CountrySearchSelector = ({
 	searchParams,
 	setSearchParams,
 }: SearchParamsProps) => {

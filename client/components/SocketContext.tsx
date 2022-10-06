@@ -17,12 +17,12 @@ interface ClientToServerEvents {
 	auth: { token: string; user_id: number };
 }
 
-const getTokenFromSessionStorage = () => {
+export const getTokenFromSessionStorage = () => {
 	if (typeof window === 'undefined') return null;
 	return window.sessionStorage.getItem('accessToken');
 };
 
-const getUserIDFromSessionStorage = () => {
+export const getUserIDFromSessionStorage = () => {
 	if (typeof window === 'undefined') return null;
 	const storedInfo = window.sessionStorage.getItem('userData');
 	if (storedInfo) {
