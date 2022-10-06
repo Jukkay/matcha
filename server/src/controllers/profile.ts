@@ -1,9 +1,14 @@
 import { Request, Response } from 'express';
 import { locateIP, reformatDate } from '../utilities/helpers';
 import { execute } from '../utilities/SQLConnect';
+import {
+	validateNewProfile,
+	validateUpdateProfile,
+} from '../utilities/validators';
 import { decodeUserFromAccesstoken } from './token';
 
 const newProfile = async (req: Request, res: Response) => {
+	validateNewProfile(req, res);
 	const {
 		country,
 		city,
@@ -18,22 +23,7 @@ const newProfile = async (req: Request, res: Response) => {
 		name,
 	} = req.body;
 	let { latitude, longitude } = req.body;
-	if (
-		!country ||
-		!city ||
-		!gender ||
-		!birthday ||
-		!looking ||
-		!min_age ||
-		!max_age ||
-		!introduction ||
-		!interests ||
-		!name ||
-		!profile_image
-	)
-		return res.status(400).json({
-			message: 'Incomplete profile information',
-		});
+
 	try {
 		// Get user_id
 		const user_id = await decodeUserFromAccesstoken(req);
@@ -186,6 +176,7 @@ const getProfile = async (req: Request, res: Response) => {
 };
 
 const updateProfile = async (req: Request, res: Response) => {
+	validateUpdateProfile(req, res);
 	const {
 		country,
 		city,
@@ -201,6 +192,7 @@ const updateProfile = async (req: Request, res: Response) => {
 		user_longitude,
 	} = req.body;
 	let { latitude, longitude } = req.body;
+
 	const sql = `
 		UPDATE 
 			profiles 
@@ -247,8 +239,8 @@ const updateProfile = async (req: Request, res: Response) => {
 			profile_image,
 			latitude.trim(),
 			longitude.trim(),
-			user_latitude.trim(),
-			user_longitude.trim(),
+			user_latitude ? user_latitude.trim() : '',
+			user_longitude ? user_longitude.trim() : '',
 			user_id,
 		]);
 		if (response) {

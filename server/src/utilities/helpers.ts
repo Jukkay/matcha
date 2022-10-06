@@ -4,9 +4,10 @@ import { Request } from 'express';
 
 export const reformatDate = (date: string) => {
 	const dateObject = new Date(date);
-	return `${dateObject.getFullYear()}-${
+	if (dateObject) return `${dateObject.getFullYear()}-${
 		dateObject.getMonth() + 1
 	}-${dateObject.getDate()}`;
+	else return false
 };
 
 export const convertMIN_AGE = (age: number) => {

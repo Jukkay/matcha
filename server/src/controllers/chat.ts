@@ -7,6 +7,17 @@ export const saveMessageToDatabase = async (data: {
 	message_text: string;
 	message_time: string;
 }) => {
+	if (
+		!data.match_id ||
+		!data.sender_id ||
+		!data.message_text ||
+		!data.message_time ||
+		isNaN(data.match_id) ||
+		isNaN(data.sender_id) ||
+		data.message_text.length > 65535 ||
+		data.message_time
+	)
+		return false;
 	const sql = `
 				INSERT INTO
 					messages 

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { execute } from '../utilities/SQLConnect';
+import { reformatDate } from './helpers';
 
 export const validateRegistrationInput = async (
 	req: Request,
@@ -118,5 +119,175 @@ export const validateRegistrationInput = async (
 		return res.status(400).json({
 			field: 'email',
 			message: 'Email is associated with an existing account.',
+		});
+};
+
+export const validateNewProfile = (req: Request, res: Response) => {
+	const {
+		country,
+		city,
+		gender,
+		birthday,
+		looking,
+		min_age,
+		max_age,
+		introduction,
+		interests,
+		profile_image,
+		name,
+		latitude,
+		longitude,
+	} = req.body;
+
+	if (
+		!country ||
+		!city ||
+		!gender ||
+		!birthday ||
+		!looking ||
+		!min_age ||
+		!max_age ||
+		!introduction ||
+		!interests ||
+		!name ||
+		!profile_image
+	)
+		return res.status(400).json({
+			message: 'Incomplete profile information',
+		});
+	if (
+		country.length > 56 ||
+		city.length > 85 ||
+		gender.length > 32 ||
+		!reformatDate(birthday) ||
+		looking.length > 32 ||
+		isNaN(min_age) ||
+		isNaN(max_age) ||
+		introduction.length > 4096 ||
+		!JSON.stringify(interests) ||
+		name.length > 255 ||
+		profile_image.length > 255
+	)
+		return res.status(400).json({
+			message: 'Incorrect input',
+		});
+	if (latitude?.length > 32 || longitude?.length > 32)
+		return res.status(400).json({
+			message: 'Incorrect input',
+		});
+};
+
+export const validateUpdateProfile = (req: Request, res: Response) => {
+	const {
+		country,
+		city,
+		gender,
+		birthday,
+		looking,
+		min_age,
+		max_age,
+		introduction,
+		interests,
+		profile_image,
+		user_latitude,
+		user_longitude,
+		latitude,
+		longitude,
+	} = req.body;
+	if (
+		!country ||
+		!city ||
+		!gender ||
+		!birthday ||
+		!looking ||
+		!min_age ||
+		!max_age ||
+		!introduction ||
+		!interests ||
+		!profile_image
+	)
+		return res.status(400).json({
+			message: 'Incomplete profile information',
+		});
+	if (
+		country.length > 56 ||
+		city.length > 85 ||
+		gender.length > 32 ||
+		!reformatDate(birthday) ||
+		looking.length > 32 ||
+		isNaN(min_age) ||
+		isNaN(max_age) ||
+		introduction.length > 4096 ||
+		!JSON.stringify(interests) ||
+		profile_image.length > 255
+	)
+		return res.status(400).json({
+			message: 'Incorrect input',
+		});
+	if (user_latitude?.length > 32 || user_longitude?.length > 32)
+		return res.status(400).json({
+			message: 'Incorrect input',
+		});
+	if (latitude?.length > 32 || longitude?.length > 32)
+		return res.status(400).json({
+			message: 'Incorrect input',
+		});
+};
+
+export const validateSearchParams = (req: Request, res: Response) => {
+	const { looking, gender, min_age, max_age, country, city } = req.body.data;
+	if (!gender || !min_age || !max_age || !looking)
+		return res.status(400).json({
+			message: 'Insufficient search parameters',
+		});
+	if (
+		country?.length > 56 ||
+		city?.length > 85 ||
+		gender.length > 32 ||
+		looking.length > 32 ||
+		isNaN(min_age) ||
+		isNaN(max_age)
+	)
+		return res.status(400).json({
+			message: 'Incorrect input',
+		});
+};
+
+export const validateLogin = (req: Request, res: Response) => {
+	const { username, password } = req.body;
+	if (!username)
+		return res.status(400).json({
+			auth: false,
+			field: 'username',
+			message: 'Missing username',
+		});
+	if (!password)
+		return res.status(400).json({
+			auth: false,
+			field: 'password',
+			message: 'Missing password',
+		});
+	if (username.length > 255 || password.length > 255)
+		return res.status(400).json({
+			auth: false,
+			field: 'generic',
+			message: 'Incorrect input',
+		});
+};
+
+export const validateUpdateUser = (req: Request, res: Response) => {
+	const { username, password, name, email, birthday } = req.body;
+	if (!username || !password || !name || !email || !birthday)
+		return res.status(400).json({
+			message: 'Incomplete user information',
+		});
+	if (
+		username.length > 32 ||
+		password.length > 255 ||
+		name.length > 255 ||
+		!reformatDate(birthday)
+	)
+		return res.status(400).json({
+			message: 'Incorrect input',
 		});
 };

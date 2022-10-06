@@ -1,15 +1,12 @@
 import { Request, Response } from 'express';
 import { convertMAX_AGE, convertMIN_AGE } from '../utilities/helpers';
 import { execute } from '../utilities/SQLConnect';
+import { validateSearchParams } from '../utilities/validators';
 import { decodeUserFromAccesstoken } from './token';
 
 export const searchProfiles = async (req: Request, res: Response) => {
+	validateSearchParams(req, res);
 	const { looking, gender, min_age, max_age, country, city } = req.body.data;
-	if (!gender || !min_age || !max_age || !looking)
-		return res.status(400).json({
-			message: 'Insufficient search parameters',
-		});
-
 	try {
 		// Get user_id
 		const user_id = await decodeUserFromAccesstoken(req);

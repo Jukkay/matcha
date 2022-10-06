@@ -112,9 +112,7 @@ export const UpdateProfile = ({
 			payload.interests = interests;
 			payload.user_latitude = profile.user_latitude?.trim()
 			payload.user_longitude = profile.user_longitude?.trim()
-			// Add other information user can't change
 			payload.birthday = userData.birthday;
-			payload.name = userData.name;
 			// Upload profile
 			const response = await authAPI.patch(`/profile`, payload);
 			if (response.status === 200) {

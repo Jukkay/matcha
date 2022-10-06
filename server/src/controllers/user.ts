@@ -4,7 +4,11 @@ import bcryptjs from 'bcryptjs';
 import { signAccessToken, signRefreshToken } from '../utilities/promisifyJWT';
 import { sendEmailVerification } from '../utilities/sendEmailVerification';
 import { reformatDate } from '../utilities/helpers';
-import { validateRegistrationInput } from '../utilities/validators';
+import {
+	validateLogin,
+	validateRegistrationInput,
+	validateUpdateUser,
+} from '../utilities/validators';
 import {
 	decodeUserFromAccesstoken,
 	deleteRefreshToken,
@@ -47,21 +51,9 @@ const register = async (req: Request, res: Response) => {
 };
 
 export const login = async (req: Request, res: Response) => {
+	validateLogin(req, res);
+	const { username, password } = req.body;
 	try {
-		const { username, password } = req.body;
-		if (!username)
-			return res.status(400).json({
-				auth: false,
-				field: 'username',
-				message: 'Missing username',
-			});
-		if (!password)
-			return res.status(400).json({
-				auth: false,
-				field: 'password',
-				message: 'Missing password',
-			});
-
 		// Get user data
 		const sql = `
 			SELECT 
@@ -355,6 +347,7 @@ const deleteUser = async (req: Request, res: Response) => {
 };
 
 const updateUser = async (req: Request, res: Response) => {
+	validateUpdateUser(req, res);
 	const { username, password, name, email, birthday } = req.body;
 	const sql = `
 		UPDATE 

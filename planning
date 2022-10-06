@@ -449,6 +449,7 @@ V Fix top margin on email verified card at verifyemail
 V Show match on profile page if match
 V Make sure report and block modals close on success
 V What happens if user is unmatched or blocked during chat?
+V Add validators to profile, chat and search inputs
 
 Test all required functionality
 Check that cosmetically everything is ok

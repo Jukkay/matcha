@@ -88,7 +88,7 @@ export const UnlikeButton = ({
 		const liked = otherUserProfile.user_id;
 		const liker: number = userData.user_id;
 		try {
-			await authAPI.delete(`/like?liker=${liker}&liked=${liked}`, {});
+			const response = await authAPI.delete(`/like?liker=${liker}&liked=${liked}`, {});
 
 			// Emit notification
 			const notification = {
@@ -98,7 +98,9 @@ export const UnlikeButton = ({
 				notification_text: `Somebody unliked you!`,
 				link: `/profile/${liker}`,
 			};
-			socket.emit('send_notification', liked, notification);
+			if (response.status === 200) {
+				socket.emit('send_notification', liked, notification);
+			}
 		} catch (err) {}
 	};
 
