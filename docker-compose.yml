@@ -80,10 +80,6 @@ secrets:
         file: ./config/secrets/mysql_password.secret
     mysql_root_password:
         file: ./config/secrets/mysql_root_password.secret
-    site.crt:
-        file: ./config/secrets/MyCertificate.crt
-    site.key:
-        file: ./config/secrets/MyKey.key
     server_token:
         file: ./config/secrets/server_token.secret
     refresh_token:
@@ -99,8 +95,7 @@ volumes:
 # printf "%s" "$(openssl rand -base64 20)" > mysql_root_password.secret
 # printf "%s" "$(openssl rand -base64 10)" > server_token.secret
 
-# TLS certificate has to be created manually and added as a secret
-# openssl req -new -newkey rsa:4096 -x509 -sha256 -days 365 -nodes -out MyCertificate.crt -keyout MyKey.key
-
 # Launch with:
 #   make production
+# Create dummy users with:
+#   make users

@@ -63,7 +63,7 @@ logs:
 
 reset-db: clean
 
-create-users:
+users:
 	docker-compose exec server npm run createusers
 
-production: install-production build up-production create-users
+production: install-production build up-production users

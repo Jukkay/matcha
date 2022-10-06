@@ -2,7 +2,7 @@ const { RandomUser } = require('random-user-api');
 import * as SQLConnect from '../utilities/SQLConnect';
 import { dummyData } from './data';
 import { location } from './gpsdata';
-import fs from 'fs';
+import { menFilenames, womenFilenames } from './filenames';
 
 const reformatDate = (date: string) => {
     const dateObject = new Date(date);
@@ -58,12 +58,6 @@ const sql3 = `
         username = ?`;
 const hash = '$2a$10$FMUz0quSrsDNryT2TRvSJu7JavNK8iZPYKfF68K4408Y0jPBT/vpC';
 const genderOptions = ['Male', 'Female'];
-const malePictureOptions = fs
-    .readdirSync('./images/Men/')
-    .filter((file) => file !== '.DS_Store');
-const femalePictureOptions = fs
-    .readdirSync('./images/Women/')
-    .filter((file) => file !== '.DS_Store');
 
 const removeDuplicates = (data: any) => {
     return data.filter((item: any, index: number) => {
@@ -122,14 +116,14 @@ const createProfile = async (data: any) => {
         for (let i = 0; i < 5; i++) {
             const filename =
                 data[key].gender == 'male'
-                    ? malePictureOptions[
+                    ? menFilenames[
                             Math.floor(
-                                Math.random() * malePictureOptions.length
+                                Math.random() * menFilenames.length
                             )
                       ]
-                    : femalePictureOptions[
+                    : womenFilenames[
                             Math.floor(
-                                Math.random() * femalePictureOptions.length
+                                Math.random() * womenFilenames.length
                             )
                       ];
             const temp = [user_id, filename];
