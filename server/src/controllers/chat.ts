@@ -14,8 +14,7 @@ export const saveMessageToDatabase = async (data: {
 		!data.message_time ||
 		isNaN(data.match_id) ||
 		isNaN(data.sender_id) ||
-		data.message_text.length > 65535 ||
-		data.message_time
+		data.message_text.length > 65535
 	)
 		return false;
 	const sql = `

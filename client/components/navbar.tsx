@@ -14,7 +14,7 @@ import {
 	NotificationType,
 } from '../types/types';
 import axios from 'axios';
-import { socket } from './SocketContext';
+import { socket } from './socket';
 import { ErrorFallback } from './utilities';
 import { ErrorBoundary } from 'react-error-boundary';
 
@@ -59,20 +59,22 @@ const LoggedInControls = () => {
 		activePage,
 		notifications,
 		setNotifications,
-		notificationCount,
 		setNotificationCount,
 		setLikeCount,
 		setMessageCount,
-		messageCount,
 		likeCount,
 	} = useNotificationContext();
 
+	useEffect(() => {
+		console.log('activeChatUser updated', activeChatUser);
+	}, [activeChatUser]);
 	// Subscribe for and fetch notifications
 	useEffect(() => {
 		if (!userData.user_id) return;
 		const controller = new AbortController();
 		const getNotifications = async () => {
 			try {
+				if (socket.disconnected) socket.open();
 				socket.emit('set_user', userData.user_id);
 				const response = await authAPI(
 					`/notifications/${userData.user_id}`,
@@ -95,6 +97,7 @@ const LoggedInControls = () => {
 	useEffect(() => {
 		if (!userData.user_id) return;
 		try {
+			if (socket.disconnected) socket.open();
 			socket.on('connect_error', async (err) => {
 				if (err.message === 'Unauthorized') {
 					const refreshResponse = await axios.post(`/token/`, {
@@ -112,16 +115,18 @@ const LoggedInControls = () => {
 				}
 			});
 			socket.on('receive_notification', (data) => {
-				if (
-					activePage === data.notification_type ||
-					activeChatUser === data.sender_id
-				)
-					return;
+				console.log('Received notification', data)
+				console.log('activePage', activePage);
+				console.log('activeChatUser', activeChatUser);
+				if (activeChatUser === data.sender_id) return;
 				if (data.notification_type === NotificationType.MESSAGE)
-					setMessageCount(messageCount + 1);
-				if (data.notification_type === NotificationType.LIKE)
-					setLikeCount(likeCount + 1);
-				setNotificationCount(notificationCount + 1);
+					setMessageCount((messageCount: number) => messageCount + 1);
+				else if (data.notification_type === NotificationType.LIKE)
+					setLikeCount((likeCount: number) => likeCount + 1);
+				else
+					setNotificationCount(
+						(notificationCount: number) => notificationCount + 1
+					);
 			});
 		} catch (err) {}
 		return () => {
@@ -133,18 +138,7 @@ const LoggedInControls = () => {
 	// Count notifications and update badges
 	useEffect(() => {
 		if (notifications?.length < 1) return;
-		if (
-			activePage ===
-				notifications[notifications.length - 1].notification_type ||
-			activeChatUser === notifications[notifications.length - 1].sender_id
-		)
-			return;
 		// Update notification counts
-		const all = notifications.filter((item: INotification) => {
-			if (!item.notification_read) return true;
-			return false;
-		}).length;
-		setNotificationCount(all);
 
 		const likes = notifications.filter((item: INotification) => {
 			if (
@@ -164,6 +158,11 @@ const LoggedInControls = () => {
 			return false;
 		}).length;
 		setMessageCount(messages);
+		const all = notifications.filter((item: INotification) => {
+			if (!item.notification_read) return true;
+			return false;
+		}).length;
+		setNotificationCount(all - likes - messages);
 	}, [notifications, activeChatUser, activePage]);
 
 	// Token state
@@ -261,7 +260,6 @@ const MainDropdownMenu = () => {
 					<span className="icon is-medium">
 						<IconContext.Provider
 							value={{
-								size: '1.5rem',
 								className: 'react-icons',
 							}}
 						>
@@ -303,10 +301,9 @@ const MessageIcon = () => {
 				<span title="Badge top right" className="badge is-danger mt-3">
 					{messageCount}
 				</span>
-				<span className="icon is-medium ">
+				<span className="icon is-medium">
 					<IconContext.Provider
 						value={{
-							size: '1.2rem',
 							className: 'react-icons',
 						}}
 					>
@@ -323,7 +320,6 @@ const MessageIcon = () => {
 				<span className="icon is-medium">
 					<IconContext.Provider
 						value={{
-							size: '1.2rem',
 							className: 'react-icons',
 						}}
 					>
@@ -383,7 +379,6 @@ const NotificationDropdownMenu = () => {
 						<span className="icon is-medium">
 							<IconContext.Provider
 								value={{
-									size: '1.2rem',
 									className: 'react-icons',
 								}}
 							>
@@ -398,7 +393,6 @@ const NotificationDropdownMenu = () => {
 						<span className="icon is-medium">
 							<IconContext.Provider
 								value={{
-									size: '1.2rem',
 									className: 'react-icons',
 								}}
 							>

@@ -127,12 +127,10 @@ io.on('connection', (socket) => {
 
 		socket.on('send_message', async (matchID, data) => {
 			if (!matchID) return;
-
 			// Save message to database
 			const response = await saveMessageToDatabase(data);
 			if (!response)
 				throw new Error('Failed to save message. Please try again.');
-
 			// Emit to receiver
 			socket.to(matchID).emit('receive_message', data);
 			updateUserActivity(socket.id);

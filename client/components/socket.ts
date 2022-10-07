@@ -1,6 +1,5 @@
-import { authAPI } from '../utilities/api';
 import { io, Socket } from 'socket.io-client';
-import { createContext, ReactNode, useContext } from 'react';
+import { authAPI } from '../utilities/api';
 
 interface ServerToClientEvents {
 	receive_message: (message: any) => void;
@@ -32,29 +31,11 @@ export const getUserIDFromSessionStorage = () => {
 };
 
 const API = authAPI.defaults.baseURL || 'http://localhost:4000';
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(API, {
+
+export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(API, {
+	autoConnect: false,
 	auth: {
 		token: getTokenFromSessionStorage(),
 		user_id: getUserIDFromSessionStorage(),
 	},
 });
-
-export const SocketContext = createContext(socket);
-
-export const useSocketContext = () => {
-	return useContext(SocketContext);
-};
-
-export const SocketContextProvider = ({
-	children,
-}: {
-	children: ReactNode;
-}) => {
-	return (
-		<SocketContext.Provider value={socket}>
-			{children}
-		</SocketContext.Provider>
-	);
-};
-
-export { socket };

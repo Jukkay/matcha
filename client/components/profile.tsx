@@ -17,7 +17,7 @@ import { Lazy, Navigation, Pagination } from 'swiper';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
-import { socket } from './SocketContext';
+import { socket } from './socket';
 import { useInView } from 'react-intersection-observer';
 import { Spinner } from './utilities';
 import { SearchResultItemWithoutDistance } from './profileCards';
@@ -458,6 +458,8 @@ export const OnlineIndicator = ({ user_id }: OnlineStatusProps) => {
 	useEffect(() => {
 		if (!user_id) return;
 		try {
+			if (socket.disconnected)
+				socket.open()
 			socket.on('online_response', (data) => {
 				if (data.queried_id === user_id) setOnline(data.online);
 			});

@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import { Results, ProfileSearch } from '../../components/search';
 import { useUserContext } from '../../components/UserContext';
-import { LoadStatus, SortType, IResultsProfile } from '../../types/types';
+import { LoadStatus, SortType, IResultsProfile, ActivePage } from '../../types/types';
 import {
 	convertBirthdayToAge,
 	handleRouteError,
@@ -21,6 +21,7 @@ import {
 import { ErrorBoundary } from 'react-error-boundary';
 import { ErrorFallback } from '../../components/utilities';
 import { LandingPage } from '../../components/landingPage';
+import { useNotificationContext } from '../../components/NotificationContext';
 
 const LoggedIn = () => {
 	const { profile, userData } = useUserContext();
@@ -33,7 +34,7 @@ const LoggedIn = () => {
 		city: '',
 		min_age: profile.min_age || convertBirthdayToAge(profile.birthday) - 5,
 		max_age: profile.max_age || convertBirthdayToAge(profile.birthday) + 5,
-		min_famerating: '1',
+		min_famerating: '0',
 		max_famerating: '1000',
 		max_distance: '0',
 	});
@@ -43,6 +44,7 @@ const LoggedIn = () => {
 	);
 	const [sortedResults, setSortedResults] = useState<IResultsProfile[]>([]);
 	const [wasRedirected, setWasRedirected] = useState(false);
+	const { setActivePage, setActiveChatUser } = useNotificationContext();
 	const router = useRouter();
 
 	// Router error event listener and handler
@@ -51,6 +53,12 @@ const LoggedIn = () => {
 		return () => {
 			router.events.off('routeChangeError', handleRouteError);
 		};
+	}, []);
+
+	// Set Active Page
+	useEffect(() => {
+		setActivePage(ActivePage.SEARCH)
+		setActiveChatUser(0)
 	}, []);
 
 	// Redirect if user has no profile

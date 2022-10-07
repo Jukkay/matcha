@@ -124,7 +124,7 @@ export const ProfileSearch = ({
 				profile.min_age || convertBirthdayToAge(profile.birthday) - 5,
 			max_age:
 				profile.max_age || convertBirthdayToAge(profile.birthday) + 5,
-			min_famerating: 1,
+			min_famerating: 0,
 			max_famerating: 1000,
 			max_distance: 0,
 		});
@@ -210,7 +210,7 @@ const Filters = ({
 		setSearchParams({
 			...searchParams,
 			max_distance: 0,
-			min_famerating: 1,
+			min_famerating: 0,
 			max_famerating: 1000,
 		});
 		setInterests([]);
@@ -229,7 +229,6 @@ const Filters = ({
 							<span className="icon is-medium">
 								<IconContext.Provider
 									value={{
-										size: '0.9rem',
 										className: 'react-icons',
 									}}
 								>
@@ -283,7 +282,6 @@ const Filters = ({
 						<span className="icon is-medium">
 							<IconContext.Provider
 								value={{
-									size: '0.9rem',
 									className: 'react-icons',
 								}}
 							>
@@ -425,10 +423,9 @@ export const SortSelector = ({ sort, setSort }: SortProps) => {
 				<label htmlFor="sort" className="label">
 					Sort by
 				</label>
-				<span className="icon is-medium">
+				<span className="icon">
 					<IconContext.Provider
 						value={{
-							size: '1.3rem',
 							className: 'react-icons',
 						}}
 					>

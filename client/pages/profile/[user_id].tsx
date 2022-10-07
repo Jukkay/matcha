@@ -11,7 +11,7 @@ import {
 import { authAPI } from '../../utilities/api';
 import { handleRouteError } from '../../utilities/helpers';
 import { useNotificationContext } from '../../components/NotificationContext';
-import { useSocketContext } from '../../components/SocketContext';
+import { socket } from '../../components/socket';
 import { LoadError, Spinner } from '../../components/utilities';
 import { ProfileViewWithLikeButtons } from '../../components/profileCards';
 import { LandingPage } from '../../components/landingPage';
@@ -46,7 +46,6 @@ const LoggedIn = () => {
 	const { userData } = useUserContext();
 	const { setActivePage } = useNotificationContext();
 	const [profileExists, setProfileExists] = useState(false);
-	const socket = useSocketContext();
 	const [wasRedirected, setWasRedirected] = useState(false);
 	const router = useRouter();
 
@@ -82,6 +81,8 @@ const LoggedIn = () => {
 				notification_text: `Somebody viewed your profile!`,
 				link: `/profile/${userData.user_id}`,
 			};
+			if (socket.disconnected)
+				socket.open()
 			socket.emit('send_notification', Number(user_id), notification);
 		} catch (err) {}
 	};

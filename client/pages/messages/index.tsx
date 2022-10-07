@@ -18,14 +18,14 @@ import { useRouter } from 'next/router';
 import { useNotificationContext } from '../../components/NotificationContext';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import { LoadError, Spinner } from '../../components/utilities';
-import { socket } from '../../components/SocketContext';
+import { socket } from '../../components/socket';
 import { useInView } from 'react-intersection-observer';
 import { LandingPage } from '../../components/landingPage';
 
 const LoggedIn = () => {
 	const { userData } = useUserContext();
 	const [loadStatus, _setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
-	const { setMessageCount } = useNotificationContext();
+	const { setMessageCount, setActivePage } = useNotificationContext();
 	const [wasRedirected, setWasRedirected] = useState(false);
 	const router = useRouter();
 
@@ -46,6 +46,8 @@ const LoggedIn = () => {
 
 	useEffect(() => {
 		markMessageNotificationsRead();
+		setActivePage(ActivePage.MESSAGES)
+		
 	}, [userData.user_id]);
 
 	const markMessageNotificationsRead = async () => {
@@ -260,7 +262,7 @@ const MatchList = () => {
 	const { profile } = useUserContext();
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
 	const [matches, setMatches] = useState<IMatch[]>([]);
-	const { matchData, setMatchData, setActivePage } = useNotificationContext();
+	const { matchData, setMatchData } = useNotificationContext();
 
 	useEffect(() => {
 		const getUsersMatches = async () => {
@@ -278,8 +280,12 @@ const MatchList = () => {
 			}
 		};
 		getUsersMatches();
-		setActivePage(ActivePage.MESSAGES);
 	}, [profile.user_id]);
+
+	// useEffect(() => {
+	// 	setMatchData({})
+	// 	setActiveChatUser(0)
+	// }, []);
 
 	if (loadStatus == LoadStatus.LOADING) return <Spinner />;
 	if (loadStatus == LoadStatus.ERROR)
@@ -313,6 +319,8 @@ const OnlineIndicator = ({ user_id }: OnlineStatusProps) => {
 	// Query online status and listen for response
 	useEffect(() => {
 		try {
+			if (socket.disconnected)
+				socket.open()
 			socket.on('online_response', (data) => {
 				if (data.queried_id === user_id) setOnline(data.online);
 			});
@@ -370,7 +378,7 @@ const MatchListItem = ({ match, user_id }: any) => {
 			<div className="p-2">
 				<strong className="is-size-7">{name}</strong>
 			</div>
-			<ReportMenu reporter={user_id} reported={receiver_id}setMatchData={setMatchData} setActiveChatUser={setActiveChatUser} />
+			<ReportMenu reporter={user_id} reported={receiver_id} setMatchData={setMatchData} setActiveChatUser={setActiveChatUser} />
 		</div>
 	) : (
 		<div
@@ -436,6 +444,8 @@ const ChatWindow = () => {
 		payload: {},
 		notification: {}
 	) => {
+		if (socket.disconnected)
+				socket.open()
 		socket.emit('send_message', matchData.match_id, payload);
 		socket.emit('send_notification', matchData.receiver_id, notification);
 	};
@@ -444,6 +454,8 @@ const ChatWindow = () => {
 		try {
 			if (!matchData.match_id) return;
 			setReceived([]);
+			if (socket.disconnected)
+				socket.open()
 			socket.emit('active_chat', matchData.match_id);
 			setLoadStatus(LoadStatus.LOADING);
 			const response = await authAPI(`/messages/${matchData.match_id}`, {
@@ -495,7 +507,10 @@ const ChatWindow = () => {
 
 	useEffect(() => {
 		try {
+			if (socket.disconnected)
+				socket.open()
 			socket.on('receive_message', (data) => {
+				console.log('Received message', data)
 				setReceived((current) => [...current, data]);
 			});
 		} catch (err) {}
@@ -510,6 +525,8 @@ const ChatWindow = () => {
 			try {
 				if (!matchData.match_id) return;
 				setReceived([]);
+				if (socket.disconnected)
+					socket.open()
 				socket.emit('active_chat', matchData.match_id);
 				setLoadStatus(LoadStatus.LOADING);
 				const response = await authAPI(

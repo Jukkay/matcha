@@ -24,9 +24,10 @@ down:
 clean:
 	docker-compose down --remove-orphans
 	rm -rf client/.next
-	docker volume rm matcha-data
 
 clean-modules:
+	rm -rf client/.next
+	rm -rf client/.pnpm-store
 	rm -rf client/node_modules
 	rm -rf server/node_modules
 
@@ -61,7 +62,9 @@ goto-db:
 logs:
 	docker-compose logs -f
 
-reset-db: clean
+reset-db: docker volume rm matcha-data
+
+fclean: clean reset-db
 
 users:
 	docker-compose exec server npm run createusers

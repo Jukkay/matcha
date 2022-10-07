@@ -19,7 +19,8 @@ import { LandingPage } from '../../components/landingPage';
 
 const LoggedIn = () => {
 	const { userData } = useUserContext();
-	const { setActivePage, setLikeCount } = useNotificationContext();
+	const { setActivePage, setLikeCount, setActiveChatUser } =
+		useNotificationContext();
 	const [likedProfiles, setLikedProfiles] = useState<ILikeProfile[]>([]);
 	const [likerProfiles, setLikerProfiles] = useState<ILikeProfile[]>([]);
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
@@ -46,37 +47,36 @@ const LoggedIn = () => {
 		controller2: AbortController,
 		controller3: AbortController
 	) => {
-		const promises = [
-			authAPI.patch('/notifications', {
-				type: NotificationType.LIKE,
-				user_id: userData.user_id,
-				signal: controller1.signal,
-			}),
-			authAPI.get(`/like/${userData.user_id}`, {
-				signal: controller2.signal,
-			}),
-			authAPI.get(`/likedprofiles/${userData.user_id}`, {
-				signal: controller3.signal,
-			}),
-		];
-		Promise.all(promises).then((responses) => {
-			if (responses[0].status === 200) {
-				setLikeCount(0);
-			}
-			if (responses[1].data?.profiles?.length > 0) {
-				setLikerProfiles(responses[1].data.profiles);
-			}
-			if (responses[2].data?.profiles?.length > 0) {
-				setLikedProfiles(responses[2].data.profiles);
-			}
-		});
+			const promises = [
+				authAPI.patch('/notifications', {
+					type: NotificationType.LIKE,
+					user_id: userData.user_id,
+					signal: controller1.signal,
+				}),
+				authAPI.get(`/like/${userData.user_id}`, {
+					signal: controller2.signal,
+				}),
+				authAPI.get(`/likedprofiles/${userData.user_id}`, {
+					signal: controller3.signal,
+				}),
+			];
+			Promise.all(promises).then((responses) => {
+				if (responses[0].status === 200) {
+					setLikeCount(0);
+				}
+				if (responses[1].data?.profiles?.length > 0) {
+					setLikerProfiles(responses[1].data.profiles);
+				}
+				if (responses[2].data?.profiles?.length > 0) {
+					setLikedProfiles(responses[2].data.profiles);
+				}
+			}).catch((error) => error);
 	};
 	useEffect(() => {
 		if (!userData.user_id) return;
 		const controller1 = new AbortController();
 		const controller2 = new AbortController();
 		const controller3 = new AbortController();
-		setActivePage(ActivePage.LIKES);
 		const fetchData = async () => {
 			try {
 				setLoadStatus(LoadStatus.LOADING);
@@ -88,6 +88,8 @@ const LoggedIn = () => {
 				setLoadStatus(LoadStatus.IDLE);
 			}
 		};
+		setActivePage(ActivePage.LIKES);
+		setActiveChatUser(0);
 		fetchData();
 		return () => {
 			controller1.abort();

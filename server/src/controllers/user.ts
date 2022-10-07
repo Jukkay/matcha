@@ -349,7 +349,7 @@ const deleteUser = async (req: Request, res: Response) => {
 const updateUser = async (req: Request, res: Response) => {
 	validateUpdateUser(req, res);
 	const { username, password, name, email, birthday } = req.body;
-	const sql = `
+	let sql = `
 		UPDATE 
 			users 
 		SET 
@@ -377,7 +377,20 @@ const updateUser = async (req: Request, res: Response) => {
 			reformatDate(birthday),
 			user_id,
 		]);
-		if (response)
+		sql = `
+		UPDATE 
+			profiles
+		SET 
+			name=?, 
+			birthday=? 
+		WHERE 
+			user_id = ?;`;
+		const response2 = await execute(sql, [
+			name,
+			reformatDate(birthday),
+			user_id,
+			]);
+		if (response && response2)
 			return res.status(200).json({
 				message: 'User information updated successfully',
 			});

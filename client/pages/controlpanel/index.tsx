@@ -19,7 +19,7 @@ import { API, authAPI } from '../../utilities/api';
 const LoggedIn = () => {
 	// Context states
 	const { userData, updateUserData, setProfile, refreshToken, updateRefreshToken, updateAccessToken } = useUserContext();
-	const { setActivePage } = useNotificationContext();
+	const { setActivePage, setActiveChatUser } = useNotificationContext();
 
 	// validator states
 	const [validUsername, setValidUsername] = useState(false);
@@ -160,6 +160,30 @@ const LoggedIn = () => {
 					setValues({
 						...values,
 						birthday: new Date(response.data.userData.birthday)
+						.toISOString()
+						.substring(0, 10),
+						username: response.data.userData.username,
+						email: response.data.userData.email,
+						name: response.data.userData.name,
+					});
+				}
+			} catch (err) {}
+		};
+		setActivePage(ActivePage.CONTROL_PANEL);
+		setActiveChatUser(0)
+		getUserData();
+	}, [userData.user_id]);
+
+	useEffect(() => {
+		const getUserData = async () => {
+			try {
+				if (!userData.user_id || !success) return;
+				setActivePage(ActivePage.CONTROL_PANEL);
+				let response = await authAPI.get(`/user/${userData.user_id}`);
+				if (response?.data?.userData) {
+					updateUserData({
+						...userData,
+						birthday: new Date(response.data.userData.birthday)
 							.toISOString()
 							.substring(0, 10),
 						username: response.data.userData.username,
@@ -170,8 +194,7 @@ const LoggedIn = () => {
 			} catch (err) {}
 		};
 		getUserData();
-		setActivePage(ActivePage.CONTROL_PANEL);
-	}, [userData.user_id]);
+	}, [success]);
 
 	// Update object values
 	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {

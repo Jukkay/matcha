@@ -19,7 +19,7 @@ const saveFilenames = async (user_id: string, filenames: string[]) => {
 			(filename) =>
 				Promise.resolve(execute(sql, [user_id, filename]))
 		)
-	)
+	).catch(error => console.error(error))
 	return response
 };
 

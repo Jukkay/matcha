@@ -8,7 +8,7 @@ import {
 	UnlikeButtonProps,
 } from '../types/types';
 import { authAPI } from '../utilities/api';
-import { useSocketContext } from './SocketContext';
+import { socket } from './socket';
 import { useUserContext } from './UserContext';
 
 export const LikeButton = ({
@@ -17,7 +17,6 @@ export const LikeButton = ({
 	setMatch,
 }: LikeButtonProps) => {
 	const { userData } = useUserContext();
-	const socket = useSocketContext();
 
 	const likeProfile = async () => {
 		const liked = profile.user_id;
@@ -37,6 +36,8 @@ export const LikeButton = ({
 					notification_text: `Somebody liked you!`,
 					link: `/profile/${liker}`,
 				};
+				if (socket.disconnected)
+					socket.open()
 				socket.emit('send_notification', liked, notification);
 				// Send match notification
 				if (response.data.match) {
@@ -82,7 +83,6 @@ export const UnlikeButton = ({
 	setMatch,
 }: UnlikeButtonProps) => {
 	const { userData } = useUserContext();
-	const socket = useSocketContext();
 
 	const unlikeProfile = async () => {
 		const liked = otherUserProfile.user_id;
@@ -99,6 +99,8 @@ export const UnlikeButton = ({
 				link: `/profile/${liker}`,
 			};
 			if (response.status === 200) {
+				if (socket.disconnected)
+					socket.open()
 				socket.emit('send_notification', liked, notification);
 			}
 		} catch (err) {}

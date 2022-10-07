@@ -2,6 +2,7 @@ import { API } from '../../utilities/api';
 import type { NextPage } from 'next';
 import { useEffect } from 'react';
 import { useUserContext } from '../../components/UserContext';
+import { socket } from '../../components/socket';
 
 const Logout: NextPage = () => {
 	const {
@@ -15,6 +16,8 @@ const Logout: NextPage = () => {
 	useEffect(() => {
 		if (!refreshToken) return;
 		try {
+			if (socket.connected)
+				socket.disconnect();
 			API.post('/logout/', {
 				refreshToken: refreshToken,
 			});

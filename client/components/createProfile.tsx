@@ -48,7 +48,6 @@ export const CreateProfile = ({
 
 	// Preset profile values
 	useEffect(() => {
-		setInterests(profile.interests);
 		setProfile({ ...profile, min_age: age - 5, max_age: age + 5 });
 	}, []);
 

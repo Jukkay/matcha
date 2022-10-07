@@ -452,7 +452,16 @@ V What happens if user is unmatched or blocked during chat?
 V Add validators to profile, chat and search inputs
 V Check that cosmetically everything is ok
 V Made filenames in an array in random user script
-
+V Remove auto connect from sockets
+V Add socket connect where socket is used
+V Add socket disconnect to logout
+V Refresh userdata state after update
+V Change min famerating to 0
+V Add activepage and reset activechatuser to make sure notifications come through
+V Add catch to promise.all on likes page
+V Make messages and likes only show in their own notification counters
+Remove message notifications from notifications dropdown
+Fix No Profile message spacing
 Test all required functionality
 
 # Backlog

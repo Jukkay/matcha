@@ -310,7 +310,7 @@ export interface INotification {
 
 export enum ActivePage {
 	MESSAGES = 'Messages',
-	DISCOVER = 'Discover',
+	SEARCH = 'Search',
 	MAIN = 'Main',
 	PROFILE = 'Profile',
 	OTHER_PROFILE = 'Other profile',

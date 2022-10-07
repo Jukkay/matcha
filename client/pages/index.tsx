@@ -9,7 +9,7 @@ import {
 	Recommendations,
 } from '../components/frontpage';
 import { useUserContext } from '../components/UserContext';
-import { IResultsProfile, LoadStatus } from '../types/types';
+import { ActivePage, IResultsProfile, LoadStatus } from '../types/types';
 import { authAPI } from '../utilities/api';
 import {
 	addDistanceToProfiles,
@@ -17,6 +17,7 @@ import {
 } from '../utilities/helpers';
 import { moreCommonTagsFirst } from '../utilities/sort';
 import { LandingPage } from '../components/landingPage';
+import { useNotificationContext } from '../components/NotificationContext';
 
 const NotLoggedIn = () => {
 	return (
@@ -29,6 +30,7 @@ const LoggedIn = () => {
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
 	const [results, setResults] = useState<IResultsProfile[]>([]);
 	const [wasRedirected, setWasRedirected] = useState(false);
+	const { setActivePage, setActiveChatUser } = useNotificationContext();
 	const router = useRouter();
 
 	// Redirect if user has no profile
@@ -87,6 +89,8 @@ const LoggedIn = () => {
 	};
 
 	useEffect(() => {
+		setActivePage(ActivePage.MAIN)
+		setActiveChatUser(0)
 		searchDatabase();
 	}, []);
 

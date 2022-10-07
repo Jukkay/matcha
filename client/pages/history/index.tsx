@@ -14,7 +14,7 @@ import { LandingPage } from '../../components/landingPage';
 
 const LoggedIn = () => {
 	const { userData } = useUserContext();
-	const { setActivePage } = useNotificationContext();
+	const { setActivePage, setActiveChatUser } = useNotificationContext();
 	const [log, setLog] = useState([]);
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
 	const [wasRedirected, setWasRedirected] = useState(false);
@@ -66,6 +66,7 @@ const LoggedIn = () => {
 		};
 		getVisitorLog();
 		setActivePage(ActivePage.HISTORY);
+		setActiveChatUser(0)
 		return () => controller.abort();
 	}, []);
 
@@ -93,10 +94,10 @@ const LoggedIn = () => {
 			)}
 		</div>
 	) : (
-		<section className="section">
-			<h3 className="title is-3">Recently visited profiles</h3>
+		<div className="my-6 pt-6">
+			<h1 className="title is-1">Recently visited profiles</h1>
 			<div className="block">No visits yet</div>
-		</section>
+		</div>
 	);
 };
 

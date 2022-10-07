@@ -7,7 +7,7 @@ import { useUserContext } from '../../components/UserContext';
 import { API, authAPI } from '../../utilities/api';
 import Link from 'next/link';
 import { handleRouteError } from '../../utilities/helpers';
-import { socket } from '../../components/SocketContext';
+import { socket } from '../../components/socket';
 import { SubmitButton } from '../../components/buttons';
 
 const LoginSuccess = () => {
