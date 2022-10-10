@@ -70,12 +70,14 @@ const onlineUsers: IOnlineUser[] = [];
 const updateOnlineUsers = (user_id: number, socket_id: string) => {
 	const i = onlineUsers?.findIndex((item) => item.user_id === user_id);
 	if (i && i > -1) {
+		console.log('Updating existing online user', user_id, socket_id);
 		onlineUsers[i] = {
 			user_id: user_id,
 			socket_id: socket_id,
 			active: Date.now(),
 		};
 	} else {
+		console.log('Adding new online user', user_id, socket_id);
 		onlineUsers.push({
 			user_id: user_id,
 			socket_id: socket_id,
@@ -121,17 +123,20 @@ io.on('connection', (socket) => {
 	try {
 		// Chat
 		socket.on('active_chat', (data) => {
+			console.log('Setting active chat', data);
 			socket.join(data);
 			updateUserActivity(socket.id);
 		});
 
 		socket.on('send_message', async (matchID, data) => {
 			if (!matchID) return;
+			console.log('Sending message', matchID, data);
 			// Save message to database
 			const response = await saveMessageToDatabase(data);
 			if (!response)
 				throw new Error('Failed to save message. Please try again.');
 			// Emit to receiver
+			console.log('Emitting message notification');
 			socket.to(matchID).emit('receive_message', data);
 			updateUserActivity(socket.id);
 		});
@@ -139,16 +144,19 @@ io.on('connection', (socket) => {
 		// Notifications
 
 		socket.on('set_user', (data) => {
+			console.log('Setting notification user', data);
 			updateOnlineUsers(data, socket.id);
 			socket.join(data);
 		});
 
 		socket.on('send_notification', async (user_id, data) => {
 			if (!user_id) return;
+			console.log('Sending notification', data);
 			// Save notification to database
 			await saveNotificationToDatabase(data);
 
 			// Emit to user
+			console.log('Emitting notification to user');
 			socket.to(user_id).emit('receive_notification', data);
 			updateUserActivity(socket.id);
 		});
@@ -161,6 +169,10 @@ io.on('connection', (socket) => {
 				online: onlineStatus,
 			});
 			updateUserActivity(socket.id);
+		});
+		// Disconnect debug
+		socket.on("disconnect", (reason) => {
+			console.log('Disconnected socket', socket, reason)
 		});
 	} catch (err) {
 		console.error(err);

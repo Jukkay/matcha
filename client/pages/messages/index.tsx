@@ -25,7 +25,7 @@ import { LandingPage } from '../../components/landingPage';
 const LoggedIn = () => {
 	const { userData } = useUserContext();
 	const [loadStatus, _setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
-	const { setMessageCount, setActivePage } = useNotificationContext();
+	const { setMessageCount } = useNotificationContext();
 	const [wasRedirected, setWasRedirected] = useState(false);
 	const router = useRouter();
 
@@ -46,8 +46,6 @@ const LoggedIn = () => {
 
 	useEffect(() => {
 		markMessageNotificationsRead();
-		setActivePage(ActivePage.MESSAGES)
-		
 	}, [userData.user_id]);
 
 	const markMessageNotificationsRead = async () => {
@@ -258,11 +256,12 @@ const ReportMenu = ({ reporter, reported, setMatchData, setActiveChatUser }: any
 		</div>
 	);
 };
+
 const MatchList = () => {
 	const { profile } = useUserContext();
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
 	const [matches, setMatches] = useState<IMatch[]>([]);
-	const { matchData, setMatchData } = useNotificationContext();
+	const { setActivePage } = useNotificationContext();
 
 	useEffect(() => {
 		const getUsersMatches = async () => {
@@ -280,12 +279,8 @@ const MatchList = () => {
 			}
 		};
 		getUsersMatches();
+		setActivePage(ActivePage.MESSAGES);
 	}, [profile.user_id]);
-
-	// useEffect(() => {
-	// 	setMatchData({})
-	// 	setActiveChatUser(0)
-	// }, []);
 
 	if (loadStatus == LoadStatus.LOADING) return <Spinner />;
 	if (loadStatus == LoadStatus.ERROR)
@@ -298,8 +293,6 @@ const MatchList = () => {
 				<MatchListItem
 					key={index}
 					match={match}
-					matchData={matchData}
-					setMatchData={setMatchData}
 					user_id={profile.user_id}
 				/>
 			))}
@@ -319,8 +312,6 @@ const OnlineIndicator = ({ user_id }: OnlineStatusProps) => {
 	// Query online status and listen for response
 	useEffect(() => {
 		try {
-			if (socket.disconnected)
-				socket.open()
 			socket.on('online_response', (data) => {
 				if (data.queried_id === user_id) setOnline(data.online);
 			});
@@ -342,16 +333,21 @@ const MatchListItem = ({ match, user_id }: any) => {
 	const name = user_id === match.user1 ? match.name2 : match.name1;
 	const profile_image = user_id === match.user1 ? match.image2 : match.image1;
 	const receiver_id = user_id === match.user1 ? match.user2 : match.user1;
-	const { matchData, setMatchData, setActiveChatUser } =
+	const { setActiveChatUser, matchData, setMatchData } =
 		useNotificationContext();
 
+	useEffect(() => {
+		console.log('matchData updated in handleClick', matchData);
+	}, [matchData])
+	
 	const handleClick = (event: React.MouseEvent) => {
 		event.preventDefault();
-		setMatchData({
+		const newData = {
 			match_id: match.match_id,
 			sender_id: user_id,
 			receiver_id: receiver_id,
-		});
+		}
+		setMatchData(newData);
 		setActiveChatUser(receiver_id);
 	};
 
@@ -416,6 +412,10 @@ const ChatWindow = () => {
 	const { profile } = useUserContext();
 	const [startIndex, setStartIndex] = useState(received.length);
 
+	useEffect(() => {
+		console.log('MatchData updated', matchData)
+	}, [matchData]);
+
 	// Infinite scroll hooks
 	const { ref, inView } = useInView({
 		threshold: 0,
@@ -434,6 +434,7 @@ const ChatWindow = () => {
 	const scrollToBottom = () => {
 		windowBottom?.current?.scrollIntoView();
 	};
+
 	useEffect(() => {
 		scrollToBottom();
 		setStartIndex(received.length - 10 > 0 ? received.length - 10 : 0);
@@ -444,8 +445,6 @@ const ChatWindow = () => {
 		payload: {},
 		notification: {}
 	) => {
-		if (socket.disconnected)
-				socket.open()
 		socket.emit('send_message', matchData.match_id, payload);
 		socket.emit('send_notification', matchData.receiver_id, notification);
 	};
@@ -454,15 +453,15 @@ const ChatWindow = () => {
 		try {
 			if (!matchData.match_id) return;
 			setReceived([]);
-			if (socket.disconnected)
-				socket.open()
 			socket.emit('active_chat', matchData.match_id);
 			setLoadStatus(LoadStatus.LOADING);
 			const response = await authAPI(`/messages/${matchData.match_id}`, {
 				signal: controller.signal,
 			});
-			if (response?.data?.messages?.length > 0)
+			if (response?.data?.messages?.length > 0) {
 				setReceived([...response.data.messages]);
+				console.log('set received in selectChat')
+			}
 		} catch (err) {
 			setLoadStatus(LoadStatus.ERROR);
 		} finally {
@@ -491,6 +490,7 @@ const ChatWindow = () => {
 				link: '/messages',
 			};
 			setReceived((current) => [...current, payload]);
+			console.log('added payload to received in sendMessage')
 			emitMessageAndNotification(matchData, payload, notification);
 			await selectChat(controller);
 			setOutgoing('');
@@ -507,11 +507,13 @@ const ChatWindow = () => {
 
 	useEffect(() => {
 		try {
-			if (socket.disconnected)
-				socket.open()
 			socket.on('receive_message', (data) => {
-				console.log('Received message', data)
-				setReceived((current) => [...current, data]);
+				console.log('message received', data)
+				console.log('current matchData', matchData)
+				if (data.match_id == matchData.match_id) {
+					setReceived((current) => [...current, data]);
+					console.log('set received in receive_message listener')
+				}
 			});
 		} catch (err) {}
 		return () => {
@@ -521,29 +523,7 @@ const ChatWindow = () => {
 
 	useEffect(() => {
 		const controller = new AbortController();
-		const selectChat = async () => {
-			try {
-				if (!matchData.match_id) return;
-				setReceived([]);
-				if (socket.disconnected)
-					socket.open()
-				socket.emit('active_chat', matchData.match_id);
-				setLoadStatus(LoadStatus.LOADING);
-				const response = await authAPI(
-					`/messages/${matchData.match_id}`,
-					{
-						signal: controller.signal,
-					}
-				);
-				if (response?.data?.messages?.length > 0)
-					setReceived([...response.data.messages]);
-			} catch (err) {
-				setLoadStatus(LoadStatus.ERROR);
-			} finally {
-				setLoadStatus(LoadStatus.IDLE);
-			}
-		};
-		selectChat();
+		selectChat(controller);
 		return () => controller.abort();
 	}, [matchData.match_id]);
 

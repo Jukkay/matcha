@@ -45,7 +45,7 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
 		user_longitude: '',
 		famerating: 0,
 	});
-
+	console.log('usercontext initialized')
 	// Read from sessionStorage
 	useEffect(() => {
 		updateUserData((current) => {
