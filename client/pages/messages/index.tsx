@@ -27,6 +27,7 @@ const LoggedIn = () => {
 	const [loadStatus, _setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
 	const { setMessageCount } = useNotificationContext();
 	const [wasRedirected, setWasRedirected] = useState(false);
+	const [currentChat, setCurrentChat] = useState(0);
 	const router = useRouter();
 
 	// Router error event listener and handler
@@ -67,8 +68,8 @@ const LoggedIn = () => {
 
 	return (
 		<div className="is-flex is-flex-direction-row is-justify-content-center is-align-content-center">
-			<ChatWindow />
-			<MatchList />
+			<ChatWindow currentChat={currentChat} />
+			<MatchList setCurrentChat={setCurrentChat} />
 		</div>
 	);
 };
@@ -257,7 +258,7 @@ const ReportMenu = ({ reporter, reported, setMatchData, setActiveChatUser }: any
 	);
 };
 
-const MatchList = () => {
+const MatchList = ({setCurrentChat}: any) => {
 	const { profile } = useUserContext();
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
 	const [matches, setMatches] = useState<IMatch[]>([]);
@@ -294,6 +295,7 @@ const MatchList = () => {
 					key={index}
 					match={match}
 					user_id={profile.user_id}
+					setCurrentChat={setCurrentChat}
 				/>
 			))}
 		</div>
@@ -328,7 +330,7 @@ const OnlineIndicator = ({ user_id }: OnlineStatusProps) => {
 		<div className="round-gray"></div>
 	);
 };
-const MatchListItem = ({ match, user_id }: any) => {
+const MatchListItem = ({ match, user_id, setCurrentChat }: any) => {
 	// Check if user is user1 or user2
 	const name = user_id === match.user1 ? match.name2 : match.name1;
 	const profile_image = user_id === match.user1 ? match.image2 : match.image1;
@@ -336,18 +338,14 @@ const MatchListItem = ({ match, user_id }: any) => {
 	const { setActiveChatUser, matchData, setMatchData } =
 		useNotificationContext();
 
-	useEffect(() => {
-		console.log('matchData updated in handleClick', matchData);
-	}, [matchData])
-	
 	const handleClick = (event: React.MouseEvent) => {
 		event.preventDefault();
-		const newData = {
+		setMatchData({
 			match_id: match.match_id,
 			sender_id: user_id,
 			receiver_id: receiver_id,
-		}
-		setMatchData(newData);
+		});
+		setCurrentChat(match.match_id)
 		setActiveChatUser(receiver_id);
 	};
 
@@ -403,7 +401,7 @@ const MatchListItem = ({ match, user_id }: any) => {
 	);
 };
 
-const ChatWindow = () => {
+const ChatWindow = ({currentChat}) => {
 	const [received, setReceived] = useState<{}[]>([]);
 	const [outgoing, setOutgoing] = useState('');
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
@@ -415,6 +413,10 @@ const ChatWindow = () => {
 	useEffect(() => {
 		console.log('MatchData updated', matchData)
 	}, [matchData]);
+
+	useEffect(() => {
+		console.log('currentChat updated', currentChat)
+	}, [currentChat]);
 
 	// Infinite scroll hooks
 	const { ref, inView } = useInView({
@@ -510,7 +512,8 @@ const ChatWindow = () => {
 			socket.on('receive_message', (data) => {
 				console.log('message received', data)
 				console.log('current matchData', matchData)
-				if (data.match_id == matchData.match_id) {
+				console.log('currentChat in receive message', currentChat)
+				if (data.match_id == currentChat) {
 					setReceived((current) => [...current, data]);
 					console.log('set received in receive_message listener')
 				}

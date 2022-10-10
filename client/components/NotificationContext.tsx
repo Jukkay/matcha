@@ -18,7 +18,6 @@ export const NotificationContextProvider = ({
 		sender_id: 0,
 		receiver_id: 0,
 	});
-	console.log('matchData initialized in notification context')
 	const [activeChatUser, setActiveChatUser] = useState(0);
 	const [notifications, setNotifications] = useState<INotification[]>([]);
 	const [notificationCount, setNotificationCount] = useState(0);
