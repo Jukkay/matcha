@@ -44,7 +44,7 @@ const LoggedIn = () => {
 	);
 	const [sortedResults, setSortedResults] = useState<IResultsProfile[]>([]);
 	const [wasRedirected, setWasRedirected] = useState(false);
-	const { setActivePage, setActiveChatUser } = useNotificationContext();
+	const { setActivePage, setMatchData } = useNotificationContext();
 	const router = useRouter();
 
 	// Router error event listener and handler
@@ -58,7 +58,7 @@ const LoggedIn = () => {
 	// Set Active Page
 	useEffect(() => {
 		setActivePage(ActivePage.SEARCH)
-		setActiveChatUser(0)
+		setMatchData({})
 	}, []);
 
 	// Redirect if user has no profile

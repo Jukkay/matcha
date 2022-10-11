@@ -55,7 +55,7 @@ const LoggedInControls = () => {
 	const { refreshToken, userData, updateAccessToken, profile } =
 		useUserContext();
 	const {
-		activeChatUser,
+		matchData,
 		activePage,
 		notifications,
 		setNotifications,
@@ -65,9 +65,6 @@ const LoggedInControls = () => {
 		likeCount,
 	} = useNotificationContext();
 
-	useEffect(() => {
-		console.log('activeChatUser updated', activeChatUser);
-	}, [activeChatUser]);
 	// Subscribe for and fetch notifications
 	useEffect(() => {
 		if (!userData.user_id) return;
@@ -98,6 +95,7 @@ const LoggedInControls = () => {
 		if (!userData.user_id) return;
 		try {
 			if (socket.disconnected) socket.open();
+			console.log('Setting up socket listeners. Socket disconnected?', socket.disconnected)
 			socket.on('connect_error', async (err) => {
 				if (err.message === 'Unauthorized') {
 					const refreshResponse = await axios.post(`/token/`, {
@@ -116,28 +114,33 @@ const LoggedInControls = () => {
 			});
 			socket.on('receive_notification', (data) => {
 				console.log('Received notification', data)
-				console.log('activePage', activePage);
-				console.log('activeChatUser', activeChatUser);
-				if (activeChatUser === data.sender_id) return;
-				if (data.notification_type === NotificationType.MESSAGE)
+				if (data.notification_type === NotificationType.MESSAGE) {
+					console.log('Message notification')
+					if (matchData.receiver_id === data.sender_id) return;
+					console.log('Updating message counter')
 					setMessageCount((messageCount: number) => messageCount + 1);
-				else if (data.notification_type === NotificationType.LIKE)
+				}
+				else if (data.notification_type === NotificationType.LIKE) {
+					console.log('Like notification. Updating like counter.')
 					setLikeCount((likeCount: number) => likeCount + 1);
-				else
+				}
+				else {
+					console.log('Other notification. Updating notification counter')
 					setNotificationCount(
 						(notificationCount: number) => notificationCount + 1
-					);
+						);
+					}
 			});
 		} catch (err) {}
 		return () => {
 			socket.removeAllListeners('receive_notification');
 			socket.removeAllListeners('connect_error');
 		};
-	}, [userData.user_id]);
+	}, [userData.user_id, matchData.receiver_id]);
 
 	// Count notifications and update badges
 	useEffect(() => {
-		if (notifications?.length < 1) return;
+		// if (notifications?.length < 1) return;
 		// Update notification counts
 
 		const likes = notifications.filter((item: INotification) => {
@@ -163,7 +166,7 @@ const LoggedInControls = () => {
 			return false;
 		}).length;
 		setNotificationCount(all - likes - messages);
-	}, [notifications, activeChatUser, activePage]);
+	}, [notifications, matchData, activePage]);
 
 	// Token state
 	return (

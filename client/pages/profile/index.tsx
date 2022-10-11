@@ -12,7 +12,7 @@ import { authAPI } from '../../utilities/api';
 
 const LoggedIn = () => {
 	const { userData, updateUserData, profile, setProfile } = useUserContext();
-	const { setActivePage, setActiveChatUser } = useNotificationContext();
+	const { setActivePage, setMatchData } = useNotificationContext();
 	const [editMode, setEditMode] = useState(false);
 
 	// Fetch profile data
@@ -38,7 +38,7 @@ const LoggedIn = () => {
 		};
 		getUserProfile();
 		setActivePage(ActivePage.PROFILE);
-		setActiveChatUser(0)
+		setMatchData({})
 	}, [userData.user_id]);
 
 	return editMode ? (

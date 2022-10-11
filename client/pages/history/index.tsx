@@ -14,7 +14,7 @@ import { LandingPage } from '../../components/landingPage';
 
 const LoggedIn = () => {
 	const { userData } = useUserContext();
-	const { setActivePage, setActiveChatUser } = useNotificationContext();
+	const { setActivePage, setMatchData } = useNotificationContext();
 	const [log, setLog] = useState([]);
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
 	const [wasRedirected, setWasRedirected] = useState(false);
@@ -66,7 +66,7 @@ const LoggedIn = () => {
 		};
 		getVisitorLog();
 		setActivePage(ActivePage.HISTORY);
-		setActiveChatUser(0)
+		setMatchData({})
 		return () => controller.abort();
 	}, []);
 

@@ -460,8 +460,13 @@ V Change min famerating to 0
 V Add activepage and reset activechatuser to make sure notifications come through
 V Add catch to promise.all on likes page
 V Make messages and likes only show in their own notification counters
-Remove message notifications from notifications dropdown
-Fix No Profile message spacing
+V Remove message notifications from notifications dropdown
+V Fix issue with messages showing in wrong chats
+V Fix issue with notifications not working
+V Check why we get profile with user_id 0
+V Fix No Profile message spacing
+V Fix notification counters
+
 Test all required functionality
 
 # Backlog

@@ -112,6 +112,7 @@ const createProfile = async (data: any) => {
             );
         }
         const user_id = userIDs.get(data[key].login.username);
+        if (!user_id) continue
         const filenames: string[][] = [];
         for (let i = 0; i < 5; i++) {
             const filename =

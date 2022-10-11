@@ -129,7 +129,7 @@ const LoggedIn = () => {
 	return profileExists ? (
 		<ProfileViewWithLikeButtons otherUserProfile={otherUserProfile} />
 	) : (
-		<section className="section has-text-centered">
+		<section className="section has-text-centered my-6">
 			<h3 className="title is-3">No profile found.</h3>
 		</section>
 	);

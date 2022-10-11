@@ -18,7 +18,6 @@ export const NotificationContextProvider = ({
 		sender_id: 0,
 		receiver_id: 0,
 	});
-	const [activeChatUser, setActiveChatUser] = useState(0);
 	const [notifications, setNotifications] = useState<INotification[]>([]);
 	const [notificationCount, setNotificationCount] = useState(0);
 	const [messageCount, setMessageCount] = useState(0);
@@ -32,8 +31,6 @@ export const NotificationContextProvider = ({
 				setActivePage,
 				matchData,
 				setMatchData,
-				activeChatUser,
-				setActiveChatUser,
 				notifications,
 				setNotifications,
 				notificationCount,

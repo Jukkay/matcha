@@ -104,9 +104,9 @@ const getProfile = async (req: Request, res: Response) => {
 			});
 
 		const user_id = req.params.id;
-		if (!user_id)
+		if (!user_id || user_id === '0')
 			return res.status(400).json({
-				message: 'No user id given',
+				message: 'Invalid user ID',
 			});
 		const sql = `
 				SELECT 

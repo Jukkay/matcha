@@ -19,7 +19,7 @@ import { API, authAPI } from '../../utilities/api';
 const LoggedIn = () => {
 	// Context states
 	const { userData, updateUserData, setProfile, refreshToken, updateRefreshToken, updateAccessToken } = useUserContext();
-	const { setActivePage, setActiveChatUser } = useNotificationContext();
+	const { setActivePage, setMatchData } = useNotificationContext();
 
 	// validator states
 	const [validUsername, setValidUsername] = useState(false);
@@ -170,7 +170,7 @@ const LoggedIn = () => {
 			} catch (err) {}
 		};
 		setActivePage(ActivePage.CONTROL_PANEL);
-		setActiveChatUser(0)
+		setMatchData({})
 		getUserData();
 	}, [userData.user_id]);
 

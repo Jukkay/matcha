@@ -19,7 +19,7 @@ import { LandingPage } from '../../components/landingPage';
 
 const LoggedIn = () => {
 	const { userData } = useUserContext();
-	const { setActivePage, setLikeCount, setActiveChatUser } =
+	const { setActivePage, setLikeCount, setMatchData } =
 		useNotificationContext();
 	const [likedProfiles, setLikedProfiles] = useState<ILikeProfile[]>([]);
 	const [likerProfiles, setLikerProfiles] = useState<ILikeProfile[]>([]);
@@ -89,7 +89,7 @@ const LoggedIn = () => {
 			}
 		};
 		setActivePage(ActivePage.LIKES);
-		setActiveChatUser(0);
+		setMatchData({})
 		fetchData();
 		return () => {
 			controller1.abort();

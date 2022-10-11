@@ -30,7 +30,7 @@ const LoggedIn = () => {
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
 	const [results, setResults] = useState<IResultsProfile[]>([]);
 	const [wasRedirected, setWasRedirected] = useState(false);
-	const { setActivePage, setActiveChatUser } = useNotificationContext();
+	const { setActivePage, setMatchData } = useNotificationContext();
 	const router = useRouter();
 
 	// Redirect if user has no profile
@@ -90,7 +90,7 @@ const LoggedIn = () => {
 
 	useEffect(() => {
 		setActivePage(ActivePage.MAIN)
-		setActiveChatUser(0)
+		setMatchData({})
 		searchDatabase();
 	}, []);
 
