@@ -122,7 +122,7 @@ export const validateRegistrationInput = async (
 		});
 };
 
-export const validateNewProfile = (req: Request, res: Response) => {
+export const validateNewProfile = (req: Request) => {
 	const {
 		country,
 		city,
@@ -138,7 +138,7 @@ export const validateNewProfile = (req: Request, res: Response) => {
 		latitude,
 		longitude,
 	} = req.body;
-
+	console.log(req.body);
 	if (
 		!country ||
 		!city ||
@@ -152,9 +152,7 @@ export const validateNewProfile = (req: Request, res: Response) => {
 		!name ||
 		!profile_image
 	)
-		return res.status(400).json({
-			message: 'Incomplete profile information',
-		});
+		return {valid: false, message: 'Incomplete profile information'}
 	if (
 		country.length > 56 ||
 		city.length > 85 ||
@@ -168,13 +166,10 @@ export const validateNewProfile = (req: Request, res: Response) => {
 		name.length > 255 ||
 		profile_image.length > 255
 	)
-		return res.status(400).json({
-			message: 'Incorrect input',
-		});
+		return {valid: false, message: 'Incorrect input'}
 	if (latitude?.length > 32 || longitude?.length > 32)
-		return res.status(400).json({
-			message: 'Incorrect input',
-		});
+		return {valid: false, message: 'Incorrect input'}
+	return {valid: true, message: 'Input is valid'}
 };
 
 export const validateUpdateProfile = (req: Request, res: Response) => {
@@ -275,19 +270,135 @@ export const validateLogin = (req: Request, res: Response) => {
 		});
 };
 
-export const validateUpdateUser = (req: Request, res: Response) => {
-	const { username, password, name, email, birthday } = req.body;
-	if (!username || !password || !name || !email || !birthday)
+export const validateUpdateUser = async(req: Request, res: Response, user_id: string) => {
+	const { username, password, confirmPassword, name, email, birthday } =
+		req.body;
+
+	// check exists
+
+	if (!username)
 		return res.status(400).json({
-			message: 'Incomplete user information',
+			field: 'username',
+			message: 'Missing username.',
 		});
-	if (
-		username.length > 32 ||
-		password.length > 255 ||
-		name.length > 255 ||
-		!reformatDate(birthday)
-	)
+	if (!password)
 		return res.status(400).json({
-			message: 'Incorrect input',
+			field: 'password',
+			message: 'Missing password.',
+		});
+	if (!confirmPassword)
+		return res.status(400).json({
+			field: 'confirmPassword',
+			message: 'Missing password confirmation.',
+		});
+	if (!email)
+		return res.status(400).json({
+			field: 'email',
+			message: 'Missing email.',
+		});
+	if (!birthday)
+		return res.status(400).json({
+			field: 'birthday',
+			message: 'Missing birthday.',
+		});
+
+	// check input length
+
+	if (username.length > 32 || username.length < 3)
+		return res.status(400).json({
+			field: 'username',
+			message: 'Username must be between 3 and 32 characters long.',
+		});
+	if (password.length > 255 || password.length < 8)
+		return res.status(400).json({
+			field: 'password',
+			message: 'Password must be between 8 and 255 characters long.',
+		});
+	if (email.length > 320 || email.length < 6)
+		return res.status(400).json({
+			field: 'email',
+			message: 'Email must be between 6 and 320 characters long.',
+		});
+	if (name?.length > 255)
+		return res.status(400).json({
+			field: 'name',
+			message: 'Name has maximum length of 255 characters.',
+		});
+	if (birthday.length != 10)
+		return res.status(400).json({
+			field: 'birthday',
+			message: 'Invalid birthday length.',
+		});
+
+	// check username validity
+	if (!/^[a-zA-Z0-9.]{3,32}$/i.test(username))
+		return res.status(400).json({
+			field: 'username',
+			message:
+				'Invalid username. Only characters a-z and 0-9 are allowed.',
+		});
+	// check email validity
+	if (!/^\S+@\S+\.\S+$/i.test(email))
+		return res.status(400).json({
+			field: 'email',
+			message: 'Invalid email address.',
+		});
+	// check password match
+	if (password !== confirmPassword)
+		return res.status(400).json({
+			field: 'confirmPassword',
+			message: "Passwords don't match.",
+		});
+
+	// check password validity
+	if (!/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/i.test(password))
+		return res.status(400).json({
+			field: 'password',
+			message:
+				'Password must include at least one number and one uppercase and lowercase characters.',
+		});
+
+	// Check birthday validity
+	const now = new Date().getTime();
+	const bd = new Date(birthday).getTime();
+	const age = (now - bd) / (1000 * 60 * 60 * 24) / 365;
+	if (age < 18)
+		return res.status(400).json({
+			field: 'birthday',
+			message:
+				'You seem to be too young. Must be at least 18 years old to register.',
+		});
+
+	// check username exists
+	const sql = `
+		SELECT 
+			username 
+		FROM 
+			users 
+		WHERE 
+			username = ?
+			AND
+			NOT user_id = ?`;
+	const usercheck = await execute(sql, [username, user_id]);
+	if (usercheck.length)
+		return res.status(400).json({
+			field: 'username',
+			message: 'Username is already taken.',
+		});
+	// check email exists
+	const sql2 = `
+		SELECT 
+			email 
+		FROM 
+			users 
+		WHERE 
+			email = ?
+			AND
+			NOT user_id = ?`;
+	const emailcheck = await execute(sql2, [email, user_id]);
+	if (emailcheck.length)
+		return res.status(400).json({
+			field: 'email',
+			message: 'Email is associated with an existing account.',
 		});
 };

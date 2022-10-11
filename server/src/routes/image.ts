@@ -6,10 +6,14 @@ import multer, { FileFilterCallback } from 'multer';
 import path from 'path';
 import { decodeUserFromAccesstoken } from '../controllers/token';
 
-type DestinationCallback = (err: Error | null, destination: string) => void
-type FilenameCallback = (err: Error | null, filename: string) => void
+type DestinationCallback = (err: Error | null, destination: string) => void;
+type FilenameCallback = (err: Error | null, filename: string) => void;
 
-const checkFileValidity = (req: Request, file: Express.Multer.File, callback: FileFilterCallback) => {
+const checkFileValidity = (
+	req: Request,
+	file: Express.Multer.File,
+	callback: FileFilterCallback
+) => {
 	const validExtensions = /png|jpg|jpeg|gif|/;
 	const validFileType = validExtensions.test(
 		path?.extname(file.originalname).toLowerCase()
@@ -21,10 +25,18 @@ const checkFileValidity = (req: Request, file: Express.Multer.File, callback: Fi
 };
 
 const diskStorage = multer.diskStorage({
-	destination: (req: Request, file: Express.Multer.File, callback: DestinationCallback) => {
+	destination: (
+		req: Request,
+		file: Express.Multer.File,
+		callback: DestinationCallback
+	) => {
 		callback(null, './images');
 	},
-	filename: (req: Request, file: Express.Multer.File, callback: FilenameCallback) => {
+	filename: (
+		req: Request,
+		file: Express.Multer.File,
+		callback: FilenameCallback
+	) => {
 		const extension = file.mimetype.split('/')[1].toLowerCase();
 		const filename = `${uuidv4().toString()}.${extension}`;
 		callback(null, filename);
@@ -35,7 +47,7 @@ const diskStorage = multer.diskStorage({
 const upload = multer({
 	storage: diskStorage,
 	fileFilter: checkFileValidity,
-	limits: { fileSize: 10000000 },
+	limits: { fileSize: 10000000, files: 5 },
 });
 
 const imageRouter: express.Router = express.Router();
@@ -53,9 +65,11 @@ imageRouter.post(
 	async (req: Request, res: Response) => {
 		try {
 			// Get new filenames
-			const filenames = (req.files as Express.Multer.File[]).map((file) => {
+			const filenames = (req.files as Express.Multer.File[]).map(
+				(file) => {
 					return file.filename;
-			});
+				}
+			);
 
 			// Get user_id
 			const user_id = await decodeUserFromAccesstoken(req);
@@ -64,10 +78,7 @@ imageRouter.post(
 					message: 'Cannot parse user_id',
 				});
 			// Save filenames to database
-			const response = await controller.saveFilenames(
-				user_id,
-				filenames
-			);
+			const response = await controller.saveFilenames(user_id, filenames);
 			if (!response)
 				return res.status(500).json({
 					message: 'Failed to save filenames to database',

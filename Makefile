@@ -15,6 +15,9 @@ up:
 up-production:
 	docker compose -f docker-compose.yml -f production.yml up
 
+up-production-detached:
+	docker compose -f docker-compose.yml -f production.yml up -d
+
 restart:
 	docker-compose up -d
 
@@ -62,11 +65,12 @@ goto-db:
 logs:
 	docker-compose logs -f
 
-reset-db: docker volume rm matcha-data
+reset-db:
+	docker volume rm matcha-data
 
 fclean: clean reset-db
 
 users:
 	docker-compose exec server npm run createusers
 
-production: install-production build up-production users
+production: install-production build up-production-detached users logs

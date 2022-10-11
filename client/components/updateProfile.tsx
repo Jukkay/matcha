@@ -35,8 +35,11 @@ export const UpdateProfile = ({
 	const [deleted, setDeleted] = useState(false);
 	const [interestsError, setInterestsError] = useState(false);
 	const [coordinateError, setCoordinateError] = useState(false);
+	const [fileAmountError, setFileAmountError] = useState(false);
 	const [imageError, setImageError] = useState(false);
+	const [imageAmount, setImageAmount] = useState(0);
 	const [files, setFiles] = useState<FileList>();
+
 	const [interests, setInterests] = useState<string[]>([]);
 	const [query, setQuery] = useState('');
 	const [result, setResult] = useState<string[]>([]);
@@ -105,6 +108,10 @@ export const UpdateProfile = ({
 			}
 			// Check photos
 			if (files && files.length > 0) {
+				if (files.length + imageAmount > 5) {
+					setFileAmountError(true);
+					return;
+				}
 				// upload photos
 				await uploadPhotos();
 			}
@@ -234,13 +241,16 @@ export const UpdateProfile = ({
 					</div>
 
 					{/* Pictures */}
-					<EditGallery files={files} setImageError={setImageError} />
+					<EditGallery files={files} setImageError={setImageError} setImageAmount={setImageAmount} />
 					<ErrorMessage
 						errorMessage="You must have at least one picture."
 						error={imageError}
 					/>
-					<FileInput files={files} setFiles={setFiles} />
-
+					<FileInput files={files} setFiles={setFiles} setFileAmountError={setFileAmountError} setFileError={setImageError} imageAmount={imageAmount}/>
+					<ErrorMessage
+						errorMessage="You may not upload more than 5 pictures."
+						error={fileAmountError}
+					/>
 					<h3 className="title is-3 mt-6">
 						What kind of partner are you looking for?
 					</h3>
@@ -294,7 +304,7 @@ export const UpdateProfile = ({
 	);
 };
 
-export const EditGallery = ({ setImageError }: GalleryProps) => {
+export const EditGallery = ({ setImageError, setImageAmount }: GalleryProps) => {
 	const [images, setImages] = useState<string[]>([]);
 	const { userData, updateUserData, profile, setProfile } = useUserContext();
 
@@ -323,6 +333,7 @@ export const EditGallery = ({ setImageError }: GalleryProps) => {
 			if (response.status === 200) {
 				const newImages = images.filter((item) => item != url);
 				setImages([...newImages]);
+				setImageAmount(newImages.length)
 			}
 		} catch (err) {}
 	};
@@ -349,6 +360,7 @@ export const EditGallery = ({ setImageError }: GalleryProps) => {
 							`${authAPI.defaults.baseURL}/images/${item['filename']}`
 					);
 					setImages(filenames);
+					setImageAmount(filenames.length)
 				}
 			} catch (err) {}
 		};

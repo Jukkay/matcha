@@ -344,11 +344,20 @@ export const Gallery = ({ user_id }: OnlineStatusProps) => {
 	) : null;
 };
 
-export const FileInput = ({ files, setFiles }: FileInputProps) => {
+export const FileInput = ({ files, setFiles, setFileAmountError, setFileError, imageAmount }: FileInputProps) => {
 	const [preview, setPreview] = useState<string[]>([]);
 
 	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		if (!event.target.files) return;
+		if (!event.target.files || event.target.files.length < 1) {
+			setFileError(true);
+			return;
+		}
+		if (event.target.files.length + (imageAmount || 0) > 5) {
+			setFileAmountError(true);
+			return;
+		}
+		setFileError(false);
+		setFileAmountError(false);
 		setFiles(event.target.files);
 	};
 

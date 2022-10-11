@@ -34,6 +34,7 @@ export const CreateProfile = ({
 	const [success, setSuccess] = useState(false);
 	const [interestsError, setInterestsError] = useState(false);
 	const [fileError, setFileError] = useState(false);
+	const [fileAmountError, setFileAmountError] = useState(false);
 	const [files, setFiles] = useState<FileList>();
 	const [interests, setInterests] = useState<string[]>([]);
 	const [query, setQuery] = useState('');
@@ -85,13 +86,17 @@ export const CreateProfile = ({
 				setFileError(true);
 				return;
 			}
+			if (files.length > 5) {
+				setFileAmountError(true);
+				return;
+			}
 			// Check interests amount
 			if (interests?.length < 1) {
 				setInterestsError(true);
 				return;
 			}
 			// Add interests object to profile
-			let payload = profile;
+			let payload = {...profile};
 			payload.interests = interests;
 			// upload photos
 			const photoUpload = await uploadPhotos();
@@ -100,13 +105,15 @@ export const CreateProfile = ({
 				return;
 			}
 			// Get profile picture filename
-			payload.profile_image =
-				profile.profile_image === 'default.png'
-					? photoUpload.data.filenames[0]
-					: photoUpload.data.filenames[profile.profile_image];
+			const profile_image = profile.profile_image === 'default.png'
+			? photoUpload.data.filenames[0]
+			: photoUpload.data.filenames[profile.profile_image];
+			console.log(profile_image);
+			payload.profile_image = profile_image;
 			// Add other information user can't change
 			payload.birthday = userData.birthday;
 			payload.name = userData.name;
+			console.log(payload)
 			// Upload profile
 			const response = await authAPI.post(`/profile`, payload);
 			if (response.status === 200) {
@@ -207,10 +214,14 @@ export const CreateProfile = ({
 							query={query}
 						/>
 					</div>
-					<FileInput files={files} setFiles={setFiles} />
+					<FileInput files={files} setFiles={setFiles} setFileAmountError={setFileAmountError} setFileError={setFileError}/>
 					<ErrorMessage
 						errorMessage="You must upload at least one picture."
 						error={fileError}
+					/>
+					<ErrorMessage
+						errorMessage="You may not upload more than 5 pictures."
+						error={fileAmountError}
 					/>
 
 					<h3 className="title is-3 mt-6">

@@ -17,7 +17,7 @@ import {
 import { findMatch, removeMatch } from './match';
 import { sendReportMessage } from '../utilities/sendReportMessage';
 import { unlink } from 'fs';
-
+ 
 const register = async (req: Request, res: Response) => {
 	const validationResponse = await validateRegistrationInput(req, res);
 	if (validationResponse !== undefined) return;
@@ -347,9 +347,21 @@ const deleteUser = async (req: Request, res: Response) => {
 };
 
 const updateUser = async (req: Request, res: Response) => {
-	validateUpdateUser(req, res);
-	const { username, password, name, email, birthday } = req.body;
-	let sql = `
+	try {
+		// Get user_id
+		const user_id = await decodeUserFromAccesstoken(req);
+		if (!user_id)
+			return res.status(401).json({
+				message: 'Unauthorized',
+			});
+		const validationResponse = await validateUpdateUser(
+			req,
+			res,
+			user_id
+		);
+		if (validationResponse !== undefined) return;
+		const { username, password, name, email, birthday } = req.body;
+		let sql = `
 		UPDATE 
 			users 
 		SET 
@@ -360,13 +372,6 @@ const updateUser = async (req: Request, res: Response) => {
 			birthday=? 
 		WHERE 
 			user_id = ?;`;
-	try {
-		// Get user_id
-		const user_id = await decodeUserFromAccesstoken(req);
-		if (!user_id)
-			return res.status(401).json({
-				message: 'Unauthorized',
-			});
 		// Hash password
 		const hash = await bcryptjs.hash(password, 10);
 		const response = await execute(sql, [
@@ -389,7 +394,7 @@ const updateUser = async (req: Request, res: Response) => {
 			name,
 			reformatDate(birthday),
 			user_id,
-			]);
+		]);
 		if (response && response2)
 			return res.status(200).json({
 				message: 'User information updated successfully',

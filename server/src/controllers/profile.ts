@@ -8,23 +8,28 @@ import {
 import { decodeUserFromAccesstoken } from './token';
 
 const newProfile = async (req: Request, res: Response) => {
-	validateNewProfile(req, res);
-	const {
-		country,
-		city,
-		gender,
-		birthday,
-		looking,
-		min_age,
-		max_age,
-		introduction,
-		interests,
-		profile_image,
-		name,
-	} = req.body;
-	let { latitude, longitude } = req.body;
-
 	try {
+		const input = validateNewProfile(req);
+		if (!input.valid) {
+			return res.status(400).json({
+				message: input.message
+			});
+		}
+		const {
+			country,
+			city,
+			gender,
+			birthday,
+			looking,
+			min_age,
+			max_age,
+			introduction,
+			interests,
+			profile_image,
+			name,
+		} = req.body;
+		let { latitude, longitude } = req.body;
+
 		// Get user_id
 		const user_id = await decodeUserFromAccesstoken(req);
 		if (!user_id)
@@ -37,7 +42,21 @@ const newProfile = async (req: Request, res: Response) => {
 			latitude = location?.ll[0] || '60.16952';
 			longitude = location?.ll[1] || '24.93545';
 		}
-
+		// Check for duplicate profile
+		const duplicateCheck = `
+			SELECT
+				user_id
+			FROM 
+				profiles
+			WHERE
+				user_id = ?;
+		`;
+		const profileExists = await execute(duplicateCheck, [user_id]);
+		if (profileExists.length > 0) {
+			return res.status(400).json({
+				message: 'Profile already exists.',
+			});
+		}
 		const sql = `INSERT INTO 
 				profiles
 				(
@@ -86,6 +105,9 @@ const newProfile = async (req: Request, res: Response) => {
 			return res.status(200).json({
 				message: 'Profile created',
 			});
+		// return res.status(500).json({
+		// 	message: 'Failed to save to database',
+		// });
 	} catch (err) {
 		console.error(err);
 		return res.status(500).json({
@@ -256,6 +278,9 @@ const updateProfile = async (req: Request, res: Response) => {
 				message: 'Profile updated successfully',
 			});
 		}
+		return res.status(500).json({
+			message: 'Failed to save to database',
+		});
 	} catch (err) {
 		console.error(err);
 		return res.status(500).json({

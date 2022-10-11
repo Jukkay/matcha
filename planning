@@ -466,7 +466,14 @@ V Fix issue with notifications not working
 V Check why we get profile with user_id 0
 V Fix No Profile message spacing
 V Fix notification counters
-
+V Add drop shadow to white overlay text
+V Limit number of pictures that can be uploaded to 5
+V Check for existing profile in create profile
+Profile image doesn't get added to formdata in create profile
+Alaharma is null value in city. Crashes.
+0 low limit for famerating in search breaks famerating filtering
+Unicode input crashes backend
+Chat layout breaks in mobile
 Test all required functionality
 
 # Backlog

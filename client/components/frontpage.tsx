@@ -112,7 +112,7 @@ export const ProfileCarousel = ({ profiles }: ResultProfiles) => {
 									crossOrigin=""
 									className="rounded-corners"
 								/>
-								<p className="is-overlay has-text-weight-bold has-text-white mt-3 ml-3">{`${
+								<p className="is-overlay has-text-weight-bold has-text-white has-text-shadow mt-3 ml-3">{`${
 									profiles[index].name
 								}, ${convertBirthdayToAge(
 									profiles[index].birthday

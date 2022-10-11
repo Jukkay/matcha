@@ -34,6 +34,7 @@ const API = authAPI.defaults.baseURL || 'http://localhost:4000';
 
 export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(API, {
 	autoConnect: false,
+	reconnection: true,
 	auth: {
 		token: getTokenFromSessionStorage(),
 		user_id: getUserIDFromSessionStorage(),

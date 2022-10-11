@@ -65,14 +65,12 @@ const LoggedInControls = () => {
 		likeCount,
 	} = useNotificationContext();
 
-	// Subscribe for and fetch notifications
+	// Fetch notifications
 	useEffect(() => {
 		if (!userData.user_id) return;
 		const controller = new AbortController();
 		const getNotifications = async () => {
 			try {
-				if (socket.disconnected) socket.open();
-				socket.emit('set_user', userData.user_id);
 				const response = await authAPI(
 					`/notifications/${userData.user_id}`,
 					{ signal: controller.signal }
@@ -95,7 +93,9 @@ const LoggedInControls = () => {
 		if (!userData.user_id) return;
 		try {
 			if (socket.disconnected) socket.open();
-			console.log('Setting up socket listeners. Socket disconnected?', socket.disconnected)
+			socket.on('connect', () => {
+				socket.emit('set_user', userData.user_id);
+			})
 			socket.on('connect_error', async (err) => {
 				if (err.message === 'Unauthorized') {
 					const refreshResponse = await axios.post(`/token/`, {
@@ -113,19 +113,14 @@ const LoggedInControls = () => {
 				}
 			});
 			socket.on('receive_notification', (data) => {
-				console.log('Received notification', data)
 				if (data.notification_type === NotificationType.MESSAGE) {
-					console.log('Message notification')
 					if (matchData.receiver_id === data.sender_id) return;
-					console.log('Updating message counter')
 					setMessageCount((messageCount: number) => messageCount + 1);
 				}
 				else if (data.notification_type === NotificationType.LIKE) {
-					console.log('Like notification. Updating like counter.')
 					setLikeCount((likeCount: number) => likeCount + 1);
 				}
 				else {
-					console.log('Other notification. Updating notification counter')
 					setNotificationCount(
 						(notificationCount: number) => notificationCount + 1
 						);
@@ -135,6 +130,7 @@ const LoggedInControls = () => {
 		return () => {
 			socket.removeAllListeners('receive_notification');
 			socket.removeAllListeners('connect_error');
+			socket.removeAllListeners('connect')
 		};
 	}, [userData.user_id, matchData.receiver_id]);
 

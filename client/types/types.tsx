@@ -19,6 +19,9 @@ export interface ViewProps {
 export interface FileInputProps {
 	files: FileList | undefined;
 	setFiles?: SetStateAction<any>;
+	setFileAmountError?: SetStateAction<any>;
+	setFileError?: SetStateAction<any>;
+	imageAmount?: number;
 }
 
 export interface ProfileViewProps {
@@ -191,6 +194,7 @@ export interface IThumbnails {
 export interface GalleryProps {
 	files: FileList | undefined;
 	setImageError: SetStateAction<any>;
+	setImageAmount: SetStateAction<any>;
 }
 
 export interface SearchProps {

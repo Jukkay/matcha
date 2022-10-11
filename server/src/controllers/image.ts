@@ -6,6 +6,7 @@ import { decodeUserFromAccesstoken } from './token';
 const saveFilenames = async (user_id: string, filenames: string[]) => {
 	// user_id was decoded from accesstoken on calling function
 	if (filenames.length < 1) return;
+	
 	const sql = `
 		INSERT INTO 
 			photos
