@@ -17,13 +17,15 @@ import {
 import { findMatch, removeMatch } from './match';
 import { sendReportMessage } from '../utilities/sendReportMessage';
 import { unlink } from 'fs';
- 
+
 const register = async (req: Request, res: Response) => {
-	const validationResponse = await validateRegistrationInput(req, res);
-	if (validationResponse !== undefined) return;
-	const { username, password, name, email, birthday } = req.body;
-	const hash = await bcryptjs.hash(password, 10);
-	const sql = `
+	try {
+		const validationResponse = await validateRegistrationInput(req);
+		if (!validationResponse.valid)
+			return res.status(400).json(validationResponse);
+		const { username, password, name, email, birthday } = req.body;
+		const hash = await bcryptjs.hash(password, 10);
+		const sql = `
 		INSERT INTO 
 			users 
 			(
@@ -34,7 +36,6 @@ const register = async (req: Request, res: Response) => {
 				birthday
 			) 
 		VALUES (?, ?, ?, ?, ?);`;
-	try {
 		await execute(sql, [username, hash, email, name, birthday]);
 		await sendEmailVerification(req.body.email);
 		return res.status(201).json({
@@ -51,9 +52,10 @@ const register = async (req: Request, res: Response) => {
 };
 
 export const login = async (req: Request, res: Response) => {
-	validateLogin(req, res);
-	const { username, password } = req.body;
 	try {
+		const input = validateLogin(req);
+		if (!input.valid) return res.status(400).json(input);
+		const { username, password } = req.body;
 		// Get user data
 		const sql = `
 			SELECT 
@@ -159,19 +161,20 @@ export const logout = async (req: Request, res: Response) => {
 };
 
 const getUserInformation = async (req: Request, res: Response) => {
-	// Get user_id
-	const requester = await decodeUserFromAccesstoken(req);
-	if (!requester)
-		return res.status(401).json({
-			message: 'Unauthorized',
-		});
+	try {
+		// Get user_id
+		const requester = await decodeUserFromAccesstoken(req);
+		if (!requester)
+			return res.status(401).json({
+				message: 'Unauthorized',
+			});
 
-	const user_id = req.params.id;
-	if (!user_id)
-		return res.status(400).json({
-			message: 'No user id given',
-		});
-	const sql = `
+		const user_id = req.params.id;
+		if (!user_id)
+			return res.status(400).json({
+				message: 'No user id given',
+			});
+		const sql = `
 				SELECT 
 					username,
 					email,
@@ -182,7 +185,6 @@ const getUserInformation = async (req: Request, res: Response) => {
 				WHERE 
 					user_id = ?
 				`;
-	try {
 		const userData = await execute(sql, [user_id]);
 		if (userData.length > 0) {
 			return res.status(200).json({
@@ -354,24 +356,23 @@ const updateUser = async (req: Request, res: Response) => {
 			return res.status(401).json({
 				message: 'Unauthorized',
 			});
-		const validationResponse = await validateUpdateUser(
-			req,
-			res,
-			user_id
-		);
-		if (validationResponse !== undefined) return;
+		const validationResponse = await validateUpdateUser(req, user_id);
+		if (!validationResponse.valid)
+			return res.status(400).json({
+				message: validationResponse.message,
+			});
 		const { username, password, name, email, birthday } = req.body;
 		let sql = `
-		UPDATE 
-			users 
-		SET 
-			username=?, 
-			password=?, 
-			email=?, 
-			name=?, 
-			birthday=? 
-		WHERE 
-			user_id = ?;`;
+			UPDATE 
+				users 
+			SET 
+				username=?, 
+				password=?, 
+				email=?, 
+				name=?, 
+				birthday=? 
+			WHERE 
+				user_id = ?;`;
 		// Hash password
 		const hash = await bcryptjs.hash(password, 10);
 		const response = await execute(sql, [
@@ -383,13 +384,13 @@ const updateUser = async (req: Request, res: Response) => {
 			user_id,
 		]);
 		sql = `
-		UPDATE 
-			profiles
-		SET 
-			name=?, 
-			birthday=? 
-		WHERE 
-			user_id = ?;`;
+			UPDATE 
+				profiles
+			SET 
+				name=?, 
+				birthday=? 
+			WHERE 
+				user_id = ?;`;
 		const response2 = await execute(sql, [
 			name,
 			reformatDate(birthday),

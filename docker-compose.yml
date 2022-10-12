@@ -53,6 +53,7 @@ services:
     volumes:
         - mariadb-data:/var/lib/mysql
         - ./config/db/init.sql:/server/config/init.sql
+        - ./config/db/my.cnf:/etc/mysql/my.cnf
     command: --init-file /server/config/init.sql
     secrets:
         - mysql_password

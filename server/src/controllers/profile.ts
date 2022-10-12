@@ -12,7 +12,7 @@ const newProfile = async (req: Request, res: Response) => {
 		const input = validateNewProfile(req);
 		if (!input.valid) {
 			return res.status(400).json({
-				message: input.message
+				message: input.message,
 			});
 		}
 		const {
@@ -198,24 +198,30 @@ const getProfile = async (req: Request, res: Response) => {
 };
 
 const updateProfile = async (req: Request, res: Response) => {
-	validateUpdateProfile(req, res);
-	const {
-		country,
-		city,
-		gender,
-		birthday,
-		looking,
-		min_age,
-		max_age,
-		introduction,
-		interests,
-		profile_image,
-		user_latitude,
-		user_longitude,
-	} = req.body;
-	let { latitude, longitude } = req.body;
+	try {
+		const input = validateUpdateProfile(req);
+		if (!input.valid) {
+			return res.status(400).json({
+				message: input.message,
+			});
+		}
+		const {
+			country,
+			city,
+			gender,
+			birthday,
+			looking,
+			min_age,
+			max_age,
+			introduction,
+			interests,
+			profile_image,
+			user_latitude,
+			user_longitude,
+		} = req.body;
+		let { latitude, longitude } = req.body;
 
-	const sql = `
+		const sql = `
 		UPDATE 
 			profiles 
 		SET 
@@ -235,7 +241,6 @@ const updateProfile = async (req: Request, res: Response) => {
 			user_longitude=? 
 		WHERE 
 			user_id = ?;`;
-	try {
 		// Get user_id
 		const user_id = await decodeUserFromAccesstoken(req);
 		if (!user_id)

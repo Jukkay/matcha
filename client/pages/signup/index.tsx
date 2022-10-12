@@ -288,7 +288,7 @@ const Signup: NextPage = () => {
 				<section className="section">
 					<div className="box">
 						<section className="section">
-							<form onSubmit={handleSubmit} autoComplete="on">
+							<form onSubmit={handleSubmit} autoComplete="on" acceptCharset="UTF-8">
 								<h1 className="title is-1">
 									Sign up
 								</h1>

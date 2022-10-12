@@ -126,7 +126,7 @@ const EmailConfirmation: NextPage = () => {
 				<section className="section">
 					<div className="box">
 						<section className="section">
-							<form onSubmit={handleSubmit} autoComplete="on">
+							<form onSubmit={handleSubmit} autoComplete="on" acceptCharset="UTF-8">
 								<h3 className="title is-3">
 									Send new confirmation email
 								</h3>

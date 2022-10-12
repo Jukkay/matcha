@@ -551,7 +551,7 @@ const ChatWindow = () => {
 				</div>
 			</div>
 			<div className="chat-input has-background-white">
-				<form onSubmit={handleSubmit}>
+				<form onSubmit={handleSubmit} acceptCharset="UTF-8">
 					<div className="field has-addons">
 						<div className="control fullwidth">
 							<input

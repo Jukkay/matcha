@@ -5,9 +5,14 @@ import { validateSearchParams } from '../utilities/validators';
 import { decodeUserFromAccesstoken } from './token';
 
 export const searchProfiles = async (req: Request, res: Response) => {
-	validateSearchParams(req, res);
-	const { looking, gender, min_age, max_age, country, city } = req.body.data;
 	try {
+		const input = validateSearchParams(req);
+		if (!input.valid)
+			return res.status(400).json({
+				message: input.message,
+			});
+		const { looking, gender, min_age, max_age, country, city } =
+			req.body.data;
 		// Get user_id
 		const user_id = await decodeUserFromAccesstoken(req);
 		if (!user_id)

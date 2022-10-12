@@ -170,7 +170,7 @@ export const UpdateProfile = ({
 		</div>
 	) : (
 		<div className="my-6">
-			<form onSubmit={handleSubmit}>
+			<form onSubmit={handleSubmit} acceptCharset="UTF-8">
 				<section className="section">
 					<h1 className="title is-1">Edit profile</h1>
 

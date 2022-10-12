@@ -469,10 +469,12 @@ V Fix notification counters
 V Add drop shadow to white overlay text
 V Limit number of pictures that can be uploaded to 5
 V Check for existing profile in create profile
-Profile image doesn't get added to formdata in create profile
+V Profile image doesn't get added to formdata in create profile
+V Added utf-8 check on forms
+V Added mysql conf file and charset configuration to avoid unicode problems
+
 Alaharma is null value in city. Crashes.
 0 low limit for famerating in search breaks famerating filtering
-Unicode input crashes backend
 Chat layout breaks in mobile
 Test all required functionality
 

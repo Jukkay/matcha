@@ -105,7 +105,7 @@ export const CreateProfile = ({
 				return;
 			}
 			// Get profile picture filename
-			const profile_image = profile.profile_image === 'default.png'
+			const profile_image: string = profile.profile_image === 'default.png'
 			? photoUpload.data.filenames[0]
 			: photoUpload.data.filenames[profile.profile_image];
 			console.log(profile_image);
@@ -143,7 +143,7 @@ export const CreateProfile = ({
 		</div>
 	) : (
 		<div className="my-6">
-			<form onSubmit={handleSubmit}>
+			<form onSubmit={handleSubmit} acceptCharset="UTF-8">
 				<section className="section">
 					<h1 className="title is-1">Create new profile</h1>
 
