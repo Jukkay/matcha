@@ -108,12 +108,10 @@ export const CreateProfile = ({
 			const profile_image: string = profile.profile_image === 'default.png'
 			? photoUpload.data.filenames[0]
 			: photoUpload.data.filenames[profile.profile_image];
-			console.log(profile_image);
 			payload.profile_image = profile_image;
 			// Add other information user can't change
 			payload.birthday = userData.birthday;
 			payload.name = userData.name;
-			console.log(payload)
 			// Upload profile
 			const response = await authAPI.post(`/profile`, payload);
 			if (response.status === 200) {

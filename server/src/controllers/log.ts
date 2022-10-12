@@ -66,8 +66,12 @@ export const logVisitor = async (req: Request, res: Response) => {
 export const getVisitorLog = async (req: Request, res: Response) => {
 	const requestedID = req.params.id;
 	try {
+		if (!requestedID)
+			return res.status(400).json({
+				message: 'Missing user ID',
+			});
 		const user_id = await decodeUserFromAccesstoken(req);
-		if (!user_id || !requestedID)
+		if (!user_id)
 			return res.status(401).json({
 				message: 'Unauthorized',
 			});
@@ -83,20 +87,33 @@ export const getVisitorLog = async (req: Request, res: Response) => {
 					country, 
 					profile_image, 
 					user_id, 
-					interests 
+					interests,
+					blocks.block_id
 				FROM 
-					profiles 
+					profiles
+				LEFT JOIN
+					blocks
+					ON
+						(blocks.blocker = profiles.user_id
+						AND
+						blocks.blocked = ?)
+						OR
+						(blocks.blocked = profiles.user_id
+						AND
+						blocks.blocker = ?)
 				INNER JOIN 
 					visitors 
 					ON 
 					profiles.user_id = visitors.visiting_user 
 				WHERE 
 					visited_user = ?
+					AND
+					blocks.block_id IS NULL
 				ORDER BY 
 					visitors.log_id DESC
 				LIMIT 
 					100`;
-		const log = await execute(sql, [user_id]);
+		const log = await execute(sql, [user_id, user_id, user_id]);
 		if (log.length > 0)
 			return res.status(200).json({
 				message: 'Visitor log retrieved successfully',
@@ -128,20 +145,33 @@ export const getRecentProfiles = async (req: Request, res: Response) => {
 			country, 
 			profile_image, 
 			user_id, 
-			interests 
+			interests,
+			blocks.block_id
 		FROM 
 			profiles 
+		LEFT JOIN
+			blocks
+			ON
+				(blocks.blocker = profiles.user_id
+				AND
+				blocks.blocked = ?)
+				OR
+				(blocks.blocked = profiles.user_id
+				AND
+				blocks.blocker = ?)
 		INNER JOIN 
 			visitors 
 			ON 
 			profiles.user_id = visitors.visited_user 
 		WHERE 
 			visiting_user = ?
+			AND
+			blocks.block_id IS NULL
 		ORDER BY 
 			visitors.visit_date DESC
 		LIMIT 
 			100`;
-		const log = await execute(sql, [user_id]);
+		const log = await execute(sql, [user_id, user_id, user_id]);
 		if (log.length > 0)
 			return res.status(200).json({
 				message: 'Profile visit history retrieved successfully',

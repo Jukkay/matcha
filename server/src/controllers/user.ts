@@ -192,7 +192,9 @@ const getUserInformation = async (req: Request, res: Response) => {
 				userData: userData[0],
 			});
 		}
-		return res.status(204);
+		return res.status(204).json({
+			message: 'User data not found',
+		});
 	} catch (err) {
 		console.error(err);
 		return res.status(500).json({
@@ -358,9 +360,7 @@ const updateUser = async (req: Request, res: Response) => {
 			});
 		const validationResponse = await validateUpdateUser(req, user_id);
 		if (!validationResponse.valid)
-			return res.status(400).json({
-				message: validationResponse.message,
-			});
+			return res.status(400).json(validationResponse);
 		const { username, password, name, email, birthday } = req.body;
 		let sql = `
 			UPDATE 

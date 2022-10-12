@@ -156,7 +156,6 @@ export const validateNewProfile = (req: Request) => {
 		latitude,
 		longitude,
 	} = req.body;
-	console.log(req.body);
 	if (
 		!country ||
 		!city ||

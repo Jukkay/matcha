@@ -68,7 +68,7 @@ const LoggedIn = () => {
 		return <LoadError text="Error loading messages" />;
 
 	return (
-		<div className="is-flex is-flex-direction-row is-justify-content-center is-align-content-center">
+		<div className="columns is-centered is-gapless">
 			<ChatWindow />
 			<MatchList />
 		</div>

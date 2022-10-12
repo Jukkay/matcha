@@ -142,9 +142,13 @@ const getProfile = async (req: Request, res: Response) => {
 				LEFT JOIN
 					blocks
 					ON
-						blocks.blocker = profiles.user_id
-					AND
-						blocks.blocked = ?
+						(blocks.blocker = profiles.user_id
+						AND
+						blocks.blocked = ?)
+						OR
+						(blocks.blocked = profiles.user_id
+						AND
+						blocks.blocker = ?)
 				LEFT JOIN
 					likes
 					ON
@@ -179,16 +183,20 @@ const getProfile = async (req: Request, res: Response) => {
 			requester,
 			requester,
 			requester,
+			requester,
 			user_id,
 		]);
+		console.log(profile_data);
 		if (profile_data.length > 0) {
-			// TODO Create notification of profile visit
 			return res.status(200).json({
 				message: 'Profile data retrieved successfully',
 				profile: profile_data[0],
 			});
 		}
-		return res.status(204);
+
+		return res.status(204).json({
+			message: 'No profile found',
+		});
 	} catch (err) {
 		console.error(err);
 		return res.status(500).json({

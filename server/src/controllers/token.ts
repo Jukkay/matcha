@@ -41,15 +41,15 @@ export const refreshToken = async (req: Request, res: Response) => {
 	try {
 		const { user_id, token } = req.body;
 		const refresh_token = getSecret('refresh_token');
-		if (!token) {
-			return res.status(204).json({
-				error: 'No token given',
+		if (!token || !token) {
+			return res.status(400).json({
+				error: 'Incomplete information',
 			});
 		}
 		// Check if token is valid
 		const decoded = await verifyJWT(token, refresh_token);
 		if (!decoded) {
-			return res.status(204).json({
+			return res.status(401).json({
 				error: 'Unauthorized',
 			});
 		}
@@ -63,7 +63,7 @@ export const refreshToken = async (req: Request, res: Response) => {
 				token = ?;`;
 		const foundToken = await execute(findToken, [token]);
 		if (!foundToken) {
-			return res.status(204).json({
+			return res.status(401).json({
 				error: 'Token has been invalidated',
 			});
 		}

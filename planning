@@ -475,8 +475,11 @@ V Added mysql conf file and charset configuration to avoid unicode problems
 V Alaharma is null value in city. Crashes.
 V 0 low limit for famerating in search breaks famerating filtering
 V Changed famerating range to use slider
+V Chat layout breaks in mobile
+V Changed chat page to use columns again to take advantage on built in responsivity
+V Added check for username/email match on password change
+V Made it impossible for blocker and blocked to see each other in any history/log
 
-Chat layout breaks in mobile
 Test all required functionality
 
 # Backlog
@@ -504,3 +507,6 @@ Socket authentication
 Random user script
 Delete profile and/or userdata
 Makefile
+
+Correction to react-icons package.json:
+ "main": "./lib/cjs/index.js",

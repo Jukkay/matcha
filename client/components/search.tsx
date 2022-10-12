@@ -616,7 +616,10 @@ export const AgeRangeSlider = ({ state, setState }: IAgeRangeSlider) => {
 	);
 };
 
-export const FameratingRangeSlider = ({ state, setState }: IFameratingRangeSlider) => {
+export const FameratingRangeSlider = ({
+	state,
+	setState,
+}: IFameratingRangeSlider) => {
 	const [value, setValue] = React.useState<number[]>([
 		Number(state.min_famerating),
 		Number(state.max_famerating),
@@ -638,7 +641,7 @@ export const FameratingRangeSlider = ({ state, setState }: IFameratingRangeSlide
 	return (
 		<div className="mx-3">
 			<Slider
-				sx={{color: 'hsl(315, 97%, 26%)' }}
+				sx={{ color: 'hsl(315, 97%, 26%)' }}
 				getAriaLabel={() => 'Famerating range'}
 				value={value}
 				onChange={handleChange}
@@ -677,17 +680,21 @@ export const SearchFameratingRange = ({
 	setSearchParams,
 }: SearchParamsProps) => {
 	return (
+		<div className="block">
+			<label htmlFor="fameratingRange" className="label mb-6">
+				Famerating range
+			</label>
 			<div className="field">
-				<label htmlFor="fameratingRange" className="label mb-6">
-					Famerating range
-				</label>
-				<div className="control" id="fameratingRange">
-					<FameratingRangeSlider
-						state={searchParams}
-						setState={setSearchParams}
-					/>
+				<div className="column is-three-quarters">
+					<div className="control" id="fameratingRange">
+						<FameratingRangeSlider
+							state={searchParams}
+							setState={setSearchParams}
+						/>
+					</div>
 				</div>
 			</div>
+		</div>
 	);
 };
 export const SearchGenderSelector = ({

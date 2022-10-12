@@ -76,6 +76,10 @@ export const getNotifications = async (req: Request, res: Response) => {
 
 export const markNotificationsRead = async (req: Request, res: Response) => {
 	const { type, user_id } = req.body;
+	if (!user_id || !type)
+			return res.status(400).json({
+				message: 'Incomplete information'
+			});
 	let response;
 	try {
 		if (type === 'all') {
