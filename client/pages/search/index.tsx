@@ -34,9 +34,9 @@ const LoggedIn = () => {
 		city: '',
 		min_age: profile.min_age || convertBirthdayToAge(profile.birthday) - 5,
 		max_age: profile.max_age || convertBirthdayToAge(profile.birthday) + 5,
-		min_famerating: '0',
-		max_famerating: '1000',
-		max_distance: '0',
+		min_famerating: '',
+		max_famerating: '',
+		max_distance: '',
 	});
 	const [results, setResults] = useState<IResultsProfile[]>([]);
 	const [filteredResults, setFilteredResults] = useState<IResultsProfile[]>(

@@ -472,9 +472,10 @@ V Check for existing profile in create profile
 V Profile image doesn't get added to formdata in create profile
 V Added utf-8 check on forms
 V Added mysql conf file and charset configuration to avoid unicode problems
+V Alaharma is null value in city. Crashes.
+V 0 low limit for famerating in search breaks famerating filtering
+V Changed famerating range to use slider
 
-Alaharma is null value in city. Crashes.
-0 low limit for famerating in search breaks famerating filtering
 Chat layout breaks in mobile
 Test all required functionality
 

@@ -359,6 +359,12 @@ export interface IAgeRangeSlider {
 	setState: SetStateAction<any>;
 }
 
+export interface IFameratingRangeSlider {
+	state: ISearchParams
+	setState: SetStateAction<any>;
+}
+
+
 export interface INavbarProfile {
 	username: string;
 	profile_image: string;

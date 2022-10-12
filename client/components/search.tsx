@@ -5,6 +5,7 @@ import {
 	AdvancedSearchProps,
 	BasicSearchProps,
 	IAgeRangeSlider,
+	IFameratingRangeSlider,
 	LoadStatus,
 	ResultsProps,
 	SearchParamsProps,
@@ -19,7 +20,7 @@ import {
 	convertBirthdayToAge,
 } from '../utilities/helpers';
 import { moreCommonTagsFirst } from '../utilities/sort';
-import { DistanceRange, ErrorMessage, FameratingRange } from './form';
+import { DistanceRange, ErrorMessage } from './form';
 import { dummyData } from './data';
 import { LoadError, Spinner } from './utilities';
 import { FaFilter } from 'react-icons/fa';
@@ -124,9 +125,9 @@ export const ProfileSearch = ({
 				profile.min_age || convertBirthdayToAge(profile.birthday) - 5,
 			max_age:
 				profile.max_age || convertBirthdayToAge(profile.birthday) + 5,
-			min_famerating: 0,
-			max_famerating: 1000,
-			max_distance: 0,
+			min_famerating: '',
+			max_famerating: '',
+			max_distance: '',
 		});
 		setInterests([]);
 		setFilteredResults(results);
@@ -178,7 +179,7 @@ const Filters = ({
 		let filteredResults = results;
 
 		// Filter by distance
-		if (Number(searchParams.max_distance) > 0) {
+		if (searchParams.max_distance !== '') {
 			filteredResults = [...filteredResults].filter(
 				(item) =>
 					Number(item.distance) <= Number(searchParams.max_distance)
@@ -193,7 +194,10 @@ const Filters = ({
 			});
 		}
 		// Filter by famerating
-		if (Number(searchParams.min_famerating) > 0) {
+		if (
+			searchParams.min_famerating !== '' &&
+			searchParams.max_famerating !== ''
+		) {
 			filteredResults = [...filteredResults].filter(
 				(item) =>
 					Number(item.famerating) >=
@@ -209,9 +213,9 @@ const Filters = ({
 		event.preventDefault();
 		setSearchParams({
 			...searchParams,
-			max_distance: 0,
-			min_famerating: 0,
-			max_famerating: 1000,
+			max_distance: '',
+			min_famerating: '',
+			max_famerating: '',
 		});
 		setInterests([]);
 		setFilteredResults(results);
@@ -238,7 +242,10 @@ const Filters = ({
 								</IconContext.Provider>
 							</span>
 						</div>
-						<button className="button is-primary is-outlined" onClick={onClick}>
+						<button
+							className="button is-primary is-outlined"
+							onClick={onClick}
+						>
 							Hide filters
 						</button>
 					</div>
@@ -247,7 +254,7 @@ const Filters = ({
 				</div>
 			</div>
 			<div className="block">
-				<FameratingRange
+				<SearchFameratingRange
 					searchParams={searchParams}
 					setSearchParams={setSearchParams}
 				/>
@@ -266,7 +273,10 @@ const Filters = ({
 				>
 					Apply filters
 				</button>
-				<button className="button is-primary is-outlined m-1" onClick={handleReset}>
+				<button
+					className="button is-primary is-outlined m-1"
+					onClick={handleReset}
+				>
 					Reset filters
 				</button>
 			</div>
@@ -606,6 +616,41 @@ export const AgeRangeSlider = ({ state, setState }: IAgeRangeSlider) => {
 	);
 };
 
+export const FameratingRangeSlider = ({ state, setState }: IFameratingRangeSlider) => {
+	const [value, setValue] = React.useState<number[]>([
+		Number(state.min_famerating),
+		Number(state.max_famerating),
+	]);
+
+	useEffect(() => {
+		setValue([Number(state.min_famerating), Number(state.max_famerating)]);
+	}, [state.min_famerating, state.max_famerating]);
+
+	const handleChange = (_event: Event, newValue: number | number[]) => {
+		const array = newValue as number[];
+		setState({
+			...state,
+			min_famerating: array[0],
+			max_famerating: array[1],
+		});
+	};
+
+	return (
+		<div className="mx-3">
+			<Slider
+				sx={{color: 'hsl(315, 97%, 26%)' }}
+				getAriaLabel={() => 'Famerating range'}
+				value={value}
+				onChange={handleChange}
+				min={0}
+				max={1000}
+				valueLabelDisplay="on"
+				disableSwap
+			/>
+		</div>
+	);
+};
+
 export const SearchAgeRange = ({
 	searchParams,
 	setSearchParams,
@@ -627,6 +672,24 @@ export const SearchAgeRange = ({
 	);
 };
 
+export const SearchFameratingRange = ({
+	searchParams,
+	setSearchParams,
+}: SearchParamsProps) => {
+	return (
+			<div className="field">
+				<label htmlFor="fameratingRange" className="label mb-6">
+					Famerating range
+				</label>
+				<div className="control" id="fameratingRange">
+					<FameratingRangeSlider
+						state={searchParams}
+						setState={setSearchParams}
+					/>
+				</div>
+			</div>
+	);
+};
 export const SearchGenderSelector = ({
 	searchParams,
 	setSearchParams,
