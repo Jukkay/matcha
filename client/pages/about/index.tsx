@@ -44,7 +44,6 @@ const About: NextPage = () => {
 							<li>Geolocation API</li>
 							<li>Random User Generator API</li>
 							<li>Docker</li>
-							<li>AWS</li>
 						</ul>
 					</div>
 					<p className="content">

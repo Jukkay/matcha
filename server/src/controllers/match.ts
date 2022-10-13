@@ -60,7 +60,7 @@ const getAllMatches = async (req: Request, res: Response) => {
 			user_id,
 			user_id,
 			user_id,
-		]);
+		])
 		if (matches.length > 0)
 			return res.status(200).json({
 				message: 'Matches retrieved successfully',

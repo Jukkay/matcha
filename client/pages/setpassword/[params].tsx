@@ -109,7 +109,9 @@ const SetPassword: NextPage = () => {
 
 	// Form validation
 	useEffect(() => {
-		if (validPassword && validMatch) setValidForm(true);
+		if (validPassword && validMatch) {
+			setValidForm(true);
+		} else setValidForm(false);
 	}, [validPassword, validMatch]);
 
 	const router = useRouter();
@@ -174,7 +176,11 @@ const SetPassword: NextPage = () => {
 				<section className="section">
 					<div className="box">
 						<section className="section">
-							<form onSubmit={handleSubmit} autoComplete="on" acceptCharset="UTF-8">
+							<form
+								onSubmit={handleSubmit}
+								autoComplete="on"
+								acceptCharset="UTF-8"
+							>
 								<h3 className="title is-3">Set new password</h3>
 
 								{inputs.map((input) => (

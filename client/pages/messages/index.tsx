@@ -257,16 +257,16 @@ const ReportMenu = ({ reporter, reported, setMatchData }: any) => {
 	);
 };
 const MatchList = () => {
-	const { profile } = useUserContext();
+	const { userData } = useUserContext();
 	const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.IDLE);
 	const [matches, setMatches] = useState<IMatch[]>([]);
 
 	useEffect(() => {
 		const getUsersMatches = async () => {
-			if (!profile.user_id) return;
+			if (!userData.user_id) return;
 			try {
 				setLoadStatus(LoadStatus.LOADING);
-				let response = await authAPI.get(`/match/${profile.user_id}`);
+				let response = await authAPI.get(`/match/${userData.user_id}`);
 				if (response.status === 200) {
 					setMatches(response.data.matches);
 				}
@@ -277,12 +277,7 @@ const MatchList = () => {
 			}
 		};
 		getUsersMatches();
-	}, [profile.user_id]);
-
-	// useEffect(() => {
-	// 	setMatchData({})
-	// 	setActiveChatUser(0)
-	// }, []);
+	}, [userData.user_id]);
 
 	if (loadStatus == LoadStatus.LOADING) return <Spinner />;
 	if (loadStatus == LoadStatus.ERROR)
@@ -295,7 +290,7 @@ const MatchList = () => {
 				<MatchListItem
 					key={index}
 					match={match}
-					user_id={profile.user_id}
+					user_id={userData.user_id}
 				/>
 			))}
 		</div>

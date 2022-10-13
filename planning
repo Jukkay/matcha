@@ -483,8 +483,11 @@ V Fixed profile image setting in different scenarios
 V Delete pictures on profile delete
 V Change default.png to correct color
 V Fixed automated profile image selection when removing current profile image
+V Prohibit password reset with bad password
+V Fix notification dropdown's position in mobile view
+V Test all required functionality
 
-Test all required functionality
+Update about page
 
 # Backlog
 Deploy to AWS

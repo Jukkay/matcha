@@ -374,7 +374,7 @@ const NotificationDropdownMenu = () => {
 		} catch (err) {}
 	};
 	return (
-		<div className="dropdown is-hoverable fullheight">
+		<div className="dropdown is-hoverable is-right fullheight">
 			<div
 				className="dropdown-trigger"
 				onMouseEnter={markNotificationsRead}
@@ -416,7 +416,7 @@ const NotificationDropdownMenu = () => {
 				)}
 			</div>
 			<div className="dropdown-menu" id="dropdown-menu" role="menu">
-				<div className="dropdown-content">
+				<div className="dropdown-content notification-dropdown">
 					<NotificationsList />
 				</div>
 			</div>
