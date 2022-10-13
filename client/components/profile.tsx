@@ -344,7 +344,7 @@ export const Gallery = ({ user_id }: OnlineStatusProps) => {
 	) : null;
 };
 
-export const FileInput = ({ files, setFiles, setFileAmountError, setFileError, imageAmount }: FileInputProps) => {
+export const FileInput = ({ files, setFiles, setFileAmountError, setFileError, imageAmount, setNewProfileImage }: FileInputProps) => {
 	const [preview, setPreview] = useState<string[]>([]);
 
 	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -397,12 +397,12 @@ export const FileInput = ({ files, setFiles, setFileAmountError, setFileError, i
 					</label>
 				</div>
 			</div>
-			<Thumbnails preview={preview} setPreview={setPreview} />
+			<Thumbnails preview={preview} setPreview={setPreview} setNewProfileImage={setNewProfileImage} />
 		</div>
 	);
 };
 
-export const Thumbnails = ({ preview, setPreview }: IThumbnails) => {
+export const Thumbnails = ({ preview, setPreview, setNewProfileImage }: IThumbnails) => {
 	const { profile, setProfile } = useUserContext();
 	// Remove uploaded image
 	const handleRemove = (event: PointerEvent<HTMLButtonElement>) => {
@@ -416,6 +416,7 @@ export const Thumbnails = ({ preview, setPreview }: IThumbnails) => {
 		event.preventDefault();
 		const imageNumber = event.currentTarget.id;
 		setProfile({ ...profile, profile_image: imageNumber });
+		setNewProfileImage(true)
 	};
 
 	return preview ? (

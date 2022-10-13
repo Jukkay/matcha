@@ -38,6 +38,7 @@ export const UpdateProfile = ({
 	const [fileAmountError, setFileAmountError] = useState(false);
 	const [imageError, setImageError] = useState(false);
 	const [imageAmount, setImageAmount] = useState(0);
+	const [newProfileImage, setNewProfileImage] = useState(false);
 	const [files, setFiles] = useState<FileList>();
 
 	const [interests, setInterests] = useState<string[]>([]);
@@ -96,9 +97,12 @@ export const UpdateProfile = ({
 				if (!latitudeTest || !longitudeTest) {
 					setCoordinateError(true);
 					return;
-				}
-				else {
-					setProfile({...profile, user_latitude: profile.user_latitude.trim(), user_longitude: profile.user_longitude.trim()})
+				} else {
+					setProfile({
+						...profile,
+						user_latitude: profile.user_latitude.trim(),
+						user_longitude: profile.user_longitude.trim(),
+					});
 				}
 			}
 			// Check interests amount
@@ -106,6 +110,11 @@ export const UpdateProfile = ({
 				setInterestsError(true);
 				return;
 			}
+			let payload = { ...profile };
+			payload.interests = interests;
+			payload.user_latitude = profile.user_latitude?.trim();
+			payload.user_longitude = profile.user_longitude?.trim();
+			payload.birthday = userData.birthday;
 			// Check photos
 			if (files && files.length > 0) {
 				if (files.length + imageAmount > 5) {
@@ -113,13 +122,23 @@ export const UpdateProfile = ({
 					return;
 				}
 				// upload photos
-				await uploadPhotos();
+				const photoUpload = await uploadPhotos();
+				if (!photoUpload) {
+					setImageError(true);
+					return;
+				}
+
+				// Get profile picture filename
+				if (newProfileImage) {
+					const profile_image: string =
+						profile.profile_image === 'default.png'
+							? photoUpload.data.filenames[0]
+							: photoUpload.data.filenames[profile.profile_image];
+					payload.profile_image = profile_image;
+					setProfile({ ...profile, profile_image: profile_image });
+				}
 			}
-			let payload = profile;
-			payload.interests = interests;
-			payload.user_latitude = profile.user_latitude?.trim()
-			payload.user_longitude = profile.user_longitude?.trim()
-			payload.birthday = userData.birthday;
+
 			// Upload profile
 			const response = await authAPI.patch(`/profile`, payload);
 			if (response.status === 200) {
@@ -140,10 +159,29 @@ export const UpdateProfile = ({
 			if (response.status === 200) {
 				setDeleted(true);
 				setTimeout(() => {
+					sessionStorage.removeItem('profile');
+					setProfile({
+						user_id: 0,
+						name: '',
+						birthday: '',
+						profile_image: 'default.png',
+						gender: '',
+						looking: '',
+						min_age: 0,
+						max_age: 0,
+						interests: [],
+						introduction: '',
+						country: '',
+						city: '',
+						latitude: '',
+						longitude: '',
+						user_latitude: '',
+						user_longitude: '',
+						famerating: 0,
+					});
 					updateUserData({ ...userData, profile_exists: false });
 					setDeleted(false);
 					setEditMode(false);
-					sessionStorage.removeItem('profile');
 				}, 2000);
 			}
 		} catch (err) {}
@@ -241,12 +279,23 @@ export const UpdateProfile = ({
 					</div>
 
 					{/* Pictures */}
-					<EditGallery files={files} setImageError={setImageError} setImageAmount={setImageAmount} />
+					<EditGallery
+						files={files}
+						setImageError={setImageError}
+						setImageAmount={setImageAmount}
+					/>
 					<ErrorMessage
 						errorMessage="You must have at least one picture."
 						error={imageError}
 					/>
-					<FileInput files={files} setFiles={setFiles} setFileAmountError={setFileAmountError} setFileError={setImageError} imageAmount={imageAmount}/>
+					<FileInput
+						files={files}
+						setFiles={setFiles}
+						setFileAmountError={setFileAmountError}
+						setFileError={setImageError}
+						imageAmount={imageAmount}
+						setNewProfileImage={setNewProfileImage}
+					/>
 					<ErrorMessage
 						errorMessage="You may not upload more than 5 pictures."
 						error={fileAmountError}
@@ -304,9 +353,12 @@ export const UpdateProfile = ({
 	);
 };
 
-export const EditGallery = ({ setImageError, setImageAmount }: GalleryProps) => {
+export const EditGallery = ({
+	setImageError,
+	setImageAmount,
+}: GalleryProps) => {
 	const [images, setImages] = useState<string[]>([]);
-	const { userData, updateUserData, profile, setProfile } = useUserContext();
+	const { userData, profile, setProfile } = useUserContext();
 
 	// Remove uploaded image
 	const handleClick = async (event: PointerEvent<HTMLButtonElement>) => {
@@ -323,17 +375,13 @@ export const EditGallery = ({ setImageError, setImageAmount }: GalleryProps) => 
 				...profile,
 				profile_image: images[0].substring(url.lastIndexOf('/') + 1),
 			});
-			updateUserData({
-				...userData,
-				profile_image: images[0].substring(url.lastIndexOf('/') + 1),
-			});
 		}
 		try {
 			let response = await authAPI.delete(`/image/${removedImage}`);
 			if (response.status === 200) {
 				const newImages = images.filter((item) => item != url);
 				setImages([...newImages]);
-				setImageAmount(newImages.length)
+				setImageAmount(newImages.length);
 			}
 		} catch (err) {}
 	};
@@ -344,7 +392,6 @@ export const EditGallery = ({ setImageError, setImageAmount }: GalleryProps) => 
 		const url = event.currentTarget.id;
 		const chosenImage = url.substring(url.lastIndexOf('/') + 1);
 		setProfile({ ...profile, profile_image: chosenImage });
-		updateUserData({ ...userData, profile_image: chosenImage });
 	};
 
 	useEffect(() => {
@@ -360,7 +407,7 @@ export const EditGallery = ({ setImageError, setImageAmount }: GalleryProps) => 
 							`${authAPI.defaults.baseURL}/images/${item['filename']}`
 					);
 					setImages(filenames);
-					setImageAmount(filenames.length)
+					setImageAmount(filenames.length);
 				}
 			} catch (err) {}
 		};

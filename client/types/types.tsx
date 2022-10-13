@@ -22,6 +22,7 @@ export interface FileInputProps {
 	setFileAmountError?: SetStateAction<any>;
 	setFileError?: SetStateAction<any>;
 	imageAmount?: number;
+	setNewProfileImage: SetStateAction<any>;
 }
 
 export interface ProfileViewProps {
@@ -189,6 +190,7 @@ export interface IThumbnails {
 	preview: string[];
 	setPreview: SetStateAction<any>;
 	setFiles?: SetStateAction<any>;
+	setNewProfileImage: SetStateAction<any>;
 }
 
 export interface GalleryProps {

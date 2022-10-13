@@ -1,4 +1,6 @@
 import { Request, Response } from 'express';
+import { unlink } from 'fs';
+import { RowDataPacket } from 'mysql';
 import { locateIP, reformatDate } from '../utilities/helpers';
 import { execute } from '../utilities/SQLConnect';
 import {
@@ -186,7 +188,6 @@ const getProfile = async (req: Request, res: Response) => {
 			requester,
 			user_id,
 		]);
-		console.log(profile_data);
 		if (profile_data.length > 0) {
 			return res.status(200).json({
 				message: 'Profile data retrieved successfully',
@@ -319,22 +320,47 @@ const deleteProfile = async (req: Request, res: Response) => {
 			return res.status(400).json({
 				message: 'ID mismatch. Are you doing something shady?',
 			});
+		// Get filenames
+		let sql = `
+			SELECT
+				filename
+			FROM
+				photos
+			WHERE
+				user_id = ?;`;
+		const filenames = await execute(sql, [user_id]);
+		// Delete files from server
+		filenames.forEach((image: RowDataPacket) => {
+			unlink(`./images/${image['filename']}`, (err) => {
+				if (err) {
+					console.error(err);
+				}
+			});
+		});
+		// Delete from database
+		sql = `
+			DELETE FROM 
+				photos 
+			WHERE 
+				user_id = ?;`;
+
+		const response = await execute(sql, [user_id]);
 		// Remove profile
-		const sql = `
+		sql = `
 			DELETE FROM 
 				profiles 
 			WHERE 
-				user_id = ?`;
-		const response = await execute(sql, [user_id]);
-		const sql2 = `
+			user_id = ?`;
+		const response2 = await execute(sql, [user_id]);
+		sql = `
 			UPDATE 
 				users 
 			SET 
 				profile_exists = "0" 
 			WHERE 
 				user_id = ?;`;
-		const response2 = await execute(sql2, [user_id]);
-		if (response && response2)
+		const response3 = await execute(sql, [user_id]);
+		if (response && response2 && response3)
 			return res.status(200).json({
 				message: 'Profile removed successfully',
 			});

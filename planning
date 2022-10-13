@@ -476,10 +476,11 @@ V Alaharma is null value in city. Crashes.
 V 0 low limit for famerating in search breaks famerating filtering
 V Changed famerating range to use slider
 V Chat layout breaks in mobile
-V Changed chat page to use columns again to take advantage on built in responsivity
+V Changed chat page to use columns again to take advantage of built in responsivity
 V Added check for username/email match on password change
 V Made it impossible for blocker and blocked to see each other in any history/log
-
+V Fixed profile image setting in different scenarios
+V Delete pictures on profile delete
 Test all required functionality
 
 # Backlog

@@ -39,6 +39,7 @@ export const CreateProfile = ({
 	const [interests, setInterests] = useState<string[]>([]);
 	const [query, setQuery] = useState('');
 	const [result, setResult] = useState<string[]>([]);
+	const [_newProfileImage, setNewProfileImage] = useState(false);
 	const { userData, updateUserData } = useUserContext();
 	const age = convertBirthdayToAge(userData.birthday);
 
@@ -96,7 +97,7 @@ export const CreateProfile = ({
 				return;
 			}
 			// Add interests object to profile
-			let payload = {...profile};
+			let payload = { ...profile };
 			payload.interests = interests;
 			// upload photos
 			const photoUpload = await uploadPhotos();
@@ -105,10 +106,12 @@ export const CreateProfile = ({
 				return;
 			}
 			// Get profile picture filename
-			const profile_image: string = profile.profile_image === 'default.png'
-			? photoUpload.data.filenames[0]
-			: photoUpload.data.filenames[profile.profile_image];
+			const profile_image: string =
+				profile.profile_image === 'default.png'
+					? photoUpload.data.filenames[0]
+					: photoUpload.data.filenames[profile.profile_image];
 			payload.profile_image = profile_image;
+			setProfile({ ...profile, profile_image: profile_image });
 			// Add other information user can't change
 			payload.birthday = userData.birthday;
 			payload.name = userData.name;
@@ -212,7 +215,13 @@ export const CreateProfile = ({
 							query={query}
 						/>
 					</div>
-					<FileInput files={files} setFiles={setFiles} setFileAmountError={setFileAmountError} setFileError={setFileError}/>
+					<FileInput
+						files={files}
+						setFiles={setFiles}
+						setFileAmountError={setFileAmountError}
+						setFileError={setFileError}
+						setNewProfileImage={setNewProfileImage}
+					/>
 					<ErrorMessage
 						errorMessage="You must upload at least one picture."
 						error={fileError}
