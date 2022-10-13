@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS profiles(
 	profile_id BIGINT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 	`user_id` INT(10) UNSIGNED NOT NULL UNIQUE,
 	`name` VARCHAR(255) NOT NULL,
-	profile_image VARCHAR(255) DEFAULT "default.png",
+	profile_image VARCHAR(255) DEFAULT "profile.svg",
 	country VARCHAR(56) NOT NULL,
 	birthday DATE NOT NULL,
 	city VARCHAR(85) NOT NULL,

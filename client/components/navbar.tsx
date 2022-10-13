@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { IconContext } from 'react-icons';
 import { FaBell } from 'react-icons/fa';
 import { FiMenu } from 'react-icons/fi';
@@ -95,7 +95,7 @@ const LoggedInControls = () => {
 			if (socket.disconnected) socket.open();
 			socket.on('connect', () => {
 				socket.emit('set_user', userData.user_id);
-			})
+			});
 			socket.on('connect_error', async (err) => {
 				if (err.message === 'Unauthorized') {
 					const refreshResponse = await axios.post(`/token/`, {
@@ -116,21 +116,19 @@ const LoggedInControls = () => {
 				if (data.notification_type === NotificationType.MESSAGE) {
 					if (matchData.receiver_id === data.sender_id) return;
 					setMessageCount((messageCount: number) => messageCount + 1);
-				}
-				else if (data.notification_type === NotificationType.LIKE) {
+				} else if (data.notification_type === NotificationType.LIKE) {
 					setLikeCount((likeCount: number) => likeCount + 1);
-				}
-				else {
+				} else {
 					setNotificationCount(
 						(notificationCount: number) => notificationCount + 1
-						);
-					}
+					);
+				}
 			});
 		} catch (err) {}
 		return () => {
 			socket.removeAllListeners('receive_notification');
 			socket.removeAllListeners('connect_error');
-			socket.removeAllListeners('connect')
+			socket.removeAllListeners('connect');
 		};
 	}, [userData.user_id, matchData.receiver_id]);
 
@@ -188,35 +186,49 @@ const LoggedInControls = () => {
 };
 
 const Profile = ({ username, profile_image }: INavbarProfile) => {
+	const [path, setPath] = useState('');
+
+	useEffect(() => {
+		const filePath =
+			profile_image === 'profile.svg' ||
+			profile_image === '' ||
+			profile_image === '0' ||
+			profile_image === '1' ||
+			profile_image === '2' ||
+			profile_image === '3' ||
+			profile_image === '4' ||
+			profile_image === undefined
+				? '/profile.svg'
+				: `${authAPI.defaults.baseURL}/images/${profile_image}`;
+		setPath(filePath);
+	}, [profile_image]);
 	return (
 		<Link href="/profile">
 			<a className="navbar-item fullheight">
 				<div className="username mr-3">
 					<strong>{username}</strong>
 				</div>
-				<figure className="image navbar-profile-image">
+				{path === '/profile.svg' ? (
 					<img
-						className="is-rounded"
-						src={
-							profile_image === 'default.png' ||
-							profile_image === '' ||
-							profile_image === '0' ||
-							profile_image === '1' ||
-							profile_image === '2' ||
-							profile_image === '3' ||
-							profile_image === '4' ||
-							profile_image === undefined
-								? '/default.png'
-								: `${authAPI.defaults.baseURL}/images/${profile_image}`
-						}
-						onError={({ currentTarget }) => {
-							currentTarget.onerror = null;
-							currentTarget.src = '/default.png';
-						}}
+						className="profile-icon"
+						src={path}
 						alt="Profile picture"
 						crossOrigin=""
 					/>
-				</figure>
+				) : (
+					<figure className="image navbar-profile-image">
+						<img
+							className="is-rounded"
+							src={path}
+							onError={({ currentTarget }) => {
+								currentTarget.onerror = null;
+								currentTarget.src = '/profile.svg';
+							}}
+							alt="Profile picture"
+							crossOrigin=""
+						/>
+					</figure>
+				)}
 			</a>
 		</Link>
 	);

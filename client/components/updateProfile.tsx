@@ -131,7 +131,7 @@ export const UpdateProfile = ({
 				// Get profile picture filename
 				if (newProfileImage) {
 					const profile_image: string =
-						profile.profile_image === 'default.png'
+						profile.profile_image === 'profile.svg'
 							? photoUpload.data.filenames[0]
 							: photoUpload.data.filenames[profile.profile_image];
 					payload.profile_image = profile_image;
@@ -164,7 +164,7 @@ export const UpdateProfile = ({
 						user_id: 0,
 						name: '',
 						birthday: '',
-						profile_image: 'default.png',
+						profile_image: 'profile.svg',
 						gender: '',
 						looking: '',
 						min_age: 0,
@@ -363,23 +363,29 @@ export const EditGallery = ({
 	// Remove uploaded image
 	const handleClick = async (event: PointerEvent<HTMLButtonElement>) => {
 		event.preventDefault();
-		if (images.length < 2) {
-			setImageError(true);
-			return;
-		}
 		const url = event.currentTarget.id;
-		const removedImage = url.substring(url.lastIndexOf('/') + 1);
-		if (!removedImage) return;
-		if (removedImage == profile.profile_image) {
+		if (images.length < 2) {
 			setProfile({
 				...profile,
 				profile_image: images[0].substring(url.lastIndexOf('/') + 1),
 			});
+			setImageError(true);
+			return;
 		}
+		const removedImage = url.substring(url.lastIndexOf('/') + 1);
+		if (!removedImage) return;
 		try {
 			let response = await authAPI.delete(`/image/${removedImage}`);
 			if (response.status === 200) {
 				const newImages = images.filter((item) => item != url);
+				if (removedImage == profile.profile_image) {
+					setProfile({
+						...profile,
+						profile_image: newImages[0].substring(
+							url.lastIndexOf('/') + 1
+						),
+					});
+				}
 				setImages([...newImages]);
 				setImageAmount(newImages.length);
 			}

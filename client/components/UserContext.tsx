@@ -30,7 +30,7 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
 		user_id: 0,
 		name: '',
 		birthday: '',
-		profile_image: 'default.png',
+		profile_image: 'profile.svg',
 		gender: '',
 		looking: '',
 		min_age: 0,

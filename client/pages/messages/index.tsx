@@ -362,7 +362,7 @@ const MatchListItem = ({ match, user_id }: any) => {
 						src={`${authAPI.defaults.baseURL}/images/${profile_image}`}
 						onError={({ currentTarget }) => {
 							currentTarget.onerror = null;
-							currentTarget.src = '/default.png';
+							currentTarget.src = '/profile.svg';
 						}}
 						alt="Profile picture"
 						crossOrigin=""
@@ -387,7 +387,7 @@ const MatchListItem = ({ match, user_id }: any) => {
 						src={`${authAPI.defaults.baseURL}/images/${profile_image}`}
 						onError={({ currentTarget }) => {
 							currentTarget.onerror = null;
-							currentTarget.src = '/default.png';
+							currentTarget.src = '/profile.svg';
 						}}
 						alt="Profile picture"
 						crossOrigin=""

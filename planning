@@ -481,6 +481,9 @@ V Added check for username/email match on password change
 V Made it impossible for blocker and blocked to see each other in any history/log
 V Fixed profile image setting in different scenarios
 V Delete pictures on profile delete
+V Change default.png to correct color
+V Fixed automated profile image selection when removing current profile image
+
 Test all required functionality
 
 # Backlog

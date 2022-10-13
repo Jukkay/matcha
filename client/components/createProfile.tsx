@@ -107,7 +107,7 @@ export const CreateProfile = ({
 			}
 			// Get profile picture filename
 			const profile_image: string =
-				profile.profile_image === 'default.png'
+				profile.profile_image === 'profile.svg'
 					? photoUpload.data.filenames[0]
 					: photoUpload.data.filenames[profile.profile_image];
 			payload.profile_image = profile_image;
