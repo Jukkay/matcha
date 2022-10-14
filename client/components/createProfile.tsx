@@ -35,6 +35,7 @@ export const CreateProfile = ({
 	const [interestsError, setInterestsError] = useState(false);
 	const [fileError, setFileError] = useState(false);
 	const [fileAmountError, setFileAmountError] = useState(false);
+	const [textAreaError, setTextAreaError] = useState(false);
 	const [files, setFiles] = useState<FileList>();
 	const [interests, setInterests] = useState<string[]>([]);
 	const [query, setQuery] = useState('');
@@ -96,6 +97,11 @@ export const CreateProfile = ({
 				setInterestsError(true);
 				return;
 			}
+			// Check textarea length
+			if (profile.introduction && profile.introduction.length > 4096) {
+				setTextAreaError(true)
+				return
+			}
 			// Add interests object to profile
 			let payload = { ...profile };
 			payload.interests = interests;
@@ -115,6 +121,7 @@ export const CreateProfile = ({
 			// Add other information user can't change
 			payload.birthday = userData.birthday;
 			payload.name = userData.name;
+			payload.user_id = userData.user_id;
 			// Upload profile
 			const response = await authAPI.post(`/profile`, payload);
 			if (response.status === 200) {
@@ -134,8 +141,15 @@ export const CreateProfile = ({
 		uploadProfile();
 	};
 
+	useEffect(() => {
+		if (profile.introduction && profile.introduction.length > 4095)
+			setTextAreaError(true)
+		else
+			setTextAreaError(false);
+	}, [profile.introduction])
+
 	return success ? (
-		<div className="my-6 pt-6">
+		<div className="my-6 pt-6 mx-3">
 			<div className="card p-3 rounded-corners has-text-centered">
 				<section className="section">
 					<h3 className="title is-3">Profile created successfully</h3>
@@ -143,7 +157,7 @@ export const CreateProfile = ({
 			</div>
 		</div>
 	) : (
-		<div className="my-6">
+		<div className="my-6 mx-3">
 			<form onSubmit={handleSubmit} acceptCharset="UTF-8">
 				<section className="section">
 					<h1 className="title is-1">Create new profile</h1>
@@ -185,7 +199,7 @@ export const CreateProfile = ({
 							})
 						}
 					/>
-
+					<ErrorMessage errorMessage={'Introduction maximum length is 4096 characters'} error={textAreaError} />
 					{/* Interests */}
 					<div className="block">
 						<label htmlFor="interests" className="label my-3">

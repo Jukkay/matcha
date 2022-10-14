@@ -134,7 +134,7 @@ export const EditButton = ({ setEditMode }: EditButtonProps) => {
 
 export const NewProfileButton = ({ setEditMode }: EditButtonProps) => {
 	return (
-		<div className="my-6 pt-6">
+		<div className="my-6 pt-6 mx-3">
 			<div className="card p-3 rounded-corners has-text-centered">
 				<section className="section">
 					<h3 className="title is-3">

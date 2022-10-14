@@ -360,7 +360,7 @@ const LoggedIn = () => {
 			</div>
 		</div>
 	) : (
-		<div className="my-6 pt-6">
+		<div className="my-6 pt-6 mx-3">
 			<div className="box">
 				<section className="section">
 					<form onSubmit={handleSubmit} autoComplete="on">

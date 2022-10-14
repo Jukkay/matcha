@@ -103,7 +103,7 @@ const LoggedIn = () => {
 		return <LoadError text="Error loading likes" />;
 
 	return (
-		<div className="my-6 pt-6">
+		<div className="my-6 pt-6 mx-3">
 			<h1 className="title is-1">Likes</h1>
 			<h4 className="title is-4">They liked your profile:</h4>
 			<div className="block">

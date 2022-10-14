@@ -191,7 +191,7 @@ export const ProfileViewWithLikeButtons = ({
 		setMatch(false);
 	};
 	return (
-		<div className="my-6 pt-6">
+		<div className="my-6 pt-6 mx-3">
 			<div className="columns card p-3 is-gapless">
 				<div className="column card-image has-text-left is-two-thirds">
 					<Gallery user_id={otherUserProfile.user_id} />

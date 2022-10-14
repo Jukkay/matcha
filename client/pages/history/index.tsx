@@ -75,7 +75,7 @@ const LoggedIn = () => {
 		return <LoadError text="Error loading history" />;
 
 	return log.length > 0 ? (
-		<div className="my-6 pt-6">
+		<div className="my-6 pt-6 mx-3">
 			<h1 className="title is-1">Recently visited profiles</h1>
 			{log.slice(0, endIndex).map((visitor: LogEntry, index) => (
 				<SearchResultItemWithoutDistance
@@ -94,7 +94,7 @@ const LoggedIn = () => {
 			)}
 		</div>
 	) : (
-		<div className="my-6 pt-6">
+		<div className="my-6 pt-6 mx-3">
 			<h1 className="title is-1">Recently visited profiles</h1>
 			<div className="block">No visits yet</div>
 		</div>

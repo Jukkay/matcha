@@ -487,6 +487,11 @@ V Prohibit password reset with bad password
 V Fix notification dropdown's position in mobile view
 V Test all required functionality
 V Update about page
+V Added higher payload size limit to json and urlencoded middlewares to avoid payloadsizeerrors
+V Added limit for textarea length in client
+V Explicitly added user_id to profile payload to make sure payload always has up to date user_id
+V Added a new hook to handle profile image and update it to api if current profile image is deleted
+V Fixed spacing to work better in mobile view
 
 
 # Backlog
@@ -495,6 +500,7 @@ Change language to very plain language for accessibility
 Show image counter
 Remove error message passthrough in user controller
 Move components to files that make most sense
+
 
 # Possible bonuses
 AWS deployment

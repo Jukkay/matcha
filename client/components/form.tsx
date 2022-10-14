@@ -289,6 +289,7 @@ export const TextArea = ({
 				placeholder={placeholder}
 				value={value}
 				onChange={onChange}
+				maxLength={4096}
 				required
 			></textarea>
 		</div>

@@ -107,7 +107,7 @@ const LoggedIn = () => {
 		return <LoadError text="Error loading likes" />;
 
 	return likedProfiles.length > 0 ? (
-		<div className="my-6 pt-6">
+		<div className="my-6 pt-6 mx-3">
 			<h1 className="title is-1">You liked their profiles</h1>
 			<div className="block">
 				{likedProfiles.slice(0, endIndex).map((liker, index) => (

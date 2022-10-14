@@ -68,7 +68,7 @@ const LoggedIn = () => {
 		return <LoadError text="Error loading messages" />;
 
 	return (
-		<div className="columns is-centered is-gapless">
+		<div className="columns is-centered is-gapless mx-3">
 			<ChatWindow />
 			<MatchList />
 		</div>
@@ -236,7 +236,7 @@ const ReportMenu = ({ reporter, reported, setMatchData }: any) => {
 						<BsThreeDotsVertical className="has-text-primary" />
 					</div>
 				</div>
-				<div className="dropdown-menu" id="dropdown-menu" role="menu">
+				<div className="dropdown-menu pl-5 pr-2" id="dropdown-menu" role="menu">
 					<div className="dropdown-content">
 						<a
 							className="dropdown-item"
@@ -545,7 +545,7 @@ const ChatWindow = () => {
 					.
 				</div>
 			</div>
-			<div className="chat-input has-background-white">
+			<div className="chat-input has-background-white my-3">
 				<form onSubmit={handleSubmit} acceptCharset="UTF-8">
 					<div className="field has-addons">
 						<div className="control fullwidth">

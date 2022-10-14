@@ -36,6 +36,7 @@ export const UpdateProfile = ({
 	const [interestsError, setInterestsError] = useState(false);
 	const [coordinateError, setCoordinateError] = useState(false);
 	const [fileAmountError, setFileAmountError] = useState(false);
+	const [textAreaError, setTextAreaError] = useState(false);
 	const [imageError, setImageError] = useState(false);
 	const [imageAmount, setImageAmount] = useState(0);
 	const [newProfileImage, setNewProfileImage] = useState(false);
@@ -110,11 +111,17 @@ export const UpdateProfile = ({
 				setInterestsError(true);
 				return;
 			}
+			// Check textarea length
+			if (profile.introduction && profile.introduction.length > 4096) {
+				setTextAreaError(true);
+				return;
+			}
 			let payload = { ...profile };
 			payload.interests = interests;
 			payload.user_latitude = profile.user_latitude?.trim();
 			payload.user_longitude = profile.user_longitude?.trim();
 			payload.birthday = userData.birthday;
+			payload.user_id = userData.user_id;
 			// Check photos
 			if (files && files.length > 0) {
 				if (files.length + imageAmount > 5) {
@@ -190,8 +197,15 @@ export const UpdateProfile = ({
 		event.preventDefault();
 		uploadProfile();
 	};
+
+	useEffect(() => {
+		if (profile.introduction && profile.introduction.length > 4095)
+			setTextAreaError(true);
+		else setTextAreaError(false);
+	}, [profile.introduction]);
+
 	return deleted ? (
-		<div className="my-6 pt-6">
+		<div className="my-6 pt-6 mx-3">
 			<div className="card p-3 rounded-corners has-text-centered">
 				<section className="section">
 					<h3 className="title is-3">Profile deleted successfully</h3>
@@ -199,7 +213,7 @@ export const UpdateProfile = ({
 			</div>
 		</div>
 	) : success ? (
-		<div className="my-6 pt-6">
+		<div className="my-6 pt-6 mx-3">
 			<div className="card p-3 rounded-corners has-text-centered">
 				<section className="section">
 					<h3 className="title is-3">Profile updated successfully</h3>
@@ -207,7 +221,7 @@ export const UpdateProfile = ({
 			</div>
 		</div>
 	) : (
-		<div className="my-6">
+		<div className="my-6 mx-3">
 			<form onSubmit={handleSubmit} acceptCharset="UTF-8">
 				<section className="section">
 					<h1 className="title is-1">Edit profile</h1>
@@ -246,6 +260,12 @@ export const UpdateProfile = ({
 								introduction: event.target.value,
 							})
 						}
+					/>
+					<ErrorMessage
+						errorMessage={
+							'Introduction maximum length is 4096 characters'
+						}
+						error={textAreaError}
 					/>
 
 					{/* Interests */}
@@ -364,11 +384,7 @@ export const EditGallery = ({
 	const handleClick = async (event: PointerEvent<HTMLButtonElement>) => {
 		event.preventDefault();
 		const url = event.currentTarget.id;
-		if (images.length < 2) {
-			setProfile({
-				...profile,
-				profile_image: images[0].substring(url.lastIndexOf('/') + 1),
-			});
+		if (images.length == 1) {
 			setImageError(true);
 			return;
 		}
@@ -378,14 +394,6 @@ export const EditGallery = ({
 			let response = await authAPI.delete(`/image/${removedImage}`);
 			if (response.status === 200) {
 				const newImages = images.filter((item) => item != url);
-				if (removedImage == profile.profile_image) {
-					setProfile({
-						...profile,
-						profile_image: newImages[0].substring(
-							url.lastIndexOf('/') + 1
-						),
-					});
-				}
 				setImages([...newImages]);
 				setImageAmount(newImages.length);
 			}
@@ -419,6 +427,35 @@ export const EditGallery = ({
 		};
 		getUserImages();
 	}, [userData.user_id]);
+
+	// Set first image in images as profile picture if the current is deleted
+	useEffect(() => {
+		const updateProfileImage = async (controller: AbortController) => {
+			try {
+				await authAPI.post(`/updateprofileimage`, {
+					profile_image: filename,
+					signal: controller.signal,
+				});
+			} catch (err) {}
+		};
+		if (!images) return;
+		if (
+			images.indexOf(
+				`${authAPI.defaults.baseURL}/images/${profile.profile_image}`
+			) > -1
+		)
+			return;
+		const filename = images[0]?.substring(images[0].lastIndexOf('/') + 1);
+		setProfile({
+			...profile,
+			profile_image: filename?.length > 0 ? filename : 'profile.svg',
+		});
+
+		// Update to database
+		const controller = new AbortController();
+		updateProfileImage(controller);
+		return () => controller.abort();
+	}, [images]);
 
 	return images ? (
 		<div className="block">
