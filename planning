@@ -486,8 +486,8 @@ V Fixed automated profile image selection when removing current profile image
 V Prohibit password reset with bad password
 V Fix notification dropdown's position in mobile view
 V Test all required functionality
+V Update about page
 
-Update about page
 
 # Backlog
 Deploy to AWS
