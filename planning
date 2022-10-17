@@ -494,7 +494,7 @@ V Added a new hook to handle profile image and update it to api if current profi
 V Fixed spacing to work better in mobile view
 V Removed unnecessary setItems for usercontext states to avoid setting wrong values
 V Fixed Name, age and interests missing from profile after profile creation until refreshed
-Opening edit profile resets the profile picture to first picture
+V Opening edit profile resets the profile picture to first picture
 
 # Backlog
 Deploy to AWS
