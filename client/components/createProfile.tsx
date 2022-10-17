@@ -102,9 +102,10 @@ export const CreateProfile = ({
 				setTextAreaError(true)
 				return
 			}
-			// Add interests object to profile
+			// Create payload for API
 			let payload = { ...profile };
-			payload.interests = interests;
+			payload.interests = [...interests];
+			payload.introduction = profile.introduction?.trim();
 			// upload photos
 			const photoUpload = await uploadPhotos();
 			if (!photoUpload) {
@@ -117,8 +118,9 @@ export const CreateProfile = ({
 					? photoUpload.data.filenames[0]
 					: photoUpload.data.filenames[profile.profile_image];
 			payload.profile_image = profile_image;
-			setProfile({ ...profile, profile_image: profile_image });
-			// Add other information user can't change
+			// Update profile object with form data
+			setProfile({ ...profile, profile_image: profile_image, interests: [...interests], birthday: userData.birthday, name: userData.name });
+			// Add other information user can't change on this form to payload
 			payload.birthday = userData.birthday;
 			payload.name = userData.name;
 			payload.user_id = userData.user_id;

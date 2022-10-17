@@ -493,6 +493,8 @@ V Explicitly added user_id to profile payload to make sure payload always has up
 V Added a new hook to handle profile image and update it to api if current profile image is deleted
 V Fixed spacing to work better in mobile view
 V Removed unnecessary setItems for usercontext states to avoid setting wrong values
+V Fixed Name, age and interests missing from profile after profile creation until refreshed
+Opening edit profile resets the profile picture to first picture
 
 # Backlog
 Deploy to AWS

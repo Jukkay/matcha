@@ -117,11 +117,14 @@ export const UpdateProfile = ({
 				return;
 			}
 			let payload = { ...profile };
-			payload.interests = interests;
+			payload.interests = [...interests];
 			payload.user_latitude = profile.user_latitude?.trim();
 			payload.user_longitude = profile.user_longitude?.trim();
+			payload.introduction = profile.introduction?.trim();
 			payload.birthday = userData.birthday;
 			payload.user_id = userData.user_id;
+			// Update profile object with form data
+			setProfile({ ...profile, interests: [...interests]});
 			// Check photos
 			if (files && files.length > 0) {
 				if (files.length + imageAmount > 5) {
@@ -145,7 +148,6 @@ export const UpdateProfile = ({
 					setProfile({ ...profile, profile_image: profile_image });
 				}
 			}
-
 			// Upload profile
 			const response = await authAPI.patch(`/profile`, payload);
 			if (response.status === 200) {
@@ -437,7 +439,7 @@ export const EditGallery = ({
 				});
 			} catch (err) {}
 		};
-		if (!images) return;
+		if (images.length < 1) return;
 		if (
 			images.indexOf(
 				`${authAPI.defaults.baseURL}/images/${profile.profile_image}`
