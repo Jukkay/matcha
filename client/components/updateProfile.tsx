@@ -153,7 +153,6 @@ export const UpdateProfile = ({
 				setTimeout(() => {
 					setSuccess(false);
 					setEditMode(false);
-					sessionStorage.setItem('profile', JSON.stringify(payload));
 				}, 2000);
 			}
 		} catch (err) {}

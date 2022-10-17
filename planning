@@ -492,7 +492,7 @@ V Added limit for textarea length in client
 V Explicitly added user_id to profile payload to make sure payload always has up to date user_id
 V Added a new hook to handle profile image and update it to api if current profile image is deleted
 V Fixed spacing to work better in mobile view
-
+V Removed unnecessary setItems for usercontext states to avoid setting wrong values
 
 # Backlog
 Deploy to AWS

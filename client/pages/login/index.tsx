@@ -51,10 +51,6 @@ const LoginSuccess = () => {
 						response.data.profile.interests
 					);
 					setProfile(response.data.profile);
-					sessionStorage.setItem(
-						'profile',
-						JSON.stringify(response.data.profile)
-					);
 				} else updateUserData({ ...userData, profile_exists: false });
 			} catch (err) {}
 		};

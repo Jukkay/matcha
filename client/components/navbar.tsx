@@ -108,7 +108,6 @@ const LoggedInControls = () => {
 						user_id: userData.user_id,
 					};
 					updateAccessToken(newToken);
-					sessionStorage.setItem('accessToken', newToken);
 					socket.connect();
 				}
 			});

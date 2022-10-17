@@ -130,7 +130,6 @@ export const CreateProfile = ({
 					setSuccess(false);
 					setEditMode(false);
 					updateUserData({ ...userData, profile_exists: true });
-					sessionStorage.setItem('profile', JSON.stringify(payload));
 				}, 2000);
 			}
 		} catch (err) {}
