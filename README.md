@@ -1,4 +1,4 @@
-## 42 Dates / Matcha
+# 42 Dates / Matcha
 
 42 Dates is a dating app I built for a project called Matcha at
 Hive Helsinki Coding School. The app is built with React
@@ -19,20 +19,20 @@ Unfortunately matches cannot be simulated unless you
 create two users that like each other. The accounts can
 be removed after testing.
 
-##Technologies
+## Technologies
 				
-*React
-*Next.js
-*Typescript
-*Node
-*Express
-*MariaDB
-*Socket.io
-*JSON web tokens
-*Axios
-*Geolocation API
-*Random User Generator API
-*Docker
+* React
+* Next.js
+* Typescript
+* Node
+* Express
+* MariaDB
+* Socket.io
+* JSON web tokens
+* Axios
+* Geolocation API
+* Random User Generator API
+* Docker
 			
 Next.js is used mainly as a create-react-app
 replacement. No server-side rendering is used for this
