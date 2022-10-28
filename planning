@@ -496,6 +496,11 @@ V Removed unnecessary setItems for usercontext states to avoid setting wrong val
 V Fixed Name, age and interests missing from profile after profile creation until refreshed
 V Opening edit profile resets the profile picture to first picture
 
+Deploy the app somewhere
+Make sure the git cloned app works without hardcoded email addresses
+Complete readme.md
+
+
 # Backlog
 Deploy to AWS
 Change language to very plain language for accessibility
