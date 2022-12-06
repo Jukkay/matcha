@@ -1,5 +1,7 @@
-
 # 42 Dates / Matcha
+![Matcha](https://img.shields.io/github/languages/top/Jukkay/matcha)
+
+## Description
 
 42 Dates is a dating app I built for a project called Matcha at
 Hive Helsinki Coding School. The app is built with React
@@ -9,107 +11,70 @@ dummy users created using Random User Generator API and
 Node script, so unfortunately this is not the place to
 find real love.
 
-The app has basic functionality including dating
-profile, suggested matches based on preferences, profile
-search, instant notifications, and instant messaging
-between matched users. Users are located using
-Geolocation API and it falls back on IP location with
-Fast-geoip library. You&apos;re free to try it out, but
+You&apos;re free to try it out, but
 it requires registration with working email address.
 Unfortunately matches cannot be simulated unless you
 create two users that like each other. The accounts can
 be removed after testing.
 
+## Features
+
+* Authentication with email and password
+* Email validation
+* Authorization with JWT
+* Dating profiles
+* Profile search
+* Suggested matches based on user preferences
+* Profile visit history
+* Like / Unlike
+* Match / Unmatch
+* Instant notifications (sockets)
+* Instant messaging between matched users (sockets)
+* Calculate distance between users
+* Report / block user
+* Change screen name / email address / password / profile picture
+* Upload / delete images
+* Remove profile / user
+* Users are located using Geolocation API and it falls back on IP location with
+Fast-geoip library. 
+
 ## Technologies
 				
-* React
-* Next.js
-* Typescript
-* Node
-* Express
-* MariaDB
-* Socket.io
-* JSON web tokens
-* Axios
-* Geolocation API
-* Random User Generator API
-* Docker
+* [React.js](https://reactjs.org/)
+* [Next.js](https://nextjs.org/)
+* [Typescript](https://www.typescriptlang.org/)
+* [Node.js](https://nodejs.org)
+* [Express](https://expressjs.com/)
+* [MariaDB](https://mariadb.com/)
+* [Socket.io](https://socket.io)
+* [JSON web tokens](https://jwt.io/)
+* [Axios](https://axios-http.com/)
+* [Geolocation API](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API)
+* [Fast-geoip](https://github.com/onramper/fast-geoip)
+* [Random User Generator API](https://randomuser.me/documentation)
+* [Docker](https://docker.com)
 			
 Next.js is used mainly as a create-react-app
 replacement. No server-side rendering is used for this
 project and API is done with Node and Express. API
-authentication is done with JSON web tokens. Axios
+authorization is done with JSON web tokens. Axios
 interceptor tries to refresh access tokens automatically
 if response status is 401. Socket.io is used for
 handling websocket connections for notifications and
 instant messaging.
 				
 Development environment runs in Docker containers and the Docker files are included in the repository.
-				
-# <Your-Project-Title>
-
-## Description
-
-Provide a short description explaining the what, why, and how of your project. Use the following questions as a guide:
-
-- What was your motivation?
-- Why did you build this project? (Note: the answer is not "Because it was a homework assignment.")
-- What problem does it solve?
-- What did you learn?
-
-## Table of Contents (Optional)
-
-If your README is long, add a table of contents to make it easy for users to find what they need.
-
-- [Installation](#installation)
-- [Usage](#usage)
-- [Credits](#credits)
-- [License](#license)
 
 ## Installation
 
-What are the steps required to install your project? Provide a step-by-step description of how to get the development environment running.
+1. Go to config/secrets folder and create secrets with:
+```printf "%s" "$(openssl rand -base64 20)" > mysql_password.secret
+printf "%s" "$(openssl rand -base64 20)" > mysql_root_password.secret
+printf "%s" "$(openssl rand -base64 10)" > server_token.secret```
+2. Add your outlook password to outlook_password.secret file
+3. Add you outlook email address to MAIL_USER environment variable in docker-compose.yml
+4. Build the project with ```make production```
+5. Create dummy users with ```make users```
+6. Browse to [http://localhost:3000](http://localhost:3000)
+7. Create your test users. (Email validation is required)
 
-## Usage
-
-Provide instructions and examples for use. Include screenshots as needed.
-
-To add a screenshot, create an `assets/images` folder in your repository and upload your screenshot to it. Then, using the relative filepath, add it to your README using the following syntax:
-
-    ```md
-    ![alt text](assets/images/screenshot.png)
-    ```
-
-## Credits
-
-List your collaborators, if any, with links to their GitHub profiles.
-
-If you used any third-party assets that require attribution, list the creators with links to their primary web presence in this section.
-
-If you followed tutorials, include links to those here as well.
-
-## License
-
-The last section of a high-quality README file is the license. This lets other developers know what they can and cannot do with your project. If you need help choosing a license, refer to [https://choosealicense.com/](https://choosealicense.com/).
-
----
-
-🏆 The previous sections are the bare minimum, and your project will ultimately determine the content of this document. You might also want to consider adding the following sections.
-
-## Badges
-
-![badmath](https://img.shields.io/github/languages/top/lernantino/badmath)
-
-Badges aren't necessary, per se, but they demonstrate street cred. Badges let other developers know that you know what you're doing. Check out the badges hosted by [shields.io](https://shields.io/). You may not understand what they all represent now, but you will in time.
-
-## Features
-
-If your project has a lot of features, list them here.
-
-## How to Contribute
-
-If you created an application or package and would like other developers to contribute it, you can include guidelines for how to do so. The [Contributor Covenant](https://www.contributor-covenant.org/) is an industry standard, but you can always write your own if you'd prefer.
-
-## Tests
-
-Go the extra mile and write tests for your application. Then provide examples on how to run them here.
