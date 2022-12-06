@@ -68,9 +68,11 @@ Development environment runs in Docker containers and the Docker files are inclu
 ## Installation
 
 1. Go to config/secrets folder and create secrets with:
-```printf "%s" "$(openssl rand -base64 20)" > mysql_password.secret
+```
+printf "%s" "$(openssl rand -base64 20)" > mysql_password.secret
 printf "%s" "$(openssl rand -base64 20)" > mysql_root_password.secret
-printf "%s" "$(openssl rand -base64 10)" > server_token.secret```
+printf "%s" "$(openssl rand -base64 10)" > server_token.secret
+```
 2. Add your outlook password to outlook_password.secret file
 3. Add you outlook email address to MAIL_USER environment variable in docker-compose.yml
 4. Build the project with ```make production```
