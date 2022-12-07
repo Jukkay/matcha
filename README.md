@@ -5,15 +5,15 @@
 
 42 Dates is a dating app I built for a project called Matcha at
 Hive Helsinki Coding School. The app is built with React
-on Next.js create-next-app. Backend is using Node and
+on Next.js create-next-app. The back end is using Node and
 Express with MariaDB database. Userbase has about 3800
 dummy users created using Random User Generator API and
 Node script, so unfortunately this is not the place to
 find real love.
 
 You&apos;re free to try it out, but
-it requires registration with working email address.
-Unfortunately matches cannot be simulated unless you
+it requires registration with a working email address.
+Unfortunately, matches cannot be simulated unless you
 create two users that like each other. The accounts can
 be removed after testing.
 
@@ -30,7 +30,7 @@ be removed after testing.
 * Match / Unmatch
 * Instant notifications (sockets)
 * Instant messaging between matched users (sockets)
-* Calculate distance between users
+* Calculate the distance between users
 * Report / block user
 * Change screen name / email address / password / profile picture
 * Upload / delete images
@@ -59,24 +59,23 @@ replacement. No server-side rendering is used for this
 project and API is done with Node and Express. API
 authorization is done with JSON web tokens. Axios
 interceptor tries to refresh access tokens automatically
-if response status is 401. Socket.io is used for
-handling websocket connections for notifications and
+if the response status is 401. Socket.io is used for
+handling WebSocket connections for notifications and
 instant messaging.
 				
-Development environment runs in Docker containers and the Docker files are included in the repository.
+The development environment runs in Docker containers and the Docker files are included in the repository.
 
 ## Installation
 
-1. Go to config/secrets folder and create secrets with:
+1. Go to the config/secrets folder and create secrets with:
 ```
 printf "%s" "$(openssl rand -base64 20)" > mysql_password.secret
 printf "%s" "$(openssl rand -base64 20)" > mysql_root_password.secret
 printf "%s" "$(openssl rand -base64 10)" > server_token.secret
 ```
 2. Add your outlook password to outlook_password.secret file
-3. Add you outlook email address to MAIL_USER environment variable in docker-compose.yml
+3. Add your outlook email address to the MAIL_USER environment variable in docker-compose.yml
 4. Build the project with ```make production```
 5. Create dummy users with ```make users```
 6. Browse to [http://localhost:3000](http://localhost:3000)
 7. Create your test users. (Email validation is required)
-
