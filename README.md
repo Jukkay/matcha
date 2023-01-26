@@ -13,12 +13,6 @@ dummy users created using Random User Generator API and
 Node script, so unfortunately this is not the place to
 find real love.
 
-You&apos;re free to try it out, but
-it requires registration with working email address.
-Unfortunately matches cannot be simulated unless you
-create two users that like each other. The accounts can
-be removed after testing.
-
 ## Features
 
 * Authentication with email and password
@@ -72,7 +66,7 @@ Development environment runs in Docker containers and the Docker files are inclu
 The app is deployed at:
 https://matcha-app.fly.dev/
 
-Registration is fully functional and requires email verification. If you'd rather not register, you can try it out using these ready test users:
+Registration is fully functional and requires email verification. The created account and user data can be removed from user settings. If you'd rather not register, you can try it out using these ready test users:
 
 Username: ```testuser1``` OR ```testuser2```
 
