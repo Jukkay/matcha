@@ -1,6 +1,8 @@
 # 42 Dates / Matcha
 ![Matcha](https://img.shields.io/github/languages/top/Jukkay/matcha)
 
+https://matcha-app.fly.dev/
+
 ## Description
 
 42 Dates is a dating app I built for a project called Matcha at
@@ -73,6 +75,7 @@ https://matcha-app.fly.dev/
 Registration is fully functional and requires email verification. If you'd rather not register, you can try it out using these ready test users
 
 Username: ```testuser1``` OR ```testuser2```
+
 Password: ```Password1```
 
 ## How can I run it locally?
