@@ -72,7 +72,7 @@ Development environment runs in Docker containers and the Docker files are inclu
 The app is deployed at:
 https://matcha-app.fly.dev/
 
-Registration is fully functional and requires email verification. If you'd rather not register, you can try it out using these ready test users
+Registration is fully functional and requires email verification. If you'd rather not register, you can try it out using these ready test users:
 
 Username: ```testuser1``` OR ```testuser2```
 
