@@ -9,6 +9,7 @@ import {
 	GPSCoordinateInput,
 	LookingSelector,
 	TextArea,
+	Notification
 } from './form';
 import { FileInput, SearchResult } from './profile';
 import { useUserContext } from './UserContext';
@@ -41,11 +42,12 @@ export const UpdateProfile = ({
 	const [imageAmount, setImageAmount] = useState(0);
 	const [newProfileImage, setNewProfileImage] = useState(false);
 	const [files, setFiles] = useState<FileList>();
-
+	const [showGenericError, setShowGenericError] = useState(false);
 	const [interests, setInterests] = useState<string[]>([]);
 	const [query, setQuery] = useState('');
 	const [result, setResult] = useState<string[]>([]);
 	const { userData, updateUserData } = useUserContext();
+	const [genericErrorMessage, setGenericErrorMessage] = useState('')
 
 	// Update object values
 	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -124,7 +126,7 @@ export const UpdateProfile = ({
 			payload.birthday = userData.birthday;
 			payload.user_id = userData.user_id;
 			// Update profile object with form data
-			setProfile({ ...profile, interests: [...interests]});
+			setProfile({ ...profile, interests: [...interests] });
 			// Check photos
 			if (files && files.length > 0) {
 				if (files.length + imageAmount > 5) {
@@ -157,7 +159,7 @@ export const UpdateProfile = ({
 					setEditMode(false);
 				}, 2000);
 			}
-		} catch (err) {}
+		} catch (err) { }
 	};
 	const deleteProfile = async () => {
 		try {
@@ -192,10 +194,17 @@ export const UpdateProfile = ({
 					setEditMode(false);
 				}, 2000);
 			}
-		} catch (err) {}
+		} catch (err: any) {
+			const errorMessage = err.response?.data?.message;
+			if (errorMessage) {
+				setGenericErrorMessage(errorMessage)
+				setShowGenericError(true);
+			}
+		}
 	};
 	const handleSubmit = (event: React.FormEvent) => {
 		event.preventDefault();
+		setShowGenericError(false);
 		uploadProfile();
 	};
 
@@ -223,8 +232,8 @@ export const UpdateProfile = ({
 		</div>
 	) : (
 		<div className="my-6 mx-3">
-			<form onSubmit={handleSubmit} acceptCharset="UTF-8">
-				<section className="section">
+			<section className="section">
+				<form onSubmit={handleSubmit} acceptCharset="UTF-8">
 					<h1 className="title is-1">Edit profile</h1>
 
 					{/* Location. Components imported dynamically */}
@@ -355,9 +364,13 @@ export const UpdateProfile = ({
 							Cancel
 						</button>
 					</div>
-				</section>
-			</form>
-
+					<Notification
+						notificationText={genericErrorMessage}
+						notificationState={showGenericError}
+						handleClick={() => setShowGenericError(false)}
+					/>
+				</form>
+			</section>
 			<section className="section">
 				<p className="block">
 					Caution: Removing profile is irreversible. If you remove
@@ -398,7 +411,7 @@ export const EditGallery = ({
 				setImages([...newImages]);
 				setImageAmount(newImages.length);
 			}
-		} catch (err) {}
+		} catch (err) { }
 	};
 
 	// Set as profile picture
@@ -424,7 +437,7 @@ export const EditGallery = ({
 					setImages(filenames);
 					setImageAmount(filenames.length);
 				}
-			} catch (err) {}
+			} catch (err) { }
 		};
 		getUserImages();
 	}, [userData.user_id]);
@@ -437,7 +450,7 @@ export const EditGallery = ({
 					profile_image: filename,
 					signal: controller.signal,
 				});
-			} catch (err) {}
+			} catch (err) { }
 		};
 		if (images.length < 1) return;
 		if (
@@ -482,7 +495,7 @@ export const EditGallery = ({
 								Remove
 							</button>
 							{profile.profile_image ==
-							image.substring(image.lastIndexOf('/') + 1) ? (
+								image.substring(image.lastIndexOf('/') + 1) ? (
 								<button
 									className="button is-small is-centered mt-3 is-primary is-outlined"
 									id={image}

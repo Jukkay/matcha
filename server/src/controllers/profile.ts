@@ -30,7 +30,8 @@ const newProfile = async (req: Request, res: Response) => {
 			profile_image,
 			name,
 		} = req.body;
-		let { latitude, longitude } = req.body;
+		let { latitude, longitude }: { latitude: string; longitude: string } =
+			req.body;
 
 		// Get user_id
 		const user_id = await decodeUserFromAccesstoken(req);
@@ -40,9 +41,9 @@ const newProfile = async (req: Request, res: Response) => {
 			});
 		// Get and locate IP
 		if (!latitude || !longitude) {
-			const location = await locateIP(user_id, req);
-			latitude = location?.ll[0] || '60.16952';
-			longitude = location?.ll[1] || '24.93545';
+			const location = await locateIP(req);
+			latitude = location?.ll[0].toString() || '60.16952';
+			longitude = location?.ll[1].toString() || '24.93545';
 		}
 		// Check for duplicate profile
 		const duplicateCheck = `
@@ -228,8 +229,8 @@ const updateProfile = async (req: Request, res: Response) => {
 			user_latitude,
 			user_longitude,
 		} = req.body;
-		let { latitude, longitude } = req.body;
-
+		let { latitude, longitude }: { latitude: string; longitude: string } =
+			req.body;
 		const sql = `
 		UPDATE 
 			profiles 
@@ -256,11 +257,12 @@ const updateProfile = async (req: Request, res: Response) => {
 			return res.status(401).json({
 				message: 'Unauthorized',
 			});
+
 		// Get and locate IP
 		if (!latitude || !longitude) {
-			const location = await locateIP(user_id, req);
-			latitude = location?.ll[0] || '60.16952';
-			longitude = location?.ll[1] || '24.93545';
+			const location = await locateIP(req);
+			latitude = location?.ll[0].toString() || '60.16952';
+			longitude = location?.ll[1].toString() || '24.93545';
 		}
 		const response = await execute(sql, [
 			country,
@@ -319,6 +321,11 @@ const deleteProfile = async (req: Request, res: Response) => {
 		if (user_id != decoded_user_id)
 			return res.status(400).json({
 				message: 'ID mismatch. Are you doing something shady?',
+			});
+		// Prevent testusers from from deleting the profiles
+		if (user_id == '5001' || user_id == '5003')
+			return res.status(400).json({
+				message: 'You cannot delete our test user profiles, sorry.',
 			});
 		// Get filenames
 		let sql = `

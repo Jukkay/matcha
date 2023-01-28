@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-import { getSecret } from 'docker-secret';
 import { IEmailToken } from '../interfaces/token';
 import { execute } from '../utilities/SQLConnect';
 import { verifyJWT } from '../utilities/promisifyJWT';
 import bcryptjs from 'bcryptjs';
+import { getServerToken } from '../utilities/checkENV';
 
 export const resetPassword = async (req: Request, res: Response) => {
 	try {
@@ -25,7 +25,7 @@ export const resetPassword = async (req: Request, res: Response) => {
 				message: 'Missing password',
 			});
 		}
-		const server_token = getSecret('server_token');
+		const server_token = getServerToken()
 		const decoded = await verifyJWT(token, server_token);
 		if (!decoded)
 			return res.status(401).json({

@@ -14,7 +14,7 @@ export const updateLocation = async (req: Request, res: Response) => {
 			});
 		// Get and locate IP
 		if (!latitude || !longitude) {
-			const location = await locateIP(user_id, req);
+			const location = await locateIP(req);
 			latitude = location?.ll[0] || '60.16952';
 			longitude = location?.ll[1] || '24.93545';
 		}

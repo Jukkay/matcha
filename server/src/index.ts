@@ -11,7 +11,6 @@ import {
 	sendPasswordReset,
 } from './controllers/mailer';
 import * as SQLConnect from './utilities/SQLConnect';
-import { getURL } from './utilities/getURL';
 import {
 	blockUser,
 	login,
@@ -32,13 +31,14 @@ import {
 	saveNotificationToDatabase,
 } from './controllers/notification';
 import { getProfilesUserLikes } from './controllers/like';
-import { getSecret } from 'docker-secret';
 import jwt, { VerifyErrors } from 'jsonwebtoken';
 import { updateLocation } from './controllers/updateLocation';
 import { IOnlineUser } from './interfaces/token';
 import { updateProfileImage } from './controllers/updateProfileImage';
+import { checkENV, getClientURL, getPort, getServerToken } from './utilities/checkENV';
 
-const server_token = getSecret('server_token');
+// Check environmental variables
+checkENV()
 
 const app: express.Application = express();
 
@@ -53,14 +53,14 @@ app.use(cors());
 app.use('/images', express.static('./images'));
 
 // Server start
-const httpServer = app.listen(process.env.PORT, () => {
-	console.log(`API running at ${getURL()}`);
+const httpServer = app.listen(getPort(), () => {
+	console.log(`API running in port ${getPort()}`);
 });
 
 // Socket.io initialization
 const io = new Server(httpServer, {
 	cors: {
-		origin: 'http://localhost:3000',
+		origin: getClientURL(),
 		methods: ['GET', 'POST'],
 	},
 });
@@ -109,7 +109,7 @@ io.use((socket, next) => {
 	if (!token || !user_id) {
 		return next(new Error('Unauthorized'));
 	}
-	jwt.verify(token, server_token, (err: VerifyErrors | null) => {
+	jwt.verify(token, getServerToken(), (err: VerifyErrors | null) => {
 		if (err) {
 			return next(new Error('Unauthorized'));
 		}
@@ -169,7 +169,7 @@ io.on('connection', (socket) => {
 });
 
 // *** Endpoints without JWT auth ***
-app.get('/', (req: express.Request, res: express.Response) => {
+app.get('/', (_req: express.Request, res: express.Response) => {
 	res.send('backend server is running');
 });
 

@@ -1,9 +1,10 @@
 import createResetMessage from './createResetMessage';
-import { getSecret } from 'docker-secret';
 import { signEmailToken } from '../utilities/promisifyJWT';
 import nodemailer from 'nodemailer';
-const mailUser: string = process.env.MAIL_USER || 'jukkacamagru@outlook.com';
-const password: string = getSecret('outlook_password');
+import { getEmailPassword, getEmailUser } from './checkENV';
+
+const mailUser: string = getEmailUser()
+const password: string = getEmailPassword();
 
 export const sendPasswordResetEmail = async (email: string) => {
 	try {

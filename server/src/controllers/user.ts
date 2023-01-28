@@ -130,12 +130,10 @@ export const login = async (req: Request, res: Response) => {
 				refreshToken: refreshToken,
 			});
 		}
-	} catch (error) {
-		let errorMessage;
-		if (error instanceof Error) errorMessage = error.message;
-		else errorMessage = 'Login failed. Unknown error.';
+	} catch (err) {
+		console.error(err);
 		return res.status(500).json({
-			message: errorMessage,
+			message: 'Something went wrong',
 		});
 	}
 };
@@ -220,6 +218,12 @@ const deleteUser = async (req: Request, res: Response) => {
 			return res.status(400).json({
 				message: 'ID mismatch. Are you doing something shady?',
 			});
+		// Prevent testusers from from deleting the users
+		if (user_id == '5001' || user_id == '5003')
+			return res.status(400).json({
+				message: 'You cannot delete our test users, sorry.',
+			});
+
 		// Remove profile
 		let sql = `
 			DELETE FROM 
@@ -361,6 +365,11 @@ const updateUser = async (req: Request, res: Response) => {
 		const validationResponse = await validateUpdateUser(req, user_id);
 		if (!validationResponse.valid)
 			return res.status(400).json(validationResponse);
+		// Prevent testusers from updating the user info
+		if (user_id == '5001' || user_id == '5003')
+			return res.status(400).json({
+				message: 'You cannot update info on our test user accounts, sorry.',
+			});
 		const { username, password, name, email, birthday } = req.body;
 		let sql = `
 			UPDATE 

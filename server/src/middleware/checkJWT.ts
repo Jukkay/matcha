@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { getSecret } from 'docker-secret';
 import jwt from 'jsonwebtoken';
+import { getServerToken } from '../utilities/checkENV';
 
-const server_token = getSecret('server_token');
+const server_token = getServerToken()
 
 const checkJWT = (req: Request, res: Response, next: NextFunction) => {
 	try {

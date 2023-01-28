@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `users`(
 	birthday DATE NOT NULL,
 	username VARCHAR(32) NOT NULL UNIQUE,
 	`password` VARCHAR(255) NOT NULL,
-	`name` VARCHAR(255) DEFAULT username,
+	`name` VARCHAR(255) DEFAULT (username),
 	email VARCHAR(320) NOT NULL UNIQUE,
 	validated BOOLEAN DEFAULT FALSE,
 	profile_exists BOOLEAN DEFAULT FALSE,

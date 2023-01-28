@@ -1,6 +1,6 @@
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import { getSecret } from 'docker-secret';
 import { RowDataPacket } from 'mysql';
+import { getRefreshToken, getServerToken } from './checkENV';
 
 export const signEmailToken = async (email: string): Promise<string> => {
 	return new Promise((resolve, reject) => {
@@ -9,7 +9,7 @@ export const signEmailToken = async (email: string): Promise<string> => {
 			{
 				email: email,
 			},
-			getSecret('server_token'),
+			getServerToken(),
 			{
 				issuer: '42 Dates',
 				algorithm: 'HS256',
@@ -45,7 +45,7 @@ export const signAccessToken = async (
 			{
 				user_id: user_id,
 			},
-			getSecret('server_token'),
+			getServerToken(),
 			{
 				issuer: '42 Dates',
 				algorithm: 'HS256',
@@ -68,7 +68,7 @@ export const signRefreshToken = async (
 			{
 				user_id: user_id,
 			},
-			getSecret('refresh_token'),
+			getRefreshToken(),
 			{
 				issuer: '42 Dates',
 				algorithm: 'HS256',

@@ -8,7 +8,7 @@ services:
     working_dir: "/client"
     entrypoint: "/bin/bash -c"
     command:
-      - "pnpm dev"
+      - "npm run dev"
     ports:
       - 3000:3000
     environment:
@@ -23,29 +23,29 @@ services:
       - ./server:/server
       - ./config/db/init.sql:/server/config/init.sql
     working_dir: "/server"
-    secrets:
-        - mysql_password
-        - outlook_password
-        - server_token
-        - refresh_token
     environment:
+        SERVER_TOKEN: RandomServerTokenSecret
+        REFRESH_TOKEN: RandomRefreshTokenSecret
         MYSQL_HOST: mariadb
         MYSQL_DATABASE: matcha
         MYSQL_USER: matcha
-        MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+        MYSQL_ROOT_PASSWORD: RandomRootPassword
+        MYSQL_PASSWORD: RandomPassword
         MYSQL_CONNECTION_LIMIT: 5
         DOMAIN_NAME: localhost
         PORT: 4000
-        MAIL_USER: jukkacamagru@outlook.com
         PROTOCOL: http
         CLIENT_URL: http://localhost:3000
         IMG_PATH: "./images/"
+        ADMIN_EMAIL: admins.email@address.com
+        ## Must give these for email verification to work
+        MAIL_USER: your.outlook.email@address.com
+        OUTLOOK_PASSWORD: yourOutlookPassword
     entrypoint: "/bin/bash -c"
     command:
       - "npm start"
     ports:
       - 4000:4000
-
   mariadb:
     image: 'mariadb'
     container_name: 'matcha_db'
@@ -55,14 +55,11 @@ services:
         - ./config/db/init.sql:/server/config/init.sql
         - ./config/db/my.cnf:/etc/mysql/my.cnf
     command: --init-file /server/config/init.sql
-    secrets:
-        - mysql_password
-        - mysql_root_password
     environment:
         MYSQL_DATABASE: matcha
         MYSQL_USER: matcha
-        MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
-        MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+        MYSQL_ROOT_PASSWORD: RandomRootPassword
+        MYSQL_PASSWORD: RandomPassword
     ports:
         - '8083:3306'
     restart: always
@@ -76,25 +73,9 @@ services:
           - 8081:80
       environment:
           PMA_HOST: mariadb
-secrets:
-    mysql_password:
-        file: ./config/secrets/mysql_password.secret
-    mysql_root_password:
-        file: ./config/secrets/mysql_root_password.secret
-    server_token:
-        file: ./config/secrets/server_token.secret
-    refresh_token:
-        file: ./config/secrets/refresh_token.secret
-    outlook_password:
-        file: ./config/secrets/outlook_password.secret
 volumes:
     mariadb-data:
         name: matcha-data
-
-# Create secrets with:
-# printf "%s" "$(openssl rand -base64 20)" > mysql_password.secret
-# printf "%s" "$(openssl rand -base64 20)" > mysql_root_password.secret
-# printf "%s" "$(openssl rand -base64 10)" > server_token.secret
 
 # Launch with:
 #   make production

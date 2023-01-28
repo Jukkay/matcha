@@ -1,14 +1,15 @@
-import { getSecret } from 'docker-secret';
 import nodemailer from 'nodemailer';
+import { getAdminEmail, getEmailPassword, getEmailUser } from './checkENV';
 import createReportMessage from './createReportMessage';
-const mailUser: string = process.env.MAIL_USER || 'jukkacamagru@outlook.com';
-const password: string = getSecret('outlook_password');
+
+const mailUser: string = getEmailUser()
+const password: string = getEmailPassword()
 
 export const sendReportMessage = async (
 	report_id: number,
 	report_reason: number
 ) => {
-	const adminEmail = 'jukkacamagru@outlook.com';
+	const adminEmail = getAdminEmail()
 	try {
 		const message = createReportMessage(report_id, report_reason);
 		const transporter = nodemailer.createTransport({

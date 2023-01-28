@@ -65,6 +65,7 @@ const LoggedIn = () => {
 		email: 'Invalid email address',
 		name: 'Invalid name',
 	});
+	const [genericErrorMessage, setGenericErrorMessage] = useState('')
 
 	// Data for input fields
 	const inputs = [
@@ -311,6 +312,7 @@ const LoggedIn = () => {
 				setErrors({ ...errors, [errorField]: true });
 			}
 			if (errorMessage && !errorField) {
+				setGenericErrorMessage(errorMessage)
 				setShowGenericError(true);
 			}
 		} finally {
@@ -337,7 +339,13 @@ const LoggedIn = () => {
 					sessionStorage?.removeItem('profile');
 				}, 2000);
 			}
-		} catch (err) {}
+		} catch (err: any) {
+			const errorMessage = err.response?.data?.message;
+			if (errorMessage) {
+				setGenericErrorMessage(errorMessage)
+				setShowGenericError(true);
+			}
+		}
 	};
 
 	// Component
@@ -396,7 +404,7 @@ const LoggedIn = () => {
 						</div>
 					</form>
 					<Notification
-						notificationText="Server error. Please try again later."
+						notificationText={genericErrorMessage}
 						notificationState={showGenericError}
 						handleClick={() => setShowGenericError(false)}
 					/>

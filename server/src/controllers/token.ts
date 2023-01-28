@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
-import { getSecret } from 'docker-secret';
 import { IAccesstoken, IEmailToken } from '../interfaces/token';
 import { execute } from '../utilities/SQLConnect';
 import { signAccessToken, verifyJWT } from '../utilities/promisifyJWT';
+import { getRefreshToken, getServerToken } from '../utilities/checkENV';
 
 export const verifyEmailToken = async (req: Request, res: Response) => {
 	try {
 		const { token } = req.body;
-		const server_token = getSecret('server_token');
+		const server_token = getServerToken()
 		if (!token) {
 			return res.status(400).json({
 				message: 'No token provided',
@@ -40,7 +40,7 @@ export const verifyEmailToken = async (req: Request, res: Response) => {
 export const refreshToken = async (req: Request, res: Response) => {
 	try {
 		const { user_id, token } = req.body;
-		const refresh_token = getSecret('refresh_token');
+		const refresh_token = getRefreshToken();
 		if (!token || !token) {
 			return res.status(400).json({
 				error: 'Incomplete information',
@@ -145,7 +145,7 @@ export const deleteRefreshToken = async (refreshToken: string) => {
 export const decodeUserFromAccesstoken = async (req: Request) => {
 	try {
 		const accessToken = req.headers.authorization?.split(' ')[1];
-		const server_token = getSecret('server_token');
+		const server_token = getServerToken();
 		if (!accessToken || !server_token) return;
 		const decoded = await verifyJWT(accessToken, server_token);
 		if (!decoded) return;

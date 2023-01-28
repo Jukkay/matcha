@@ -12,11 +12,11 @@ create: create-client create-server create-db
 up:
 	docker-compose up
 
-up-production:
-	docker compose -f docker-compose.yml -f production.yml up
+up-detached:
+	docker-compose up -d
 
 up-production-detached:
-	docker compose -f docker-compose.yml -f production.yml up -d
+	docker compose -f docker-compose.yml -f production.yml up
 
 restart:
 	docker-compose up -d
@@ -26,22 +26,22 @@ down:
 
 clean:
 	docker-compose down --remove-orphans
-	rm -rf client/.next
+	sudo rm -rf client/.next
 
 clean-modules:
-	rm -rf client/.next
-	rm -rf client/.pnpm-store
-	rm -rf client/node_modules
-	rm -rf server/node_modules
+	sudo rm -rf client/.next
+	sudo rm -rf client/.pnpm-store
+	sudo rm -rf client/node_modules
+	sudo rm -rf server/node_modules
 
 build:
-	docker-compose run --rm client "pnpm build"
+	docker-compose run --rm client "npm run build"
 
 install-client:
-	docker-compose run --rm client "pnpm install"
+	docker-compose run --rm client "npm install"
 
 install-client-production:
-	docker-compose run --rm client "pnpm i -P"
+	docker-compose run --rm client "npm install --omit=dev"
 
 install-server:
 	docker-compose run --rm server "npm install"
@@ -73,4 +73,17 @@ fclean: clean reset-db
 users:
 	docker-compose exec server npm run createusers
 
-production: install-production build up-production-detached users logs
+production: install build up-production-detached users logs
+
+clean-docker:
+	docker rm -f matcha_client
+	docker rm -f matcha_server
+	docker rm -f matcha_db
+	docker image rm -f matcha-client
+	docker image rm -f matcha-server
+	docker image rm -f mariadb
+	docker container prune -f
+	docker volume prune -f
+	docker image prune -f
+
+re: clean-docker up

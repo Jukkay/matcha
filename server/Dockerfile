@@ -1,7 +1,10 @@
 FROM node
 
-COPY package.json ./
-RUN npm install --loglevel=error
-
-EXPOSE 3000
+WORKDIR /server
+ADD package.json ./
+RUN npm install
+ADD . ./
+RUN npx tsc
+RUN npm install --omit=dev
+EXPOSE 4000
 CMD [ "npm", "start" ]
