@@ -1,3 +1,5 @@
+matcha: install build up-production-detached users logs
+
 create-client:
 	docker-compose up -d --force-recreate client
 
@@ -35,19 +37,20 @@ clean-modules:
 	sudo rm -rf server/node_modules
 
 build:
-	docker-compose run --rm client "npm run build"
+	docker-compose run client "npm run build"
+	docker-compose run server "npm run build"
 
 install-client:
-	docker-compose run --rm client "npm install"
+	docker-compose run client "npm install"
 
 install-client-production:
-	docker-compose run --rm client "npm install --omit=dev"
+	docker-compose run client "npm install --omit=dev"
 
 install-server:
-	docker-compose run --rm server "npm install"
+	docker-compose run server "npm install"
 
 install-server-production:
-	docker-compose run --rm server "npm install --omit=dev"
+	docker-compose run server "npm install --omit=dev"
 
 install: install-client install-server
 
@@ -73,12 +76,11 @@ fclean: clean reset-db
 users:
 	docker-compose exec server npm run createusers
 
-production: install build up-production-detached users logs
-
 clean-docker:
 	docker rm -f matcha_client
 	docker rm -f matcha_server
 	docker rm -f matcha_db
+	docker rm -f phpmyadmin
 	docker image rm -f matcha-client
 	docker image rm -f matcha-server
 	docker image rm -f mariadb
