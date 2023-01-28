@@ -8,7 +8,7 @@ https://matcha-app.fly.dev/
 42 Dates is a dating app I built for a project called Matcha at
 Hive Helsinki Coding School. The app is built with React
 on Next.js create-next-app. Backend is using Node and
-Express with MariaDB database. Userbase has about 3800
+Express with MariaDB database. Userbase has about 4000
 dummy users created using Random User Generator API and
 Node script, so unfortunately this is not the place to
 find real love.
@@ -72,20 +72,16 @@ Username: ```testuser1``` OR ```testuser2```
 
 Password: ```Password1```
 
+The test users have full functionality but cannot change user information, or delete profile or account.
+
 ## How can I run it locally?
 
-If you'd prefer to run it locally, follow these instructions:
+Running the project locally requires:
+* Docker to run the containers
+* Cmake to use build script.
 
-1. Go to config/secrets folder and create secrets with:
-```
-printf "%s" "$(openssl rand -base64 20)" > mysql_password.secret
-printf "%s" "$(openssl rand -base64 20)" > mysql_root_password.secret
-printf "%s" "$(openssl rand -base64 10)" > server_token.secret
-```
-2. Add your outlook password to outlook_password.secret file
-3. Add you outlook email address to MAIL_USER environment variable in docker-compose.yml
-4. Build the project with ```make production```
-5. Create dummy users with ```make users```
-6. Browse to [http://localhost:3000](http://localhost:3000)
-7. Create your test users. (Email validation is required)
+1. Go to the file docker-compose.yml and fill in the environmental variables OUTLOOK_PASSWORD and MAIL_USER. These are required for the email verification to work. 
+2. Build the project with ```make production```
+3. Browse to [http://localhost:3000](http://localhost:3000)
 
+Note. Users created manually after running the random users script have the same limitation as the test users above if their user ids happen to be the same. To avoid losing this functionality, change the auto increment starting value on users table. Log in to your database and run ```ALTER TABLE users AUTO_INCREMENT=5004;```
