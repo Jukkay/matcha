@@ -76,12 +76,30 @@ The test users have full functionality but cannot change user information, or de
 
 ## How can I run it locally?
 
-Running the project locally requires:
-* Docker to run the containers
-* Cmake to use build script.
+Prerequisites:
+* [Docker](https://docker.com) must be installed
+* [Make](https://www.gnu.org/software/make/) is optional but highly recommended `sudo apt-get update && sudo apt-get -y install make`
 
-1. Go to the file docker-compose.yml and fill in the environmental variables OUTLOOK_PASSWORD and MAIL_USER. These are required for the email verification to work. 
-2. Build the project with ```make production```
-3. Browse to [http://localhost:3000](http://localhost:3000)
+Using make:
+
+1. Clone the dev branch of this repository `git clone git@github.com:Jukkay/matcha.git matcha`
+2. Move to the created directory `cd matcha`
+3. Go to the file docker-compose.yml and fill in the environmental variables OUTLOOK_PASSWORD and MAIL_USER. These are required for the email verification to work. 
+4. Use command line `make production` to start install script
+5. When the script is complete, the app can be accessed at http://localhost:3000
+
+OR 
+
+Using docker-compose:
+
+1. Clone the dev branch of this repository `git clone git@github.com:Jukkay/matcha.git matcha`
+2. Go to the file docker-compose.yml and fill in the environmental variables OUTLOOK_PASSWORD and MAIL_USER. These are required for the email verification to work. 
+3. Use command line `docker-compose run --rm matcha_client "npm install"` to install client packages
+4. Use command line `docker-compose run --rm matcha_server "npm install"` to install server packages
+5. Use command line `docker-compose run --rm matcha_client "npm run build"` to build the project
+6. Use command line `docker compose -f docker-compose.yml -f production.yml up -d` to start the containers detached
+7. Use command line `docker-compose exec matcha_server node dist/config/randomusers.js` to create random users
+8. Use command line `docker-compose logs -f` to see the back end log (optional)
+9. The app can be accessed at http://localhost:3000
 
 Note. Users created manually after running the random users script have the same limitation as the test users above if their user ids happen to be the same. To avoid losing this functionality, change the auto increment starting value on users table. Log in to your database and run ```ALTER TABLE users AUTO_INCREMENT=5004;```
