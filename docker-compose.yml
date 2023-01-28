@@ -21,7 +21,6 @@ services:
       - mariadb
     volumes:
       - ./server:/server
-      - ./config/db/init.sql:/server/config/init.sql
     working_dir: "/server"
     environment:
         SERVER_TOKEN: RandomServerTokenSecret
@@ -36,7 +35,7 @@ services:
         PORT: 4000
         PROTOCOL: http
         CLIENT_URL: http://localhost:3000
-        IMG_PATH: "./images/"
+        IMG_PATH: "/server/images/"
         ADMIN_EMAIL: admins.email@address.com
         ## Must give these for email verification to work
         MAIL_USER: your.outlook.email@address.com
