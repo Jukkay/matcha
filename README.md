@@ -95,8 +95,8 @@ Using docker-compose:
 1. Clone the dev branch of this repository `git clone git@github.com:Jukkay/matcha.git matcha`
 2. Go to the file docker-compose.yml and fill in the environmental variables OUTLOOK_PASSWORD and MAIL_USER. These are required for the email verification to work. 
 3. Use command line `docker-compose run client "npm run build"` to build the app
-4. Use command line `docker-compose run server "npx tsc"` to build the server
-7. Use command line `docker compose -f docker-compose.yml -f production.yml up -d` to start the containers detached
+4. Use command line `docker-compose run server "npm run build"` to build the server
+7. Use command line `docker-compose -f docker-compose.yml -f production.yml up -d` to start the containers detached
 8. Use command line `docker-compose exec server node dist/config/randomusers.js` to create random users
 9. Use command line `docker-compose logs -f` to attach to logs (optional)
 10. The app can be accessed at http://localhost:3000
